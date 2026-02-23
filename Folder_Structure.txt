@@ -1,0 +1,260 @@
+This Structure CAN BE CHANGED according to our needs
+
+src/
+├── app/
+│   ├── (auth)/
+│   │   ├── login/
+│   │   │   └── page.tsx
+│   │   ├── register/
+│   │   │   └── page.tsx
+│   │   ├── forgot-password/
+│   │   │   └── page.tsx
+│   │   └── layout.tsx
+│   ├── (main)/
+│   │   ├── profile/
+│   │   │   ├── [username]/
+│   │   │   │   └── page.tsx
+│   │   │   ├── edit/
+│   │   │   │   └── page.tsx
+│   │   │   └── page.tsx
+│   │   ├── feed/
+│   │   │   └── page.tsx
+│   │   ├── search/
+│   │   │   └── page.tsx
+│   │   ├── track/
+│   │   │   ├── [id]/
+│   │   │   │   └── page.tsx
+│   │   │   └── upload/
+│   │   │       └── page.tsx
+│   │   ├── playlist/
+│   │   │   ├── [id]/
+│   │   │   │   └── page.tsx
+│   │   │   └── create/
+│   │   │       └── page.tsx
+│   │   ├── messages/
+│   │   │   ├── [userId]/
+│   │   │   │   └── page.tsx
+│   │   │   └── page.tsx
+│   │   ├── notifications/
+│   │   │   └── page.tsx
+│   │   ├── admin/
+│   │   │   ├── dashboard/
+│   │   │   │   └── page.tsx
+│   │   │   ├── reports/
+│   │   │   │   └── page.tsx
+│   │   │   └── page.tsx
+│   │   ├── subscription/
+│   │   │   └── page.tsx
+│   │   └── layout.tsx
+│   ├── api/
+│   │   └── auth/
+│   │       └── [...nextauth]/
+│   │           └── route.ts
+│   ├── favicon.ico
+│   ├── globals.css
+│   ├── layout.tsx
+│   └── page.tsx
+│
+├── components/
+│   ├── ui/
+│   │   ├── Button.tsx
+│   │   ├── Input.tsx
+│   │   ├── Modal.tsx
+│   │   ├── Avatar.tsx
+│   │   ├── Badge.tsx
+│   │   ├── Dropdown.tsx
+│   │   ├── Tabs.tsx
+│   │   └── Spinner.tsx
+│   └── layout/
+│       ├── Navbar.tsx
+│       ├── Sidebar.tsx
+│       ├── Footer.tsx
+│       └── PlayerBar.tsx
+│
+├── modules/
+│   │
+│   ├── auth/                           # Module 1
+│   │   ├── components/
+│   │   │   ├── LoginForm.tsx
+│   │   │   ├── RegisterForm.tsx
+│   │   │   ├── SocialLoginButton.tsx
+│   │   │   └── ForgotPasswordForm.tsx
+│   │   ├── hooks/
+│   │   │   └── useAuth.ts
+│   │   ├── services/
+│   │   │   └── auth.service.ts
+│   │   ├── types/
+│   │   │   └── auth.types.ts
+│   │   └── index.ts
+│   │
+│   ├── profile/                        # Module 2
+│   │   ├── components/
+│   │   │   ├── ProfileHeader.tsx
+│   │   │   ├── ProfileEditForm.tsx
+│   │   │   ├── AvatarUpload.tsx
+│   │   │   ├── CoverPhotoUpload.tsx
+│   │   │   ├── SocialLinksForm.tsx
+│   │   │   └── GenreTagSelector.tsx
+│   │   ├── hooks/
+│   │   │   └── useProfile.ts
+│   │   ├── services/
+│   │   │   └── profile.service.ts
+│   │   ├── types/
+│   │   │   └── profile.types.ts
+│   │   └── index.ts
+│   │
+│   ├── social/                         # Module 3
+│   │   ├── components/
+│   │   │   ├── FollowButton.tsx
+│   │   │   ├── FollowersList.tsx
+│   │   │   ├── FollowingList.tsx
+│   │   │   ├── SuggestedUsers.tsx
+│   │   │   └── BlockedUsersList.tsx
+│   │   ├── hooks/
+│   │   │   └── useSocial.ts
+│   │   ├── services/
+│   │   │   └── social.service.ts
+│   │   ├── types/
+│   │   │   └── social.types.ts
+│   │   └── index.ts
+│   │
+│   ├── tracks/                         # Module 4
+│   │   ├── components/
+│   │   │   ├── TrackUploadForm.tsx
+│   │   │   ├── TrackCard.tsx
+│   │   │   ├── TrackMetadataForm.tsx
+│   │   │   ├── WaveformDisplay.tsx
+│   │   │   └── TrackVisibilityToggle.tsx
+│   │   ├── hooks/
+│   │   │   └── useTracks.ts
+│   │   ├── services/
+│   │   │   └── tracks.service.ts
+│   │   ├── types/
+│   │   │   └── tracks.types.ts
+│   │   └── index.ts
+│   │
+│   ├── player/                         # Module 5
+│   │   ├── components/
+│   │   │   ├── PlayerControls.tsx
+│   │   │   ├── ProgressBar.tsx
+│   │   │   ├── VolumeControl.tsx
+│   │   │   └── PlayerQueue.tsx
+│   │   ├── hooks/
+│   │   │   └── usePlayer.ts
+│   │   ├── services/
+│   │   │   └── player.service.ts
+│   │   ├── types/
+│   │   │   └── player.types.ts
+│   │   └── index.ts
+│   │
+│   ├── engagement/                     # Module 6
+│   │   ├── components/
+│   │   │   ├── LikeButton.tsx
+│   │   │   ├── RepostButton.tsx
+│   │   │   ├── CommentSection.tsx
+│   │   │   ├── CommentItem.tsx
+│   │   │   └── EngagementList.tsx
+│   │   ├── hooks/
+│   │   │   └── useEngagement.ts
+│   │   ├── services/
+│   │   │   └── engagement.service.ts
+│   │   ├── types/
+│   │   │   └── engagement.types.ts
+│   │   └── index.ts
+│   │
+│   ├── playlists/                      # Module 7
+│   │   ├── components/
+│   │   │   ├── PlaylistCard.tsx
+│   │   │   ├── PlaylistCreateForm.tsx
+│   │   │   ├── PlaylistEditForm.tsx
+│   │   │   ├── TrackSequencer.tsx
+│   │   │   └── EmbedCodeGenerator.tsx
+│   │   ├── hooks/
+│   │   │   └── usePlaylists.ts
+│   │   ├── services/
+│   │   │   └── playlists.service.ts
+│   │   ├── types/
+│   │   │   └── playlists.types.ts
+│   │   └── index.ts
+│   │
+│   ├── discovery/                      # Module 8
+│   │   ├── components/
+│   │   │   ├── ActivityFeed.tsx
+│   │   │   ├── SearchBar.tsx
+│   │   │   ├── SearchResults.tsx
+│   │   │   └── TrendingCharts.tsx
+│   │   ├── hooks/
+│   │   │   └── useDiscovery.ts
+│   │   ├── services/
+│   │   │   └── discovery.service.ts
+│   │   ├── types/
+│   │   │   └── discovery.types.ts
+│   │   └── index.ts
+│   │
+│   ├── messages/                       # Module 9
+│   │   ├── components/
+│   │   │   ├── ConversationList.tsx
+│   │   │   ├── MessageThread.tsx
+│   │   │   ├── MessageInput.tsx
+│   │   │   └── TrackPreviewCard.tsx
+│   │   ├── hooks/
+│   │   │   └── useMessages.ts
+│   │   ├── services/
+│   │   │   └── messages.service.ts
+│   │   ├── types/
+│   │   │   └── messages.types.ts
+│   │   └── index.ts
+│   │
+│   ├── notifications/                  # Module 10
+│   │   ├── components/
+│   │   │   ├── NotificationList.tsx
+│   │   │   ├── NotificationItem.tsx
+│   │   │   └── NotificationBadge.tsx
+│   │   ├── hooks/
+│   │   │   └── useNotifications.ts
+│   │   ├── services/
+│   │   │   └── notifications.service.ts
+│   │   ├── types/
+│   │   │   └── notifications.types.ts
+│   │   └── index.ts
+│   │
+│   ├── moderation/                     # Module 11
+│   │   ├── components/
+│   │   │   ├── ReportForm.tsx
+│   │   │   ├── AdminTrackTable.tsx
+│   │   │   ├── AdminUserTable.tsx
+│   │   │   └── AnalyticsDashboard.tsx
+│   │   ├── hooks/
+│   │   │   └── useModeration.ts
+│   │   ├── services/
+│   │   │   └── moderation.service.ts
+│   │   ├── types/
+│   │   │   └── moderation.types.ts
+│   │   └── index.ts
+│   │
+│   └── subscription/                  # Module 12
+│       ├── components/
+│       │   ├── PricingCard.tsx
+│       │   ├── SubscriptionForm.tsx
+│       │   └── UploadLimitBanner.tsx
+│       ├── hooks/
+│       │   └── useSubscription.ts
+│       ├── services/
+│       │   └── subscription.service.ts
+│       ├── types/
+│       │   └── subscription.types.ts
+│       └── index.ts
+│
+├── lib/
+│   ├── api.ts
+│   └── utils.ts
+│
+├── hooks/
+│   └── useDebounce.ts
+│
+├── store/
+│   ├── authStore.ts
+│   └── playerStore.ts
+│
+└── types/
+    └── index.ts
