@@ -41,6 +41,13 @@ Create your branch from main using this naming convention:
 git checkout -b login-form
 ```
 
+**Examples:**
+```
+JD/login-form
+SA/profile-header
+MK/audio-upload
+```
+
 ### 3. Work on your feature
 Make your changes, then stage and commit using the commit convention below.
 
@@ -88,21 +95,6 @@ git commit -m "OM - profile-header - v1"
 
 ---
 
-## Branch Naming Convention
-
-```
-{INITIALS}/{feature-name}
-```
-
-**Examples:**
-```
-JD/login-form
-SA/profile-header
-MK/audio-upload
-```
-
----
-
 ## Full Example Workflow
 
 ```bash
@@ -127,8 +119,8 @@ git push origin JD/login-form
 
 
 
-
-
+---
+##
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
