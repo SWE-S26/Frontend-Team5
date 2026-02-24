@@ -1,80 +1,80 @@
-This Structure CAN BE CHANGED according to our needs
-
 src/
 ├── app/
-│   ├── (auth)/
-│   │   ├── login/
-│   │   │   └── page.tsx
-│   │   ├── register/
-│   │   │   └── page.tsx
-│   │   ├── forgot-password/
-│   │   │   └── page.tsx
+│   ├── (landing)/
+│   │   ├── page.tsx                        # Landing page (not logged in)
 │   │   └── layout.tsx
+│   │
 │   ├── (main)/
-│   │   ├── profile/
-│   │   │   ├── [username]/
-│   │   │   │   └── page.tsx
-│   │   │   ├── edit/
-│   │   │   │   └── page.tsx
-│   │   │   └── page.tsx
+│   │   ├── layout.tsx                      # Navbar + RightSidebar + PlayerBar
+│   │   ├── home/
+│   │   │   └── page.tsx                    # Home tab (after login)
 │   │   ├── feed/
-│   │   │   └── page.tsx
-│   │   ├── search/
-│   │   │   └── page.tsx
-│   │   ├── track/
-│   │   │   ├── [id]/
-│   │   │   │   └── page.tsx
-│   │   │   └── upload/
-│   │   │       └── page.tsx
-│   │   ├── playlist/
-│   │   │   ├── [id]/
-│   │   │   │   └── page.tsx
-│   │   │   └── create/
-│   │   │       └── page.tsx
-│   │   ├── messages/
-│   │   │   ├── [userId]/
-│   │   │   │   └── page.tsx
-│   │   │   └── page.tsx
-│   │   ├── notifications/
-│   │   │   └── page.tsx
-│   │   ├── admin/
-│   │   │   ├── dashboard/
-│   │   │   │   └── page.tsx
-│   │   │   ├── reports/
-│   │   │   │   └── page.tsx
-│   │   │   └── page.tsx
-│   │   ├── subscription/
-│   │   │   └── page.tsx
-│   │   └── layout.tsx
-│   ├── api/
-│   │   └── auth/
-│   │       └── [...nextauth]/
-│   │           └── route.ts
-│   ├── favicon.ico
+│   │   │   └── page.tsx                    # Feed tab
+│   │   ├── library/
+│   │   │   ├── page.tsx                    # Library → Overview tab
+│   │   │   ├── likes/
+│   │   │   │   └── page.tsx                # Library → Likes tab
+│   │   │   ├── playlists/
+│   │   │   │   └── page.tsx                # Library → Playlists tab
+│   │   │   ├── albums/
+│   │   │   │   └── page.tsx                # Library → Albums tab
+│   │   │   ├── stations/
+│   │   │   │   └── page.tsx                # Library → Stations tab
+│   │   │   ├── following/
+│   │   │   │   └── page.tsx                # Library → Following tab
+│   │   │   └── history/
+│   │   │       └── page.tsx                # Library → History tab
+│   │   ├── artists/
+│   │   │   └── page.tsx                    # Artists tab + Tracks dropdown shortcut
+│   │   └── (profile-dropdown)/             # Grouped, no effect on URL
+│   │       ├── profile/
+│   │       │   └── [username]/
+│   │       │       └── page.tsx            # URL → /profile/username
+│   │       ├── insights/
+│   │       │   └── page.tsx                # URL → /insights
+│   │       └── distribute/
+│   │           └── page.tsx                # URL → /distribute
+│   │
 │   ├── globals.css
-│   ├── layout.tsx
-│   └── page.tsx
+│   ├── layout.tsx                          # Root layout
+│   └── page.tsx                            # Redirects → /home or landing
+│
 │
 ├── components/
-│   ├── ui/
+│   ├── ui/                                 # Reusable UI primitives
 │   │   ├── Button.tsx
 │   │   ├── Input.tsx
-│   │   ├── Modal.tsx
+│   │   ├── Modal.tsx                       # Auth popup (sign in / sign up)
 │   │   ├── Avatar.tsx
 │   │   ├── Badge.tsx
 │   │   ├── Dropdown.tsx
-│   │   ├── Tabs.tsx
 │   │   └── Spinner.tsx
+│   │
 │   └── layout/
-│       ├── Navbar.tsx
-│       ├── Sidebar.tsx
-│       ├── Footer.tsx
-│       └── PlayerBar.tsx
+│       ├── navbar/
+│       │   ├── Navbar.tsx                  # Main navbar wrapper
+│       │   ├── NavbarLeft.tsx              # Logo + tabs (Home, Feed, Library, Artists)
+│       │   ├── NavbarCenter.tsx            # Search bar
+│       │   ├── NavbarRight.tsx             # Upload, profile pic, notif, msg, ···
+│       │   ├── NavbarProfileDropdown.tsx   # Profile pic dropdown
+│       │   └── NavbarMoreDropdown.tsx      # ··· dropdown
+│       │
+│       ├── player/
+│       │   ├── PlayerBar.tsx               # Player bar wrapper
+│       │   ├── PlayerControls.tsx          # Prev, Play, Next, Shuffle, Repeat
+│       │   ├── PlayerProgress.tsx          # Progress bar + timestamps
+│       │   ├── PlayerVolume.tsx            # Volume + Cast icons
+│       │   ├── PlayerTrackInfo.tsx         # Track image + name + Like, Follow, Queue
+│       │   └── PlayerNextUp.tsx            # "Next Up" popup with queue list
+│       │
+│       ├── RightSidebar.tsx                # Artist tools + suggestions + likes
+│       └── LandingNavbar.tsx               # Navbar for non logged in users
+│
 │
 ├── modules/
-│   │
-│   ├── auth/                           # Module 1
+│   ├── auth/                               # Module 1
 │   │   ├── components/
+│   │   │   ├── AuthModal.tsx               # Sign in / Sign up popup
 │   │   │   ├── LoginForm.tsx
 │   │   │   ├── RegisterForm.tsx
 │   │   │   ├── SocialLoginButton.tsx
@@ -87,163 +87,22 @@ src/
 │   │   │   └── auth.types.ts
 │   │   └── index.ts
 │   │
-│   ├── profile/                        # Module 2
-│   │   ├── components/
-│   │   │   ├── ProfileHeader.tsx
-│   │   │   ├── ProfileEditForm.tsx
-│   │   │   ├── AvatarUpload.tsx
-│   │   │   ├── CoverPhotoUpload.tsx
-│   │   │   ├── SocialLinksForm.tsx
-│   │   │   └── GenreTagSelector.tsx
-│   │   ├── hooks/
-│   │   │   └── useProfile.ts
-│   │   ├── services/
-│   │   │   └── profile.service.ts
-│   │   ├── types/
-│   │   │   └── profile.types.ts
-│   │   └── index.ts
-│   │
-│   ├── social/                         # Module 3
-│   │   ├── components/
-│   │   │   ├── FollowButton.tsx
-│   │   │   ├── FollowersList.tsx
-│   │   │   ├── FollowingList.tsx
-│   │   │   ├── SuggestedUsers.tsx
-│   │   │   └── BlockedUsersList.tsx
-│   │   ├── hooks/
-│   │   │   └── useSocial.ts
-│   │   ├── services/
-│   │   │   └── social.service.ts
-│   │   ├── types/
-│   │   │   └── social.types.ts
-│   │   └── index.ts
-│   │
-│   ├── tracks/                         # Module 4
-│   │   ├── components/
-│   │   │   ├── TrackUploadForm.tsx
-│   │   │   ├── TrackCard.tsx
-│   │   │   ├── TrackMetadataForm.tsx
-│   │   │   ├── WaveformDisplay.tsx
-│   │   │   └── TrackVisibilityToggle.tsx
-│   │   ├── hooks/
-│   │   │   └── useTracks.ts
-│   │   ├── services/
-│   │   │   └── tracks.service.ts
-│   │   ├── types/
-│   │   │   └── tracks.types.ts
-│   │   └── index.ts
-│   │
-│   ├── player/                         # Module 5
-│   │   ├── components/
-│   │   │   ├── PlayerControls.tsx
-│   │   │   ├── ProgressBar.tsx
-│   │   │   ├── VolumeControl.tsx
-│   │   │   └── PlayerQueue.tsx
-│   │   ├── hooks/
-│   │   │   └── usePlayer.ts
-│   │   ├── services/
-│   │   │   └── player.service.ts
-│   │   ├── types/
-│   │   │   └── player.types.ts
-│   │   └── index.ts
-│   │
-│   ├── engagement/                     # Module 6
-│   │   ├── components/
-│   │   │   ├── LikeButton.tsx
-│   │   │   ├── RepostButton.tsx
-│   │   │   ├── CommentSection.tsx
-│   │   │   ├── CommentItem.tsx
-│   │   │   └── EngagementList.tsx
-│   │   ├── hooks/
-│   │   │   └── useEngagement.ts
-│   │   ├── services/
-│   │   │   └── engagement.service.ts
-│   │   ├── types/
-│   │   │   └── engagement.types.ts
-│   │   └── index.ts
-│   │
-│   ├── playlists/                      # Module 7
-│   │   ├── components/
-│   │   │   ├── PlaylistCard.tsx
-│   │   │   ├── PlaylistCreateForm.tsx
-│   │   │   ├── PlaylistEditForm.tsx
-│   │   │   ├── TrackSequencer.tsx
-│   │   │   └── EmbedCodeGenerator.tsx
-│   │   ├── hooks/
-│   │   │   └── usePlaylists.ts
-│   │   ├── services/
-│   │   │   └── playlists.service.ts
-│   │   ├── types/
-│   │   │   └── playlists.types.ts
-│   │   └── index.ts
-│   │
-│   ├── discovery/                      # Module 8
-│   │   ├── components/
-│   │   │   ├── ActivityFeed.tsx
-│   │   │   ├── SearchBar.tsx
-│   │   │   ├── SearchResults.tsx
-│   │   │   └── TrendingCharts.tsx
-│   │   ├── hooks/
-│   │   │   └── useDiscovery.ts
-│   │   ├── services/
-│   │   │   └── discovery.service.ts
-│   │   ├── types/
-│   │   │   └── discovery.types.ts
-│   │   └── index.ts
-│   │
-│   ├── messages/                       # Module 9
-│   │   ├── components/
-│   │   │   ├── ConversationList.tsx
-│   │   │   ├── MessageThread.tsx
-│   │   │   ├── MessageInput.tsx
-│   │   │   └── TrackPreviewCard.tsx
-│   │   ├── hooks/
-│   │   │   └── useMessages.ts
-│   │   ├── services/
-│   │   │   └── messages.service.ts
-│   │   ├── types/
-│   │   │   └── messages.types.ts
-│   │   └── index.ts
-│   │
-│   ├── notifications/                  # Module 10
-│   │   ├── components/
-│   │   │   ├── NotificationList.tsx
-│   │   │   ├── NotificationItem.tsx
-│   │   │   └── NotificationBadge.tsx
-│   │   ├── hooks/
-│   │   │   └── useNotifications.ts
-│   │   ├── services/
-│   │   │   └── notifications.service.ts
-│   │   ├── types/
-│   │   │   └── notifications.types.ts
-│   │   └── index.ts
-│   │
-│   ├── moderation/                     # Module 11
-│   │   ├── components/
-│   │   │   ├── ReportForm.tsx
-│   │   │   ├── AdminTrackTable.tsx
-│   │   │   ├── AdminUserTable.tsx
-│   │   │   └── AnalyticsDashboard.tsx
-│   │   ├── hooks/
-│   │   │   └── useModeration.ts
-│   │   ├── services/
-│   │   │   └── moderation.service.ts
-│   │   ├── types/
-│   │   │   └── moderation.types.ts
-│   │   └── index.ts
-│   │
-│   └── subscription/                  # Module 12
+│   └── profile/                            # Module 2
 │       ├── components/
-│       │   ├── PricingCard.tsx
-│       │   ├── SubscriptionForm.tsx
-│       │   └── UploadLimitBanner.tsx
+│       │   ├── ProfileHeader.tsx           # Cover photo + avatar + name + bio
+│       │   ├── ProfileEditForm.tsx
+│       │   ├── AvatarUpload.tsx
+│       │   ├── CoverPhotoUpload.tsx
+│       │   ├── SocialLinksForm.tsx         # Instagram, Twitter, Website links
+│       │   └── GenreTagSelector.tsx        # Favorite genres tagging
 │       ├── hooks/
-│       │   └── useSubscription.ts
+│       │   └── useProfile.ts
 │       ├── services/
-│       │   └── subscription.service.ts
+│       │   └── profile.service.ts
 │       ├── types/
-│       │   └── subscription.types.ts
+│       │   └── profile.types.ts
 │       └── index.ts
+│
 │
 ├── lib/
 │   ├── api.ts
@@ -253,8 +112,8 @@ src/
 │   └── useDebounce.ts
 │
 ├── store/
-│   ├── authStore.ts
-│   └── playerStore.ts
+│   ├── authStore.ts                        # Logged in/out state
+│   └── playerStore.ts                      # Sticky player state
 │
 └── types/
     └── index.ts
