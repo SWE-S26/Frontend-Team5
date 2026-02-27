@@ -130,7 +130,7 @@ export default function LoginForm({ email, setEmail, onSwitchToRegister }: Login
           onClick={() => !showPasswordStep ? setShowPasswordStep(true) : console.log("Login Action")}
           className={`w-full h-12 font-bold rounded transition-all duration-200 font-sans ${
             (showPasswordStep ? isPasswordEmpty : isEmailEmpty)
-              ? "bg-white/60 text-[#121212] cursor-not-allowed" 
+              ? "bg-white/60 text-[#121212]" 
               : "bg-white text-[#121212] cursor-pointer hover:bg-gray-200"
           }`}
         >

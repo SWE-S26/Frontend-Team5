@@ -1,1 +1,45 @@
 @import "tailwindcss";
+
+:root {
+  /* soundcloud color palete */
+  --chinese-black   : #121212; /* main background color */
+  --silver          : #A0A0A0;
+  --white-smoke     : #f4f4f4;
+  --brilliant-orange: #FF9533;
+  --crusta          : #FF7F34;
+  --papaya          : #FE6D35;
+  --inferno         : #FF5836;
+  --anger           : #FF4137;
+  --gentle-peach    : #FFE9E1;
+}
+
+/* @media is used for dark mode */
+/* @media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+} */
+
+@theme inline {
+  /* soundcloud color palete */
+  /* These colors are added onto the already existing default color list of tailwind 
+     -> normally you say "bg-black"
+     -> for any of colors below such as chinese black you do "bg-chinese-black"
+  */
+  --color-chinese-black   : var(--chinese-black);
+  --color-silver          : var(--silver);
+  --color-white-smoke     : var(--white-smoke);
+  --color-brilliant-orange: var(--brilliant-orange);
+  --color-crusta          : var(--crusta);
+  --color-papaya          : var(--papaya);
+  --color-inferno         : var(--inferno);
+  --color-anger           : var(--anger);
+  --color-gentle-peach    : var(--gentle-peach);
+}
+
+body {
+  background: var(--chinese-black);
+  color: var(--white-smoke);
+  font-family: var(--font-sans);
+}

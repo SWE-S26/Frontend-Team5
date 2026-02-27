@@ -103,7 +103,7 @@ git checkout main
 git pull origin main
 
 # 2. Create your branch
-git checkout -b JD/login-form
+git checkout -b login-form
 
 # 3. Do your work, then stage changes
 git add .
@@ -112,7 +112,7 @@ git add .
 git commit -m "OM - login-form - v1"
 
 # 5. Push branch
-git push origin JD/login-form
+git push origin login-form
 
 # 6. Open a Pull Request on GitHub
 ```
