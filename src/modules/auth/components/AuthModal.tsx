@@ -26,7 +26,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       {/* Close button */}
       <button
         onClick={onClose}
-        className="fixed top-6 right-6 z-[60]
+        className="fixed top-6 right-6 z-60
            w-10 h-10 rounded-full
            flex items-center justify-center
            text-white hover:text-gray-400
@@ -36,7 +36,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
         <IoClose size={32} />
       </button>
 
-      <div className="relative w-full max-w-[420px] p-8 bg-[#111111] rounded-lg shadow-2xl border border-white/10">
+      <div className="relative w-full max-w-105 p-8 bg-[#111111] rounded-lg shadow-2xl border border-white/10">
         {view === "login" ? (
           <LoginForm 
             email={email} 
