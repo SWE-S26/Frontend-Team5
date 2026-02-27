@@ -14,6 +14,7 @@ export default function Card({
   subtitle = "CRISPY CLOUD",
   artist = "Artist station",
 }: CardProps) {
+  // Handler Functions
   function handleCardClick() {
     console.log("Card clicked!");
   }
@@ -36,10 +37,10 @@ export default function Card({
   return (
     <>
       <div className="flex flex-col max-w-40">
-        <div className="relative w-40 aspect-square rounded overflow-hidden group cursor-pointer bg-[#303030] m-1 mb-1.75">
+        <div className="relative w-40 aspect-square rounded group cursor-pointer bg-[#303030] m-1 mb-1.75">
           {img && (
             <div
-              className="absolute inset-0 bg-cover bg-center"
+              className="absolute inset-0 bg-cover bg-center overflow-hidden rounded"
               style={{ backgroundImage: `url(${img})` }}
             />
           )}
@@ -48,22 +49,39 @@ export default function Card({
             <div className="absolute inset-0 bg-white/50 opacity-0 group-hover:opacity-100" />
           )}
 
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full z-20 opacity-0 group-hover:opacity-100 flex items-center justify-center">
+          {/* Play Button */}
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full z-20 opacity-0 group/play group-hover:opacity-100 flex items-center justify-center">
             <IoMdPlay
-              className="text-black text-[38px] ml-1.5 hover:opacity-50"
+              className="text-black text-[38px] ml-1.5 group-hover/play:opacity-50"
               onClick={handlePlayClick}
             />
           </div>
 
-          <HiHeart
-            className="absolute bottom-3.25 right-15 text-black z-10 text-[15px] font-bold opacity-0 group-hover:opacity-100 hover:opacity-50"
-            onClick={handleLikeClick}
-          />
+          {/* Like Button */}
+          <div className="absolute bottom-3.25 right-[48.5px] z-30 group/tooltip flex flex-col items-center w-10">
+            <HiHeart
+              className="text-black text-[16px] font-bold opacity-0 group-hover:opacity-100 group-hover/tooltip:opacity-50"
+              onClick={handleLikeClick}
+            />
 
-          <IoIosMore
-            className="absolute bottom-3.25 right-4.5 text-black z-10 text-[20px] font-bold opacity-0 group-hover:opacity-100 hover:opacity-50"
-            onClick={handleMoreClick}
-          />
+            <div className="absolute top-full mt-2 px-2 py-1 bg-[#303030] text-white text-[11px] rounded opacity-0 group-hover/tooltip:opacity-100 pointer-events-none whitespace-nowrap z-50">
+              Like
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-[#303030]" />
+            </div>
+          </div>
+
+          {/* More Options Button */}
+          <div className="absolute bottom-3.25 right-2.25 z-30 group/tooltip flex flex-col items-center w-10">
+            <IoIosMore
+              className="text-black text-[20px] font-bold opacity-0 group-hover:opacity-100 group-hover/tooltip:opacity-50"
+              onClick={handleMoreClick}
+            />
+
+            <div className="absolute top-full mt-2 px-2 py-1 bg-[#303030] text-white text-[11px] rounded opacity-0 group-hover/tooltip:opacity-100 pointer-events-none whitespace-nowrap z-50">
+              More
+              <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-[#303030]"></div>
+            </div>
+          </div>
         </div>
 
         <a
