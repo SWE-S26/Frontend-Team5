@@ -5,13 +5,13 @@ import { HiHeart } from "react-icons/hi";
 
 type CardProps = {
   img?: string;
-  subtitle?: string;
+  title?: string;
   artist?: string;
 };
 
 export default function Card({
-  img = "/test.jpg",
-  subtitle = "CRISPY CLOUD",
+  img = "/Gradution.jpg",
+  title = "CRISPY CLOUD",
   artist = "Artist station",
 }: CardProps) {
   // Handler Functions
@@ -39,7 +39,7 @@ export default function Card({
       <div className="flex flex-col max-w-40">
         <div className="relative w-40 aspect-square rounded group cursor-pointer bg-[#303030] m-1 mb-1.75">
           {img && (
-            <div
+            <button
               className="absolute inset-0 bg-cover bg-center overflow-hidden rounded"
               style={{ backgroundImage: `url(${img})` }}
             />
@@ -84,14 +84,16 @@ export default function Card({
           </div>
         </div>
 
+        {/* Card Title */}
         <a
           href="#"
-          className="text-white no-underline hover:text-gray-300 text-[14px] font-bold tracking-tight"
+          className="text-white no-underline hover:text-gray-300 text-[14px] font-bold tracking-tight pl-1"
         >
-          {subtitle}
+          {title}
         </a>
 
-        <p className="text-[#828282] text-[14px] font-bold"> {artist}</p>
+        {/* Artist Name */}
+        <p className="text-[#828282] text-[14px] font-bold pl-1"> {artist}</p>
       </div>
     </>
   );
