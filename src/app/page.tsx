@@ -1,7 +1,7 @@
 "use client";
 
-import { useState } from 'react';
-import AuthModal from '@/modules/auth/components/AuthModal';
+import { useState } from "react";
+import AuthModal from "@/modules/auth/components/AuthModal";
 
 export default function Navbar() {
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -13,16 +13,13 @@ export default function Navbar() {
 
         <button
           onClick={() => setIsModalOpen(true)}
-          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition"
+          className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700 transition cursor-pointer"
         >
           Sign In
         </button>
       </nav>
 
-      <AuthModal 
-        isOpen={isModalOpen} 
-        onClose={() => setIsModalOpen(false)} 
-      />
+      <AuthModal isOpen={isModalOpen} onClose={() => setIsModalOpen(false)} />
     </>
   );
 }

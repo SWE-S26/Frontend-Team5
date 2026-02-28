@@ -8,7 +8,7 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "My Beatza App",
+  title: "Beatza",
   description: "Craving Tunes",
 };
 
@@ -18,7 +18,11 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable}>
+    <html
+      lang="en"
+      className={inter.variable}
+      suppressHydrationWarning
+    >
       <body className="antialiased">
         {children}
       </body>
