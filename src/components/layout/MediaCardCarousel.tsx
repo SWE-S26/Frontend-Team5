@@ -23,7 +23,7 @@ export default function MediaCardCarousel() {
           <FaAngleLeft className="text-white text-2xl" />
         </button>
         {/* Carousel */}
-        <div className="flex overflow-x-auto gap-6 pb-4 scrollbar-hide snap-x">
+        <div className="flex overflow-x-auto gap-6 pb-4 no-scrollbar snap-x">
           {cardData.map((card, index) => (
             <div key={index} className="snap-start">
               <Card img={card.img} title={card.title} artist={card.artist} />
