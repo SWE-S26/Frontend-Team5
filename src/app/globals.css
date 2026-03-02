@@ -1,5 +1,6 @@
 @import "tailwindcss";
 
+
 :root {
   /* soundcloud color palete (Default: Dark Mode) */
   --bg              : #121212; /* chinese black */
