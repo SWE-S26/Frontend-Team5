@@ -2,12 +2,15 @@
 import { IoIosMore, IoMdHeart } from "react-icons/io";
 import { IoMdPlay } from "react-icons/io";
 import { HiHeart } from "react-icons/hi";
+// import { useState } from "react";
 
 type CardProps = {
   img?: string;
   title?: string;
   artist?: string;
 };
+
+// const [isLiked, setIsLiked] = useState<boolean>(false);
 
 export default function Card({
   img = "/Gradution.jpg",
@@ -50,7 +53,7 @@ export default function Card({
           )}
 
           {/* Play Button */}
-          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full z-20 opacity-0 group/play group-hover:opacity-100 flex items-center justify-center">
+          <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white rounded-full z-10 opacity-0 group/play group-hover:opacity-100 flex items-center justify-center">
             <IoMdPlay
               className="text-black text-[38px] ml-1.5 group-hover/play:opacity-50"
               onClick={handlePlayClick}
