@@ -28,33 +28,39 @@ export default function MediaCardCarousel() {
   ];
 
   const carouselRef = useRef<HTMLDivElement>(null);
+  const lockAnimationRef = useRef<boolean>(false);
 
   const [isAtStart, setIsAtStart] = useState<boolean>(true);
   const [isAtEnd, setIsAtEnd] = useState<boolean>(false);
   const [isMoving, setIsMoving] = useState<"left" | "right" | false>(false);
 
   function scroll(direction: "left" | "right") {
-    if (carouselRef.current) {
-      const scrollAmount = direction === "left" ? -800 : 800;
-      carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
-    }
+    if (!carouselRef.current) return;
+
+    const scrollAmount = direction === "left" ? -737 : 737;
+    carouselRef.current.scrollBy({ left: scrollAmount, behavior: "smooth" });
   }
 
-  function handleScroll() {
-    if (carouselRef.current) {
-      const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
-      setIsAtStart(scrollLeft <= 5);
-      setIsAtEnd(scrollLeft + clientWidth >= scrollWidth - 5);
-    }
+  function handleButtonsVisiblity() {
+    if (!carouselRef.current) return;
+
+    const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+
+    setIsAtStart(scrollLeft <= 5);
+    setIsAtEnd(scrollLeft + clientWidth >= scrollWidth - 5);
   }
 
   function handleMouseEnter(direction: "left" | "right") {
-    if (isMoving) return;
+    if (isMoving || lockAnimationRef.current) return;
 
     setIsMoving(direction);
+    lockAnimationRef.current = true;
 
     setTimeout(() => {
       setIsMoving(false);
+      setTimeout(() => {
+        lockAnimationRef.current = false;
+      }, 300);
     }, 200);
   }
   return (
@@ -66,8 +72,8 @@ export default function MediaCardCarousel() {
         {/* Carousel Container */}
         <div
           ref={carouselRef}
-          onScroll={handleScroll}
-          className="overflow-x-auto no-scrollbar snap-x snap-mandatory"
+          onScroll={handleButtonsVisiblity}
+          className="overflow-x-auto no-scrollbar"
         >
           {/* Animation Wrapper */}
           <div
@@ -80,13 +86,14 @@ export default function MediaCardCarousel() {
             }`}
           >
             {cardData.map((card, index) => (
-              <div key={index} className="snap-start flex-none">
+              <div key={index} className="flex-none">
                 <Card img={card.img} title={card.title} artist={card.artist} />
               </div>
             ))}
           </div>
         </div>
 
+        {/* Right Button */}
         {!isAtEnd && (
           <button
             onClick={() => scroll("right")}
@@ -97,6 +104,7 @@ export default function MediaCardCarousel() {
           </button>
         )}
 
+        {/* Left Button */}
         {!isAtStart && (
           <button
             onClick={() => scroll("left")}

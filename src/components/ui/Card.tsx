@@ -2,7 +2,7 @@
 import { IoIosMore, IoMdHeart } from "react-icons/io";
 import { IoMdPlay } from "react-icons/io";
 import { HiHeart } from "react-icons/hi";
-// import { useState } from "react";
+import { useState } from "react";
 
 type CardProps = {
   img?: string;
@@ -10,13 +10,13 @@ type CardProps = {
   artist?: string;
 };
 
-// const [isLiked, setIsLiked] = useState<boolean>(false);
-
 export default function Card({
   img = "/Gradution.jpg",
   title = "CRISPY CLOUD",
   artist = "Artist station",
 }: CardProps) {
+  const [isLiked, setIsLiked] = useState<boolean>(false);
+
   // Handler Functions
   function handleCardClick() {
     console.log("Card clicked!");
@@ -24,6 +24,7 @@ export default function Card({
 
   function handleLikeClick(e: React.MouseEvent) {
     e.stopPropagation();
+    setIsLiked((prev) => !prev);
     console.log("Like clicked!");
   }
 
@@ -63,7 +64,10 @@ export default function Card({
           {/* Like Button */}
           <div className="absolute bottom-3.25 right-[48.5px] z-30 group/tooltip flex flex-col items-center w-10">
             <HiHeart
-              className="text-black text-[16px] font-bold opacity-0 group-hover:opacity-100 group-hover/tooltip:opacity-50"
+              className={
+                "text-black text-[16px] font-bold opacity-0 group-hover:opacity-100 group-hover/tooltip:opacity-50" +
+                (isLiked ? " text-brilliant-orange" : "text-black")
+              }
               onClick={handleLikeClick}
             />
 
