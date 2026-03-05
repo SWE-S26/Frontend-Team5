@@ -3,11 +3,8 @@
 import { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import LoginForm from "./LoginForm";
+import { AuthModalProps } from "@/modules/auth/types/auth.types";
 
-interface AuthModalProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
   const [email, setEmail] = useState("");

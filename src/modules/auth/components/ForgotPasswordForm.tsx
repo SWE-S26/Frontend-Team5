@@ -1,12 +1,7 @@
 "use client";
 
 import { IoChevronBack } from "react-icons/io5";
-
-interface ForgotPasswordFormProps {
-  email: string;
-  setEmail: (val: string) => void;
-  onBack: () => void;
-}
+import { ForgotPasswordFormProps } from "@/modules/auth/types/auth.types";
 
 export default function ForgotPasswordForm({
   email,
