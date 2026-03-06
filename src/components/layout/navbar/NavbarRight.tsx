@@ -1,8 +1,10 @@
 "use client"
 import Link from "next/link"
 import Dropdown from "@/components/ui/Dropdown";
-import { DropdownItem } from "@/components/ui/Dropdown"
+import AuthModal from "@/components/auth/AuthModal";
 import { useRouter } from "next/navigation"
+import { useState } from "react";
+import { DropdownItem } from "@/components/ui/Dropdown"
 
 import { MdOutlineExpandMore } from "react-icons/md";
 import { SlBell } from "react-icons/sl";
@@ -27,6 +29,7 @@ interface NavbarRightProps {
 
 export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   const router = useRouter()
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   return (
     <div className="flex items-center gap-7">
       {isLoggedIn ? (
@@ -64,8 +67,8 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
       ) : (
         // not logged in
         <>
-          <button className="text-off-white font-bold hover:text-silver px-4 py-2 transition-all duration-300"> Sign In        </button>
-          <button className="bg-white-smoke font-bold text-chinese-black px-3 py-1.5 rounded-md transition-all duration-300 border hover:bg-transparent hover:text-white-smoke"> Create Account </button>
+          <button onClick={() => setIsAuthModalOpen(true)} className="text-off-white font-bold hover:text-silver px-4 py-2 transition-all duration-300"> Sign In </button>
+          <button onClick={() => setIsAuthModalOpen(true)} className="bg-white-smoke font-bold text-chinese-black px-3 py-1.5 rounded-md transition-all duration-300 border hover:bg-transparent hover:text-white-smoke"> Create Account </button>
           <Link href="/upload" className="text-silver py-2 font-bold hover:text-white-smoke transition-all duration-300"> Upload </Link>
         </>
       )}
@@ -100,7 +103,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
                 ]),
           ]as DropdownItem[]}
         />
-
+        <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   )
 }

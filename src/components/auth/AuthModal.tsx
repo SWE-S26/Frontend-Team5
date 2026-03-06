@@ -3,7 +3,7 @@
 import { useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
 import LoginForm from "./LoginForm";
-import { AuthModalProps } from "@/modules/auth/types/auth.types";
+import { AuthModalProps } from "@/types/auth.types";
 
 
 export default function AuthModal({ isOpen, onClose }: AuthModalProps) {

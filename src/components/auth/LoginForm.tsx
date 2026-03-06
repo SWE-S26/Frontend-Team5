@@ -5,7 +5,7 @@ import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { IoChevronBack, IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import ForgotPasswordForm from "./ForgotPasswordForm";
-import { LoginFormProps } from "@/modules/auth/types/auth.types";
+import { LoginFormProps } from "@/types/auth.types";
 
 const mockUsers = ["karimhegab698@gmail.com", "test@test.com"];
 
