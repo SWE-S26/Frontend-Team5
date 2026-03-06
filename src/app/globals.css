@@ -45,6 +45,11 @@
   --color-inferno: var(--inferno);
   --color-anger: var(--anger);
   --color-gentle-peach: var(--gentle-peach);
+  --color-crusta: var(--crusta);
+  --color-papaya: var(--papaya);
+  --color-inferno: var(--inferno);
+  --color-anger: var(--anger);
+  --color-gentle-peach: var(--gentle-peach);
 }
 
 body {
@@ -52,6 +57,17 @@ body {
   color: var(--fg);
   font-family: var(--font-sans);
 }
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
 
 @layer utilities {
   .no-scrollbar::-webkit-scrollbar {
