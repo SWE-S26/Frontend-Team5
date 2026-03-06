@@ -1,7 +1,5 @@
-export default function NORMAL() {
+export default function LandingPage() {
   return (
-    <div className="">
-      <h1>Home</h1>
-    </div>
-  );
+    <div>page</div>
+  )
 }

@@ -1,16 +1,24 @@
 @import "tailwindcss";
 
 :root {
-  /* soundcloud color palete */
-  --chinese-black   : #121212; /* main background color */
-  --silver          : #A0A0A0;
-  --white-smoke     : #f4f4f4;
+  /* soundcloud color palete (Default: Dark Mode) */
+  --bg              : #121212; /* chinese black */
+  --fg              : #f4f4f4; /* white smoke   */
+  --silver          : #818181;
+  --off-black       : #303030;
   --brilliant-orange: #FF9533;
   --crusta          : #FF7F34;
   --papaya          : #FE6D35;
   --inferno         : #FF5836;
   --anger           : #FF4137;
   --gentle-peach    : #FFE9E1;
+}
+
+[data-theme="light"] {
+  /* Light Mode */
+  --bg       : #f4f4f4;
+  --fg       : #121212;
+  --off-black: #e7e7e7;
 }
 
 /* @media is used for dark mode */
@@ -27,9 +35,10 @@
      -> normally you say "bg-black"
      -> for any of colors below such as chinese black you do "bg-chinese-black"
   */
-  --color-chinese-black   : var(--chinese-black);
+  --color-chinese-black   : var(--bg);
+  --color-white-smoke     : var(--fg);
   --color-silver          : var(--silver);
-  --color-white-smoke     : var(--white-smoke);
+  --color-off-black       : var(--off-black); 
   --color-brilliant-orange: var(--brilliant-orange);
   --color-crusta          : var(--crusta);
   --color-papaya          : var(--papaya);
@@ -39,7 +48,7 @@
 }
 
 body {
-  background: var(--chinese-black);
-  color: var(--white-smoke);
+  background: var(--bg);
+  color: var(--fg);
   font-family: var(--font-sans);
 }
