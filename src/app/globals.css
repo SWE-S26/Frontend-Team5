@@ -40,15 +40,41 @@
   --color-silver          : var(--silver);
   --color-off-black       : var(--off-black); 
   --color-brilliant-orange: var(--brilliant-orange);
-  --color-crusta          : var(--crusta);
-  --color-papaya          : var(--papaya);
-  --color-inferno         : var(--inferno);
-  --color-anger           : var(--anger);
-  --color-gentle-peach    : var(--gentle-peach);
+  --color-crusta: var(--crusta);
+  --color-papaya: var(--papaya);
+  --color-inferno: var(--inferno);
+  --color-anger: var(--anger);
+  --color-gentle-peach: var(--gentle-peach);
+  --color-crusta: var(--crusta);
+  --color-papaya: var(--papaya);
+  --color-inferno: var(--inferno);
+  --color-anger: var(--anger);
+  --color-gentle-peach: var(--gentle-peach);
 }
 
 body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-sans);
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+}
+
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar {
+    display: none;
+  }
+  .no-scrollbar {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
 }
