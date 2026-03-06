@@ -64,7 +64,7 @@ export default function MediaCardCarousel() {
     }, 200);
   }
   return (
-    <div className="w-full max-w-6xl mx-auto py-8 px-4">
+    <div className="w-full max-w-6xl py-8"> {/* OM - removed this from className (mx-auto px-4) for alignment purposes, re-add them to see yourself */}
       {/* Title */}
       <h2 className="text-[22px] font-bold pb-4 text-white">Featured Tracks</h2>
 
