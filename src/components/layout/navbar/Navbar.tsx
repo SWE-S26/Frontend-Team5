@@ -8,7 +8,7 @@ interface NavbarProps {
   isLoggedIn: boolean
 }
 
-// Navbar.tsx
+
 export default function Navbar({ className, isLoggedIn }: NavbarProps) {
   return (
     <div className={`flex justify-center w-full ${className}`}>
