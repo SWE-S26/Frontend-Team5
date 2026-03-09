@@ -3,7 +3,7 @@ import Navbar from "@/components/layout/navbar/Navbar";
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <div>
-      <Navbar className="fixed top-0 w-full" isLoggedIn={true}/>
+      <Navbar className="fixed top-0 w-full z-1000 bg-chinese-black" isLoggedIn={true}/>
       <main className="mt-18 flex justify-center">
         <div className="w-full max-w-6/7">
           {children}
