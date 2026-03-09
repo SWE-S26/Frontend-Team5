@@ -1,6 +1,6 @@
-
-
 import ProfileHeader from "@/components/profile/ProfileHeader";
+import TabsNavBar from "@/components/profile/TabsNavBar";
+
 
 interface Props {
   params: {
@@ -8,10 +8,13 @@ interface Props {
   };
 }
 
+
 const ProfilePage = ({ params }: Props) => {
   return (
     <div>
       <ProfileHeader />
+      <TabsNavBar />
+
     </div>
   );
 };

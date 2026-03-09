@@ -29,6 +29,8 @@ export default function NavbarLeft({ isLoggedIn }: NavbarLeftProps) {
       <TabsButton href="/home"    label="Home"    pathname={pathname} textSize="text-md"/>
       <TabsButton href="/feed"    label="Feed"    pathname={pathname} textSize="text-md"/>
       <TabsButton href="/library" label="Library" pathname={pathname} textSize="text-md"/>
+      
+      
     </div>
   )
 }
