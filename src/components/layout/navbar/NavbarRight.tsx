@@ -47,7 +47,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
               </button>
             }
             items={[
-              { label: "Profile",        icon: <FaUser />,                 onClick: () => console.log("done") },
+              { label: "Profile",        icon: <FaUser />,                 onClick: () => router.push("/profile/1") },
               { label: "Likes",          icon: <FaHeart />,                onClick: () => console.log("done") },
               { label: "Playlists",      icon: <BiSolidCopy />,            onClick: () => console.log("done") },
               { label: "Stations",       icon: <HiMiniSignal />,           onClick: () => console.log("done") },
