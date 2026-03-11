@@ -1,22 +1,6 @@
-import ProfileHeader from "@/components/profile/ProfileHeader";
-import TabsNavBar from "@/components/profile/TabsNavBar";
-
-
-interface Props {
-  params: {
-    username: string;
-  };
-}
-
-
-const ProfilePage = ({ params }: Props) => {
+// default page of profile goes to all tab
+export default function ProfilePage() {
   return (
-    <div>
-      <ProfileHeader />
-      <TabsNavBar />
-
-    </div>
-  );
-};
-
-export default ProfilePage;
+    <div>All</div>
+  )
+}
