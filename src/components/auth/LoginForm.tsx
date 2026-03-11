@@ -133,7 +133,7 @@ export default function LoginForm({
               className={`absolute left-3 transition-all duration-200 text-gray-400 font-bold tracking-wider pointer-events-none ${isPasswordActive ? "text-[10px] top-2" : "text-[12px] top-1/2 -translate-y-1/2"}`}
             >
               {userExists
-                ? "Your Password (min. 6 characters)"
+                ? "Your Password (min. 8 characters)"
                 : "Choose a password (min. 8 characters)"}
             </label>
             <div className="flex items-center">
