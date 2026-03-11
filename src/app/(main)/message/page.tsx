@@ -1,8 +1,5 @@
-'use client'
-import MessagePerview from '@/components/messages/MessagePerview'
-import NewMessageButton from '@/components/messages/NewMessageButton'
-import React from 'react'
-import NewMessagePopUP from '../../../components/messages/NewMessagePopUP'
+"use client"
+
 import MessageSidebar from '@/components/messages/MessageSidebar'
 
 

@@ -1,5 +1,4 @@
-'use client'
-import React from 'react'
+"use client"
 import SendButton from './SendButton'
 import { motion, AnimatePresence } from 'framer-motion'
 

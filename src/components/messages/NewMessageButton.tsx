@@ -1,6 +1,4 @@
-'use client'
-
-import React from 'react'
+"use client"
 
 const NewMessageButton = ({ onClick }: { onClick: () => void }) => {
   return (
