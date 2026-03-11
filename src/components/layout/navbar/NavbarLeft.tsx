@@ -1,6 +1,6 @@
 "use client"
 import { usePathname } from "next/navigation"
-import TabsButton from "@/components/ui/TabsButton";
+import TabsNavbar from "./TabsNavbar";
 
 interface NavbarLeftProps {
   isLoggedIn: boolean
@@ -10,7 +10,7 @@ export default function NavbarLeft({ isLoggedIn }: NavbarLeftProps) {
   const pathname = usePathname()
 
   return (
-    <div className="flex items-center gap-2 text-sm">
+    <div className="flex items-center gap-2 text-sm mr-5">
 
       <div className="flex items-center">
         <img src="/beatza.png" className="w-13 mr-5 mt-1" />
@@ -26,9 +26,14 @@ export default function NavbarLeft({ isLoggedIn }: NavbarLeftProps) {
         )}
       </div>
       
-      <TabsButton href="/home"    label="Home"    pathname={pathname} textSize="text-md"/>
-      <TabsButton href="/feed"    label="Feed"    pathname={pathname} textSize="text-md"/>
-      <TabsButton href="/library" label="Library" pathname={pathname} textSize="text-md"/>
+      <TabsNavbar pathname={pathname}
+        tabs={[
+          { href: "/home",    label: "Home"    },
+          { href: "/feed",    label: "Feed"    },
+          { href: "/library", label: "Library", basePath: "/library" },
+        ]}
+      />
+      
     </div>
   )
 }

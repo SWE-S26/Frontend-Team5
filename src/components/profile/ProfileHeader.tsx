@@ -1,4 +1,3 @@
-
 import Button from "@/components/ui/Button"
 import AvatarUpload from "./AvatarUpload"
 
@@ -16,13 +15,17 @@ export default function ProfileHeader() {
                 </Button>
             </div>
 
-            <div className="absolute left-10 top-1/2 -translate-y-1/2">
-                <AvatarUpload className="relative">
-                    <Button className="absolute bottom-9 right-9 ">
-                        Upload image
-                    </Button>
-                </AvatarUpload>
+            <div className="absolute left-10 top-1/2 -translate-y-1/2 group/avatar">
+              <AvatarUpload className="relative overflow-hidden">
 
+                
+                <div className="absolute inset-0 bg-gray-400/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity"></div>
+
+                <Button className="absolute bottom-9 right-9 opacity-0 group-hover/avatar:opacity-100">
+                  Upload image
+                </Button>
+
+              </AvatarUpload>
             </div>
 
             <div className="absolute left-72 bottom-20 -translate-y-1/2">

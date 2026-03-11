@@ -1,19 +1,6 @@
-
-
-import ProfileHeader from "@/components/profile/ProfileHeader";
-
-interface Props {
-  params: {
-    username: string;
-  };
-}
-
-const ProfilePage = ({ params }: Props) => {
+// default page of profile goes to all tab
+export default function ProfilePage() {
   return (
-    <div>
-      <ProfileHeader />
-    </div>
-  );
-};
-
-export default ProfilePage;
+    <div>All</div>
+  )
+}

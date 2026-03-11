@@ -31,7 +31,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   const router = useRouter()
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   return (
-    <div className="flex items-center gap-7">
+    <div className="flex items-center gap-7 ml-5">
       {isLoggedIn ? (
         // logged in
         <>
@@ -48,15 +48,15 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
             }
             items={[
               { label: "Profile",        icon: <FaUser />,                 onClick: () => router.push("/profile/1") },
-              { label: "Likes",          icon: <FaHeart />,                onClick: () => console.log("done") },
-              { label: "Playlists",      icon: <BiSolidCopy />,            onClick: () => console.log("done") },
-              { label: "Stations",       icon: <HiMiniSignal />,           onClick: () => console.log("done") },
-              { label: "Following",      icon: <FaUserCheck />,            onClick: () => console.log("done") },
+              { label: "Likes",          icon: <FaHeart />,                onClick: () => router.push("/library/likes") },
+              { label: "Playlists",      icon: <BiSolidCopy />,            onClick: () => router.push("/library/playlists") },
+              { label: "Stations",       icon: <HiMiniSignal />,           onClick: () => router.push("/library/stations") },
+              { label: "Following",      icon: <FaUserCheck />,            onClick: () => router.push("/library/following") },
               { label: "Who to follow",  icon: <FaUserPlus />,             onClick: () => console.log("done") },
-              { label: "Try Artist Pro", icon: <FaStar />,                 onClick: () => console.log("done") },
-              { label: "Tracks",         icon: <PiWaveformBold />,         onClick: () => console.log("done") },
+              { label: "Try Artist Pro", icon: <FaStar />,                 onClick: () => router.push("/artistpro") },
+              { label: "Tracks",         icon: <PiWaveformBold />,         onClick: () => router.push("/artists") },
               { label: "Insights",       icon: <ImStatsBars />,            onClick: () => console.log("done") },
-              { label: "Distribute",     icon: <BsArrowsExpandVertical />, onClick: () => console.log("done") },
+              { label: "Distribute",     icon: <BsArrowsExpandVertical />, onClick: () => router.push("/artistpro") },
             ]}
           />
 
