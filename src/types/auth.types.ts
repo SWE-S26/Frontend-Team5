@@ -19,3 +19,15 @@ export interface ForgotPasswordFormProps {
   setEmail: (val: string) => void;
   onBack: () => void;
 }
+
+export interface RegisterDetailsFormProps {
+  email: string;
+  onBack: () => void;
+  onComplete: (details: { displayName: string; dob: string; gender: string }) => void;
+}
+
+export interface DetailsValidationFormProps {
+  email: string;
+  onBackToLogin: () => void;
+  onSendAgain?: () => void;
+}
