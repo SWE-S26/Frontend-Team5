@@ -1,4 +1,3 @@
-import React from 'react'
 import LatestComment from './LatestComment'
 
 const ListLatestComments = () => {
@@ -11,8 +10,6 @@ const ListLatestComments = () => {
         <LatestComment />
         <LatestComment />
         <LatestComment />
-
-    
     </>
   )
 }

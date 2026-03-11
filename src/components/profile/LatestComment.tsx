@@ -8,13 +8,7 @@ const LatestComment = () => {
     const [isHovered, setIsHovered] = useState(false);
     return (
         <>
-        
-
-            <div 
-            className='flex flex-row gap-58 items-center'
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => setIsHovered(false)}
-            >
+            <div className='flex flex-row gap-58 items-center w-110' onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
                 <div className='flex flex-col gap-3 mt-7'>
                         <p className='text-sm'>
                         <span className='text-silver'>on</span>{' '}
@@ -36,7 +30,6 @@ const LatestComment = () => {
                                 </div>
                         </div>
                         )}
-                
             </div>
         </>
     )
