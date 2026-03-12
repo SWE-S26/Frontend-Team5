@@ -29,15 +29,14 @@ export default function DetailsValidationForm({
       </p>
 
       {/* Paper plane illustration */}
-      <div className="mb-8 w-56 h-56 flex items-center justify-center relative">
-        {/* Grid background */}
-        <div className="absolute inset-0 grid grid-cols-10 grid-rows-10 opacity-60">
-          {Array.from({ length: 100 }).map((_, i) => (
-            <div key={i} className="border border-white"></div>
-          ))}
-        </div>
-
-        {/* Paper plane icon */}
+      <div
+        className="mb-8 w-56 h-56 flex items-center justify-center relative overflow-hidden"
+        style={{
+          backgroundImage:
+            "linear-gradient(rgba(255,255,255,0.15) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.15) 1px, transparent 1px)",
+          backgroundSize: "10% 10%",
+        }}
+      >
         <SiMinutemailer size={200} className="relative scale-x-[-1]" />
       </div>
 
