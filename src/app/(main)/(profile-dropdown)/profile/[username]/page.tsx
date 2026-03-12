@@ -1,14 +1,20 @@
-// default page of profile goes to all tab
-"use client"
-import Following from "@/components/profile/Following"
-import ListLatestComments from "@/components/profile/ListLatestComments"
 
-export default function ProfilePage() {
+
+import ProfileHeader from "@/components/profile/ProfileHeader";
+
+import PlayerBar2 from "@/components/layout/player/PlayerBar2";
+
+interface Props {
+  params: {
+    username: string;
+  };
+}
+
+const ProfilePage = ({ params }: Props) => {
   return (
     <div>
-      All
-      <ListLatestComments />
-      <Following/>
+      <ProfileHeader />
+      
     </div>
   )
 }
