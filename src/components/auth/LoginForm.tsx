@@ -5,7 +5,11 @@ import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { IoChevronBack, IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import ForgotPasswordForm from "./ForgotPasswordForm";
+import RegisterDetailsForm from "./RegisterDetailsForm";
+import DetailsValidationForm from "./DetailsValidationForm";
 import { LoginFormProps } from "@/types/auth.types";
+
+
 
 const mockUsers = ["karimhegab698@gmail.com", "test@test.com"];
 
@@ -20,6 +24,8 @@ export default function LoginForm({
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [userExists, setUserExists] = useState(false);
+  const [showRegisterDetails, setShowRegisterDetails] = useState(false);
+  const [showDetailsValidation, setShowDetailsValidation] = useState(false);
 
   const isEmailActive = isInteracting || email.length > 0;
   const isPasswordActive = password.length > 0;
@@ -29,7 +35,10 @@ export default function LoginForm({
       const exists = mockUsers.includes(email.trim().toLowerCase());
       setUserExists(exists);
       setShowPasswordStep(true);
-    } else {
+    }else if(!userExists){
+      setShowRegisterDetails(true);
+    }
+    else {
       console.log("Submit logic here");
     }
   };
@@ -46,6 +55,36 @@ export default function LoginForm({
     setIsInteracting(false);
     setPassword("");
   };
+
+  if (showDetailsValidation) {
+  return (
+    <DetailsValidationForm
+      email={email}
+      onBackToLogin={() => {
+        setShowDetailsValidation(false);
+        setShowRegisterDetails(false);
+        setShowPasswordStep(false);
+        setIsInteracting(false);
+        setPassword("");
+        setEmail("");
+      }}
+      onSendAgain={() => console.log("Resend email to", email)}
+    />
+  );
+}
+
+  if (showRegisterDetails) {
+  return (
+    <RegisterDetailsForm
+      email={email}
+      onBack={() => setShowRegisterDetails(false)}
+      onComplete={(details) => {
+        console.log("Registration complete:", { email, password, ...details });
+        setShowDetailsValidation(true);
+      }}
+    />
+  );
+  }
 
   if (showForgotForm) {
     return (
