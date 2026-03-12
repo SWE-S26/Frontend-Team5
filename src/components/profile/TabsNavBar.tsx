@@ -13,19 +13,19 @@ type Props = {
 }
 
 
-export default function TabNavBar({ activeTab, setActiveTab }: Props) {
+export default function TabsNavBar({ activeTab, setActiveTab }: Props) {
     const pathname = usePathname()
 
   return (
     <div className="flex items-center justify-between text-white py-6 px-1">
      
       <div className="flex space-x-6">
-       <TabsButton onClick={() => setActiveTab("all")} href="" label="All" pathname={pathname} textSize="text-md" isActive={activeTab === "all"}/>
-       <TabsButton onClick={() => setActiveTab("popular tracks")} href="" label="Popular tracks" pathname={pathname} textSize="text-md" isActive={activeTab === "popular tracks"}/>
-       <TabsButton onClick={() => setActiveTab("tracks")} href="" label="Tracks" pathname={pathname} textSize="text-md" isActive={activeTab === "tracks"}/>
-       <TabsButton onClick={() => setActiveTab("albums")} href="" label="Albums" pathname={pathname} textSize="text-md" isActive={activeTab === "albums"}/>
-       <TabsButton onClick={() => setActiveTab("playlists")} href="" label="Playlists" pathname={pathname} textSize="text-md" isActive={activeTab === "playlists"}/>
-       <TabsButton onClick={() => setActiveTab("reposts")} href="" label="Reposts" pathname={pathname} textSize="text-md" isActive={activeTab === "reposts"}/>
+       <TabsButton onClick={() => setActiveTab("all")} href="" label="All" pathname={pathname} textSize="text-md" isActiveb={activeTab === "all"}/>
+       <TabsButton onClick={() => setActiveTab("popular tracks")} href="" label="Popular tracks" pathname={pathname} textSize="text-md" isActiveb={activeTab === "popular tracks"}/>
+       <TabsButton onClick={() => setActiveTab("tracks")} href="" label="Tracks" pathname={pathname} textSize="text-md" isActiveb={activeTab === "tracks"}/>
+       <TabsButton onClick={() => setActiveTab("albums")} href="" label="Albums" pathname={pathname} textSize="text-md" isActiveb={activeTab === "albums"}/>
+       <TabsButton onClick={() => setActiveTab("playlists")} href="" label="Playlists" pathname={pathname} textSize="text-md" isActiveb={activeTab === "playlists"}/>
+       <TabsButton onClick={() => setActiveTab("reposts")} href="" label="Reposts" pathname={pathname} textSize="text-md" isActiveb={activeTab === "reposts"}/>
       </div>
 
       
