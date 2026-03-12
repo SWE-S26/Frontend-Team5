@@ -5,20 +5,27 @@ import { PencilIcon, ShareIcon } from "@heroicons/react/24/solid";
 import { LuShare } from "react-icons/lu";
 import { MdOutlineEdit } from "react-icons/md";
 
+import Album from "./Album";
 
-export default function Navbar() {
+type Props = {
+  activeTab: string
+  setActiveTab: (tab: string) => void
+}
+
+
+export default function TabNavBar({ activeTab, setActiveTab }: Props) {
     const pathname = usePathname()
 
   return (
     <div className="flex items-center justify-between text-white py-6 px-1">
      
       <div className="flex space-x-6">
-       <TabsButton href="" label="All" pathname={pathname} textSize="text-md"/>
-       <TabsButton href="" label="Popular tracks" pathname={pathname} textSize="text-md"/>
-       <TabsButton href="" label="Tracks" pathname={pathname} textSize="text-md"/>
-       <TabsButton href="" label="Albums" pathname={pathname} textSize="text-md"/>
-       <TabsButton href="" label="Playlists" pathname={pathname} textSize="text-md"/>
-       <TabsButton href="" label="Reposts" pathname={pathname} textSize="text-md"/>
+       <TabsButton onClick={() => setActiveTab("all")} href="" label="All" pathname={pathname} textSize="text-md" isActive={activeTab === "all"}/>
+       <TabsButton onClick={() => setActiveTab("popular tracks")} href="" label="Popular tracks" pathname={pathname} textSize="text-md" isActive={activeTab === "popular tracks"}/>
+       <TabsButton onClick={() => setActiveTab("tracks")} href="" label="Tracks" pathname={pathname} textSize="text-md" isActive={activeTab === "tracks"}/>
+       <TabsButton onClick={() => setActiveTab("albums")} href="" label="Albums" pathname={pathname} textSize="text-md" isActive={activeTab === "albums"}/>
+       <TabsButton onClick={() => setActiveTab("playlists")} href="" label="Playlists" pathname={pathname} textSize="text-md" isActive={activeTab === "playlists"}/>
+       <TabsButton onClick={() => setActiveTab("reposts")} href="" label="Reposts" pathname={pathname} textSize="text-md" isActive={activeTab === "reposts"}/>
       </div>
 
       

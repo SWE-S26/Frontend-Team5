@@ -1,3 +1,4 @@
+"use client"
 import { CiSearch } from "react-icons/ci";
 
 interface NavbarCenterProps {
