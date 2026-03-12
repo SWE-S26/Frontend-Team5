@@ -8,7 +8,7 @@ const LatestComment = () => {
     const [isHovered, setIsHovered] = useState(false);
     return (
         <>
-            <div className='flex flex-row gap-50 items-center' onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
+            <div className='flex justify-between items-center' onMouseEnter={() => setIsHovered(true)} onMouseLeave={() => setIsHovered(false)}>
                 <div className='flex flex-col gap-2 mt-4 '>
                     <p className='text-sm'>
                         <span className='text-silver'>on</span>{' '}
@@ -17,7 +17,7 @@ const LatestComment = () => {
                     <p className='text-sm text-white'>"ohhh"</p>
                 </div>
 
-                <div className='flex items-center justify-center w-10 h-8'>
+                <div className='flex items-center justify-center h-8'>
                     {!isHovered ? (
                         <p className='text-sm text-silver whitespace-nowrap'>11 minutes ago</p>
                     ) : (

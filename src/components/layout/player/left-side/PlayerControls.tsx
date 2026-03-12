@@ -27,7 +27,7 @@ const [repeatMode, setRepeatMode] = useState(0)
 
     return(
         <div className="flex items-center flex-shrink-0">
-            <div className="flex gap-2 sm:gap-4 px-2 sm:px-5">
+            <div className="flex gap-2 sm:gap-4 pr-5">
                 <button>
                 <IoPlaySkipBackSharp className="hover:text-silver cursor-pointer" size={25}/>
                 </button>
@@ -51,11 +51,7 @@ const [repeatMode, setRepeatMode] = useState(0)
 
             <div className="flex sm:flex gap-4">
             <button onClick={() => setShuffled(!shuffled)} className="relative group cursor-pointer hover:text-silver font-bold " >
-            {shuffled ? <RiShuffleFill size={15} className="text-anger "/> : <RiShuffleFill size={15} />}
-            
-            <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-2 py-[2px] bg-[#f3f3f3] text-black text-xs border border-gray-400 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-50">
-            Shuffle
-            </span>
+                {shuffled ? <RiShuffleFill size={15} className="text-anger "/> : <RiShuffleFill size={15} />}
             </button>
 
             <button onClick={handleRepeat} className="relative group cursor-pointer hover:text-silver ">
@@ -93,9 +89,7 @@ const [repeatMode, setRepeatMode] = useState(0)
                                     <polyline strokeLinecap="round" strokeLinejoin="round" points="14,1 17,4 14,7" />
                                     </svg> 
             }
-            <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-2 py-[2px] bg-[#f3f3f3] text-black text-xs border border-gray-400 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-50">
-            Repeat
-            </span>
+
             </button>
             </div>
 

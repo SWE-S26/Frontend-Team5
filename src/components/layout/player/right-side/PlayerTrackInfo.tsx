@@ -4,7 +4,7 @@ export default function PlayerTrackInfo() {
       <img
         src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF7MG32vJAUlDYjqVgOEN8EQp1MFWX7_dqAw&s"
         alt="cover"
-        className="w-9 h-9 object-cover "
+        className="w-9 h-9 object-cover"
       />
 
       <div className="flex flex-col mr-5 min-w-[90px] max-w-[200px]">

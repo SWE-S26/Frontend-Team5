@@ -8,7 +8,7 @@ type Props = {
 export default function PlayerVolume({ volume, setVolume }: Props) {
 
   return (
-      <div className="relative flex items-center group flex-shrink-0">
+      <div className="relative flex items-center group flex-shrink-0 mr-2">
 
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 z-50 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 pb-3">
 
