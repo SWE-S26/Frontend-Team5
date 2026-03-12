@@ -59,81 +59,10 @@ const ProfilePage = ({ params }: Props) => {
 
   return (
     <div>
-
-      <ProfileHeader />
-      <div className="flex items-center justify-between mb-4">
-        <TabsNavbar tabs={profileTabs} activeTab={activeTab} onTabChange={setActiveTab}
-          textSize="text-md" className="flex items-center justify-between text-white py-6 px-1" tabsWrapperClassName="flex space-x-6"/>
-        <div className="flex space-x-2">
-          <button className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10">
-            <LuShare className="w-4 h-4 " />
-            <span className="ml-1 text-sm font-bold px-1">Share</span>
-
-            <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-3 py-1 rounded-md bg-[#2C2C2C] text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none shadow-lg z-50">
-                Share
-            </span>
-          </button>
-
-          <button className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center cursor-pointer hover:text-silver h-10">
-            <MdOutlineEdit className="w-5 h-5" />
-            <span className="ml-1 text-sm font-bold px-1">Edit</span>
-
-            
-            <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-3 py-1 rounded-md bg-[#2C2C2C] text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none shadow-lg z-50">
-                Edit
-            </span>
-          </button>
-        </div>
-      </div>
-
-
-      <div className="flex justify-between">
-        <div className="w-[68%]">
-
-          <div className="mt-10">
-            {activeTab === "all" &&
-              (all.length === 0 ? <EmptyTab /> : <All />)}
-
-            {activeTab === "popular tracks" &&
-              (popular.length === 0 ? <EmptyTab /> : <PopularTracks />)}
-
-            {activeTab === "tracks" &&
-              (tracks.length === 0 ? <EmptyTab /> : <Tracks />)}
-
-            {activeTab === "albums" &&
-              (albums.length === 0 ? <EmptyTab /> : <Albums />)}
-
-            {activeTab === "playlists" &&
-              (playlists.length === 0 ? (
-                <h2 className="font-bold text-lg flex items-center justify-center text-center">
-                  You haven’t created any playlists.
-                </h2>
-              ) : (
-                <Playlists />
-              ))}
-
-            {activeTab === "reposts" &&
-              (reposts.length === 0 ? (
-                <h2 className="font-bold text-lg flex items-center justify-center text-center">
-                  You haven’t reposted any sounds.
-                </h2>
-              ) : (
-                <Reposts />
-              ))}
-          </div>
-
-        </div>
-
-        <div className="w-[27.75%]">
-          <ProfileSideBar/>
-        </div>
-      </div>
-
-
+     
       
-
     </div>
-  );
-};
+  )
+}
 
-export default ProfilePage;
+export default ProfilePage
