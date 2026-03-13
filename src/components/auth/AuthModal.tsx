@@ -42,7 +42,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
       {/* Modal Content */}
       <div
-        className={`relative w-full max-w-105 p-8 bg-[#111111] rounded-lg shadow-2xl border border-white/10 transform transition-transform duration-500 ${
+        className={`relative w-full max-w-105 p-8 bg-chinese-black text-white-smoke rounded-lg shadow-2xl border border-white/10 transform transition-transform duration-500 ${
           animate ? "translate-y-0" : "-translate-y-[150vh]"
         }`}
       >
