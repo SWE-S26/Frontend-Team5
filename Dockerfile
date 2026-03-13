@@ -1,0 +1,14 @@
+FROM node:20-slim AS builder
+WORKDIR /beatza
+COPY package*.json ./
+RUN npm install 
+COPY . .
+RUN npm run build
+
+FROM node:20-slim AS production
+WORKDIR /beatza
+COPY --from=builder /beatza/.next/standalone ./
+COPY --from=builder /beatza/.next/static ./.next/static
+COPY --from=builder /beatza/public ./public
+EXPOSE 3000
+CMD ["node", "server.js"]

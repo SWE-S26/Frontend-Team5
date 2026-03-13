@@ -1,0 +1,9 @@
+node_modules/
+.env
+.git/
+.gitignore
+README.md
+LICENSE
+Folder_Structure.txt
+eslint.config.mjs
+.next/
