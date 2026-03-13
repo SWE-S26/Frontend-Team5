@@ -12,17 +12,18 @@ export default function ForgotPasswordForm({
 
   return (
     <div className="w-full text-white-smoke animate-in fade-in duration-300">
-      <button
-        onClick={onBack}
-        className="mb-4 -ml-2 p-2 bg-[#303030] rounded-full transition-colors cursor-pointer"
-      >
-        <IoChevronBack size={26} />
-      </button>
+      <div className="relative flex items-center mb-8">
+        <button
+          onClick={onBack}
+          className="mb-4 -ml-2 p-2 bg-back rounded-full transition-colors cursor-pointer"
+        >
+          <IoChevronBack size={26} />
+        </button>
 
-      <h1 className="text-[28px] font-bold leading-tight mb-8 text-center">
-        Reset password
-      </h1>
-
+        <h1 className="text-[20px] font-semibold leading-tight ml-20 mt-5 mb-8 text-center">
+          Reset password
+        </h1>
+      </div>
       <div className="space-y-6">
         <div className="relative bg-chinese-black border border-white/10 rounded p-3 h-18 flex flex-col justify-center">
           <label
@@ -38,10 +39,10 @@ export default function ForgotPasswordForm({
           />
         </div>
 
-        <p className="text-[14px] text-gray-300 leading-relaxed">
+        <p className="text-[14px] text-white-smoke leading-relaxed">
           If the email address is in our database, we will send you an email to
           reset your password. Need help?
-          <span className="text-[#699FFF] cursor-pointer ml-1">
+          <span className="text-[#044DD2] cursor-pointer ml-1">
             visit our Help Center.
           </span>
         </p>

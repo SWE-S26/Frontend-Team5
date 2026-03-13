@@ -13,6 +13,8 @@
   --inferno         : #FF5836;
   --anger           : #FF4137;
   --gentle-peach    : #FFE9E1;
+  --login           : rgba(255, 255, 255, 0.4);
+  --back            : rgb(48, 48, 48);
 }
 
 [data-theme="light"] {
@@ -20,6 +22,8 @@
   --bg       : #f4f4f4;
   --fg       : #121212;
   --off-black: #e7e7e7;
+  --login    : rgba(0, 0, 0, 0.5);
+  --back     : rgb(233, 231, 231);
 }
 
 /* @media is used for dark mode */
@@ -38,6 +42,8 @@
   */
   --color-chinese-black   : var(--bg);
   --color-white-smoke     : var(--fg);
+  --color-login           : var(--login);
+  --color-back            : var(--back);
   --color-silver          : var(--silver);
   --color-off-black       : var(--off-black); 
   --color-brilliant-orange: var(--brilliant-orange);
