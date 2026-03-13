@@ -58,7 +58,7 @@ export default function Legal() {
   ];
 
   const Link = ({ children }: { children: React.ReactNode }) => (
-    <span className="cursor-pointer text-[#699FFF] hover:underline transition-colors">
+    <span className="cursor-pointer text-[#044DD2] hover:underline transition-colors">
       {children}
     </span>
   );
@@ -80,7 +80,7 @@ export default function Legal() {
 
   return (
     <div className="min-h-screen bg-chinese-black text-white-smoke font-sans">
-      <div className="max-w-7xl mx-auto px-8 py-3 flex gap-24">
+      <div className="max-w-7xl mx-auto pr-8 py-3 flex gap-24">
         {/* MAIN CONTENT */}
 
         <main className="flex-1 max-w-3xl text-[14px] leading-relaxed text-white-smoke">
@@ -140,7 +140,7 @@ export default function Legal() {
                 <li key={item.id}>
                   <a
                     href={`#${item.id}`}
-                    className="text-[#699FFF] hover:underline"
+                    className="text-[#044DD2] hover:underline"
                   >
                     {item.label}
                   </a>{" "}
