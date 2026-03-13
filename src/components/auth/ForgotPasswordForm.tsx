@@ -11,7 +11,7 @@ export default function ForgotPasswordForm({
   const isEmailActive = email.length > 0;
 
   return (
-    <div className="w-full text-white animate-in fade-in duration-300">
+    <div className="w-full text-white-smoke animate-in fade-in duration-300">
       <button
         onClick={onBack}
         className="mb-4 -ml-2 p-2 bg-[#303030] rounded-full transition-colors cursor-pointer"
@@ -24,7 +24,7 @@ export default function ForgotPasswordForm({
       </h1>
 
       <div className="space-y-6">
-        <div className="relative bg-[#222222] border border-white/10 rounded p-3 h-18 flex flex-col justify-center">
+        <div className="relative bg-chinese-black border border-white/10 rounded p-3 h-18 flex flex-col justify-center">
           <label
             className={`absolute left-3 transition-all duration-200 text-gray-400 font-bold tracking-wider pointer-events-none ${isEmailActive ? "text-[10px] top-2" : "text-[14px] top-1/2 -translate-y-1/2"}`}
           >
@@ -34,7 +34,7 @@ export default function ForgotPasswordForm({
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
-            className={`w-full bg-transparent border-none outline-none text-white text-base ${isEmailActive ? "pt-4" : "pt-0"}`}
+            className={`w-full bg-transparent border-none outline-none text-white-smoke text-base ${isEmailActive ? "pt-4" : "pt-0"}`}
           />
         </div>
 
@@ -48,7 +48,7 @@ export default function ForgotPasswordForm({
 
         <button
           disabled={!email.trim()}
-          className={`w-full h-12 font-bold rounded transition-all duration-200 ${!email.trim() ? "bg-white/60 text-chinese-black" : "bg-white text-chinese-black cursor-pointer "}`}
+          className={`w-full h-12 font-bold rounded transition-all duration-200 ${!email.trim() ? "bg-white-smoke/60 text-chinese-black" : "bg-white-smoke text-chinese-black cursor-pointer "}`}
         >
           Send reset link
         </button>

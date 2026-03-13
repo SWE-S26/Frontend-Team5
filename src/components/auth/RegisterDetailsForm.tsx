@@ -42,7 +42,7 @@ export default function RegisterDetailsForm({
   };
 
   return (
-    <div className="w-full text-white transition-all duration-300">
+    <div className="w-full text-white-smoke transition-all duration-300">
       <button
         onClick={onBack}
         className="mb-4 -ml-2 p-2 bg-[#303030] rounded-full transition-colors cursor-pointer"
@@ -57,7 +57,7 @@ export default function RegisterDetailsForm({
       <div className="space-y-4">
         {/* Display Name */}
         <div>
-          <div className="relative bg-[#222222] border border-white/10 rounded p-3 h-16 flex flex-col justify-center">
+          <div className="relative bg-chinese-black border border-white/10 rounded p-3 h-16 flex flex-col justify-center">
             <label
               className={`absolute left-3 transition-all duration-200 text-gray-400 font-bold tracking-wider pointer-events-none ${
                 isNameActive || displayName.length > 0
@@ -73,7 +73,7 @@ export default function RegisterDetailsForm({
               onFocus={() => setIsNameActive(true)}
               onBlur={() => setIsNameActive(displayName.length > 0)}
               onChange={(e) => setDisplayName(e.target.value)}
-              className={`w-full bg-transparent border-none outline-none text-white text-base ${
+              className={`w-full bg-transparent border-none outline-none text-white-smoke text-base ${
                 isNameActive || displayName.length > 0 ? "pt-4" : "pt-0"
               }`}
             />
@@ -85,18 +85,18 @@ export default function RegisterDetailsForm({
 
         {/* Date of Birth */}
         <div>
-          <p className="text-sm font-bold text-white mb-2">Date of birth (required)</p>
+          <p className="text-sm font-bold text-white-smoke mb-2">Date of birth (required)</p>
           <div className="grid grid-cols-3 gap-2">
             {/* Month */}
-            <div className="relative bg-[#222222] border border-white/10 rounded px-3 h-12 flex items-center">
+            <div className="relative bg-chinese-black border border-white/10 rounded px-3 h-12 flex items-center">
               <select
                 value={month}
                 onChange={(e) => setMonth(e.target.value)}
-                className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer text-gray-300"
+                className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer text-white-smoke"
               >
-                <option value="" disabled className="bg-[#222222]">Month</option>
+                <option value="" disabled className="bg-chinese-black text-white-smoke">Month</option>
                 {MONTHS.map((m) => (
-                  <option key={m} value={m} className="bg-[#222222]">{m}</option>
+                  <option key={m} value={m} className="bg-chinese-black text-white-smoke">{m}</option>
                 ))}
               </select>
               <div className="pointer-events-none absolute right-3 text-gray-400">
@@ -107,15 +107,15 @@ export default function RegisterDetailsForm({
             </div>
 
             {/* Day */}
-            <div className="relative bg-[#222222] border border-white/10 rounded px-3 h-12 flex items-center">
+            <div className="relative bg-chinese-black border border-white/10 rounded px-3 h-12 flex items-center">
               <select
                 value={day}
                 onChange={(e) => setDay(e.target.value)}
-                className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer text-gray-300"
+                className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer text-white-smoke"
               >
-                <option value="" disabled className="bg-[#222222]">Day</option>
+                <option value="" disabled className="bg-chinese-black text-white-smoke">Day</option>
                 {DAYS.map((d) => (
-                  <option key={d} value={d} className="bg-[#222222]">{d}</option>
+                  <option key={d} value={d} className="bg-chinese-black text-white-smoke">{d}</option>
                 ))}
               </select>
               <div className="pointer-events-none absolute right-3 text-gray-400">
@@ -126,15 +126,15 @@ export default function RegisterDetailsForm({
             </div>
 
             {/* Year */}
-            <div className="relative bg-[#222222] border border-white/10 rounded px-3 h-12 flex items-center">
+            <div className="relative bg-chinese-black border border-white/10 rounded px-3 h-12 flex items-center">
               <select
                 value={year}
                 onChange={(e) => setYear(e.target.value)}
-                className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer text-gray-300"
+                className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer text-white-smoke"
               >
-                <option value="" disabled className="bg-[#222222]">Year</option>
+                <option value="" disabled className="bg-chinese-black text-white-smoke">Year</option>
                 {YEARS.map((y) => (
-                  <option key={y} value={y} className="bg-[#222222]">{y}</option>
+                  <option key={y} value={y} className="bg-chinese-black text-white-smoke">{y}</option>
                 ))}
               </select>
               <div className="pointer-events-none absolute right-3 text-gray-400">
@@ -150,15 +150,15 @@ export default function RegisterDetailsForm({
         </div>
 
         {/* Gender */}
-        <div className="relative bg-[#222222] border border-white/10 rounded px-3 h-12 flex items-center">
+        <div className="relative bg-chinese-black border border-white/10 rounded px-3 h-12 flex items-center">
           <select
             value={gender}
             onChange={(e) => setGender(e.target.value)}
-            className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer text-gray-300"
+            className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer text-white-smoke"
           >
-            <option value="" disabled className="bg-[#222222]">Gender (required)</option>
+            <option value="" disabled className="bg-chinese-black text-white-smoke">Gender (required)</option>
             {GENDERS.map((g) => (
-              <option key={g} value={g} className="bg-[#222222]">{g}</option>
+              <option key={g} value={g} className="bg-chinese-black text-white-smoke">{g}</option>
             ))}
           </select>
           <div className="pointer-events-none absolute right-3 text-gray-400">
@@ -174,8 +174,8 @@ export default function RegisterDetailsForm({
           disabled={!isValid}
           className={`w-full h-12 font-bold rounded transition-all duration-200 ${
             isValid
-              ? "bg-white text-[#111111] cursor-pointer"
-              : "bg-white/60 text-[#111111] cursor-not-allowed"
+              ? "bg-white-smoke text-chinese-black cursor-pointer"
+              : "bg-white-smoke/60 text-chinese-black cursor-not-allowed"
           }`}
         >
           Continue

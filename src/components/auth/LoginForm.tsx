@@ -86,7 +86,7 @@ export default function LoginForm() {
   const isPasswordStep = step === "password";
 
   return (
-    <div className="w-full text-white transition-all duration-300">
+    <div className="w-full text-white-smoke transition-all duration-300">
       {(isEmailFocused || isPasswordStep) && (
         <button
           onClick={handleBackToEmail}
@@ -117,12 +117,12 @@ export default function LoginForm() {
             <button className="w-full h-11 cursor-pointer bg-[#003bb3] rounded flex items-center justify-center gap-3 font-semibold text-sm">
               <FaFacebook size={20} /> Continue with Facebook
             </button>
-            <button className="w-full h-11 cursor-pointer bg-[#333333] rounded flex items-center justify-center gap-3 font-semibold text-sm">
+            <button className="w-full h-11 cursor-pointer bg-chinese-black rounded flex items-center justify-center gap-3 font-semibold text-sm">
               <FcGoogle size={20} /> Continue with Google
             </button>
           </div>
           <div className="relative mb-6 flex justify-start">
-            <span className="bg-[#111111] text-sm font-bold text-white">Or with email</span>
+            <span className="bg-chinese-black text-sm font-bold text-white-smoke">Or with email</span>
           </div>
         </div>
       )}
@@ -130,7 +130,7 @@ export default function LoginForm() {
       <div className="space-y-4">
         <div
           className={`relative transition-all duration-300 rounded p-3 h-16 flex flex-col justify-center ${
-            isPasswordStep ? "bg-transparent border-none" : "bg-[#222222] border border-white/10"
+            isPasswordStep ? "bg-transparent border-none" : "bg-chinese-black border border-white/10"
           }`}
         >
           <label
@@ -146,14 +146,14 @@ export default function LoginForm() {
             disabled={isPasswordStep}
             onFocus={() => setIsEmailFocused(true)}
             onChange={(e) => setEmail(e.target.value)}
-            className={`w-full bg-transparent border-none outline-none text-white text-base ${
+            className={`w-full bg-transparent border-none outline-none text-white-smoke text-base ${
               isEmailActive ? "pt-4" : "pt-0"
             } ${isPasswordStep ? "opacity-80" : ""}`}
           />
         </div>
 
         {isPasswordStep && (
-          <div className="relative bg-[#222222] border border-white/30 rounded p-3 h-16 flex flex-col justify-center animate-in slide-in-from-top-2">
+          <div className="relative bg-chinese-black border border-white/30 rounded p-3 h-16 flex flex-col justify-center animate-in slide-in-from-top-2">
             <label
               className={`absolute left-3 transition-all duration-200 text-gray-400 font-bold tracking-wider pointer-events-none ${
                 isPasswordActive ? "text-[10px] top-2" : "text-[12px] top-1/2 -translate-y-1/2"
@@ -169,7 +169,7 @@ export default function LoginForm() {
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
                 autoFocus
-                className={`w-full bg-transparent border-none outline-none text-white text-base ${
+                className={`w-full bg-transparent border-none outline-none text-white-smoke text-base ${
                   isPasswordActive ? "pt-4" : "pt-0"
                 }`}
               />
@@ -189,8 +189,8 @@ export default function LoginForm() {
           disabled={isPasswordStep ? !password.trim() : !email.trim()}
           className={`w-full h-12 font-bold rounded transition-all duration-200 ${
             !email.trim() || (isPasswordStep && !password.trim())
-              ? "bg-white/60 text-chinese-black"
-              : "bg-white text-chinese-black cursor-pointer"
+              ? "bg-white-smoke/60 text-chinese-black"
+              : "bg-white-smoke text-chinese-black cursor-pointer"
           }`}
         >
           Continue
