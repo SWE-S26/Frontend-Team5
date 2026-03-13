@@ -73,37 +73,37 @@ export default function Legal() {
     children: React.ReactNode;
   }) => (
     <section id={id} className="scroll-mt-24">
-      <h2 className="text-white text-xl font-bold mb-3">{title}</h2>
+      <h2 className="text-white-smoke text-xl font-bold mb-3">{title}</h2>
       {children}
     </section>
   );
 
   return (
-    <div className="min-h-screen bg-[#111111] text-white font-sans">
+    <div className="min-h-screen bg-chinese-black text-white-smoke font-sans">
       <div className="max-w-7xl mx-auto px-8 py-3 flex gap-24">
         {/* MAIN CONTENT */}
 
         <main className="flex-1 max-w-3xl text-[14px] leading-relaxed text-white-smoke">
-          <h1 className="text-3xl font-bold text-white mb-6">
+          <h1 className="text-3xl font-bold text-white-smoke mb-6">
             BeatZa Terms of Use
           </h1>
 
           <p className="mb-4">
             Welcome to BeatZa®, a service provided by BeatZa Global Limited &
             Co. KG, a company incorporated under the laws of Egypt and with its
-            main place of business at Cairo, Egypt (<strong className="text-white">"BeatZa"</strong>, 
-            <strong className="text-white">"we"</strong>, <strong className="text-white">"our"</strong>, or
-            <strong className="text-white">"us"</strong>).
+            main place of business at Cairo, Egypt (<strong className="text-white-smoke">"BeatZa"</strong>, 
+            <strong className="text-white-smoke">"we"</strong>, <strong className="text-white-smoke">"our"</strong>, or
+            <strong className="text-white-smoke">"us"</strong>).
           </p>
 
           <p className="mb-4">
             These Terms of Use govern your use of beitza.com (together, the{" "}
-            <strong className="text-white">"Website"</strong>), our mobile and
-            desktop apps (our <strong className="text-white">"Apps"</strong>)
+            <strong className="text-white-smoke">"Website"</strong>), our mobile and
+            desktop apps (our <strong className="text-white-smoke">"Apps"</strong>)
             and all related players, widgets, tools, features, applications,
             data, software, APIs (which are also subject to separate API Terms
             of Use) and other services provided by BeatZa (the{" "}
-            <strong className="text-white">"Services"</strong>).
+            <strong className="text-white-smoke">"Services"</strong>).
           </p>
 
           <p className="mb-4">
@@ -111,11 +111,11 @@ export default function Legal() {
             Moderation and Enforcement Policy and any other terms specifically
             referred to in any of those documents, all of which are incorporated
             by reference into these Terms of Use, constitute a legally binding
-            contract (the <strong className="text-white">"Agreement"</strong>),
-            between the user (<strong className="text-white">"you"</strong>,{" "}
-            <strong className="text-white">"your"</strong>) and BeatZa in
+            contract (the <strong className="text-white-smoke">"Agreement"</strong>),
+            between the user (<strong className="text-white-smoke">"you"</strong>,{" "}
+            <strong className="text-white-smoke">"your"</strong>) and BeatZa in
             relation to your use of the Website, Apps and Services (together,
-            the <strong className="text-white">"Platform"</strong>).
+            the <strong className="text-white-smoke">"Platform"</strong>).
           </p>
 
           <p className="mb-4">

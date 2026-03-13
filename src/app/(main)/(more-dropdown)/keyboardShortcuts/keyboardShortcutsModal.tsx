@@ -93,7 +93,7 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }: KeyboardShor
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-white text-2xl font-bold mb-8">
+        <h2 className="text-white-smoke text-2xl font-bold mb-8">
           Keyboard shortcuts
         </h2>
 
