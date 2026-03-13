@@ -20,7 +20,7 @@ export default function Copyright() {
     children: React.ReactNode;
   }) => (
     <section id={id} className="scroll-mt-24 mb-8">
-      <h2 className="text-white text-2xl font-bold mb-4">{title}</h2>
+      <h2 className="text-white-smoke text-2xl font-bold mb-4">{title}</h2>
       {children}
     </section>
   );
@@ -31,7 +31,7 @@ export default function Copyright() {
 
         {/* MAIN CONTENT */}
         <main className="flex-1 max-w-3xl text-[14px] leading-relaxed text-white-smoke">
-          <h1 className="text-3xl font-bold text-white mb-4">
+          <h1 className="text-3xl font-bold text-white-smoke mb-4">
             Learn about Copyright
           </h1>
 
@@ -49,7 +49,7 @@ export default function Copyright() {
           </ul>
 
           <p className="mb-10">
-            <strong className="text-white">Please note:</strong> This page
+            <strong className="text-white-smoke">Please note:</strong> This page
             provides some basic information about copyright. However, nothing on
             this page constitutes legal advice – please do not treat it as legal
             advice or as a substitute for legal advice. Please consult a suitably
@@ -131,8 +131,8 @@ export default function Copyright() {
               consider before uploading anything to BeatZa:
             </p>
 
-            <p className="text-white font-semibold mb-2">For music uploads:</p>
-            <p className="mb-2">Can you answer <strong className="text-white">"yes"</strong> to all of the following questions?</p>
+            <p className="text-white-smoke font-semibold mb-2">For music uploads:</p>
+            <p className="mb-2">Can you answer <strong className="text-white-smoke">"yes"</strong> to all of the following questions?</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
               <li>Did you compose the music yourself?</li>
               <li>Did you write the lyrics yourself?</li>
@@ -140,7 +140,7 @@ export default function Copyright() {
               <li>Do you have written permission from all copyright owners to use any samples contained in the track?</li>
             </ul>
 
-            <p className="mb-2">Can you answer <strong className="text-white">"no"</strong> to all of the following questions?</p>
+            <p className="mb-2">Can you answer <strong className="text-white-smoke">"no"</strong> to all of the following questions?</p>
             <ul className="list-disc pl-6 mb-6 space-y-1">
               <li>Were you signed to a record label when you recorded the track?</li>
               <li>Do you have a publishing deal?</li>
@@ -149,8 +149,8 @@ export default function Copyright() {
               <li>Does the track contain the entirety or any part of someone else's song(s)? Is it based on someone else's song(s)?</li>
             </ul>
 
-            <p className="text-white font-semibold mb-2">For other sounds, including field recordings, podcasts, audiobooks or voice messages:</p>
-            <p className="mb-2">Can you answer <strong className="text-white">"yes"</strong> to all of the following questions?</p>
+            <p className="text-white-smoke font-semibold mb-2">For other sounds, including field recordings, podcasts, audiobooks or voice messages:</p>
+            <p className="mb-2">Can you answer <strong className="text-white-smoke">"yes"</strong> to all of the following questions?</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
               <li>Is the recording spontaneous, as opposed to being recited from a script, play or book (other than one written by you)?</li>
               <li>Is it a recording of your performance?</li>
@@ -158,7 +158,7 @@ export default function Copyright() {
               <li>Do you have the permission of anyone else appearing in the recording to upload and share the recording on BeatZa?</li>
             </ul>
 
-            <p className="mb-2">Can you answer <strong className="text-white">"no"</strong> to all of the following questions?</p>
+            <p className="mb-2">Can you answer <strong className="text-white-smoke">"no"</strong> to all of the following questions?</p>
             <ul className="list-disc pl-6 mb-4 space-y-1">
               <li>Is the recording rehearsed or recited from a script, play or book (other than one written by you)?</li>
               <li>Does the recording contain any music or excerpts from other copyright works (e.g. movie dialogue)?</li>
@@ -183,16 +183,16 @@ export default function Copyright() {
         <div className="w-64 shrink-0">
 
           {/* Report Card */}
-          <div className="bg-[#303030] w-85 p-5 mb-8">
-            <h3 className="text-white font-bold text-base mb-3">
+          <div className="bg-off-black w-85 p-5 mb-8 rounded">
+            <h3 className="text-white-smoke font-bold text-base mb-3">
               Report Copyright Infringement
             </h3>
-            <p className="text-[#999999] text-[13px] mb-4">
+            <p className="text-silver text-[13px] mb-4">
               If you identify content on BeatZa that you believe infringes your
               copyright, you can let us know using any of the methods explained
               on these pages.
             </p>
-            <button className="w-56 bg-chinese-black text-white-smoke cursor-pointer text-[14px] font-semibold py-2 px-2 rounded hover:text-gray-500 transition-colors">
+            <button className="w-56 bg-white-smoke text-chinese-black cursor-pointer text-[14px] font-semibold py-2 px-2 rounded hover:opacity-90 transition-colors">
               Report Copyright Infringement
             </button>
           </div>
