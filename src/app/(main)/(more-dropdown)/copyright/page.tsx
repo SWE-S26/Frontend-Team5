@@ -5,7 +5,7 @@ import LegalSidebar from "@/app/(main)/(more-dropdown)/shared/LegalSidebar";
 
 export default function Copyright() {
   const Link = ({ children }: { children: React.ReactNode }) => (
-    <span className="cursor-pointer text-[#699FFF] hover:underline transition-colors">
+    <span className="cursor-pointer text-[#044DD2] hover:underline transition-colors">
       {children}
     </span>
   );
@@ -27,7 +27,7 @@ export default function Copyright() {
 
   return (
     <div className="min-h-screen bg-chinese-black text-white-smoke font-sans">
-      <div className="max-w-7xl mx-auto px-8 py-2 flex gap-28">
+      <div className="max-w-7xl mx-auto pr-8 py-2 flex gap-28">
 
         {/* MAIN CONTENT */}
         <main className="flex-1 max-w-3xl text-[14px] leading-relaxed text-white-smoke">
@@ -42,10 +42,10 @@ export default function Copyright() {
 
           {/* TOC */}
           <ul className="list-disc pl-6 mb-6 space-y-1">
-            <li><a href="#what-is-copyright" className="text-[#699FFF] hover:underline">What is copyright?</a></li>
-            <li><a href="#infringement" className="text-[#699FFF] hover:underline">What is copyright infringement and how can I avoid it?</a></li>
-            <li><a href="#checklist" className="text-[#699FFF] hover:underline">Copyright Checklist</a></li>
-            <li><a href="#resources" className="text-[#699FFF] hover:underline">Further resources</a></li>
+            <li><a href="#what-is-copyright" className="text-[#044DD2] hover:underline">What is copyright?</a></li>
+            <li><a href="#infringement" className="text-[#044DD2] hover:underline">What is copyright infringement and how can I avoid it?</a></li>
+            <li><a href="#checklist" className="text-[#044DD2] hover:underline">Copyright Checklist</a></li>
+            <li><a href="#resources" className="text-[#044DD2] hover:underline">Further resources</a></li>
           </ul>
 
           <p className="mb-10">
@@ -183,7 +183,7 @@ export default function Copyright() {
         <div className="w-64 shrink-0">
 
           {/* Report Card */}
-          <div className="bg-off-black w-85 p-5 mb-8 rounded">
+          <div className="bg-off-black w-75 p-5 mb-8">
             <h3 className="text-white-smoke font-bold text-base mb-3">
               Report Copyright Infringement
             </h3>
@@ -192,7 +192,7 @@ export default function Copyright() {
               copyright, you can let us know using any of the methods explained
               on these pages.
             </p>
-            <button className="w-56 bg-white-smoke text-chinese-black cursor-pointer text-[14px] font-semibold py-2 px-2 rounded hover:opacity-90 transition-colors">
+            <button className="w-56 bg-chinese-black text-white-smoke cursor-pointer text-[14px] font-semibold py-2 px-2 rounded hover:opacity-90 transition-colors">
               Report Copyright Infringement
             </button>
           </div>

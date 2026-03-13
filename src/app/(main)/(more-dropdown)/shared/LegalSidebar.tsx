@@ -39,7 +39,7 @@ export default function LegalSidebar() {
             <ul className="space-y-2">
               {section.links.map((link, index) => (
                 <li key={`${link}-${index}`}>
-                  <a className="text-[13px] cursor-pointer hover:underline text-[#699FFF]">
+                  <a className="text-[13px] cursor-pointer hover:underline text-[#044DD2]">
                     {link}
                   </a>
                 </li>
