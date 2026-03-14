@@ -6,12 +6,31 @@ interface TabsButtonProps {
   pathname: string
   textSize?: string
   basePath?: string
+  onClick?: () => void
+  isActiveb?: boolean
 }
 
-export default function TabsButton({ href, label, pathname, textSize = "text-base", basePath  }: TabsButtonProps) {
+export default function TabsButton({
+  href,
+  label,
+  pathname,
+  textSize = "text-base",
+  basePath,
+  onClick,
+  isActiveb
+}: TabsButtonProps) {
+
   const isActive = basePath ? pathname.startsWith(basePath) : pathname === href
+  const active = isActiveb ?? isActive
+
   return (
-    <Link href={href} className={`px-2 py-2 font-bold border-b-2 border-chinese-black hover:text-white-smoke transition-all duration-300 ${textSize} ${isActive ? "border-b-2 border-white-smoke text-white-smoke" : "text-silver"}`}>
+    <Link
+      onClick={onClick}
+      href={href}
+      className={`px-2 py-2 font-bold border-b-2 border-chinese-black hover:text-white-smoke transition-all duration-300 ${textSize} ${
+        active ? "border-white-smoke text-white-smoke" : "text-silver"
+      }`}
+    >
       {label}
     </Link>
   )

@@ -1,5 +1,6 @@
 // this file is created to add navbar to all pages inside /(main) folder to avoid adding navbar manually to each page
 import Navbar from "@/components/layout/navbar/Navbar";
+import PlayerBar from "@/components/layout/player/PlayerBar";
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <div>
@@ -9,6 +10,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           {children}
         </div>
       </main>
+      <PlayerBar/>
     </div>
   )
 }

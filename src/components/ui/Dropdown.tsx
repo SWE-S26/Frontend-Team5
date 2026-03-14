@@ -42,7 +42,7 @@ export default function Dropdown({ trigger, items, width = "w-40", position = "r
               <hr key={index} className="border-silver my-1" />
             ) : (
               <button key={index} onClick={() => { item.onClick?.(); setIsOpen(false) }}
-                className="flex items-center text-sm gap-3 text-white-smoke hover:text-silver font-bold px-4 py-2 text-left transition-all duration-300">
+                className="flex items-center text-sm gap-3 text-white-smoke hover:text-silver font-bold px-4 py-2 text-left transition-all duration-300 cursor-pointer">
                 {item.icon && <span className="text-md">{item.icon}</span>}
                 {item.label}
               </button>
