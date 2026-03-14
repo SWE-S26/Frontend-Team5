@@ -2,6 +2,7 @@
 
 import React from "react";
 import LegalSidebar from "@/app/(main)/(more-dropdown)/shared/LegalSidebar";
+import { useRouter } from "next/navigation";
 
 export default function Copyright() {
   const Link = ({ children }: { children: React.ReactNode }) => (
@@ -24,6 +25,8 @@ export default function Copyright() {
       {children}
     </section>
   );
+
+  const router = useRouter();
 
   return (
     <div className="min-h-screen bg-chinese-black text-white-smoke font-sans">
@@ -192,7 +195,7 @@ export default function Copyright() {
               copyright, you can let us know using any of the methods explained
               on these pages.
             </p>
-            <button className="w-56 bg-chinese-black text-white-smoke cursor-pointer text-[14px] font-semibold py-2 px-2 rounded hover:opacity-90 transition-colors">
+            <button onClick={() => router.push("/copyright/report")}  className="w-56 bg-chinese-black text-white-smoke cursor-pointer text-[14px] font-semibold py-2 px-2 rounded hover:opacity-90 transition-colors">
               Report Copyright Infringement
             </button>
           </div>
