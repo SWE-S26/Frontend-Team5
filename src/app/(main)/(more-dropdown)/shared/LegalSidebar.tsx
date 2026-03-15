@@ -32,14 +32,14 @@ export default function LegalSidebar() {
       <div className="sticky top-10 space-y-8">
         {sidebarSections.map((section) => (
           <div key={section.title}>
-            <h3 className="text-white font-bold text-base mb-3">
+            <h3 className="text-white-smoke font-bold text-base mb-3">
               {section.title}
             </h3>
 
             <ul className="space-y-2">
               {section.links.map((link, index) => (
                 <li key={`${link}-${index}`}>
-                  <a className="text-[13px] cursor-pointer hover:underline text-[#699FFF]">
+                  <a className="text-[13px] cursor-pointer hover:underline text-[#044DD2]">
                     {link}
                   </a>
                 </li>
