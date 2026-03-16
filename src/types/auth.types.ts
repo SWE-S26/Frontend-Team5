@@ -32,7 +32,7 @@ export interface DetailsValidationFormProps {
 
 //* ======================== API Integration ======================== */
 
-/* (1) "/api/auth/find-email" */
+/* (1) "/api/auth/v1/find-email" */
 export interface FindEmailRequest {
   email: string
 }
@@ -41,4 +41,37 @@ export interface FindEmailResponse {
   message: string
 }
 
-/* (2) " " */
+/* (2) "/api/auth/v1/login" */
+export interface LoginRequest {
+  email: string,
+  password: string
+}
+export interface LoginResponse {
+  success: boolean,
+  message: string,
+  data: {}
+}
+
+/* (3) "/api/auth/v1/signup" */
+export interface SignupRequest {
+  email: string,
+  password: string,
+  displayName: string,
+  dateOfBirth: string,
+  gender: string
+}
+export interface SignupResponse {
+  success: boolean,
+  message: string,
+  data: {}
+}
+
+/* (4) "/api/auth/v1/verify-email" */
+export interface VerifyEmailRequest {
+  token: string,
+}
+export interface VerifyEmailResponse {
+  success: boolean,
+  message: string,
+  data: {}
+}

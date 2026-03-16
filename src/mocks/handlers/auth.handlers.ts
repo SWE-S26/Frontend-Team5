@@ -39,4 +39,201 @@ export const authHandlers = [
     }),
 
     /* (2) */
+    http.post("/api/auth/v1/login", async ({ request }) => {
+        const body = await request.json() as { email: string, password: string }
+
+        // 400 - missing or invalid email
+        if (!body.email || !body.email.includes("@")) {
+        return HttpResponse.json(
+            { success: false, message: "Email is required or invalid format", data: {} },
+            { status: 400 }
+        )
+        }
+
+        // 400 - missing password
+        if (!body.password || body.password.trim().length === 0) {
+        return HttpResponse.json(
+            { success: false, message: "Password is required", data: {} },
+            { status: 400 }
+        )
+        }
+
+        // 429 - too many requests (simulate by using specific test email)
+        if (body.email === "ratelimit@test.com") {
+        return HttpResponse.json(
+            { success: false, message: "Too many requests, please try again later", data: {} },
+            { status: 429 }
+        )
+        }
+
+        // 500 - server error (simulate by using specific test email)
+        if (body.email === "error@test.com") {
+        return HttpResponse.json(
+            { success: false, message: "Something went wrong on the server", data: {} },
+            { status: 500 }
+        )
+        }
+
+        // 404 - user not found
+        const existingUsers = {
+        "test@test.com": "test1234",
+        "omar@beatza.com": "omar1234",
+        } as Record<string, string>
+
+        const storedPassword = existingUsers[body.email]
+        if (!storedPassword) {
+        return HttpResponse.json(
+            { success: false, message: "User not found", data: {} },
+            { status: 404 }
+        )
+        }
+
+        // 401 - invalid credentials
+        if (storedPassword !== body.password) {
+        return HttpResponse.json(
+            { success: false, message: "Authorization failed", data: {} },
+            { status: 401 }
+        )
+        }
+
+        // 200 - success (tokens are typically set via httpOnly cookies)
+        return HttpResponse.json(
+        { success: true, message: "Authenticated successfully", data: {} },
+        { status: 200 }
+        )
+    }),
+
+    /* (3) */
+    http.post("/api/auth/v1/signup", async ({ request }) => {
+        const body = await request.json() as {
+            email: string,
+            password: string,
+            displayName: string,
+            dateOfBirth: string,
+            gender: string
+        }
+
+        // 400 - missing or invalid email
+        if (!body.email || !body.email.includes("@")) {
+            return HttpResponse.json(
+                { success: false, message: "Email is required or invalid format", data: {} },
+                { status: 400 }
+            )
+        }
+
+        // 400 - missing password
+        if (!body.password || body.password.trim().length === 0) {
+            return HttpResponse.json(
+                { success: false, message: "Password is required", data: {} },
+                { status: 400 }
+            )
+        }
+
+        // 400 - missing displayName
+        if (!body.displayName || body.displayName.trim().length === 0) {
+            return HttpResponse.json(
+                { success: false, message: "Display name is required", data: {} },
+                { status: 400 }
+            )
+        }
+
+        // 400 - missing or invalid dateOfBirth
+        if (!body.dateOfBirth || isNaN(Date.parse(body.dateOfBirth))) {
+            return HttpResponse.json(
+                { success: false, message: "Date of birth is required or invalid format", data: {} },
+                { status: 400 }
+            )
+        }
+
+        // 400 - missing gender
+        if (!body.gender) {
+            return HttpResponse.json(
+                { success: false, message: "Gender is required", data: {} },
+                { status: 400 }
+            )
+        }
+
+        // 429 - rate limit simulation
+        if (body.email === "ratelimit@test.com") {
+            return HttpResponse.json(
+                { success: false, message: "Too many requests, please try again later", data: {} },
+                { status: 429 }
+            )
+        }
+
+        // 500 - server error simulation
+        if (body.email === "error@test.com") {
+            return HttpResponse.json(
+                { success: false, message: "Internal server error", data: {} },
+                { status: 500 }
+            )
+        }
+
+        // 401 - simulate already-registered email (conflict/auth guard)
+        const existingEmails = ["test@test.com", "omar@beatza.com"]
+        if (existingEmails.includes(body.email)) {
+            return HttpResponse.json(
+                { success: false, message: "Authorization failed", data: {} },
+                { status: 401 }
+            )
+        }
+
+        // 404 - resource not found (e.g. org/tenant not found, per Swagger)
+        if (body.email.endsWith("@notfound.com")) {
+            return HttpResponse.json(
+                { success: false, message: "Property not found or not updated", data: {} },
+                { status: 404 }
+            )
+        }
+
+        // 200 - signup successful
+        return HttpResponse.json(
+            { success: true, message: "Signup successful", data: null },
+            { status: 200 }
+        )
+    }),
+
+    /* (3) */
+    http.get("/api/auth/v1/verify-email", async ({ request }) => {
+        const url = new URL(request.url)
+        const token = url.searchParams.get("token")
+
+        // 401 - missing or invalid token
+        if (!token || token.trim().length === 0) {
+            return HttpResponse.json(
+                { success: false, message: "Authorization failed", data: {} },
+                { status: 401 }
+            )
+        }
+
+        // 500 - server error simulation
+        if (token === "error-token") {
+            return HttpResponse.json(
+                { success: false, message: "Internal server error", data: {} },
+                { status: 500 }
+            )
+        }
+
+        // 410 - expired/revoked token
+        if (token === "expired-token") {
+            return HttpResponse.json(
+                { success: false, message: "Link is expired" },
+                { status: 410 }
+            )
+        }
+
+        // 404 - token not found
+        if (token === "notfound-token") {
+            return HttpResponse.json(
+                { success: false, message: "Property not found or not updated", data: {} },
+                { status: 404 }
+            )
+        }
+
+        // 200 - successfully verified
+        return HttpResponse.json(
+            { success: true, message: "User Verified successfully", data: {} },
+            { status: 200 }
+        )
+    }),
 ]
