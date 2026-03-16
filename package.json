@@ -33,7 +33,13 @@
     "babel-plugin-react-compiler": "1.0.0",
     "eslint": "^10.0.1",
     "eslint-config-next": "^0.2.4",
+    "msw": "^2.12.11",
     "tailwindcss": "^4",
     "typescript": "^5"
+  },
+  "msw": {
+    "workerDirectory": [
+      "public"
+    ]
   }
 }
