@@ -1,3 +1,4 @@
+//* ======================== GUI Purposes ======================== */
 export interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
@@ -26,3 +27,18 @@ export interface DetailsValidationFormProps {
   onBackToLogin: () => void;
   onSendAgain?: () => void;
 }
+
+
+
+//* ======================== API Integration ======================== */
+
+/* (1) "/api/auth/find-email" */
+export interface FindEmailRequest {
+  email: string
+}
+export interface FindEmailResponse {
+  exists:  boolean
+  message: string
+}
+
+/* (2) " " */
