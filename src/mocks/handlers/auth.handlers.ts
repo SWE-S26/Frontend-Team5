@@ -2,7 +2,7 @@ import { http, HttpResponse } from "msw"
 
 export const authHandlers = [
     /* (1) */
-    http.post("/api/auth/find-email", async ({ request }) => {
+    http.post("/api/auth/v1/find-email", async ({ request }) => {
         const body = await request.json() as { email: string }
 
         // 400 - missing or invalid email
