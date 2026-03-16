@@ -68,9 +68,9 @@ const handleVolume = (v: number) => {
 
   return (
 
-    <div className="flex justify-center fixed bottom-0 w-full bg-[#3a3a3a] ">
+    <div className="flex justify-center fixed bottom-0 w-full h-11.75 bg-[#3a3a3a] z-1000">
  
-      <div className="flex items-center w-full max-w-6xl ">
+      <div className="flex items-center w-full max-w-302 justify-between">
         <audio
         ref={audioRef}
         src="https://serv100.albumaty.com/dl/3en/amr-diab/albums/wayah/12.Baaet_Leh.mp3"
@@ -82,7 +82,7 @@ const handleVolume = (v: number) => {
         />
 
         {/* Left-Side */}
-        <div className="flex basis-3xl">
+        <div className="flex w-[68%]">
           <div className="pr-5">
           <PlayerControls
             isPlaying={isPlaying}
@@ -103,9 +103,9 @@ const handleVolume = (v: number) => {
           />
           </div>
         </div>
-
+        
         {/* Right-Side */}
-        <div className="flex pr-5 py-2">
+        <div className="flex pr-5 py-2 w-[27.75%]">
           <PlayerTrackInfo />
           <PlayerNextUp />
         </div>

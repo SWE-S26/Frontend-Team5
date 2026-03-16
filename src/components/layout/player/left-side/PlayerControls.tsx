@@ -26,8 +26,8 @@ const [repeatMode, setRepeatMode] = useState(0)
 
 
     return(
-        <div className="flex items-center flex-shrink-0">
-            <div className="flex gap-2 sm:gap-4 pr-5">
+        <div className="flex items-center shrink-0">
+            <div className="flex gap-2 sm:gap-4 pr-5 mx-3">
                 <button>
                 <IoPlaySkipBackSharp className="hover:text-silver cursor-pointer" size={25}/>
                 </button>
@@ -37,9 +37,9 @@ const [repeatMode, setRepeatMode] = useState(0)
                 className="relative group p-2 rounded-full bg-white transition flex items-center justify-center cursor-pointer hover:text-silver"
                 >
                 {isPlaying ?
-                    <GiPauseButton className="w-4 h-4 text-black hover:text-silver ml-[1px]" />
+                    <GiPauseButton className="w-4 h-4 text-black hover:text-silver ml-px" />
                     :
-                    <IoIosPlay className="w-4 h-4 text-black hover:text-silver ml-[1px]" />
+                    <IoIosPlay className="w-4 h-4 text-black hover:text-silver ml-px" />
                 }
                 </button>
 

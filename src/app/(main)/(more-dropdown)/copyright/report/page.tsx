@@ -1,7 +1,7 @@
 "use client";
 
 import React from "react";
-import LegalSidebar from "@/app/(main)/(more-dropdown)/shared/LegalSidebar";
+import LegalSidebar from "@/app/(main)/(more-dropdown)/legal/LegalSidebar";
 import { useRouter } from "next/navigation";
 
 export default function ReportCopyright() {

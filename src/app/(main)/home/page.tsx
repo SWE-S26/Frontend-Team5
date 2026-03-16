@@ -6,13 +6,18 @@ export const metadata: Metadata = {
 
 export default function Home() {
   return (
-    <div>
-      <h1>Home</h1>
-      <MediaCardCarousel />
-      <MediaCardCarousel />
-      <MediaCardCarousel />
-      <MediaCardCarousel />
+    <div className="flex justify-between">
 
+      <div className="w-[68%]">
+        <h1>Home</h1>
+        <MediaCardCarousel />
+        <MediaCardCarousel />
+      </div>
+      
+      <div className="w-[27.75%]">
+        <MediaCardCarousel />
+      </div>
+    
     </div>
   )
 }

@@ -9,7 +9,7 @@ import { MdOutlineEdit } from "react-icons/md";
 
 /* Tabs */
 import EmptyTab from "@/components/profile/profile-tabs/EmptyTab";
-import TabsNavBar from "@/components/profile/TabsNavBar";
+import TabsNavbar from "@/components/layout/navbar/TabsNavbar";
 import All from "@/components/profile/profile-tabs/All";
 import PopularTracks from "@/components/profile/profile-tabs/PopularTracks";
 import Tracks from "@/components/profile/profile-tabs/Tracks";
@@ -25,6 +25,15 @@ interface Props {
 
 
 const ProfilePage = ({ params }: Props) => {
+  const profileTabs = [
+    { href: "", label: "All", value: "all" },
+    { href: "", label: "Popular tracks", value: "popular tracks" },
+    { href: "", label: "Tracks", value: "tracks" },
+    { href: "", label: "Albums", value: "albums" },
+    { href: "", label: "Playlists", value: "playlists" },
+    { href: "", label: "Reposts", value: "reposts" },
+  ];
+  
   const [activeTab, setActiveTab] = useState("all")
   const all: any[] = [] // mock data
   const popular: any[] = [] // mock data
@@ -53,7 +62,8 @@ const ProfilePage = ({ params }: Props) => {
 
       <ProfileHeader />
       <div className="flex items-center justify-between mb-4">
-        <TabsNavBar activeTab={activeTab} setActiveTab={setActiveTab}/>
+        <TabsNavbar tabs={profileTabs} activeTab={activeTab} onTabChange={setActiveTab}
+          textSize="text-md" className="flex items-center justify-between text-white py-6 px-1" tabsWrapperClassName="flex space-x-6"/>
         <div className="flex space-x-2">
           <button className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10">
             <LuShare className="w-4 h-4 " />
@@ -77,40 +87,44 @@ const ProfilePage = ({ params }: Props) => {
       </div>
 
 
-      <div className="flex">
-        <div className="basis-4xl">
+      <div className="flex justify-between">
+        <div className="w-[68%]">
+
           <div className="mt-10">
             {activeTab === "all" &&
               (all.length === 0 ? <EmptyTab /> : <All />)}
-          </div>
 
-          <div className="mt-10">
             {activeTab === "popular tracks" &&
               (popular.length === 0 ? <EmptyTab /> : <PopularTracks />)}
-          </div>
 
-          <div className="mt-10">
             {activeTab === "tracks" &&
               (tracks.length === 0 ? <EmptyTab /> : <Tracks />)}
-          </div>
 
-          <div className="mt-10">
             {activeTab === "albums" &&
               (albums.length === 0 ? <EmptyTab /> : <Albums />)}
-          </div>
 
-          <div className="mt-10">
             {activeTab === "playlists" &&
-              (playlists.length === 0 ? <h2 className="font-bold text-lg flex  items-center justify-center text-center">You haven’t created any playlists.</h2> : <Playlists />)}
+              (playlists.length === 0 ? (
+                <h2 className="font-bold text-lg flex items-center justify-center text-center">
+                  You haven’t created any playlists.
+                </h2>
+              ) : (
+                <Playlists />
+              ))}
+
+            {activeTab === "reposts" &&
+              (reposts.length === 0 ? (
+                <h2 className="font-bold text-lg flex items-center justify-center text-center">
+                  You haven’t reposted any sounds.
+                </h2>
+              ) : (
+                <Reposts />
+              ))}
           </div>
 
-          <div className="mt-10">
-            {activeTab === "reposts" &&
-              (reposts.length === 0 ? <h2 className="font-bold text-lg flex items-center justify-center text-center">You haven’t reposted any sounds.</h2> : <Reposts />)}
-          </div>
         </div>
 
-        <div className="">
+        <div className="w-[27.75%]">
           <ProfileSideBar/>
         </div>
       </div>

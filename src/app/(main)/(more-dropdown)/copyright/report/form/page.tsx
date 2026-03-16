@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
-import LegalSidebar from "@/app/(main)/(more-dropdown)/shared/LegalSidebar";
+import LegalSidebar from "@/app/(main)/(more-dropdown)/legal/LegalSidebar";
 import { useRouter } from "next/navigation";
 
 interface FormData {

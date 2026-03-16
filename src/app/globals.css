@@ -4,8 +4,8 @@
 :root {
   /* soundcloud color palete (Default: Dark Mode) */
   --bg              : #121212; /* chinese black */
-  --fg              : #f4f4f4; /* white smoke   */
-  --silver          : #818181;
+  --fg              : #ffffff; /* white smoke   */
+  --silver          : #8d8d8d;
   --off-black       : #303030;
   --brilliant-orange: #FF9533;
   --crusta          : #FF7F34;
@@ -19,11 +19,12 @@
 
 [data-theme="light"] {
   /* Light Mode */
-  --bg       : #f4f4f4;
+  --bg       : #ffffff;
   --fg       : #121212;
   --off-black: #e7e7e7;
   --login    : rgba(0, 0, 0, 0.5);
   --back     : rgb(233, 231, 231);
+  --silver   : #656565;
 }
 
 /* @media is used for dark mode */
@@ -47,16 +48,16 @@
   --color-silver          : var(--silver);
   --color-off-black       : var(--off-black); 
   --color-brilliant-orange: var(--brilliant-orange);
-  --color-crusta: var(--crusta);
-  --color-papaya: var(--papaya);
-  --color-inferno: var(--inferno);
-  --color-anger: var(--anger);
-  --color-gentle-peach: var(--gentle-peach);
-  --color-crusta: var(--crusta);
-  --color-papaya: var(--papaya);
-  --color-inferno: var(--inferno);
-  --color-anger: var(--anger);
-  --color-gentle-peach: var(--gentle-peach);
+  --color-crusta          : var(--crusta);
+  --color-papaya          : var(--papaya);
+  --color-inferno         : var(--inferno);
+  --color-anger           : var(--anger);
+  --color-gentle-peach    : var(--gentle-peach);
+  --color-crusta          : var(--crusta);
+  --color-papaya          : var(--papaya);
+  --color-inferno         : var(--inferno);
+  --color-anger           : var(--anger);
+  --color-gentle-peach    : var(--gentle-peach);
 }
 
 body {

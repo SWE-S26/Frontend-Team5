@@ -28,6 +28,7 @@ export default function RootLayout({
         <ThemeProvider>
           {children}
         </ThemeProvider>
+        <div className="h-12"/>
       </body>
     </html>
   );

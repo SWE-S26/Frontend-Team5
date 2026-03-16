@@ -7,9 +7,13 @@ interface NavbarCenterProps {
 
 export default function NavbarCenter({ isLoggedIn }: NavbarCenterProps) {
   return (
-    <div className="relative w-full">
-      <input type="text" placeholder="Search for artists, bands, tracks, podcasts" className="bg-off-black text-white-smoke placeholder-silver rounded-sm pl-5 pr-9 py-[9.7px] text-sm w-full outline-none ring-1 ring-transparent focus:ring-silver transition-all duration-300"/>
-      <CiSearch className="absolute right-3 top-1/2 -translate-y-1/2 text-silver text-xl"/>
-    </div>
+<div className="relative w-full">
+  <input
+    type="text"
+    placeholder="Search"
+    className="w-full h-9 bg-off-black text-white-smoke placeholder-silver rounded-sm pl-4 pr-9 mb-0.75 text-sm outline-none caret-anger ring-1 ring-transparent focus:ring-silver transition-all duration-300"
+  />
+  <CiSearch className="absolute right-4 top-1/2 -translate-y-1/2 text-silver text-2xl" />
+</div>
   )
 }

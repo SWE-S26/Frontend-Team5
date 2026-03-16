@@ -6,5 +6,9 @@ export const metadata: Metadata = {
 }
 
 export default function Library() {
-  return <div>Overview</div>
+  return (
+    <div>
+      Overview
+    </div>
+  )
 }
