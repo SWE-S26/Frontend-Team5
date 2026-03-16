@@ -9,11 +9,6 @@ export interface LoginFormProps {
   onSwitchToRegister: () => void;
 }
 
-export interface RegisterFormProps {
-  email: string;
-  onSwitchToLogin: () => void;
-}
-
 export interface ForgotPasswordFormProps {
   email: string;
   setEmail: (val: string) => void;
