@@ -20,7 +20,7 @@ export default function DetailsValidationForm({
 
       <p className="text-sm text-gray-400 mb-6">
         No email in your inbox or spam folder?{" "}
-        <button
+        <button data-testid="send-again-button"
           onClick={onSendAgain}
           className="text-[#699FFF] hover:underline cursor-pointer font-medium"
         >
@@ -53,7 +53,7 @@ export default function DetailsValidationForm({
 
       <p className="text-sm text-gray-400">
         Wrong address?{" "}
-        <button
+        <button data-testid="back-to-login-button-validate"
           onClick={onBackToLogin}
           className="text-[#699FFF] hover:underline cursor-pointer font-medium"
         >
