@@ -1,11 +1,7 @@
 "use client"
 import { CiSearch } from "react-icons/ci";
 
-interface NavbarCenterProps {
-  isLoggedIn: boolean
-}
-
-export default function NavbarCenter({ isLoggedIn }: NavbarCenterProps) {
+export default function NavbarCenter() {
   return (
 <div className="relative w-full">
   <input

@@ -17,7 +17,7 @@ export default function Navbar({ className, isLoggedIn }: NavbarProps) {
           <NavbarLeft isLoggedIn={isLoggedIn}/>
         </div>
         <div className="flex-1">
-          <NavbarCenter isLoggedIn={isLoggedIn}/>
+          <NavbarCenter/>
         </div>
         <div className="flex-none">
           <NavbarRight isLoggedIn={isLoggedIn}/>
