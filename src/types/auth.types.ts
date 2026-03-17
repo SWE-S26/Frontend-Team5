@@ -23,11 +23,73 @@ export interface ForgotPasswordFormProps {
 export interface RegisterDetailsFormProps {
   email: string;
   onBack: () => void;
-  onComplete: (details: { displayName: string; dob: string; gender: string }) => void;
+  onComplete: (details: {
+    displayName: string;
+    dob: string;
+    gender: string;
+  }) => void;
 }
 
 export interface DetailsValidationFormProps {
   email: string;
   onBackToLogin: () => void;
   onSendAgain?: () => void;
+}
+
+//* ======================== API Integration ======================== */
+
+/* (1) "/api/auth/v1/find-email" */
+export interface FindEmailRequest {
+  email: string;
+}
+export interface FindEmailResponse {
+  exists: boolean;
+  message: string;
+}
+
+/* (2) "/api/auth/v1/login" */
+export interface LoginRequest {
+  email: string;
+  password: string;
+}
+export interface LoginResponse {
+  success: boolean;
+  message: string;
+  data: {};
+}
+
+/* (3) "/api/auth/v1/signup" */
+export interface SignupRequest {
+  email: string;
+  password: string;
+  displayName: string;
+  dateOfBirth: string;
+  gender: string;
+}
+export interface SignupResponse {
+  success: boolean;
+  message: string;
+  data: {};
+}
+
+/* (4) "/api/auth/v1/forget-password" */
+export interface ForgetPasswordRequest {
+  email: string;
+}
+export interface ForgetPasswordResponse {
+  success: boolean;
+  message: string;
+  data: {};
+}
+
+/* (5) "/api/auth/v1/reset-password" */
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  success: boolean;
+  message: string;
+  data: {};
 }

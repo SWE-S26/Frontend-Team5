@@ -34,7 +34,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   return (
-    <div className="flex items-center gap-[22px] ml-5 mb-1">
+    <div className="flex items-center gap-5.5 ml-5 mb-1">
       {isLoggedIn ? (
         // logged in
         <>
@@ -93,11 +93,11 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
       ) : (
         // not logged in
         <>
-          <Button className="bg-chinese-black text-white-smoke" onClick={() => setIsAuthModalOpen(true)}>
+          <Button className="px-3 py-2 bg-chinese-black text-white-smoke" onClick={() => setIsAuthModalOpen(true)}>
             Sign In
           </Button>
 
-          <Button className="bg-white-smoke text-chinese-black" onClick={() => setIsAuthModalOpen(true)}>
+          <Button className="px-3 py-2 bg-white-smoke text-chinese-black" onClick={() => setIsAuthModalOpen(true)}>
             Create Account
           </Button>
 
