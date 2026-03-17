@@ -13,7 +13,7 @@ export default function ForgotPasswordForm({
   return (
     <div className="w-full text-white-smoke animate-in fade-in duration-300">
       <div className="relative flex items-center mb-8">
-        <button
+        <button data-testid="back-to-login-forgot"
           onClick={onBack}
           className="mb-4 -ml-2 p-2 bg-back rounded-full transition-colors cursor-pointer"
         >
@@ -47,7 +47,7 @@ export default function ForgotPasswordForm({
           </span>
         </p>
 
-        <button
+        <button data-testid="send-link-button"
           disabled={!email.trim()}
           className={`w-full h-12 font-bold rounded transition-all duration-200 ${!email.trim() ? "bg-white-smoke/60 text-chinese-black" : "bg-white-smoke text-chinese-black cursor-pointer "}`}
         >

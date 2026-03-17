@@ -24,7 +24,7 @@ api.interceptors.response.use(
   async (error) => {
     if (error.response?.status === 401) {
       const refreshToken = localStorage.getItem("refreshToken")
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/refresh-token`, { refreshToken })
+      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/v1/refresh-token`, { refreshToken })
       localStorage.setItem("accessToken", res.data.accessToken)
       error.config.headers.Authorization = `Bearer ${res.data.accessToken}`
       return axios(error.config) // retry original request

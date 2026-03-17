@@ -1,24 +1,23 @@
 "use client";
 
 import { useState, useCallback } from "react";
-import { FaFacebook } from "react-icons/fa";
+import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { IoChevronBack, IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import RegisterDetailsForm from "./RegisterDetailsForm";
 import DetailsValidationForm from "./DetailsValidationForm";
 
-import { useFindEmail } from "@/hooks/useAuth"
+import { useFindEmail, useLogin, useSignup } from "@/hooks/useAuth"
 
 type Step = "email" | "password" | "forgot" | "register-details" | "validation";
-
-//const mockUsers = ["karimhegab698@gmail.com", "test@test.com"];
 
 export default function LoginForm() {
   const [step, setStep] = useState<Step>("email");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
+  const [loginSuccess, setLoginSuccess] = useState(false);
 
   // Controls UI layout (back button, compact header, hide social buttons) — sticky, never resets on blur
   const [isEmailEverFocused, setIsEmailEverFocused] = useState(false);
@@ -31,32 +30,37 @@ export default function LoginForm() {
   const isEmailActive = isEmailFocused || email.length > 0;
   const isPasswordActive = isPasswordFocused || password.length > 0;
 
-  const { findEmail, loading, error, exists } = useFindEmail();
-
-  const handleSubmit = async () => {
-    await findEmail(email)
-  }
+  const { findEmail, loading: emailLoading } = useFindEmail();
+  const { login, loading: loginLoading, error: loginError } = useLogin();
+  const { signup } = useSignup();
+  const router = useRouter();
 
   const handleContinueFromEmail = useCallback(async () => {
+    setLoginSuccess(false);
     const res = await findEmail(email)
     if (!res) return // error occurred, hook already set error state
     setUserExists(res.exists)
     setStep("password")
   }, [email, findEmail]);
 
-  const handleContinueFromPassword = useCallback(() => {
+  const handleContinueFromPassword = useCallback(async () => {
     if (userExists) {
-      console.log("Login:", { email, password });
+      const res = await login(email, password);
+      if (res?.success) {
+        setLoginSuccess(true);
+        setTimeout(() => router.push("/home"), 1500);
+      }
     } else {
       setStep("register-details");
     }
-  }, [userExists, email, password]);
+  }, [userExists, email, password, login, router]);
 
   const handleBackToEmail = useCallback(() => {
     setStep("email");
     setIsEmailEverFocused(false);
     setIsEmailFocused(false);
     setIsPasswordFocused(false);
+    setLoginSuccess(false);
     setPassword("");
   }, []);
 
@@ -65,6 +69,7 @@ export default function LoginForm() {
     setIsEmailEverFocused(false);
     setIsEmailFocused(false);
     setIsPasswordFocused(false);
+    setLoginSuccess(false);
     setPassword("");
     setEmail("");
   }, []);
@@ -84,9 +89,15 @@ export default function LoginForm() {
       <RegisterDetailsForm
         email={email}
         onBack={() => setStep("password")}
-        onComplete={(details) => {
-          console.log("Registration complete:", { email, password, ...details });
-          setStep("validation");
+        onComplete={async (details) => {
+          const res = await signup(
+            email,
+            password,
+            details.displayName,
+            details.dob,
+            details.gender
+          );
+          if (res?.success) setStep("validation");
         }}
       />
     );
@@ -104,11 +115,14 @@ export default function LoginForm() {
 
   const isPasswordStep = step === "password";
 
+  const isBusy = isPasswordStep ? loginLoading : emailLoading;
+
   return (
     <div className="w-full text-white-smoke transition-all duration-300">
       <div className="relative flex items-center mb-6">
         {(isEmailEverFocused || isPasswordStep) && (
           <button
+            data-testid="back-to-login-button-login"
             onClick={handleBackToEmail}
             className="p-2 -ml-2 bg-back rounded-full cursor-pointer z-10"
           >
@@ -145,7 +159,7 @@ export default function LoginForm() {
             <span className="text-[#699FFF] cursor-pointer ml-1">Privacy Policy</span>.
           </p>
           <div className="space-y-2 mb-8">
-            <button className="w-full h-11 cursor-pointer bg-white-smoke text-chinese-black rounded flex items-center justify-center gap-3 font-semibold text-sm">
+            <button data-testid="signin-google" className="w-full h-11 cursor-pointer bg-white-smoke text-chinese-black rounded flex items-center justify-center gap-3 font-semibold text-sm">
               <FcGoogle size={20} /> Continue with Google
             </button>
           </div>
@@ -216,6 +230,7 @@ export default function LoginForm() {
                 }`}
               />
               <button
+                data-testid="show-password-button"
                 type="button"
                 onClick={() => setShowPassword((p) => !p)}
                 className="text-gray-400 hover:text-white"
@@ -227,20 +242,34 @@ export default function LoginForm() {
         )}
 
         <button
+          data-testid="continue-button-login"
           onClick={isPasswordStep ? handleContinueFromPassword : handleContinueFromEmail}
-          disabled={isPasswordStep ? !password.trim() : !email.trim()}
+          disabled={
+            isBusy ||
+            (isPasswordStep ? !password.trim() : !email.trim())
+          }
           className={`w-full h-12 font-bold rounded transition-all duration-200 ${
-            !email.trim() || (isPasswordStep && !password.trim())
+            isBusy || !email.trim() || (isPasswordStep && !password.trim())
               ? "bg-white-smoke/60 text-chinese-black"
               : "bg-white-smoke text-chinese-black cursor-pointer"
           }`}
         >
-          Continue
+          {isBusy ? "Please wait..." : "Continue"}
         </button>
       </div>
 
+      {loginSuccess && isPasswordStep && (
+        <p className="mt-3 text-sm text-green-400">Signed in successfully. Redirecting...</p>
+      )}
+
+      {loginError && isPasswordStep && !loginSuccess && (
+        <p className="mt-3 text-sm text-red-400">{loginError}</p>
+      )}
+
+
       {isPasswordStep && userExists && (
         <button
+          data-testid="forgot-password-button"
           onClick={() => setStep("forgot")}
           className="mt-6 text-sm cursor-pointer text-[#699FFF] hover:underline block text-left font-medium"
         >
@@ -249,7 +278,7 @@ export default function LoginForm() {
       )}
 
       {!isPasswordStep && (
-        <button className="mt-6 text-sm cursor-pointer text-[#699FFF] hover:underline font-medium">
+        <button data-testid="need-help-button" className="mt-6 text-sm cursor-pointer text-[#699FFF] hover:underline font-medium">
           Need help?
         </button>
       )}

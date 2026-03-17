@@ -30,7 +30,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
       }`}
     >
       {/* Close Button */}
-      <button
+      <button data-testid="close-button"
         onClick={onClose}
         className={`fixed top-6 right-6 z-60 w-10 h-10 rounded-full flex items-center justify-center text-white-smoke hover:text-gray-400 bg-chinese-black transition-all duration-500 cursor-pointer ${
           animate ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-10"
