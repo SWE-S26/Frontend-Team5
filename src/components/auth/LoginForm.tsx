@@ -13,7 +13,7 @@ import { useFindEmail, useLogin, useSignup } from "@/hooks/useAuth"
 
 type Step = "email" | "password" | "forgot" | "register-details" | "validation";
 
-//const mockUsers = ["karimhegab698@gmail.com", "test@test.com"];
+const mockUsers = ["karimhegab698@gmail.com", "test@test.com"];
 
 export default function LoginForm() {
   const [step, setStep] = useState<Step>("email");
@@ -161,6 +161,9 @@ export default function LoginForm() {
             <span className="text-[#699FFF] cursor-pointer ml-1">Privacy Policy</span>.
           </p>
           <div className="space-y-2 mb-8">
+            <button className="w-full h-11 cursor-pointer bg-[#003bb3] text-white rounded flex items-center justify-center gap-3 font-semibold text-sm">
+              <FaFacebook size={20} /> Continue with Facebook
+            </button>
             <button className="w-full h-11 cursor-pointer bg-white-smoke text-chinese-black rounded flex items-center justify-center gap-3 font-semibold text-sm">
               <FcGoogle size={20} /> Continue with Google
             </button>
