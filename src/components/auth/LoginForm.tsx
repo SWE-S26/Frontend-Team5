@@ -13,7 +13,7 @@ import { useFindEmail, useLogin, useSignup } from "@/hooks/useAuth"
 
 type Step = "email" | "password" | "forgot" | "register-details" | "validation";
 
-//const mockUsers = ["karimhegab698@gmail.com", "test@test.com"];
+const mockUsers = ["karimhegab698@gmail.com", "test@test.com"];
 
 export default function LoginForm() {
   const [step, setStep] = useState<Step>("email");
