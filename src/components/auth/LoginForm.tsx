@@ -8,11 +8,9 @@ import ForgotPasswordForm from "./ForgotPasswordForm";
 import RegisterDetailsForm from "./RegisterDetailsForm";
 import DetailsValidationForm from "./DetailsValidationForm";
 
-import { useFindEmail } from "@/hooks/useAuth"
-
 type Step = "email" | "password" | "forgot" | "register-details" | "validation";
 
-//const mockUsers = ["karimhegab698@gmail.com", "test@test.com"];
+const mockUsers = ["karimhegab698@gmail.com", "test@test.com"];
 
 export default function LoginForm() {
   const [step, setStep] = useState<Step>("email");
@@ -31,18 +29,11 @@ export default function LoginForm() {
   const isEmailActive = isEmailFocused || email.length > 0;
   const isPasswordActive = isPasswordFocused || password.length > 0;
 
-  const { findEmail, loading, error, exists } = useFindEmail();
-
-  const handleSubmit = async () => {
-    await findEmail(email)
-  }
-
-  const handleContinueFromEmail = useCallback(async () => {
-    const res = await findEmail(email)
-    if (!res) return // error occurred, hook already set error state
-    setUserExists(res.exists)
-    setStep("password")
-  }, [email, findEmail]);
+  const handleContinueFromEmail = useCallback(() => {
+    const exists = mockUsers.includes(email.trim().toLowerCase());
+    setUserExists(exists);
+    setStep("password");
+  }, [email]);
 
   const handleContinueFromPassword = useCallback(() => {
     if (userExists) {
@@ -145,6 +136,9 @@ export default function LoginForm() {
             <span className="text-[#699FFF] cursor-pointer ml-1">Privacy Policy</span>.
           </p>
           <div className="space-y-2 mb-8">
+            <button className="w-full h-11 cursor-pointer bg-[#003bb3] text-white rounded flex items-center justify-center gap-3 font-semibold text-sm">
+              <FaFacebook size={20} /> Continue with Facebook
+            </button>
             <button className="w-full h-11 cursor-pointer bg-white-smoke text-chinese-black rounded flex items-center justify-center gap-3 font-semibold text-sm">
               <FcGoogle size={20} /> Continue with Google
             </button>
