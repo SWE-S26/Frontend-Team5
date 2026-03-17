@@ -1,21 +1,27 @@
-import api from "@/lib/api"
-import { FindEmailRequest, FindEmailResponse } from "@/types/auth.types"
-import { LoginRequest, LoginResponse } from "@/types/auth.types"
-import { SignupRequest, SignupResponse } from "@/types/auth.types"
+import api from "@/lib/api";
+import {
+  FindEmailRequest,
+  FindEmailResponse,
+  ForgetPasswordRequest,
+  ForgetPasswordResponse,
+} from "@/types/auth.types";
+import { LoginRequest, LoginResponse } from "@/types/auth.types";
+import { SignupRequest, SignupResponse } from "@/types/auth.types";
 
 export const authService = {
-    /* (1) */
-    findEmail: (data: FindEmailRequest) =>
-        api.post<FindEmailResponse>("/api/auth/v1/find-email", data),
+  /* (1) */
+  findEmail: (data: FindEmailRequest) =>
+    api.post<FindEmailResponse>("/api/auth/v1/find-email", data),
 
-    /* (2) */
-    login: (data: LoginRequest) =>
-        api.post<LoginResponse>("/api/auth/v1/login", data),
+  /* (2) */
+  login: (data: LoginRequest) =>
+    api.post<LoginResponse>("/api/auth/v1/login", data),
 
-    /* (3) */
-    signup: (data: SignupRequest) =>
-        api.post<SignupResponse>("/api/auth/v1/signup", data),
+  /* (3) */
+  signup: (data: SignupRequest) =>
+    api.post<SignupResponse>("/api/auth/v1/signup", data),
 
-    /* (4) */
-    
-}
+  /* (4) */
+  forgetPassword: (data: ForgetPasswordRequest) =>
+    api.post<ForgetPasswordResponse>("/api/auth/v1/signup", data),
+};

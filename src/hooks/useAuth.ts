@@ -1,75 +1,116 @@
-import { useState } from "react"
-import { authService } from "@/services/auth.service"
+import { useState, useCallback } from "react";
+import { authService } from "@/services/auth.service";
 
 export function useFindEmail() {
-  const [loading, setLoading] = useState(false)
-  const [error,   setError]   = useState<string | null>(null)
-  const [exists,  setExists]  = useState<boolean | null>(null)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [exists, setExists] = useState<boolean | null>(null);
 
-  const findEmail = async (email: string) => {
-    setLoading(true)
-    setError(null)
+  const findEmail = useCallback(async (email: string) => {
+    setLoading(true);
+    setError(null);
+    setExists(null); // ← reset
     try {
-      const res = await authService.findEmail({ email })
-      setExists(res.data.exists)
-      return res.data
+      const res = await authService.findEmail({ email });
+      setExists(res.data.exists);
+      return res.data;
     } catch (err: any) {
-      const message = err.response?.data?.message || "Something went wrong"
-      setError(message)
+      const message = err.response?.data?.message || "Something went wrong";
+      setError(message);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  }, []);
 
-  return { findEmail, loading, error, exists }
+  return { findEmail, loading, error, exists };
 }
-
 
 export function useLogin() {
-  const [loading, setLoading] = useState(false)
-  const [error,   setError]   = useState<string | null>(null)
-  const [success, setSuccess] = useState<boolean | null>(null)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
 
-  const login = async (email: string, password: string) => {
-    setLoading(true)
-    setError(null)
+  const login = useCallback(async (email: string, password: string) => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null); // ← reset
     try {
-      const res = await authService.login({ email, password })
-      setSuccess(res.data.success)
-      return res.data
+      const res = await authService.login({ email, password });
+      setSuccess(res.data.success);
+      return res.data;
     } catch (err: any) {
-      const message = err.response?.data?.message || "Something went wrong"
-      setError(message)
-      setSuccess(false)
+      const message = err.response?.data?.message || "Something went wrong";
+      setError(message);
+      setSuccess(false);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  }, []);
 
-  return { login, loading, error, success }
+  return { login, loading, error, success };
 }
 
-
 export function useSignup() {
-  const [loading, setLoading] = useState(false)
-  const [error,   setError]   = useState<string | null>(null)
-  const [success, setSuccess] = useState<boolean | null>(null)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
 
-  const signup = async (email: string, password: string, displayName: string, dateOfBirth: string, gender: string) => {
-    setLoading(true)
-    setError(null)
+  const signup = useCallback(
+    async (
+      email: string,
+      password: string,
+      displayName: string,
+      dateOfBirth: string,
+      gender: string,
+    ) => {
+      setLoading(true);
+      setError(null);
+      setSuccess(null); // ← reset
+      try {
+        const res = await authService.signup({
+          email,
+          password,
+          displayName,
+          dateOfBirth,
+          gender,
+        });
+        setSuccess(res.data.success);
+        return res.data;
+      } catch (err: any) {
+        const message = err.response?.data?.message || "Something went wrong";
+        setError(message);
+        setSuccess(false);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  return { signup, loading, error, success };
+}
+
+export function useForgetPassword() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+
+  const forgetPassword = useCallback(async (email: string) => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
     try {
-      const res = await authService.signup({ email, password, displayName, dateOfBirth, gender })
-      setSuccess(res.data.success)
-      return res.data
+      const res = await authService.forgetPassword({ email });
+      setSuccess(res.data.success);
+      return res.data;
     } catch (err: any) {
-      const message = err.response?.data?.message || "Something went wrong"
-      setError(message)
-      setSuccess(false)
+      const message = err.response?.data?.message || "Something went wrong";
+      setError(message);
+      setSuccess(false);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  }, []);
 
-  return { signup, loading, error, success }
+  return { forgetPassword, loading, error, success };
 }
