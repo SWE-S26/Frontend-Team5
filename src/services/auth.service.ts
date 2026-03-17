@@ -4,6 +4,8 @@ import {
   FindEmailResponse,
   ForgetPasswordRequest,
   ForgetPasswordResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
 } from "@/types/auth.types";
 import { LoginRequest, LoginResponse } from "@/types/auth.types";
 import { SignupRequest, SignupResponse } from "@/types/auth.types";
@@ -23,5 +25,9 @@ export const authService = {
 
   /* (4) */
   forgetPassword: (data: ForgetPasswordRequest) =>
-    api.post<ForgetPasswordResponse>("/api/auth/v1/signup", data),
+    api.post<ForgetPasswordResponse>("/api/auth/v1/forget-password", data),
+
+  /* (5) */
+  resetPassword: (data: ResetPasswordRequest) =>
+    api.post<ResetPasswordResponse>("/api/auth/v1/reset-password", data),
 };

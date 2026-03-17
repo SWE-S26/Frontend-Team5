@@ -290,4 +290,70 @@ export const authHandlers = [
       { status: 200 },
     );
   }),
+
+  /* (5) */
+  http.post("/api/auth/v1/reset-password", async ({ request }) => {
+    const body = (await request.json()) as {
+      token: string;
+      newPassword: string;
+    };
+
+    // 400 - missing token or password
+    if (!body.token || !body.newPassword) {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: "Token and new password are required",
+          data: {},
+        },
+        { status: 400 },
+      );
+    }
+
+    // 401 - unauthorized / invalid token
+    if (body.token === "invalid-token") {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: "Authorization failed",
+          data: {},
+        },
+        { status: 401 },
+      );
+    }
+
+    // 404 - token expired or not found
+    if (body.token === "expired-token") {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: "Property not found or not updated",
+          data: {},
+        },
+        { status: 404 },
+      );
+    }
+
+    // 500 - server error simulation
+    if (body.token === "error-token") {
+      return HttpResponse.json(
+        {
+          success: false,
+          message: "Internal server error",
+          data: {},
+        },
+        { status: 500 },
+      );
+    }
+
+    // 200 - success
+    return HttpResponse.json(
+      {
+        success: true,
+        message: "Password reset successfully",
+        data: null,
+      },
+      { status: 200 },
+    );
+  }),
 ];

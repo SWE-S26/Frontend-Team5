@@ -77,3 +77,15 @@ export interface ForgetPasswordResponse {
   message: string;
   data: {};
 }
+
+/* (5) "/api/auth/v1/reset-password" */
+export interface ResetPasswordRequest {
+  token: string;
+  newPassword: string;
+}
+
+export interface ResetPasswordResponse {
+  success: boolean;
+  message: string;
+  data: {};
+}

@@ -9,7 +9,7 @@ export function useFindEmail() {
   const findEmail = useCallback(async (email: string) => {
     setLoading(true);
     setError(null);
-    setExists(null); // ← reset
+    setExists(null);
     try {
       const res = await authService.findEmail({ email });
       setExists(res.data.exists);
@@ -33,7 +33,7 @@ export function useLogin() {
   const login = useCallback(async (email: string, password: string) => {
     setLoading(true);
     setError(null);
-    setSuccess(null); // ← reset
+    setSuccess(null);
     try {
       const res = await authService.login({ email, password });
       setSuccess(res.data.success);
@@ -65,7 +65,7 @@ export function useSignup() {
     ) => {
       setLoading(true);
       setError(null);
-      setSuccess(null); // ← reset
+      setSuccess(null);
       try {
         const res = await authService.signup({
           email,
@@ -113,4 +113,32 @@ export function useForgetPassword() {
   }, []);
 
   return { forgetPassword, loading, error, success };
+}
+
+export function useResetPassword() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+
+  const resetPassword = useCallback(
+    async (token: string, newPassword: string) => {
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+      try {
+        const res = await authService.resetPassword({ token, newPassword });
+        setSuccess(res.data.success);
+        return res.data;
+      } catch (err: any) {
+        const message = err.response?.data?.message || "Something went wrong";
+        setError(message);
+        setSuccess(false);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  return { resetPassword, loading, error, success };
 }

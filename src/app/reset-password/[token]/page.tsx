@@ -3,6 +3,9 @@
 import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { useResetPassword } from "@/hooks/useAuth";
+import { useParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 
 export default function ResetPasswordPage() {
   const [password, setPassword] = useState("");
@@ -10,15 +13,34 @@ export default function ResetPasswordPage() {
   const [signOutEverywhere, setSignOutEverywhere] = useState(true);
   const [confirmPasswordError, setConfirmPasswordError] = useState("");
 
-  const canSave = password.trim().length >= 8 && confirmPassword.trim().length >= 8;
+  const router = useRouter();
 
-  const handleSave = () => {
+  const params = useParams();
+  const token = params.token as string;
+
+  const canSave =
+    password.trim().length >= 8 && confirmPassword.trim().length >= 8;
+
+  const { resetPassword, loading, error, success } = useResetPassword();
+
+  const handleSave = async () => {
     if (password !== confirmPassword) {
       setConfirmPasswordError("Please repeat your password.");
       return;
     }
 
+    if (!token) {
+      console.error("Token is missing from the URL path");
+      return;
+    }
+
     setConfirmPasswordError("");
+
+    const result = await resetPassword(token, password);
+
+    if (result?.success) {
+      router.push("/home");
+    }
   };
 
   useEffect(() => {
@@ -32,9 +54,9 @@ export default function ResetPasswordPage() {
 
   return (
     <main className="h-dvh overflow-hidden bg-[#f2f2f2] text-[#333] flex flex-col">
-      <header className="h-13 bg-[#0f0f0f]">
+      <header className="h-13 bg-chinese-black">
         <div className="mx-auto flex h-full w-full max-w-7xl items-center">
-          <div className="flex h-full w-60 items-center bg-linear-to-r from-[black] to-[black] px-5">
+          <div className="flex h-full w-60 items-center bg-chinese-black px-5">
             <Image
               src="/beatza.png"
               alt="BeatZa logo"
@@ -61,8 +83,11 @@ export default function ResetPasswordPage() {
           </p>
 
           <p className="mt-1 text-center text-sm text-[#8d8d8d] sm:mt-1 sm:text-[13px]">
-            For tips on choosing a secure password,{' '}
-            <a href="#" className="text-[#2f73c9] underline hover:text-[#1f5ca9]">
+            For tips on choosing a secure password,{" "}
+            <a
+              href="#"
+              className="text-[#2f73c9] underline hover:text-[#1f5ca9]"
+            >
               visit our Help Center.
             </a>
           </p>
@@ -120,7 +145,9 @@ export default function ResetPasswordPage() {
               ) : null}
             </div>
             {confirmPasswordError ? (
-              <p className="mt-2 text-sm text-[#d02f2f]">{confirmPasswordError}</p>
+              <p className="mt-2 text-sm text-[#d02f2f]">
+                {confirmPasswordError}
+              </p>
             ) : null}
 
             <label className="mt-5 flex cursor-pointer items-center gap-3 text-base text-[#2b2b2b] sm:mt-6 sm:text-[18px]">
