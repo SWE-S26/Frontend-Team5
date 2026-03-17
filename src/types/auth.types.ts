@@ -66,12 +66,4 @@ export interface SignupResponse {
   data: {}
 }
 
-/* (4) "/api/auth/v1/verify-email" */
-export interface VerifyEmailRequest {
-  token: string,
-}
-export interface VerifyEmailResponse {
-  success: boolean,
-  message: string,
-  data: {}
-}
+/* (4) "/api/auth/v1/" */

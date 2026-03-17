@@ -193,47 +193,6 @@ export const authHandlers = [
         )
     }),
 
-    /* (3) */
-    http.get("/api/auth/v1/verify-email", async ({ request }) => {
-        const url = new URL(request.url)
-        const token = url.searchParams.get("token")
-
-        // 401 - missing or invalid token
-        if (!token || token.trim().length === 0) {
-            return HttpResponse.json(
-                { success: false, message: "Authorization failed", data: {} },
-                { status: 401 }
-            )
-        }
-
-        // 500 - server error simulation
-        if (token === "error-token") {
-            return HttpResponse.json(
-                { success: false, message: "Internal server error", data: {} },
-                { status: 500 }
-            )
-        }
-
-        // 410 - expired/revoked token
-        if (token === "expired-token") {
-            return HttpResponse.json(
-                { success: false, message: "Link is expired" },
-                { status: 410 }
-            )
-        }
-
-        // 404 - token not found
-        if (token === "notfound-token") {
-            return HttpResponse.json(
-                { success: false, message: "Property not found or not updated", data: {} },
-                { status: 404 }
-            )
-        }
-
-        // 200 - successfully verified
-        return HttpResponse.json(
-            { success: true, message: "User Verified successfully", data: {} },
-            { status: 200 }
-        )
-    }),
+    /* (4) */
+    
 ]

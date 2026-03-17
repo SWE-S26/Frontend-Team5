@@ -73,27 +73,3 @@ export function useSignup() {
 
   return { signup, loading, error, success }
 }
-
-export function useVerifyEmail() {
-  const [loading, setLoading] = useState(false)
-  const [error,   setError]   = useState<string | null>(null)
-  const [success, setSuccess] = useState<boolean | null>(null)
-
-  const verifyEmail = async (token: string) => {
-    setLoading(true)
-    setError(null)
-    try {
-      const res = await authService.verifyEmail({ token })
-      setSuccess(res.data.success ?? true)
-      return res.data
-    } catch (err: any) {
-      const message = err.response?.data?.message || "Something went wrong"
-      setError(message)
-      setSuccess(false)
-    } finally {
-      setLoading(false)
-    }
-  }
-
-  return { verifyEmail, loading, error, success }
-}
