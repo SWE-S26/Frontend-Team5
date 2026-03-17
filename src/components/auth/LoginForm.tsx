@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { IoChevronBack, IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import ForgotPasswordForm from "./ForgotPasswordForm";
@@ -12,8 +11,6 @@ import DetailsValidationForm from "./DetailsValidationForm";
 import { useFindEmail, useLogin, useSignup } from "@/hooks/useAuth"
 
 type Step = "email" | "password" | "forgot" | "register-details" | "validation";
-
-const mockUsers = ["karimhegab698@gmail.com", "test@test.com"];
 
 export default function LoginForm() {
   const [step, setStep] = useState<Step>("email");
