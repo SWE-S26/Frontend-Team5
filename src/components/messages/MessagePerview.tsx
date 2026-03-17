@@ -1,23 +1,37 @@
+import { formatDistanceToNow } from 'date-fns'
 interface MessagePerviewProps {
-  id: number
+  id: string
+  username: string
+  avatarUrl: string
+  lastMessage: string
+  lastMessageAt: string
+  isUnread: boolean
   isActive: boolean
   onClick: () => void
 }
 
-const MessagePerview = ({ id, isActive, onClick }: MessagePerviewProps) => {
+const MessagePerview = ({ id, username, avatarUrl, lastMessage, lastMessageAt, isUnread, isActive, onClick }: MessagePerviewProps) => {
   return (
-    <>
-      <div onClick={onClick} className={`flex flex-row gap-5 px-4 py-3 rounded-b-lg w-110 mt-0 cursor-pointer ${isActive ? 'bg-off-black' : 'hover:bg-off-black'}`}>
-        <img src={"https://i.pravatar.cc/40"} alt="User Profile" className="rounded-full w-15 h-15 " />
-        <div className='flex flex-col gap-2 w-82'>
-          <div className='flex flex-row gap-37'>
-            <p className='text-sm text-white font-bold'>Lujina Shawki</p>
-            <p className='text-sm text-silver'>10 hours ago</p>
-          </div>
-          <p className='text-sm text-silver truncate '>https://on.soundcloud.com/FuhHb5otZh2mFklxw9</p>
-        </div>
+    <div onClick={onClick} className={`flex items-center px-4 py-3 rounded-lg w-full cursor-pointer ${isActive ? 'bg-off-black' : 'hover:bg-off-black'}`}>
+      
+      {/* Avatar with orange dot */}
+      <div className='relative shrink-0 mr-3'>
+        <img src={avatarUrl} alt={username} className="rounded-full w-12 h-12" />
+        {isUnread && (
+          <span className='absolute top-0 -left-3 w-2 h-2 bg-inferno rounded-full' />
+        )}
       </div>
-    </>
+
+      
+      <div className='flex flex-col gap-2 w-full min-w-0'>
+        <div className='flex justify-between gap-2'>
+          <p className='text-sm text-white-smoke font-bold truncate'>{username}</p>
+          <p className='text-sm text-silver whitespace-nowrap'> {formatDistanceToNow(new Date(lastMessageAt), { addSuffix: true })} </p>
+        </div>
+        <p className='text-sm text-silver truncate'>{lastMessage}</p>
+      </div>
+
+    </div>
   )
 }
 
