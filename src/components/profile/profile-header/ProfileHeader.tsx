@@ -5,14 +5,14 @@ export default function ProfileHeader() {
     return (
         <div className="relative w-full h-80 bg-linear-to-r from-[#c3adb4] to-[#8f6f79] group mt-[-50px]" >
             <div className="absolute top-8 right-6 flex flex-col gap-3"> 
-                <Button className="bg-chinese-black text-white-smoke">Upload header image</Button>
+                <Button className="px-3 py-2 bg-chinese-black text-white-smoke">Upload header image</Button>
             </div>
 
             <div className="absolute left-10 top-1/2 -translate-y-1/2 group/avatar">
                 <AvatarUpload className="relative overflow-hidden">
                 <div className="absolute inset-0 bg-gray-400/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity"></div>
 
-                <Button className="bg-chinese-black text-white-smoke absolute bottom-9 right-9 opacity-0 group-hover/avatar:opacity-100">
+                <Button className="px-3 py-2 bg-chinese-black text-white-smoke absolute bottom-9 right-9 opacity-0 group-hover/avatar:opacity-100">
                   Upload image
                 </Button>
 
