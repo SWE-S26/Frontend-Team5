@@ -2,7 +2,7 @@
 ---
 
 ## Tech Stack
-
+ 
 - **Framework:** Next.js (App Router)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
