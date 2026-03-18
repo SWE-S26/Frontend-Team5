@@ -35,7 +35,7 @@ export default function ResetPasswordPage() {
     }
 
     setConfirmPasswordError("");
-    console.log(token);
+
     const result = await resetPassword(token, password);
 
     if (result?.success) {
