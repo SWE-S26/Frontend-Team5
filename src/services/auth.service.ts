@@ -4,6 +4,7 @@ import {
   FindEmailResponse,
   ForgetPasswordRequest,
   ForgetPasswordResponse,
+  LogoutResponse,
   GoogleAuthFinalizeResponse,
   GoogleCallbackRequest,
   GoogleCallbackResponse,
@@ -35,6 +36,9 @@ export const authService = {
   /* (5) */
   resetPassword: (data: ResetPasswordRequest) =>
     api.post<ResetPasswordResponse>("/api/auth/v1/reset-password", data),
+
+  /* (6) */
+  logout: () => api.post<LogoutResponse>("/api/auth/v1/logout"),
 
   /* (6) */
   googleCallback: (params: GoogleCallbackRequest) =>

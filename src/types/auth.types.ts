@@ -95,7 +95,14 @@ export interface ResetPasswordResponse {
   data: {};
 }
 
-/* (6) "/api/auth/v1/google/callback" */
+/* (6) "/api/auth/v1/logout" */
+export interface LogoutResponse {
+  success: boolean;
+  message: string;
+  data: {};
+}
+
+/* (7) "/api/auth/v1/google/callback" */
 export interface GoogleCallbackRequest {
   code: string;
   scope?: string;
@@ -108,14 +115,14 @@ export interface GoogleCallbackResponse {
   displayName?: string;
 }
 
-/* (7) "/api/auth/v1/google/complete" */
+/* (8) "/api/auth/v1/google/complete" */
 export interface GoogleCompleteRequest {
   incompleteToken: string;
   dateOfBirth: string;
   gender: string;
 }
 
-/* (8) "/api/auth/v1/google/verify-code" */
+/* (9) "/api/auth/v1/google/verify-code" */
 export interface GoogleVerifyCodeRequest {
   pendingToken: string;
   code: string;
