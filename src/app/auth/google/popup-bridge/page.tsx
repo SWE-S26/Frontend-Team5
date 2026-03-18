@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { Suspense, useEffect, useState } from "react";
 import { useSearchParams } from "next/navigation";
 import { authService } from "@/services/auth.service";
 
-export default function GooglePopupBridgePage() {
+function GooglePopupBridge() {
   const params = useSearchParams();
   const [message, setMessage] = useState("Finalizing Google sign-in...");
 
@@ -56,5 +56,13 @@ export default function GooglePopupBridgePage() {
     <div className="min-h-screen bg-chinese-black text-white-smoke flex items-center justify-center p-6 text-center">
       <p className="text-sm text-gray-300">{message}</p>
     </div>
+  );
+}
+
+export default function GooglePopupBridgePage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <GooglePopupBridge />
+    </Suspense>
   );
 }
