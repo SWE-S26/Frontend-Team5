@@ -1,10 +1,10 @@
 import { http, HttpResponse } from "msw";
-const BASE = process.env.NEXT_PUBLIC_API_URL
+const BASE = process.env.NEXT_PUBLIC_API_URL;
 export const authHandlers = [
   /* (1) */
   http.post(`${BASE}/api/auth/v1/find-email`, async ({ request }) => {
     const body = (await request.json()) as { email: string };
-    
+
     // 400 - missing or invalid email
     if (!body.email || !body.email.includes("@")) {
       return HttpResponse.json(
@@ -34,7 +34,7 @@ export const authHandlers = [
     const exists = existingEmails.includes(body.email);
     return HttpResponse.json(
       { data: { exists }, message: "Email exists in the system" },
-      { status: 200 }
+      { status: 200 },
     );
   }),
 
@@ -358,7 +358,7 @@ export const authHandlers = [
   }),
 
   /* (6) */
-  http.post("/api/auth/v1/logout", async () => {
+  http.post(`${BASE}/api/auth/v1/logout`, async () => {
     // 401 - no token / invalid token (handled automatically by axios interceptor)
     // 500 - server error simulation (no request body to trigger it, so use a flag or just leave it)
 
