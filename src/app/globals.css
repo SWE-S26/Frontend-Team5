@@ -18,16 +18,6 @@
 
 [data-theme="light"] {
   /* Light Mode */
-  --bg: #f4f4f4;
-  --fg: #121212;
-  --bg: #f4f4f4;
-  --fg: #121212;
-  --bg: #ffffff;
-  --fg: #121212;
-  --bg: #f4f4f4;
-  --fg: #121212;
-  --bg: #f4f4f4;
-  --fg: #121212;
   --bg: #ffffff;
   --fg: #121212;
   --off-black: #e7e7e7;
@@ -52,28 +42,6 @@
   */
   --color-chinese-black: var(--bg);
   --color-white-smoke: var(--fg);
-  --color-silver: var(--silver);
-  --color-off-black: var(--off-black);
-  --color-chinese-black: var(--bg);
-  --color-white-smoke: var(--fg);
-  --color-silver: var(--silver);
-  --color-off-black: var(--off-black);
-  --color-chinese-black: var(--bg);
-  --color-white-smoke: var(--fg);
-  --color-login: var(--login);
-  --color-back: var(--back);
-  --color-silver: var(--silver);
-  --color-off-black: var(--off-black);
-  --color-chinese-black: var(--bg);
-  --color-white-smoke: var(--fg);
-  --color-silver: var(--silver);
-  --color-off-black: var(--off-black);
-  --color-chinese-black: var(--bg);
-  --color-white-smoke: var(--fg);
-  --color-silver: var(--silver);
-  --color-off-black: var(--off-black);
-  --color-chinese-black: var(--bg);
-  --color-white-smoke: var(--fg);
   --color-login: var(--login);
   --color-back: var(--back);
   --color-silver: var(--silver);
@@ -95,16 +63,6 @@ body {
   background: var(--bg);
   color: var(--fg);
   font-family: var(--font-sans);
-}
-
-@layer utilities {
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
 }
 
 @layer utilities {

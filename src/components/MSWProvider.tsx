@@ -5,19 +5,18 @@ export default function MSWProvider({ children }: { children: React.ReactNode })
   const [mswReady, setMswReady] = useState(false)
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== "development" || process.env.NEXT_PUBLIC_USE_MSW === "false") {
-      setMswReady(true)
-      return
-    }
-
-    import("@/mocks/browser").then(({ worker }) => {
-      worker.start({ onUnhandledRequest: "bypass" }).then(() => {
-        setMswReady(true) // ← only show children AFTER MSW is ready
+    if (process.env.NEXT_PUBLIC_USE_MSW === "true") {
+      import("@/mocks/browser").then(({ worker }) => {
+        worker.start({ onUnhandledRequest: "bypass" }).then(() => {
+          setMswReady(true)
+        })
       })
-    })
+    } else {
+      setMswReady(true)
+    }
   }, [])
 
-  if (!mswReady) return null // ← wait, don't render anything yet
+  if (!mswReady) return null
 
   return <>{children}</>
 }
