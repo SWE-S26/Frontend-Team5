@@ -18,11 +18,14 @@ export interface ForgotPasswordFormProps {
   email: string;
   setEmail: (val: string) => void;
   onBack: () => void;
+  onSuccess?: () => void;
 }
 
 export interface RegisterDetailsFormProps {
   email: string;
   requireDisplayName?: boolean;
+  submitError?: string | null;
+  isSubmitting?: boolean;
   onBack: () => void;
   onComplete: (details: {
     displayName: string;

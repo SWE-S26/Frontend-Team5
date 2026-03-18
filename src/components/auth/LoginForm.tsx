@@ -10,6 +10,7 @@ import DetailsValidationForm from "./DetailsValidationForm";
 
 import {
   useFindEmail,
+  useForgetPassword,
   useGoogleComplete,
   useGoogleVerifyCode,
   useLogin,
@@ -27,6 +28,8 @@ type Step =
 
 export default function LoginForm() {
   const [step, setStep] = useState<Step>("email");
+  const [validationSource, setValidationSource] = useState<"signup" | "reset-password">("signup");
+  const [registerError, setRegisterError] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
@@ -50,8 +53,9 @@ export default function LoginForm() {
   const isPasswordActive = isPasswordFocused || password.length > 0;
 
   const { findEmail, loading: emailLoading } = useFindEmail();
+  const { forgetPassword } = useForgetPassword();
   const { login, loading: loginLoading, error: loginError } = useLogin();
-  const { signup } = useSignup();
+  const { signup, loading: signupLoading } = useSignup();
   const {
     completeGoogleSignup,
     loading: googleCompleteLoading,
@@ -142,6 +146,7 @@ export default function LoginForm() {
         setTimeout(() => router.push("/home"), 1500);
       }
     } else {
+      setRegisterError(null);
       setStep("register-details");
     }
   }, [userExists, email, password, login, router]);
@@ -153,6 +158,7 @@ export default function LoginForm() {
     setIsPasswordFocused(false);
     setLoginSuccess(false);
     setPassword("");
+    setRegisterError(null);
     setGoogleCode("");
     setGoogleError(null);
   }, []);
@@ -164,6 +170,7 @@ export default function LoginForm() {
     setIsPasswordFocused(false);
     setLoginSuccess(false);
     setPassword("");
+    setRegisterError(null);
     setEmail("");
     setGoogleCode("");
     setGoogleError(null);
@@ -199,7 +206,14 @@ export default function LoginForm() {
       <DetailsValidationForm
         email={email}
         onBackToLogin={handleBackToLogin}
-        onSendAgain={() => console.log("Resend email to", email)}
+        onSendAgain={() => {
+          if (validationSource === "reset-password") {
+            forgetPassword(email);
+            return;
+          }
+
+          console.log("Resend email to", email);
+        }}
       />
     );
   }
@@ -208,8 +222,11 @@ export default function LoginForm() {
     return (
       <RegisterDetailsForm
         email={email}
+        submitError={registerError}
+        isSubmitting={signupLoading}
         onBack={() => setStep("password")}
         onComplete={async (details) => {
+          setRegisterError(null);
           const res = await signup(
             email,
             password,
@@ -217,7 +234,22 @@ export default function LoginForm() {
             details.dob,
             details.gender
           );
-          if (res?.success) setStep("validation");
+
+          // Any resolved response is treated as success unless it explicitly reports success=false.
+          if (res?.success === false) {
+            const message = res?.message || "Could not create account. Please try again.";
+            if (/already|exists|conflict|registered/i.test(message)) {
+              setUserExists(true);
+              setStep("password");
+              return;
+            }
+
+            setRegisterError(message);
+            return;
+          }
+
+          setValidationSource("signup");
+          setStep("validation");
         }}
       />
     );
@@ -286,6 +318,10 @@ export default function LoginForm() {
         email={email}
         setEmail={setEmail}
         onBack={handleBackToEmail}
+        onSuccess={() => {
+          setValidationSource("reset-password");
+          setStep("validation");
+        }}
       />
     );
   }
