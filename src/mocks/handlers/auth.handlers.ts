@@ -358,7 +358,7 @@ export const authHandlers = [
   }),
 
   /* (6) */
-  http.post(`${BASE}/api/auth/v1/logout`, async () => {
+  http.get(`${BASE}/api/auth/v1/logout`, async () => {
     // 401 - no token / invalid token (handled automatically by axios interceptor)
     // 500 - server error simulation (no request body to trigger it, so use a flag or just leave it)
 
