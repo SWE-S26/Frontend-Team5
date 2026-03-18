@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback } from "react";
+import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
 import { IoChevronBack, IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
@@ -8,9 +8,22 @@ import ForgotPasswordForm from "./ForgotPasswordForm";
 import RegisterDetailsForm from "./RegisterDetailsForm";
 import DetailsValidationForm from "./DetailsValidationForm";
 
-import { useFindEmail, useLogin, useSignup } from "@/hooks/useAuth"
+import {
+  useFindEmail,
+  useGoogleComplete,
+  useGoogleVerifyCode,
+  useLogin,
+  useSignup,
+} from "@/hooks/useAuth";
 
-type Step = "email" | "password" | "forgot" | "register-details" | "validation";
+type Step =
+  | "email"
+  | "password"
+  | "forgot"
+  | "register-details"
+  | "validation"
+  | "google-complete"
+  | "google-verify";
 
 export default function LoginForm() {
   const [step, setStep] = useState<Step>("email");
@@ -26,6 +39,12 @@ export default function LoginForm() {
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   const [userExists, setUserExists] = useState(false);
+  const [googleIncompleteToken, setGoogleIncompleteToken] = useState("");
+  const [googlePendingToken, setGooglePendingToken] = useState("");
+  const [googleEmail, setGoogleEmail] = useState("");
+  const [googleDisplayName, setGoogleDisplayName] = useState("");
+  const [googleCode, setGoogleCode] = useState("");
+  const [googleError, setGoogleError] = useState<string | null>(null);
 
   const isEmailActive = isEmailFocused || email.length > 0;
   const isPasswordActive = isPasswordFocused || password.length > 0;
@@ -33,7 +52,79 @@ export default function LoginForm() {
   const { findEmail, loading: emailLoading } = useFindEmail();
   const { login, loading: loginLoading, error: loginError } = useLogin();
   const { signup } = useSignup();
+  const {
+    completeGoogleSignup,
+    loading: googleCompleteLoading,
+    error: googleCompleteError,
+  } = useGoogleComplete();
+  const {
+    verifyGoogleCode,
+    loading: googleVerifyLoading,
+    error: googleVerifyError,
+  } = useGoogleVerifyCode();
   const router = useRouter();
+
+  useEffect(() => {
+    const onGoogleAuthMessage = (event: MessageEvent) => {
+      if (event.origin !== window.location.origin) return;
+      const payload = event.data?.payload;
+      if (!event.data || event.data.type !== "google-auth-result" || !payload) return;
+
+      if (payload.status === "incomplete" && payload.incompleteToken) {
+        setGoogleIncompleteToken(payload.incompleteToken);
+        setGoogleEmail(payload.email || "");
+        setGoogleDisplayName(payload.displayName || "");
+        setGoogleError(null);
+        setStep("google-complete");
+        return;
+      }
+
+      if (payload.status === "verify" && payload.pendingToken) {
+        setGooglePendingToken(payload.pendingToken);
+        setGoogleEmail(payload.email || "");
+        setGoogleDisplayName(payload.displayName || "");
+        setGoogleCode("");
+        setGoogleError(null);
+        setStep("google-verify");
+        return;
+      }
+
+      if (payload.status === "returning_google") {
+        setGoogleError(null);
+        setLoginSuccess(true);
+        setTimeout(() => router.push("/home"), 600);
+        return;
+      }
+
+      if (payload.message) {
+        setGoogleError(payload.message);
+      } else {
+        setGoogleError("Google sign-in failed");
+      }
+    };
+
+    window.addEventListener("message", onGoogleAuthMessage);
+    return () => window.removeEventListener("message", onGoogleAuthMessage);
+  }, [router]);
+
+  const handleGoogleSignIn = useCallback(() => {
+    const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+    const url = `${baseUrl}/api/auth/v1/google`;
+    const width = 520;
+    const height = 640;
+    const left = window.screenX + (window.outerWidth - width) / 2;
+    const top = window.screenY + (window.outerHeight - height) / 2;
+
+    const popup = window.open(
+      url,
+      "google-oauth",
+      `width=${width},height=${height},left=${left},top=${top}`,
+    );
+
+    if (!popup) {
+      window.location.href = url;
+    }
+  }, []);
 
   const handleContinueFromEmail = useCallback(async () => {
     setLoginSuccess(false);
@@ -62,6 +153,8 @@ export default function LoginForm() {
     setIsPasswordFocused(false);
     setLoginSuccess(false);
     setPassword("");
+    setGoogleCode("");
+    setGoogleError(null);
   }, []);
 
   const handleBackToLogin = useCallback(() => {
@@ -72,7 +165,34 @@ export default function LoginForm() {
     setLoginSuccess(false);
     setPassword("");
     setEmail("");
+    setGoogleCode("");
+    setGoogleError(null);
   }, []);
+
+  const handleGoogleComplete = useCallback(
+    async (details: { displayName: string; dob: string; gender: string }) => {
+      if (!googleIncompleteToken) return;
+      const res = await completeGoogleSignup(
+        googleIncompleteToken,
+        details.dob,
+        details.gender,
+      );
+      if (res) {
+        setLoginSuccess(true);
+        setTimeout(() => router.push("/home"), 600);
+      }
+    },
+    [completeGoogleSignup, googleIncompleteToken, router],
+  );
+
+  const handleGoogleVerify = useCallback(async () => {
+    if (!googlePendingToken || googleCode.trim().length !== 6) return;
+    const res = await verifyGoogleCode(googlePendingToken, googleCode.trim());
+    if (res) {
+      setLoginSuccess(true);
+      setTimeout(() => router.push("/home"), 600);
+    }
+  }, [googlePendingToken, googleCode, verifyGoogleCode, router]);
 
   if (step === "validation") {
     return (
@@ -100,6 +220,63 @@ export default function LoginForm() {
           if (res?.success) setStep("validation");
         }}
       />
+    );
+  }
+
+  if (step === "google-complete") {
+    return (
+      <RegisterDetailsForm
+        email={googleEmail || email}
+        requireDisplayName={false}
+        onBack={handleBackToEmail}
+        onComplete={handleGoogleComplete}
+      />
+    );
+  }
+
+  if (step === "google-verify") {
+    return (
+      <div className="w-full text-white-smoke transition-all duration-300">
+        <button
+          data-testid="back-google-verify"
+          onClick={handleBackToEmail}
+          className="mb-4 -ml-2 p-2 bg-[#303030] rounded-full transition-colors cursor-pointer"
+        >
+          <IoChevronBack size={26} />
+        </button>
+        <h1 className="text-[28px] font-bold leading-tight mb-3 text-left">Verify your Google sign-in</h1>
+        <p className="text-sm text-gray-400 mb-6">
+          We sent a 6-digit code to {googleEmail || "your email"}. Enter it below to continue.
+        </p>
+        <div className="relative bg-chinese-black border border-white/10 rounded p-3 h-16 flex flex-col justify-center mb-4">
+          <label className="absolute left-3 text-[10px] top-2 text-gray-400 font-bold tracking-wider pointer-events-none">
+            Verification code
+          </label>
+          <input
+            type="text"
+            inputMode="numeric"
+            maxLength={6}
+            value={googleCode}
+            onChange={(e) => setGoogleCode(e.target.value.replace(/\D/g, ""))}
+            className="w-full bg-transparent border-none outline-none text-white-smoke text-base pt-4 tracking-[0.3em]"
+          />
+        </div>
+        <button
+          data-testid="verify-google-code"
+          onClick={handleGoogleVerify}
+          disabled={googleVerifyLoading || googleCode.trim().length !== 6}
+          className={`w-full h-12 font-bold rounded transition-all duration-200 ${
+            googleVerifyLoading || googleCode.trim().length !== 6
+              ? "bg-white-smoke/60 text-chinese-black"
+              : "bg-white-smoke text-chinese-black cursor-pointer"
+          }`}
+        >
+          {googleVerifyLoading ? "Verifying..." : "Verify and continue"}
+        </button>
+        {(googleVerifyError || googleError) && (
+          <p className="mt-3 text-sm text-red-400">{googleVerifyError || googleError}</p>
+        )}
+      </div>
     );
   }
 
@@ -159,7 +336,12 @@ export default function LoginForm() {
             <span className="text-[#699FFF] cursor-pointer ml-1">Privacy Policy</span>.
           </p>
           <div className="space-y-2 mb-8">
-            <button data-testid="signin-google" className="w-full h-11 cursor-pointer bg-white-smoke text-chinese-black rounded flex items-center justify-center gap-3 font-semibold text-sm">
+            <button
+              data-testid="signin-google"
+              type="button"
+              onClick={handleGoogleSignIn}
+              className="w-full h-11 cursor-pointer bg-white-smoke text-chinese-black rounded flex items-center justify-center gap-3 font-semibold text-sm"
+            >
               <FcGoogle size={20} /> Continue with Google
             </button>
           </div>
@@ -264,6 +446,10 @@ export default function LoginForm() {
 
       {loginError && isPasswordStep && !loginSuccess && (
         <p className="mt-3 text-sm text-red-400">{loginError}</p>
+      )}
+
+      {(googleCompleteError || googleError) && (
+        <p className="mt-3 text-sm text-red-400">{googleCompleteError || googleError}</p>
       )}
 
 

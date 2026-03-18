@@ -9,13 +9,14 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December",
 ];
 
-const GENDERS = ["Man", "Woman", "Max Verstappen", "Prefer not to say"];
+const GENDERS = ["Male", "Female"];
 
 const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 const YEARS = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
 
 export default function RegisterDetailsForm({
   email,
+  requireDisplayName = true,
   onBack,
   onComplete,
 }: RegisterDetailsFormProps) {
@@ -29,7 +30,7 @@ export default function RegisterDetailsForm({
   const [isNameActive, setIsNameActive] = useState(displayName.length > 0);
 
   const isValid =
-    displayName.trim().length > 0 &&
+    (!requireDisplayName || displayName.trim().length > 0) &&
     month !== "" &&
     day !== "" &&
     year !== "" &&
@@ -56,32 +57,34 @@ export default function RegisterDetailsForm({
 
       <div className="space-y-4">
         {/* Display Name */}
-        <div>
-          <div className="relative bg-chinese-black border border-white/10 rounded p-3 h-16 flex flex-col justify-center">
-            <label
-              className={`absolute left-3 transition-all duration-200 text-gray-400 font-bold tracking-wider pointer-events-none ${
-                isNameActive || displayName.length > 0
-                  ? "text-[10px] top-2"
-                  : "text-[12px] top-1/2 -translate-y-1/2"
-              }`}
-            >
-              Display name
-            </label>
-            <input
-              type="text"
-              value={displayName}
-              onFocus={() => setIsNameActive(true)}
-              onBlur={() => setIsNameActive(displayName.length > 0)}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className={`w-full bg-transparent border-none outline-none text-white-smoke text-base ${
-                isNameActive || displayName.length > 0 ? "pt-4" : "pt-0"
-              }`}
-            />
+        {requireDisplayName && (
+          <div>
+            <div className="relative bg-chinese-black border border-white/10 rounded p-3 h-16 flex flex-col justify-center">
+              <label
+                className={`absolute left-3 transition-all duration-200 text-gray-400 font-bold tracking-wider pointer-events-none ${
+                  isNameActive || displayName.length > 0
+                    ? "text-[10px] top-2"
+                    : "text-[12px] top-1/2 -translate-y-1/2"
+                }`}
+              >
+                Display name
+              </label>
+              <input
+                type="text"
+                value={displayName}
+                onFocus={() => setIsNameActive(true)}
+                onBlur={() => setIsNameActive(displayName.length > 0)}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className={`w-full bg-transparent border-none outline-none text-white-smoke text-base ${
+                  isNameActive || displayName.length > 0 ? "pt-4" : "pt-0"
+                }`}
+              />
+            </div>
+            <p className="text-[12px] text-gray-400 mt-1.5 leading-relaxed">
+              Your display name can be anything you like. Your name or artist name are good choices.
+            </p>
           </div>
-          <p className="text-[12px] text-gray-400 mt-1.5 leading-relaxed">
-            Your display name can be anything you like. Your name or artist name are good choices.
-          </p>
-        </div>
+        )}
 
         {/* Date of Birth */}
         <div>

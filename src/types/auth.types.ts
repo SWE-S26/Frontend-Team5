@@ -22,6 +22,7 @@ export interface ForgotPasswordFormProps {
 
 export interface RegisterDetailsFormProps {
   email: string;
+  requireDisplayName?: boolean;
   onBack: () => void;
   onComplete: (details: {
     displayName: string;
@@ -92,4 +93,42 @@ export interface ResetPasswordResponse {
   success: boolean;
   message: string;
   data: {};
+}
+
+/* (6) "/api/auth/v1/google/callback" */
+export interface GoogleCallbackRequest {
+  code: string;
+  scope?: string;
+}
+
+export interface GoogleCallbackResponse {
+  status: string;
+  incompleteToken?: string;
+  email?: string;
+  displayName?: string;
+}
+
+/* (7) "/api/auth/v1/google/complete" */
+export interface GoogleCompleteRequest {
+  incompleteToken: string;
+  dateOfBirth: string;
+  gender: string;
+}
+
+/* (8) "/api/auth/v1/google/verify-code" */
+export interface GoogleVerifyCodeRequest {
+  pendingToken: string;
+  code: string;
+}
+
+export interface GoogleAuthFinalizeResponse {
+  message: string;
+  data?: {
+    user?: {
+      id?: string;
+      displayName?: string;
+      role?: string;
+      profileLink?: string;
+    };
+  };
 }
