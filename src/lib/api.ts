@@ -7,7 +7,7 @@ const PUBLIC_ROUTES = [
   "/api/auth/v1/find-email",
   "/api/auth/v1/login",
   "/api/auth/v1/sign-up",
-  "/api/auth/v1/forget-password",
+  "/api/auth/v1/forgot-password",
   "/api/auth/v1/reset-password",
   "/api/auth/v1/logout",
   "/api/auth/v1/google/callback",
