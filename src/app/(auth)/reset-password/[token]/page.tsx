@@ -1,6 +1,5 @@
 "use client";
 
-import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useResetPassword } from "@/hooks/useAuth";
@@ -57,13 +56,12 @@ export default function ResetPasswordPage() {
       <header className="h-13 bg-chinese-black">
         <div className="mx-auto flex h-full w-full max-w-7xl items-center">
           <div className="flex h-full w-60 items-center bg-chinese-black px-5">
-            <Image
+            <img
               src="/beatza.png"
               alt="BeatZa logo"
               width={56}
               height={56}
               className="h-14 w-14 object-contain"
-              priority
             />
             <span className="ml-3 text-sm font-semibold tracking-[0.14em] text-white uppercase">
               BeatZa

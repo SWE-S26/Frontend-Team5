@@ -2,6 +2,7 @@
 
 import { IoChevronBack } from "react-icons/io5";
 import { ForgotPasswordFormProps } from "@/types/auth.types";
+import { useForgetPassword } from "@/hooks/useAuth";
 
 export default function ForgotPasswordForm({
   email,
@@ -9,6 +10,7 @@ export default function ForgotPasswordForm({
   onBack,
 }: ForgotPasswordFormProps) {
   const isEmailActive = email.length > 0;
+  const { forgetPassword, loading, error, success } = useForgetPassword();
 
   return (
     <div className="w-full text-white-smoke animate-in fade-in duration-300">
@@ -47,11 +49,15 @@ export default function ForgotPasswordForm({
           </span>
         </p>
 
+        {error && <p className="text-red-400 text-xs">{error}</p>}
+        {success && <p className="text-silver text-xs">Reset link sent! Check your email.</p>}
+
         <button data-testid="send-link-button"
-          disabled={!email.trim()}
-          className={`w-full h-12 font-bold rounded transition-all duration-200 ${!email.trim() ? "bg-white-smoke/60 text-chinese-black" : "bg-white-smoke text-chinese-black cursor-pointer "}`}
+          disabled={!email.trim() || loading}
+          onClick={() => forgetPassword(email)}
+          className={`w-full h-12 font-bold rounded transition-all duration-200 ${!email.trim() || loading ? "bg-white-smoke/60 text-chinese-black" : "bg-white-smoke text-chinese-black cursor-pointer"}`}
         >
-          Send reset link
+          {loading ? "Sending..." : "Send reset link"}
         </button>
       </div>
     </div>
