@@ -142,3 +142,29 @@ export function useResetPassword() {
 
   return { resetPassword, loading, error, success };
 }
+
+export function useLogout() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+
+  const logout = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const res = await authService.logout();
+      setSuccess(true);
+      return res.data;
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Something went wrong";
+      setError(message);
+      setSuccess(false);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { logout, loading, error, success };
+}

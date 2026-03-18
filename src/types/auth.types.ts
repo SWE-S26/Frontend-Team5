@@ -93,3 +93,10 @@ export interface ResetPasswordResponse {
   message: string;
   data: {};
 }
+
+/* (6) "/api/auth/v1/logout" */
+export interface LogoutResponse {
+  success: boolean;
+  message: string;
+  data: {};
+}
