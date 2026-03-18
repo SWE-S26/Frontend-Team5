@@ -1,16 +1,75 @@
-"use client"
-import RegisterDetailsForm from "@/components/auth/RegisterDetailsForm";
+"use client";
 
-export default function SignIn() {
+import { useMemo } from "react";
+import { useRouter, useSearchParams } from "next/navigation";
+import RegisterDetailsForm from "@/components/auth/RegisterDetailsForm";
+import { useGoogleComplete } from "@/hooks/useAuth";
+
+export default function OAuthContinueDetailsPage() {
+  const router = useRouter();
+  const searchParams = useSearchParams();
+  const { completeGoogleSignup, loading, error } = useGoogleComplete();
+
+  const incompleteToken = useMemo(
+    () => searchParams.get("incompleteToken") || "",
+    [searchParams],
+  );
+
+  const email = useMemo(
+    () => searchParams.get("email") || "your email",
+    [searchParams],
+  );
+
+  const handleComplete = async (details: {
+    displayName: string;
+    dob: string;
+    gender: string;
+  }) => {
+    if (!incompleteToken) {
+      return;
+    }
+
+    const result = await completeGoogleSignup(
+      incompleteToken,
+      details.dob,
+      details.gender,
+    );
+
+    if (result) {
+      router.push("/home");
+    }
+  };
+
   return (
-    <div>
-      <div className="flex mt-30 mx-auto max-w-110">
-        <RegisterDetailsForm
-          email="test@test.com"
-          onBack={() => {}}
-          onComplete={(details) => console.log(details)}
-        />
+    <main className="min-h-dvh bg-login px-4 py-8">
+      <div className="mx-auto mt-12 w-full max-w-xl">
+        {!incompleteToken ? (
+          <section className="rounded-sm border border-white/10 bg-chinese-black px-8 py-10 text-white-smoke">
+            <h1 className="text-xl font-bold">Unable to continue Google sign-in</h1>
+            <p className="mt-3 text-sm text-white-smoke/90">
+              Missing or expired continuation token. Please start Google sign-in again.
+            </p>
+            <button
+              type="button"
+              onClick={() => router.push("/sign-in")}
+              className="mt-6 h-10 rounded-md bg-white-smoke px-5 text-sm font-semibold text-chinese-black cursor-pointer"
+            >
+              Back to sign in
+            </button>
+          </section>
+        ) : (
+          <section className="rounded-sm border border-white/10 bg-chinese-black px-8 py-10">
+            <RegisterDetailsForm
+              email={email}
+              requireDisplayName={false}
+              submitError={error}
+              isSubmitting={loading}
+              onBack={() => router.push("/sign-in")}
+              onComplete={handleComplete}
+            />
+          </section>
+        )}
       </div>
-    </div>
-  )
+    </main>
+  );
 }

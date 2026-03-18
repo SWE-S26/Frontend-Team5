@@ -42,7 +42,9 @@ export const authService = {
 
   /* (7) */
   googleCallback: (params: GoogleCallbackRequest) =>
-    api.get<GoogleCallbackResponse>("/api/auth/v1/google/callback"),
+    api.get<GoogleCallbackResponse>("/api/auth/v1/google/callback", {
+      params,
+    }),
 
   /* (8) */
   googleComplete: (data: GoogleCompleteRequest) =>
@@ -50,8 +52,5 @@ export const authService = {
 
   /* (9) */
   googleVerifyCode: (data: GoogleVerifyCodeRequest) =>
-    api.post<GoogleAuthFinalizeResponse>(
-      "/api/auth/v1/google/verify-code",
-      data,
-    ),
+    api.post<GoogleAuthFinalizeResponse>("/api/auth/v1/google/verify-code", data),
 };
