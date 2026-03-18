@@ -1,33 +1,41 @@
-// This file should not be chnaged and is defined only once
+// This file should not be changed and is defined only once
 // this is an instance from axios created using axios.create()
 
 import axios from "axios"
 
+const PUBLIC_ROUTES = [
+  "/api/auth/v1/find-email",
+  "/api/auth/v1/login",
+  "/api/auth/v1/sign-up",
+  "/api/auth/v1/forget-password",
+  "/api/auth/v1/reset-password",
+  "/api/auth/v1/logout",
+  "/api/auth/v1/google/callback",
+  "/api/auth/v1/google/complete",
+  "/api/auth/v1/google/verify-code",
+]
+
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
+  withCredentials: true, // sends cookies automatically with every request
   headers: {
     "Content-Type": "application/json",
   },
 })
 
-// attach token to every request automatically
-api.interceptors.request.use((config) => {
-  const token = localStorage.getItem("accessToken")
-  if (token) config.headers.Authorization = `Bearer ${token}`
-  return config
-})
-
-// 401: means invalid user data, not authorized to loging
-// we get refresh token
+// 401: token expired, attempt refresh (skip public routes)
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    if (error.response?.status === 401) {
-      const refreshToken = localStorage.getItem("refreshToken")
-      const res = await axios.post(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/v1/refresh-token`, { refreshToken })
-      localStorage.setItem("accessToken", res.data.accessToken)
-      error.config.headers.Authorization = `Bearer ${res.data.accessToken}`
-      return axios(error.config) // retry original request
+    const isPublic = PUBLIC_ROUTES.some(route => error.config?.url?.includes(route))
+
+    if (error.response?.status === 401 && !isPublic) {
+      await axios.post(
+        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/v1/refresh-token`,
+        {},
+        { withCredentials: true }
+      )
+      return axios({ ...error.config, withCredentials: true })
     }
     return Promise.reject(error)
   }
