@@ -346,7 +346,7 @@ export const authHandlers = [
       );
     }
 
-    // 200 - success
+    // 200 - success (to test add a token in your url: {reset-password?token=valid-token})
     return HttpResponse.json(
       {
         success: true,
