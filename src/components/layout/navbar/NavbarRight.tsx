@@ -2,9 +2,7 @@
 import Link from "next/link";
 import Dropdown from "@/components/ui/Dropdown";
 import AuthModal from "@/components/auth/AuthModal";
-import ViewMessages from "@/components/messages/ViewMessages"
-
-
+import ViewMessages from "@/components/messages/ViewMessages";
 
 import KeyboardShortcutsModal from "@/app/(main)/(more-dropdown)/keyboardShortcuts/keyboardShortcutsModal";
 import { useRouter } from "next/navigation";

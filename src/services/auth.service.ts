@@ -38,7 +38,7 @@ export const authService = {
     api.post<ResetPasswordResponse>("/api/auth/v1/reset-password", data),
 
   /* (6) */
-  logout: () => api.post<LogoutResponse>("/api/auth/v1/logout"),
+  logout: () => api.get<LogoutResponse>("/api/auth/v1/logout"),
 
   /* (7) */
   googleCallback: (params: GoogleCallbackRequest) =>
@@ -50,5 +50,8 @@ export const authService = {
 
   /* (9) */
   googleVerifyCode: (data: GoogleVerifyCodeRequest) =>
-    api.post<GoogleAuthFinalizeResponse>("/api/auth/v1/google/verify-code", data),
+    api.post<GoogleAuthFinalizeResponse>(
+      "/api/auth/v1/google/verify-code",
+      data,
+    ),
 };
