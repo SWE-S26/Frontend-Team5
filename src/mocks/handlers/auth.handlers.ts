@@ -222,7 +222,7 @@ export const authHandlers = [
   }),
 
   /* (4) */
-  http.post(`${BASE}/api/auth/v1/forget-password`, async ({ request }) => {
+  http.post(`${BASE}/api/auth/v1/forgot-password`, async ({ request }) => {
     const body = (await request.json()) as {
       email: string;
     };

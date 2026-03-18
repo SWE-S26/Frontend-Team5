@@ -31,7 +31,7 @@ export const authService = {
 
   /* (4) */
   forgetPassword: (data: ForgetPasswordRequest) =>
-    api.post<ForgetPasswordResponse>("/api/auth/v1/forget-password", data),
+    api.post<ForgetPasswordResponse>("/api/auth/v1/forgot-password", data),
 
   /* (5) */
   resetPassword: (data: ResetPasswordRequest) =>
