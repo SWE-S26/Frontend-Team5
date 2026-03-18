@@ -5,7 +5,7 @@ export default function MSWProvider({ children }: { children: React.ReactNode })
   const [mswReady, setMswReady] = useState(false)
 
   useEffect(() => {
-    if (process.env.NODE_ENV !== "development") {
+    if (process.env.NODE_ENV !== "development" || process.env.NEXT_PUBLIC_USE_MSW === "false") {
       setMswReady(true)
       return
     }

@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import Link from "next/link"
 import Button from "@/components/ui/Button"
+import AuthModal from "@/components/auth/AuthModal";
 
 const slides = [
   {
@@ -33,6 +34,7 @@ const slides = [
 export default function HeroBanner() {
   const [current, setCurrent] = useState(0)
   const [animating, setAnimating] = useState(false)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   function goToSlide(index: number) {
     if (index === current) return
@@ -69,15 +71,15 @@ export default function HeroBanner() {
           <h1 className="text-white-smoke font-bold text-sm mt-1">CRAVING TUNES</h1>
         </div>
         <div className="flex gap-3">
-          <Button className="px-4 py-1.5 bg-white-smoke text-chinese-black text-[13px] cursor-pointer">
+          <Button className="px-4 py-1.5 bg-white-smoke text-chinese-black text-[13px] cursor-pointer" onClick={() => setIsAuthModalOpen(true)}>
             Sign in
           </Button>
-          <Button className="px-3 py-1.5 bg-chinese-black text-white-smoke text-[13px] cursor-pointer">
+          <Button className="px-3 py-1.5 bg-chinese-black text-white-smoke text-[13px] cursor-pointer" onClick={() => setIsAuthModalOpen(true)}>
             Create account
           </Button>
-          <button className="py-1.5 text-white-smoke font-bold text-[13px] transition-all duration-300 cursor-pointer">
+          <Link href="/sign-in" className="py-1.5 text-white-smoke font-bold text-[13px] transition-all duration-300 cursor-pointer">
             For Artists
-          </button>
+          </Link>
         </div>
       </div>
 
@@ -97,8 +99,11 @@ export default function HeroBanner() {
 
         <div className="flex gap-4 mt-12">
           {slides[current].buttons.map((btn, i) => (
-            <Link key={i} href={btn.href}>
-              <Button className={`px-3 py-1.5 text-[17px] cursor-pointer ${i === 0 ? "bg-white-smoke text-chinese-black" : "text-white-smoke hover:text-white-smoke"}`}>
+            <Link key={i} href={btn.label === "Get Started" ? "#" : btn.href}>
+              <Button
+                className={`px-3 py-1.5 text-[17px] cursor-pointer ${i === 0 ? "bg-white-smoke text-chinese-black" : "text-white-smoke hover:text-white-smoke"}`}
+                onClick={btn.label === "Get Started" ? () => setIsAuthModalOpen(true) : undefined}
+              >
                 {btn.label}
               </Button>
             </Link>
@@ -121,7 +126,10 @@ export default function HeroBanner() {
           />
         ))}
       </div>
-
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+      />
     </div>
   )
 }
