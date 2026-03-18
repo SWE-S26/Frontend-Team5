@@ -8,10 +8,7 @@ export default function MainLayout({
 }) {
   return (
     <div>
-      <Navbar
-        className="fixed top-0 w-full z-1000 bg-chinese-black"
-        isLoggedIn={false}
-      />
+      <Navbar className="fixed top-0 w-full z-1000 bg-chinese-black" isLoggedIn={true}/>
       <main className="mt-18 flex justify-center">
         <div className="w-full max-w-302">{children}</div>
       </main>

@@ -71,13 +71,13 @@ export default function HeroBanner() {
           <h1 className="text-white-smoke font-bold text-sm mt-1">CRAVING TUNES</h1>
         </div>
         <div className="flex gap-3">
-          <Button className="px-4 py-1.5 bg-white-smoke text-chinese-black text-[13px] cursor-pointer" onClick={() => setIsAuthModalOpen(true)}>
+          <Button data-testid="landing_sign_in" className="px-4 py-1.5 bg-white-smoke text-chinese-black text-[13px] cursor-pointer" onClick={() => setIsAuthModalOpen(true)}>
             Sign in
           </Button>
-          <Button className="px-3 py-1.5 bg-chinese-black text-white-smoke text-[13px] cursor-pointer" onClick={() => setIsAuthModalOpen(true)}>
+          <Button data-testid="landing_create_account" className="px-3 py-1.5 bg-chinese-black text-white-smoke text-[13px] cursor-pointer" onClick={() => setIsAuthModalOpen(true)}>
             Create account
           </Button>
-          <Link href="/sign-in" className="py-1.5 text-white-smoke font-bold text-[13px] transition-all duration-300 cursor-pointer">
+          <Link data-testid="landing_for_artist" href="/sign-in" className="py-1.5 text-white-smoke font-bold text-[13px] transition-all duration-300 cursor-pointer">
             For Artists
           </Link>
         </div>
