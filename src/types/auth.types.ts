@@ -85,7 +85,7 @@ export interface ForgetPasswordRequest {
 export interface ForgetPasswordResponse {
   success: boolean;
   message: string;
-  data: {};
+  data: null | {};
 }
 
 /* (5) "/api/auth/v1/reset-password" */
