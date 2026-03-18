@@ -54,33 +54,24 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
       {isLoggedIn ? (
         // logged in
         <>
-          <Link
-            href="/artistpro"
-            className="text-anger text-sm py-2 font-bold hover:text-white-smoke transition-all duration-300"
-          >
-            {" "}
-            Try Artist Pro{" "}
+          <Link data-testid="try_artist_pro" href="/artistpro" className="text-anger text-sm py-2 font-bold hover:text-white-smoke transition-all duration-300">
+            Try Artist Pro
           </Link>
-          <Link
-            href="/artists"
-            className="text-silver text-sm py-2 font-bold hover:text-white-smoke transition-all duration-300"
-          >
-            {" "}
-            For Artists{" "}
+
+          <Link data-testid="for_artists" href="/artists" className="text-silver text-sm py-2 font-bold hover:text-white-smoke transition-all duration-300">
+            For Artists
           </Link>
-          <Link
-            href="/upload"
-            className="text-silver text-sm py-2 font-bold hover:text-white-smoke transition-all duration-300"
-          >
-            {" "}
-            Upload{" "}
+
+          <Link data-testid="upload" href="/upload" className="text-silver text-sm py-2 font-bold hover:text-white-smoke transition-all duration-300">
+            Upload
           </Link>
 
           <Dropdown
+            data-testid="profile_dropdown"
             width="w-40"
             position="left-0"
             trigger={
-              <button className="text-silver font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2 text-4xl">
+              <button data-testid="profile_button" className="text-silver font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2 text-4xl">
                 <img
                   src="/profpic.jpg"
                   className="aspect-square h-6.5 rounded-full"
@@ -142,25 +133,19 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
             ]}
           />
 
-          <button className="text-silver text-xl font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2">
+          <button data-testid="notifications" className="text-silver text-xl font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2">
             <SlBell />
           </button>
           
-          <button className="text-silver text-xl  hover:text-white-smoke transition-all duration-300 flex items-center gap-2">
+          <button data-testid="messages" className="text-silver text-xl  hover:text-white-smoke transition-all duration-300 flex items-center gap-2" onClick={() => setIsMessagesOpen((prev) => !prev)}>
             <div className="relative">
-          <button 
-            className="text-silver text-xl  hover:text-white-smoke transition-all duration-300 flex items-center gap-2"
-            onClick={() => setIsMessagesOpen((prev) => !prev)}
-          >
-            <GrMailOption />
-          </button>
-
-          {isMessagesOpen && (
-            <div className="absolute right-0 top-8 z-15 w-100">
-              <ViewMessages />
+              <GrMailOption />
+              {isMessagesOpen && (
+                <div className="absolute right-0 top-8 z-15 w-100">
+                  <ViewMessages />
+                </div>
+                )}
             </div>
-            )}
-        </div>
           </button>
         </>
       ) : (
@@ -190,10 +175,11 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
       )}
 
       <Dropdown
+        data-testid="more_dropdown"
         width="w-43"
         position="right-0"
         trigger={
-          <button className="text-silver text-2xl font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2 cursor-pointer">
+          <button data-testid="more_button" className="text-silver text-2xl font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2 cursor-pointer">
             <IoIosMore />
           </button>
         }

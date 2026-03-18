@@ -13,7 +13,7 @@ export default function NavbarLeft({ isLoggedIn }: NavbarLeftProps) {
     <div className="flex items-center gap-2 text-sm mr-5">
 
       <div className="flex items-center">
-        <a href="/home"><img src="/beatza.png" className="w-13 mr-3 mt-1" /></a>
+        <a data-testid="navbar_logo" href="/home"><img src="/beatza.png" className="w-13 mr-3 mt-1" /></a>
         {isLoggedIn ? (
           // logged in
           <>
