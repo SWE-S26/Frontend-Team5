@@ -44,16 +44,18 @@ export default function RegisterDetailsForm({
 
   return (
     <div className="w-full text-white-smoke transition-all duration-300">
-      <button data-testid="back-to-login-button-details"
-        onClick={onBack}
-        className="mb-4 -ml-2 p-2 bg-[#303030] rounded-full transition-colors cursor-pointer"
-      >
-        <IoChevronBack size={26} />
-      </button>
+      <div className="relative flex items-center mb-6">
+        <button data-testid="back-to-login-button-details"
+          onClick={onBack}
+          className="mb-4 -ml-2 p-2 bg-[#303030] rounded-full transition-colors cursor-pointer"
+        >
+          <IoChevronBack size={26} />
+        </button>
 
-      <h1 className="text-[28px] font-bold leading-tight mb-6 text-left">
-        Tell us more about you
-      </h1>
+        <h1 className="text-[24px] ml-6 mt-3 font-semibold leading-tight mb-6 text-left">
+          Tell us more about you
+        </h1>
+      </div>
 
       <div className="space-y-4">
         {/* Display Name */}
