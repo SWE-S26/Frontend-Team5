@@ -7,7 +7,7 @@
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
 - **Formatting:** Prettier
-
+ 
 ---
 
 ## Getting Started
