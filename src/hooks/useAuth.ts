@@ -12,7 +12,7 @@ export function useFindEmail() {
     setExists(null);
     try {
       const res = await authService.findEmail({ email });
-      setExists(res.data.exists);
+      setExists(res.data.data.exists);
       return res.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Something went wrong";

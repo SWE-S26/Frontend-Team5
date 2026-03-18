@@ -116,7 +116,7 @@ export const authHandlers = [
   }),
 
   /* (3) */
-  http.post("/api/auth/v1/signup", async ({ request }) => {
+  http.post("/api/auth/v1/sign-up", async ({ request }) => {
     const body = (await request.json()) as {
       email: string;
       password: string;

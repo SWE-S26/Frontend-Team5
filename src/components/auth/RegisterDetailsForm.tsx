@@ -9,7 +9,7 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December",
 ];
 
-const GENDERS = ["Man", "Woman", "Max Verstappen", "Prefer not to say"];
+const GENDERS = ["Male", "Female", "Max Verstappen", "Prefer not to say"];
 
 const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 const YEARS = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);

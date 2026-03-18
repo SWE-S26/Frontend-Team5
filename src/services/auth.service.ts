@@ -21,7 +21,7 @@ export const authService = {
 
   /* (3) */
   signup: (data: SignupRequest) =>
-    api.post<SignupResponse>("/api/auth/v1/signup", data),
+    api.post<SignupResponse>("/api/auth/v1/sign-up", data),
 
   /* (4) */
   forgetPassword: (data: ForgetPasswordRequest) =>

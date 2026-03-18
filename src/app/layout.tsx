@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import ThemeProvider from "@/components/theme/ThemeProvider"
+import MockProvider from "@/components/MSWProvider"
 import "./globals.css";
 
 const inter = Inter({
@@ -25,9 +26,11 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="antialiased">
-        <ThemeProvider>
-          {children}
-        </ThemeProvider>
+        <MockProvider>
+          <ThemeProvider>
+            {children}
+          </ThemeProvider>
+        </MockProvider>
         <div className="h-12"/>
       </body>
     </html>

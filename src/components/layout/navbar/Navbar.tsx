@@ -11,7 +11,7 @@ interface NavbarProps {
 
 export default function Navbar({ className, isLoggedIn }: NavbarProps) {
   return (
-    <div className={`flex justify-center w-full ${className}`}>
+    <div  data-testid="Navbar" className={`flex justify-center w-full ${className}`}>
       <div className="flex items-center pt-1 w-full max-w-302">
         <div className="flex-none">
           <NavbarLeft isLoggedIn={isLoggedIn}/>

@@ -43,7 +43,9 @@ export interface FindEmailRequest {
   email: string;
 }
 export interface FindEmailResponse {
-  exists: boolean;
+  data: {
+    exists: boolean;
+  }
   message: string;
 }
 

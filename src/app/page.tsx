@@ -3,7 +3,9 @@ import HeroBanner from "@/components/landing-page/HeroBanner";
 import NavbarCenter from "@/components/layout/navbar/NavbarCenter";
 import Button from "@/components/ui/Button"
 
+
 export default function LandingPage() {
+  
   return (
     <div className="flex justify-center">
       <div className="w-full max-w-310 mt-9">
@@ -16,13 +18,19 @@ export default function LandingPage() {
             </Button>
         </div>
 
-        <div className="justify">
-          <h1 className="font-bold">Hear what’s trending for free in the SoundCloud community</h1>
+        <div className="flex flex-col gap-5 items-center justify-center mt-9">
+          <h1 className="font-bold text-xl">Hear what’s trending for free in the SoundCloud community</h1>
+          <a href="/home">
+            <Button className="px-3 py-1.5 text-[17px] cursor-pointer bg-white-smoke text-chinese-black">
+              Explore Trending Playlists
+            </Button>
+          </a>
         </div>
 
         <div className="my-20"/>
-        <HeroBanner/>
       </div>
+
+
     </div>
   )
 }
