@@ -4,7 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useResetPassword } from "@/hooks/useAuth";
-import { useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 export default function ResetPasswordPage() {
@@ -15,8 +15,8 @@ export default function ResetPasswordPage() {
 
   const router = useRouter();
 
-  const params = useParams();
-  const token = params.token as string;
+  const params = useSearchParams();
+  const token = params.get("token");
 
   const canSave =
     password.trim().length >= 8 && confirmPassword.trim().length >= 8;
@@ -30,7 +30,7 @@ export default function ResetPasswordPage() {
     }
 
     if (!token) {
-      console.error("Token is missing from the URL path");
+      setConfirmPasswordError("Missing or Invalid token!");
       return;
     }
 
