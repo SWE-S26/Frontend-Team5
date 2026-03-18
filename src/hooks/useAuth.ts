@@ -80,6 +80,7 @@ export function useSignup() {
         const message = err.response?.data?.message || "Something went wrong";
         setError(message);
         setSuccess(false);
+        return { success: false, message, data: {} };
       } finally {
         setLoading(false);
       }

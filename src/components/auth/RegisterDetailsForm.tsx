@@ -17,6 +17,8 @@ const YEARS = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i
 export default function RegisterDetailsForm({
   email,
   requireDisplayName = true,
+  submitError,
+  isSubmitting = false,
   onBack,
   onComplete,
 }: RegisterDetailsFormProps) {
@@ -44,16 +46,18 @@ export default function RegisterDetailsForm({
 
   return (
     <div className="w-full text-white-smoke transition-all duration-300">
-      <button data-testid="back-to-login-button-details"
-        onClick={onBack}
-        className="mb-4 -ml-2 p-2 bg-[#303030] rounded-full transition-colors cursor-pointer"
-      >
-        <IoChevronBack size={26} />
-      </button>
+      <div className="relative flex items-center mb-6">
+        <button data-testid="back-to-login-button-details"
+          onClick={onBack}
+          className="mb-4 -ml-2 p-2 bg-[#303030] rounded-full transition-colors cursor-pointer"
+        >
+          <IoChevronBack size={26} />
+        </button>
 
-      <h1 className="text-[28px] font-bold leading-tight mb-6 text-left">
-        Tell us more about you
-      </h1>
+        <h1 className="text-[24px] ml-6 mt-3 font-semibold leading-tight mb-6 text-left">
+          Tell us more about you
+        </h1>
+      </div>
 
       <div className="space-y-4">
         {/* Display Name */}
@@ -172,16 +176,18 @@ export default function RegisterDetailsForm({
         </div>
 
         {/* Continue Button */}
+        {submitError ? <p className="text-red-400 text-sm">{submitError}</p> : null}
+
         <button data-testid="continue-button-details"
           onClick={handleContinue}
-          disabled={!isValid}
+          disabled={!isValid || isSubmitting}
           className={`w-full h-12 font-bold rounded transition-all duration-200 ${
-            isValid
+            isValid && !isSubmitting
               ? "bg-white-smoke text-chinese-black cursor-pointer"
               : "bg-white-smoke/60 text-chinese-black cursor-not-allowed"
           }`}
         >
-          Continue
+          {isSubmitting ? "Continuing..." : "Continue"}
         </button>
       </div>
     </div>
