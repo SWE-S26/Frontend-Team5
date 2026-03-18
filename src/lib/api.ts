@@ -17,7 +17,7 @@ const PUBLIC_ROUTES = [
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
-  withCredentials: true, // sends cookies automatically with every request
+  withCredentials: true,
   headers: {
     "Content-Type": "application/json",
   },
@@ -30,9 +30,8 @@ api.interceptors.response.use(
     const isPublic = PUBLIC_ROUTES.some(route => error.config?.url?.includes(route))
 
     if (error.response?.status === 401 && !isPublic) {
-      await axios.post(
+      await axios.get( 
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/v1/refresh-token`,
-        {},
         { withCredentials: true }
       )
       return axios({ ...error.config, withCredentials: true })
