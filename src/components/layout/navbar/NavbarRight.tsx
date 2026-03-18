@@ -4,7 +4,7 @@ import Dropdown from "@/components/ui/Dropdown";
 import AuthModal from "@/components/auth/AuthModal";
 import KeyboardShortcutsModal from "@/app/(main)/(more-dropdown)/keyboardShortcuts/keyboardShortcutsModal";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { DropdownItem } from "@/components/ui/Dropdown";
 import Button from "@/components/ui/Button";
 
@@ -38,6 +38,12 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
 
   const { logout, loading, error, success } = useLogout();
+
+  useEffect(() => {
+    if (success) {
+      router.push("/");
+    }
+  }, [success]);
 
   return (
     <div className="flex items-center gap-5.5 ml-5 mb-1">
@@ -201,7 +207,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
                   },
                   {
                     label: "Sign out",
-                    onClick: () => logout().then(() => router.push("/")),
+                    onClick: () => logout(),
                     disabled: loading,
                   },
                 ]
