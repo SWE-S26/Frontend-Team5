@@ -135,12 +135,5 @@ export interface GoogleVerifyCodeRequest {
 
 export interface GoogleAuthFinalizeResponse {
   message: string;
-  data?: {
-    user?: {
-      id?: string;
-      displayName?: string;
-      role?: string;
-      profileLink?: string;
-    };
-  };
+  data: {};
 }
