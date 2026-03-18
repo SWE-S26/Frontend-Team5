@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { useRouter } from "next/navigation";
-import { FaFacebook } from "react-icons/fa";
 import { FcGoogle } from "react-icons/fc";
 import { IoChevronBack, IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import ForgotPasswordForm from "./ForgotPasswordForm";
@@ -12,8 +11,6 @@ import DetailsValidationForm from "./DetailsValidationForm";
 import { useFindEmail, useLogin, useSignup } from "@/hooks/useAuth"
 
 type Step = "email" | "password" | "forgot" | "register-details" | "validation";
-
-//const mockUsers = ["karimhegab698@gmail.com", "test@test.com"];
 
 export default function LoginForm() {
   const [step, setStep] = useState<Step>("email");
@@ -125,6 +122,7 @@ export default function LoginForm() {
       <div className="relative flex items-center mb-6">
         {(isEmailEverFocused || isPasswordStep) && (
           <button
+            data-testid="back-to-login-button-login"
             onClick={handleBackToEmail}
             className="p-2 -ml-2 bg-back rounded-full cursor-pointer z-10"
           >
@@ -161,7 +159,7 @@ export default function LoginForm() {
             <span className="text-[#699FFF] cursor-pointer ml-1">Privacy Policy</span>.
           </p>
           <div className="space-y-2 mb-8">
-            <button className="w-full h-11 cursor-pointer bg-white-smoke text-chinese-black rounded flex items-center justify-center gap-3 font-semibold text-sm">
+            <button data-testid="signin-google" className="w-full h-11 cursor-pointer bg-white-smoke text-chinese-black rounded flex items-center justify-center gap-3 font-semibold text-sm">
               <FcGoogle size={20} /> Continue with Google
             </button>
           </div>
@@ -232,6 +230,7 @@ export default function LoginForm() {
                 }`}
               />
               <button
+                data-testid="show-password-button"
                 type="button"
                 onClick={() => setShowPassword((p) => !p)}
                 className="text-gray-400 hover:text-white"
@@ -243,6 +242,7 @@ export default function LoginForm() {
         )}
 
         <button
+          data-testid="continue-button-login"
           onClick={isPasswordStep ? handleContinueFromPassword : handleContinueFromEmail}
           disabled={
             isBusy ||
@@ -269,6 +269,7 @@ export default function LoginForm() {
 
       {isPasswordStep && userExists && (
         <button
+          data-testid="forgot-password-button"
           onClick={() => setStep("forgot")}
           className="mt-6 text-sm cursor-pointer text-[#699FFF] hover:underline block text-left font-medium"
         >
@@ -277,7 +278,7 @@ export default function LoginForm() {
       )}
 
       {!isPasswordStep && (
-        <button className="mt-6 text-sm cursor-pointer text-[#699FFF] hover:underline font-medium">
+        <button data-testid="need-help-button" className="mt-6 text-sm cursor-pointer text-[#699FFF] hover:underline font-medium">
           Need help?
         </button>
       )}

@@ -43,7 +43,7 @@ export default function RegisterDetailsForm({
 
   return (
     <div className="w-full text-white-smoke transition-all duration-300">
-      <button
+      <button data-testid="back-to-login-button-details"
         onClick={onBack}
         className="mb-4 -ml-2 p-2 bg-[#303030] rounded-full transition-colors cursor-pointer"
       >
@@ -169,7 +169,7 @@ export default function RegisterDetailsForm({
         </div>
 
         {/* Continue Button */}
-        <button
+        <button data-testid="continue-button-details"
           onClick={handleContinue}
           disabled={!isValid}
           className={`w-full h-12 font-bold rounded transition-all duration-200 ${

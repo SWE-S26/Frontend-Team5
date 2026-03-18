@@ -1,8 +1,6 @@
-// src/app/layout.tsx
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import ThemeProvider from "@/components/theme/ThemeProvider"
-import MSWProvider from "@/components/MSWProvider"
 import "./globals.css";
 
 const inter = Inter({
@@ -21,13 +19,15 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html
+      lang="en"
+      className={inter.variable}
+      suppressHydrationWarning
+    >
       <body className="antialiased">
-        <MSWProvider>
-          <ThemeProvider>
-            {children}
-          </ThemeProvider>
-        </MSWProvider>
+        <ThemeProvider>
+          {children}
+        </ThemeProvider>
         <div className="h-12"/>
       </body>
     </html>
