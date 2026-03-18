@@ -130,14 +130,14 @@ export default function LoginForm() {
     setLoginSuccess(false);
     const res = await findEmail(email)
     if (!res) return // error occurred, hook already set error state
-    setUserExists(res.exists)
+    setUserExists(res.data.exists)
     setStep("password")
   }, [email, findEmail]);
 
   const handleContinueFromPassword = useCallback(async () => {
     if (userExists) {
       const res = await login(email, password);
-      if (res?.success) {
+      if (res?.message == "Authenticated successfully") {
         setLoginSuccess(true);
         setTimeout(() => router.push("/home"), 1500);
       }

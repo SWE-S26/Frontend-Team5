@@ -3,7 +3,7 @@
 const SendButton = () => {
   return (
     <>
-        <button className='text-black bg-white w-17 h-10 rounded-md font-bold px-2 py-2 hover:text-silver cursor-pointer'>Send</button>
+        <button className='text-black text-sm bg-white-smoke w-17 h-10 rounded-md font-bold px-1 py-1 hover:text-silver cursor-pointer'>Send</button>
     </>
   )
 }

@@ -1,10 +1,10 @@
 import { http, HttpResponse } from "msw";
-
+const BASE = process.env.NEXT_PUBLIC_API_URL
 export const authHandlers = [
   /* (1) */
-  http.post("/api/auth/v1/find-email", async ({ request }) => {
+  http.post(`${BASE}/api/auth/v1/find-email`, async ({ request }) => {
     const body = (await request.json()) as { email: string };
-
+    
     // 400 - missing or invalid email
     if (!body.email || !body.email.includes("@")) {
       return HttpResponse.json(
@@ -33,13 +33,13 @@ export const authHandlers = [
     const existingEmails = ["test@test.com", "omar@beatza.com"];
     const exists = existingEmails.includes(body.email);
     return HttpResponse.json(
-      { exists, message: "Email exists in the system" },
-      { status: 200 },
+      { data: { exists }, message: "Email exists in the system" },
+      { status: 200 }
     );
   }),
 
   /* (2) */
-  http.post("/api/auth/v1/login", async ({ request }) => {
+  http.post(`${BASE}/api/auth/v1/login`, async ({ request }) => {
     const body = (await request.json()) as { email: string; password: string };
 
     // 400 - missing or invalid email
@@ -116,7 +116,7 @@ export const authHandlers = [
   }),
 
   /* (3) */
-  http.post("/api/auth/v1/signup", async ({ request }) => {
+  http.post(`${BASE}/api/auth/v1/sign-up`, async ({ request }) => {
     const body = (await request.json()) as {
       email: string;
       password: string;
@@ -222,7 +222,7 @@ export const authHandlers = [
   }),
 
   /* (4) */
-  http.post("/api/auth/v1/forget-password", async ({ request }) => {
+  http.post(`${BASE}/api/auth/v1/forget-password`, async ({ request }) => {
     const body = (await request.json()) as {
       email: string;
     };
@@ -292,7 +292,7 @@ export const authHandlers = [
   }),
 
   /* (5) */
-  http.post("/api/auth/v1/reset-password", async ({ request }) => {
+  http.post(`${BASE}/api/auth/v1/reset-password`, async ({ request }) => {
     const body = (await request.json()) as {
       token: string;
       newPassword: string;

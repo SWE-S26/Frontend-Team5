@@ -2,6 +2,10 @@
 import Link from "next/link";
 import Dropdown from "@/components/ui/Dropdown";
 import AuthModal from "@/components/auth/AuthModal";
+import ViewMessages from "@/components/messages/ViewMessages"
+
+
+
 import KeyboardShortcutsModal from "@/app/(main)/(more-dropdown)/keyboardShortcuts/keyboardShortcutsModal";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -141,8 +145,22 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
           <button className="text-silver text-xl font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2">
             <SlBell />
           </button>
-          <button className="text-silver text-xl font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2">
+          
+          <button className="text-silver text-xl  hover:text-white-smoke transition-all duration-300 flex items-center gap-2">
+            <div className="relative">
+          <button 
+            className="text-silver text-xl  hover:text-white-smoke transition-all duration-300 flex items-center gap-2"
+            onClick={() => setIsMessagesOpen((prev) => !prev)}
+          >
             <GrMailOption />
+          </button>
+
+          {isMessagesOpen && (
+            <div className="absolute right-0 top-8 z-15 w-100">
+              <ViewMessages />
+            </div>
+            )}
+        </div>
           </button>
         </>
       ) : (
