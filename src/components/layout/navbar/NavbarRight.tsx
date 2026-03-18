@@ -40,7 +40,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   const router = useRouter();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
-
+  const [isMessagesOpen, setIsMessagesOpen] = useState<boolean>(false);
   const { logout, loading, error, success } = useLogout();
 
   useEffect(() => {
