@@ -3,32 +3,20 @@
 import { IoChevronBack } from "react-icons/io5";
 import { ForgotPasswordFormProps } from "@/types/auth.types";
 import { useForgetPassword } from "@/hooks/useAuth";
-import DetailsValidationForm from "./DetailsValidationForm";
-import { useState } from "react";
 
 export default function ForgotPasswordForm({
   email,
   setEmail,
   onBack,
+  onSuccess,
 }: ForgotPasswordFormProps) {
   const isEmailActive = email.length > 0;
   const { forgetPassword, loading, error } = useForgetPassword();
-  const [emailSent, setEmailSent] = useState(false);
 
   const handleSendLink = async () => {
-    const res = await forgetPassword(email)
-    if (res) setEmailSent(true)
-  }
-
-  if (emailSent) {
-    return (
-      <DetailsValidationForm
-        email={email}
-        onBackToLogin={onBack}
-        onSendAgain={() => forgetPassword(email)}
-      />
-    )
-  }
+    const res = await forgetPassword(email);
+    if (res) onSuccess?.();
+  };
 
   return (
     <div className="w-full text-white-smoke animate-in fade-in duration-300">

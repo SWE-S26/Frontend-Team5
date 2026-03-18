@@ -1,9 +1,10 @@
 "use client";
 
+import Image from "next/image";
 import Link from "next/link";
 import { useEffect, useState } from "react";
 import { useResetPassword } from "@/hooks/useAuth";
-import { useParams } from "next/navigation";
+import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
 export default function ResetPasswordPage() {
@@ -14,8 +15,8 @@ export default function ResetPasswordPage() {
 
   const router = useRouter();
 
-  const params = useParams();
-  const token = params.token as string;
+  const params = useSearchParams();
+  const token = params.get("token");
 
   const canSave =
     password.trim().length >= 8 && confirmPassword.trim().length >= 8;
@@ -29,7 +30,7 @@ export default function ResetPasswordPage() {
     }
 
     if (!token) {
-      console.error("Token is missing from the URL path");
+      setConfirmPasswordError("Missing or Invalid token!");
       return;
     }
 
@@ -56,12 +57,13 @@ export default function ResetPasswordPage() {
       <header className="h-13 bg-chinese-black">
         <div className="mx-auto flex h-full w-full max-w-7xl items-center">
           <div className="flex h-full w-60 items-center bg-chinese-black px-5">
-            <img
+            <Image
               src="/beatza.png"
               alt="BeatZa logo"
               width={56}
               height={56}
               className="h-14 w-14 object-contain"
+              priority
             />
             <span className="ml-3 text-sm font-semibold tracking-[0.14em] text-white uppercase">
               BeatZa

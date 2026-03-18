@@ -4,6 +4,12 @@ import {
   FindEmailResponse,
   ForgetPasswordRequest,
   ForgetPasswordResponse,
+  LogoutResponse,
+  GoogleAuthFinalizeResponse,
+  GoogleCallbackRequest,
+  GoogleCallbackResponse,
+  GoogleCompleteRequest,
+  GoogleVerifyCodeRequest,
   ResetPasswordRequest,
   ResetPasswordResponse,
 } from "@/types/auth.types";
@@ -30,4 +36,19 @@ export const authService = {
   /* (5) */
   resetPassword: (data: ResetPasswordRequest) =>
     api.post<ResetPasswordResponse>("/api/auth/v1/reset-password", data),
+
+  /* (6) */
+  logout: () => api.post<LogoutResponse>("/api/auth/v1/logout"),
+
+  /* (7) */
+  googleCallback: (params: GoogleCallbackRequest) =>
+    api.get<GoogleCallbackResponse>("/api/auth/v1/google/callback"),
+
+  /* (8) */
+  googleComplete: (data: GoogleCompleteRequest) =>
+    api.post<GoogleAuthFinalizeResponse>("/api/auth/v1/google/complete", data),
+
+  /* (9) */
+  googleVerifyCode: (data: GoogleVerifyCodeRequest) =>
+    api.post<GoogleAuthFinalizeResponse>("/api/auth/v1/google/verify-code", data),
 };

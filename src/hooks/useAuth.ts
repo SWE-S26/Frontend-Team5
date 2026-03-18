@@ -80,6 +80,7 @@ export function useSignup() {
         const message = err.response?.data?.message || "Something went wrong";
         setError(message);
         setSuccess(false);
+        return { success: false, message, data: {} };
       } finally {
         setLoading(false);
       }
@@ -141,4 +142,87 @@ export function useResetPassword() {
   );
 
   return { resetPassword, loading, error, success };
+}
+
+export function useLogout() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+
+  const logout = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+
+    try {
+      const res = await authService.logout();
+      setSuccess(true);
+      return res.data;
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Something went wrong";
+      setError(message);
+      setSuccess(false);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { logout, loading, error, success };
+}
+
+export function useGoogleComplete() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+
+  const completeGoogleSignup = useCallback(
+    async (incompleteToken: string, dateOfBirth: string, gender: string) => {
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+      try {
+        const res = await authService.googleComplete({
+          incompleteToken,
+          dateOfBirth,
+          gender,
+        });
+        setSuccess(true);
+        return res.data;
+      } catch (err: any) {
+        const message = err.response?.data?.message || "Something went wrong";
+        setError(message);
+        setSuccess(false);
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  return { completeGoogleSignup, loading, error, success };
+}
+
+export function useGoogleVerifyCode() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+
+  const verifyGoogleCode = useCallback(async (pendingToken: string, code: string) => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await authService.googleVerifyCode({ pendingToken, code });
+      setSuccess(true);
+      return res.data;
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Something went wrong";
+      setError(message);
+      setSuccess(false);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { verifyGoogleCode, loading, error, success };
 }

@@ -356,4 +356,16 @@ export const authHandlers = [
       { status: 200 },
     );
   }),
+
+  /* (6) */
+  http.post("/api/auth/v1/logout", async () => {
+    // 401 - no token / invalid token (handled automatically by axios interceptor)
+    // 500 - server error simulation (no request body to trigger it, so use a flag or just leave it)
+
+    // 200 - success
+    return HttpResponse.json(
+      { message: "Logged out successfully", data: null },
+      { status: 200 },
+    );
+  }),
 ];
