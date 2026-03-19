@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import ThemeProvider from "@/components/theme/ThemeProvider"
 import MockProvider from "@/components/MSWProvider"
+import AuthGoogle from "@/components/auth/AuthGoogle"
 import "./globals.css";
 
 const inter = Inter({
@@ -31,6 +32,7 @@ export default function RootLayout({
       <body className="antialiased">
         <MockProvider>
           <ThemeProvider>
+            <AuthGoogle />
             {children}
           </ThemeProvider>
         </MockProvider>
