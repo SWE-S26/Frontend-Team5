@@ -9,7 +9,8 @@ import {
   GoogleCallbackRequest, GoogleCallbackResponse,
   GoogleCompleteRequest,
   GoogleVerifyCodeRequest,GoogleAuthFinalizeResponse,
-  VerifyEmailRequest, VerifyEmailResponse
+  VerifyEmailRequest, VerifyEmailResponse,
+  ResendVerificationEmailRequest, ResendVerificationEmailResponse
 } from "@/types/auth.types";
 
 export const authService = {
@@ -52,4 +53,8 @@ export const authService = {
   /* (10) */
   verifyEmail: (token: string) =>
     api.get<VerifyEmailResponse>(`/api/auth/v1/verify-email?token=${token}`),
+
+  /* (11) */
+  resendVerificationEmail: (data: ResendVerificationEmailRequest) =>
+    api.post<ResendVerificationEmailResponse>("/api/auth/v1/resend-verification-email", data),
 };

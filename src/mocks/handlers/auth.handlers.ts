@@ -30,7 +30,7 @@ export const authHandlers = [
     }
 
     // 200 - success
-    const existingEmails = ["test@test.com", "omar@beatza.com"];
+    const existingEmails = ["test@test.com", "omar@beatza.com", "unverified@test.com"];
     const exists = existingEmails.includes(body.email);
     return HttpResponse.json(
       { data: { exists }, message: "Email exists in the system" },
@@ -90,6 +90,7 @@ export const authHandlers = [
     const existingUsers = {
       "test@test.com": "test1234",
       "omar@beatza.com": "omar1234",
+      "unverified@test.com": "unverified1234",
     } as Record<string, string>;
 
     const storedPassword = existingUsers[body.email];
@@ -106,6 +107,14 @@ export const authHandlers = [
         { success: false, message: "Authorization failed", data: {} },
         { status: 401 },
       );
+    }
+
+    // 403 - email not verified
+    if (body.email === "unverified@test.com") {
+      return HttpResponse.json(
+        { success: false, message: "Email not verified. Please verify your email before logging in.", data: {} },
+        { status: 403 }
+      )
     }
 
     // 200 - success (tokens are typically set via httpOnly cookies)
@@ -426,6 +435,42 @@ export const authHandlers = [
     // 200 - success
     return HttpResponse.json(
       { message: "User Verified successfully" },
+      { status: 200 }
+    )
+  }),
+
+  /* (11) */
+  http.post(`${BASE}/api/auth/v1/resend-verification-email`, async ({ request }) => {
+    const body = (await request.json()) as { email: string }
+
+    // 404 - email not found
+    if (!body.email || !body.email.includes("@")) {
+      return HttpResponse.json(
+        { message: "User not found" },
+        { status: 404 }
+      )
+    }
+
+    // 500 - server error simulation
+    if (body.email === "error@test.com") {
+      return HttpResponse.json(
+        { message: "Internal server error" },
+        { status: 500 }
+      )
+    }
+
+    // 404 - unregistered email
+    const registeredEmails = ["test@test.com", "omar@beatza.com"]
+    if (!registeredEmails.includes(body.email)) {
+      return HttpResponse.json(
+        { message: "User not found" },
+        { status: 404 }
+      )
+    }
+
+    // 200 - success
+    return HttpResponse.json(
+      { message: "Verification email sent successfully" },
       { status: 200 }
     )
   }),
