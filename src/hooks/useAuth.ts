@@ -128,7 +128,7 @@ export function useResetPassword() {
       setSuccess(null);
       try {
         const res = await authService.resetPassword({ token, newPassword });
-        setSuccess(res.data.success);
+        setSuccess(true)  // ← if no error thrown, it's a success
         return res.data;
       } catch (err: any) {
         const message = err.response?.data?.message || "Something went wrong";
@@ -228,4 +228,29 @@ export function useGoogleVerifyCode() {
   );
 
   return { verifyGoogleCode, loading, error, success };
+}
+
+export function useVerifyEmail() {
+  const [loading, setLoading] = useState(false)
+  const [error, setError]     = useState<string | null>(null)
+  const [success, setSuccess] = useState<boolean | null>(null)
+
+  const verifyEmail = useCallback(async (token: string) => {
+    setLoading(true)
+    setError(null)
+    setSuccess(null)
+    try {
+      const res = await authService.verifyEmail(token)
+      setSuccess(true)
+      return res.data
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Something went wrong"
+      setError(message)
+      setSuccess(false)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  return { verifyEmail, loading, error, success }
 }

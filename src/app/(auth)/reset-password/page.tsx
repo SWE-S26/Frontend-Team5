@@ -58,7 +58,7 @@ function ResetPasswordForm() {
     setConfirmPasswordError("")
 
     const result = await resetPassword(token, password)
-    if (result?.success) {
+    if (result?.message === "Password reset successfully") {
       setIsSuccess(true)
       setTimeout(() => router.push("/"), 2000)
     }
