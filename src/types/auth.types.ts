@@ -92,6 +92,7 @@ export interface ForgetPasswordResponse {
 export interface ResetPasswordRequest {
   token: string;
   newPassword: string;
+  signOutEverywhere?: boolean;
 }
 
 export interface ResetPasswordResponse {

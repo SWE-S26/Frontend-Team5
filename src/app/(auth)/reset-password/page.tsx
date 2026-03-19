@@ -57,7 +57,7 @@ function ResetPasswordForm() {
 
     setConfirmPasswordError("")
 
-    const result = await resetPassword(token, password)
+    const result = await resetPassword(token, password, signOutEverywhere)
     if (result?.message === "Password reset successfully") {
       setIsSuccess(true)
       setTimeout(() => router.push("/"), 2000)
@@ -133,6 +133,7 @@ function ResetPasswordForm() {
                 </label>
                 <div className="relative mt-2">
                   <input
+                    data-testid="reset-password-email-input"
                     type="password"
                     value={password}
                     onChange={(e) => {
@@ -160,6 +161,7 @@ function ResetPasswordForm() {
                 </label>
                 <div className="relative mt-2">
                   <input
+                    data-testid="reset-password-password-input"
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => {
@@ -188,6 +190,7 @@ function ResetPasswordForm() {
                 {/* Sign out everywhere */}
                 <label className="mt-5 flex cursor-pointer items-center gap-3 text-base text-[#2b2b2b] sm:mt-6 sm:text-[18px]">
                   <input
+                    data-testid="sign-out-everywhere-input"
                     type="checkbox"
                     checked={signOutEverywhere}
                     onChange={(e) => setSignOutEverywhere(e.target.checked)}

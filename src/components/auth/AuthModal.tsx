@@ -46,7 +46,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           animate ? "translate-y-0" : "-translate-y-[150vh]"
         }`}
       >
-        <LoginForm />
+        <LoginForm onAuthSuccess={onClose} />
       </div>
     </div>
   );
