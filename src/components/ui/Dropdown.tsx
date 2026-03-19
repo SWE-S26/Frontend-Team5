@@ -38,11 +38,12 @@ export default function Dropdown({
   }, []);
 
   return (
-    <div className="relative" ref={ref} data-testid={testId}>
+    <div className="relative" ref={ref}>
       <div onClick={() => setIsOpen(!isOpen)}>{trigger}</div>
 
       {isOpen && (
         <div
+          data-testid={testId}
           className={`flex flex-col absolute ${width} ${position} mt-5 py-2 bg-chinese-black border border-silver rounded-sm`}
         >
           {items.map((item, index) =>
