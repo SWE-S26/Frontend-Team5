@@ -16,6 +16,7 @@ import {
   useGoogleVerifyCode,
   useLogin,
   useSignup,
+  useResendVerificationEmail
 } from "@/hooks/useAuth";
 
 type Step =
@@ -86,6 +87,8 @@ export default function LoginForm() {
     loading: googleVerifyLoading,
     error: googleVerifyError,
   } = useGoogleVerifyCode();
+  const { resendVerificationEmail, loading: resendLoading, success: resendSuccess } = useResendVerificationEmail();
+  const [isUnverified, setIsUnverified] = useState(false)
   const router = useRouter();
 
   useEffect(() => {
@@ -160,13 +163,15 @@ export default function LoginForm() {
 
   const handleContinueFromPassword = useCallback(async () => {
     if (userExists) {
+      setIsUnverified(false)
       const res = await login(email, password);
-      if (res?.message == "Authenticated successfully") {
+      if (res?.message === "Authenticated successfully") {
         setLoginSuccess(true);
         setTimeout(() => router.push("/home"), 1500);
+        return
       }
     } else {
-      if (!validatePassword(password)) return  // ← validate before proceeding
+      if (!validatePassword(password)) return
       setRegisterError(null);
       setStep("register-details");
     }
@@ -221,6 +226,15 @@ export default function LoginForm() {
       setTimeout(() => router.push("/home"), 600);
     }
   }, [googlePendingToken, googleCode, verifyGoogleCode, router]);
+
+  useEffect(() => {
+    if (loginError?.toLowerCase().includes("not verified") ||
+        loginError?.toLowerCase().includes("verify your email")) {
+      setIsUnverified(true)
+    } else {
+      setIsUnverified(false)
+    }
+  }, [loginError])
 
   if (step === "validation") {
     return (
@@ -509,7 +523,21 @@ export default function LoginForm() {
       )}
 
       {loginError && isPasswordStep && !loginSuccess && (
-        <p className="mt-3 text-sm text-red-400">{loginError}</p>
+        <div className="mt-3">
+          <p className="text-sm text-red-400">{loginError}</p>
+          {isUnverified && (
+            <button
+              onClick={() => resendVerificationEmail(email)}
+              disabled={resendLoading}
+              className="mt-2 text-sm text-[#699FFF] hover:underline cursor-pointer font-medium"
+            >
+              {resendLoading ? "Sending..." : "Send a Verification Email"}
+            </button>
+          )}
+          {resendSuccess && (
+            <p className="mt-2 text-sm text-green-400">Verification email sent! Check your inbox.</p>
+          )}
+        </div>
       )}
 
       {(googleCompleteError || googleError) && (

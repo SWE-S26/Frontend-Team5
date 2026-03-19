@@ -141,3 +141,11 @@ export interface VerifyEmailRequest {
 export interface VerifyEmailResponse {
   message: string
 }
+
+/* (11) "/api/auth/v1/resend-verification-email" */
+export interface ResendVerificationEmailRequest {
+  email: string
+}
+export interface ResendVerificationEmailResponse {
+  message: string
+}

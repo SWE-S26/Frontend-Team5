@@ -254,3 +254,28 @@ export function useVerifyEmail() {
 
   return { verifyEmail, loading, error, success }
 }
+
+export function useResendVerificationEmail() {
+  const [loading, setLoading] = useState(false)
+  const [error, setError]     = useState<string | null>(null)
+  const [success, setSuccess] = useState<boolean | null>(null)
+
+  const resendVerificationEmail = useCallback(async (email: string) => {
+    setLoading(true)
+    setError(null)
+    setSuccess(null)
+    try {
+      const res = await authService.resendVerificationEmail({ email })
+      setSuccess(true)
+      return res.data
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Something went wrong"
+      setError(message)
+      setSuccess(false)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  return { resendVerificationEmail, loading, error, success }
+}
