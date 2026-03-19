@@ -28,7 +28,11 @@ type Step =
   | "google-complete"
   | "google-verify";
 
-export default function LoginForm() {
+export default function LoginForm({
+  onAuthSuccess,
+}: {
+  onAuthSuccess?: () => void;
+} = {}) {
   const [step, setStep] = useState<Step>("email");
   const [validationSource, setValidationSource] = useState<"signup" | "reset-password">("signup");
   const [registerError, setRegisterError] = useState<string | null>(null);
@@ -91,66 +95,10 @@ export default function LoginForm() {
   const [isUnverified, setIsUnverified] = useState(false)
   const router = useRouter();
 
-  useEffect(() => {
-    const onGoogleAuthMessage = (event: MessageEvent) => {
-      if (event.origin !== window.location.origin) return;
-      const payload = event.data?.payload;
-      if (!event.data || event.data.type !== "google-auth-result" || !payload) return;
-
-      if (payload.status === "incomplete" && payload.incompleteToken) {
-        setGoogleIncompleteToken(payload.incompleteToken);
-        setGoogleEmail(payload.email || "");
-        setGoogleDisplayName(payload.displayName || "");
-        setGoogleError(null);
-        setStep("google-complete");
-        return;
-      }
-
-      if (payload.status === "verify" && payload.pendingToken) {
-        setGooglePendingToken(payload.pendingToken);
-        setGoogleEmail(payload.email || "");
-        setGoogleDisplayName(payload.displayName || "");
-        setGoogleCode("");
-        setGoogleError(null);
-        setStep("google-verify");
-        return;
-      }
-
-      if (payload.status === "returning_google") {
-        setGoogleError(null);
-        setLoginSuccess(true);
-        setTimeout(() => router.push("/home"), 600);
-        return;
-      }
-
-      if (payload.message) {
-        setGoogleError(payload.message);
-      } else {
-        setGoogleError("Google sign-in failed");
-      }
-    };
-
-    window.addEventListener("message", onGoogleAuthMessage);
-    return () => window.removeEventListener("message", onGoogleAuthMessage);
-  }, [router]);
-
   const handleGoogleSignIn = useCallback(() => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
     const url = `${baseUrl}/api/auth/v1/google`;
-    const width = 520;
-    const height = 640;
-    const left = window.screenX + (window.outerWidth - width) / 2;
-    const top = window.screenY + (window.outerHeight - height) / 2;
-
-    const popup = window.open(
-      url,
-      "google-oauth",
-      `width=${width},height=${height},left=${left},top=${top}`,
-    );
-
-    if (!popup) {
-      window.location.href = url;
-    }
+    window.location.href = url;
   }, []);
 
   const handleContinueFromEmail = useCallback(async () => {
@@ -166,6 +114,7 @@ export default function LoginForm() {
       setIsUnverified(false)
       const res = await login(email, password);
       if (res?.message === "Authenticated successfully") {
+        onAuthSuccess?.();
         setLoginSuccess(true);
         setTimeout(() => router.push("/home"), 1500);
         return
@@ -175,7 +124,7 @@ export default function LoginForm() {
       setRegisterError(null);
       setStep("register-details");
     }
-  }, [userExists, email, password, login, router]);
+  }, [userExists, email, password, login, onAuthSuccess, router]);
 
   const handleBackToEmail = useCallback(() => {
     setStep("email");
@@ -211,21 +160,23 @@ export default function LoginForm() {
         details.gender,
       );
       if (res) {
+        onAuthSuccess?.();
         setLoginSuccess(true);
         setTimeout(() => router.push("/home"), 600);
       }
     },
-    [completeGoogleSignup, googleIncompleteToken, router],
+    [completeGoogleSignup, googleIncompleteToken, onAuthSuccess, router],
   );
 
   const handleGoogleVerify = useCallback(async () => {
     if (!googlePendingToken || googleCode.trim().length !== 6) return;
     const res = await verifyGoogleCode(googlePendingToken, googleCode.trim());
     if (res) {
+      onAuthSuccess?.();
       setLoginSuccess(true);
       setTimeout(() => router.push("/home"), 600);
     }
-  }, [googlePendingToken, googleCode, verifyGoogleCode, router]);
+  }, [googlePendingToken, googleCode, onAuthSuccess, verifyGoogleCode, router]);
 
   useEffect(() => {
     if (loginError?.toLowerCase().includes("not verified") ||
@@ -366,7 +317,7 @@ export default function LoginForm() {
   const isBusy = isPasswordStep ? loginLoading : emailLoading;
 
   return (
-    <div className="w-full text-white-smoke transition-all duration-300">
+    <div data-testid="Login-Form" className="w-full text-white-smoke transition-all duration-300">
       <div className="relative flex items-center mb-6">
         {(isEmailEverFocused || isPasswordStep) && (
           <button
@@ -442,6 +393,7 @@ export default function LoginForm() {
             Your email address or profile URL
           </label>
           <input
+            data-testid="email-input"
             type="email"
             value={email}
             disabled={isPasswordStep}
@@ -472,6 +424,7 @@ export default function LoginForm() {
             </label>
             <div className="flex items-center">
               <input
+                data-testid="password-input"
                 type={showPassword ? "text" : "password"}
                 value={password}
                 onChange={(e) => {

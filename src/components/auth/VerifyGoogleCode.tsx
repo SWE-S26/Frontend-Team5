@@ -2,7 +2,6 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState, Suspense } from "react";
-import { IoClose } from "react-icons/io5";
 import { useGoogleVerifyCode } from "@/hooks/useAuth";
 
 function VerifyGoogleCodeInner() {
@@ -94,7 +93,7 @@ function VerifyGoogleCodeInner() {
   };
 
   return (
-    <main className="relative min-h-dvh bg-login">
+    <main data-testid="Verify-Google-Code" className="relative min-h-dvh bg-login">
       <div className="mx-auto flex min-h-dvh w-full items-center justify-center px-4 py-8">
         <section className="w-full max-w-md rounded-sm border border-white/10 bg-chinese-black px-8 py-10 text-white-smoke shadow-[0_30px_90px_rgba(0,0,0,0.45)]">
           <h1 className="text-center text-xl font-bold leading-snug tracking-tight">
@@ -118,6 +117,7 @@ function VerifyGoogleCodeInner() {
           <div className="mt-6 flex items-center justify-center gap-2 sm:gap-3">
             {digits.map((digit, index) => (
               <input
+                data-testid="Verify-Code-input"
                 key={index}
                 ref={(element) => {
                   inputRefs.current[index] = element;

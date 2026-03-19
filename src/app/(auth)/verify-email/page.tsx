@@ -13,7 +13,7 @@ function VerifyEmailContent() {
 
   useEffect(() => {
     if (token) verifyEmail(token)
-  }, [token])
+  }, [token, verifyEmail])
 
   useEffect(() => {
     const previousOverflow = document.body.style.overflow;

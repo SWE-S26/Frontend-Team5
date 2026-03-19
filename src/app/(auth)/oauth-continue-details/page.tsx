@@ -61,7 +61,7 @@ function OAuthContinueDetailsForm() {
           <section className="rounded-sm border border-white/10 bg-chinese-black px-8 py-10">
             <RegisterDetailsForm
               email={email}
-              requireDisplayName={false}
+              requireDisplayName={true}
               submitError={error}
               isSubmitting={loading}
               onBack={() => router.push("/sign-in")}

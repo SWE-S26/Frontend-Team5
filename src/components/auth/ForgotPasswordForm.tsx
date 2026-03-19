@@ -19,7 +19,7 @@ export default function ForgotPasswordForm({
   };
 
   return (
-    <div className="w-full text-white-smoke animate-in fade-in duration-300">
+    <div data-testid="Forget-Password-Form" className="w-full text-white-smoke animate-in fade-in duration-300">
       <div className="relative flex items-center mb-8">
         <button
           data-testid="back-to-login-forgot"
@@ -39,6 +39,7 @@ export default function ForgotPasswordForm({
             Your email address
           </label>
           <input
+            data-testid="forget-password-email-input"
             type="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}

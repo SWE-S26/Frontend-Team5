@@ -69,7 +69,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
             width="w-40"
             position="left-0"
             trigger={
-              <button data-testid="profile_button" className="text-silver font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2 text-4xl">
+              <button data-testid="profile_button" className="text-silver font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2 text-4xl cursor-pointer">
                 <img
                   src="/profpic.jpg"
                   className="aspect-square h-6.5 rounded-full"
@@ -131,11 +131,11 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
             ]}
           />
 
-          <button data-testid="notifications" className="text-silver text-xl font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2">
+          <button data-testid="notifications" className="text-silver text-xl font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2 cursor-pointer">
             <SlBell />
           </button>
           
-          <button data-testid="messages" className="text-silver text-xl  hover:text-white-smoke transition-all duration-300 flex items-center gap-2" onClick={() => setIsMessagesOpen((prev) => !prev)}>
+          <button data-testid="messages" className="text-silver text-xl  hover:text-white-smoke transition-all duration-300 flex items-center gap-2 cursor-pointer" onClick={() => setIsMessagesOpen((prev) => !prev)}>
             <div className="relative">
               <GrMailOption />
               {isMessagesOpen && (
@@ -150,14 +150,14 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
         // not logged in
         <>
           <Button
-            className="px-3 py-2 bg-chinese-black text-white-smoke"
+            className="px-3 py-2 bg-chinese-black text-white-smoke cursor-pointer"
             onClick={() => setIsAuthModalOpen(true)}
           >
             Sign In
           </Button>
 
           <Button
-            className="px-3 py-2 bg-white-smoke text-chinese-black"
+            className="px-3 py-2 bg-white-smoke text-chinese-black cursor-pointer"
             onClick={() => setIsAuthModalOpen(true)}
           >
             Create Account

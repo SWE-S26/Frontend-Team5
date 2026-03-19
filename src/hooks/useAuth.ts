@@ -1,5 +1,6 @@
 import { useState, useCallback } from "react";
 import { authService } from "@/services/auth.service";
+import { authStore } from "@/store/authStore";
 
 export function useFindEmail() {
   const [loading, setLoading] = useState(false);
@@ -36,7 +37,8 @@ export function useLogin() {
     setSuccess(null);
     try {
       const res = await authService.login({ email, password });
-      setSuccess(res.data.success);
+      setSuccess(res.data.success ?? true);
+      authStore.setAuthenticated(true);
       return res.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Something went wrong";
@@ -122,12 +124,16 @@ export function useResetPassword() {
   const [success, setSuccess] = useState<boolean | null>(null);
 
   const resetPassword = useCallback(
-    async (token: string, newPassword: string) => {
+    async (token: string, newPassword: string, signOutEverywhere = false) => {
       setLoading(true);
       setError(null);
       setSuccess(null);
       try {
-        const res = await authService.resetPassword({ token, newPassword });
+        const res = await authService.resetPassword({
+          token,
+          newPassword,
+          signOutEverywhere,
+        });
         setSuccess(true)  // ← if no error thrown, it's a success
         return res.data;
       } catch (err: any) {
@@ -157,6 +163,7 @@ export function useLogout() {
     try {
       const res = await authService.logout();
       setSuccess(true);
+      authStore.setAuthenticated(false);
       return res.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Something went wrong";
@@ -187,6 +194,7 @@ export function useGoogleComplete() {
           gender,
         });
         setSuccess(true);
+        authStore.setAuthenticated(true);
         return res.data;
       } catch (err: any) {
         const message = err.response?.data?.message || "Something went wrong";
@@ -215,6 +223,7 @@ export function useGoogleVerifyCode() {
       try {
         const res = await authService.googleVerifyCode({ pendingToken, code });
         setSuccess(true);
+        authStore.setAuthenticated(true);
         return res.data;
       } catch (err: any) {
         const message = err.response?.data?.message || "Something went wrong";

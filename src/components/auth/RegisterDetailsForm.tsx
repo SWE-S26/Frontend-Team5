@@ -45,7 +45,7 @@ export default function RegisterDetailsForm({
   };
 
   return (
-    <div className="w-full text-white-smoke transition-all duration-300">
+    <div data-testid="Register-Details-Form" className="w-full text-white-smoke transition-all duration-300">
       <div className="relative flex items-center mb-6">
         <button data-testid="back-to-login-button-details"
           onClick={onBack}
@@ -74,6 +74,7 @@ export default function RegisterDetailsForm({
                 Display name
               </label>
               <input
+                data-testid="DisplayName-input"
                 type="text"
                 value={displayName}
                 onFocus={() => setIsNameActive(true)}

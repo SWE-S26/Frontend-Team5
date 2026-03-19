@@ -10,7 +10,7 @@ export default function DetailsValidationForm({
   onSendAgain,
 }: DetailsValidationFormProps) {
   return (
-    <div className="w-full text-white-smoke flex flex-col items-center text-center">
+    <div data-testid="Details-Validation-Form" className="w-full text-white-smoke flex flex-col items-center text-center">
       <h1 className="text-[28px] font-bold leading-tight mb-4">
         Check your inbox!
       </h1>
