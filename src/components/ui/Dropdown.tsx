@@ -14,6 +14,7 @@ interface DropdownProps {
   items: DropdownItem[];
   width?: string;
   position?: string;
+  testId?: string;
 }
 
 export default function Dropdown({
@@ -21,6 +22,7 @@ export default function Dropdown({
   items,
   width = "w-40",
   position = "right-0",
+  testId,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -41,6 +43,7 @@ export default function Dropdown({
 
       {isOpen && (
         <div
+          data-testid={testId}
           className={`flex flex-col absolute ${width} ${position} mt-5 py-2 bg-chinese-black border border-silver rounded-sm`}
         >
           {items.map((item, index) =>

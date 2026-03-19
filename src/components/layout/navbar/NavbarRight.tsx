@@ -65,7 +65,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
           </Link>
 
           <Dropdown
-            data-testid="profile_dropdown"
+            testId="profile_dropdown"
             width="w-40"
             position="left-0"
             trigger={
@@ -173,7 +173,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
       )}
 
       <Dropdown
-        data-testid="more_dropdown"
+        testId="more_dropdown"
         width="w-43"
         position="right-0"
         trigger={

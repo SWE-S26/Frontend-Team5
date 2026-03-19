@@ -1,11 +1,11 @@
 "use client";
 
-import { useMemo } from "react";
+import { useMemo, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import RegisterDetailsForm from "@/components/auth/RegisterDetailsForm";
 import { useGoogleComplete } from "@/hooks/useAuth";
 
-export default function OAuthContinueDetailsPage() {
+function OAuthContinueDetailsForm() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const { completeGoogleSignup, loading, error } = useGoogleComplete();
@@ -71,5 +71,13 @@ export default function OAuthContinueDetailsPage() {
         )}
       </div>
     </main>
+  );
+}
+
+export default function OAuthContinueDetailsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <OAuthContinueDetailsForm />
+    </Suspense>
   );
 }

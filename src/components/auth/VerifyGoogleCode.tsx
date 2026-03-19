@@ -1,11 +1,11 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useRef, useState } from "react";
+import { useRef, useState, Suspense } from "react";
 import { IoClose } from "react-icons/io5";
 import { useGoogleVerifyCode } from "@/hooks/useAuth";
 
-export default function VerifyGoogleCode() {
+function VerifyGoogleCodeInner() {
   const router = useRouter();
   const searchParams = useSearchParams();
   const pendingToken = searchParams.get("pendingToken") || "";
@@ -165,5 +165,13 @@ export default function VerifyGoogleCode() {
         </section>
       </div>
     </main>
+  );
+}
+
+export default function VerifyGoogleCode() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <VerifyGoogleCodeInner />
+    </Suspense>
   );
 }
