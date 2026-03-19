@@ -12,6 +12,9 @@ const inter = Inter({
 export const metadata: Metadata = {
   title: "My BeatZa App",
   description: "Craving Tunes",
+  icons: {
+    icon: "/beatza.png",
+  },
 };
 
 export default function RootLayout({
