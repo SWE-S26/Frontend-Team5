@@ -14,6 +14,7 @@ interface DropdownProps {
   items: DropdownItem[];
   width?: string;
   position?: string;
+  testId?: string;
 }
 
 export default function Dropdown({
@@ -21,6 +22,7 @@ export default function Dropdown({
   items,
   width = "w-40",
   position = "right-0",
+  testId,
 }: DropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
@@ -36,7 +38,7 @@ export default function Dropdown({
   }, []);
 
   return (
-    <div className="relative" ref={ref}>
+    <div className="relative" ref={ref} data-testid={testId}>
       <div onClick={() => setIsOpen(!isOpen)}>{trigger}</div>
 
       {isOpen && (
