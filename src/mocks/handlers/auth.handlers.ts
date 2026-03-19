@@ -293,6 +293,13 @@ export const authHandlers = [
 
   /* (5) */
   http.post(`${BASE}/api/auth/v1/reset-password`, async ({ request }) => {
+    /*
+      /reset-password?token=valid-token   -> success screen + redirect
+      /reset-password?token=invalid-token -> "Authorization failed"
+      /reset-password?token=expired-token -> "Property not found or not updated"
+      /reset-password?token=error-token   -> "Internal server error" 
+      /reset-password                     -> "Missing or invalid token!" 
+    */
     const body = (await request.json()) as {
       token: string;
       newPassword: string;
@@ -348,13 +355,9 @@ export const authHandlers = [
 
     // 200 - success (to test add a token in your url: {reset-password?token=valid-token})
     return HttpResponse.json(
-      {
-        success: true,
-        message: "Password reset successfully",
-        data: null,
-      },
-      { status: 200 },
-    );
+      { message: "Password reset successfully" },
+      { status: 200 }
+    )
   }),
 
   /* (6) */
@@ -367,5 +370,63 @@ export const authHandlers = [
       { message: "Logged out successfully", data: null },
       { status: 200 },
     );
+  }),
+
+  /* (10) */
+  http.get(`${BASE}/api/auth/v1/verify-email`, async ({ request }) => {
+    /*
+      /verify-email?token=valid-token   -> success
+      /verify-email?token=expired-token -> Link is expired
+      /verify-email?token=invalid-token -> Authorization failed
+      /verify-email                     -> Invalid link
+    */
+    const url = new URL(request.url)
+    const token = url.searchParams.get("token")
+
+    // 400 - missing token
+    if (!token) {
+      return HttpResponse.json(
+        { success: false, message: "Authorization failed", data: {} },
+        { status: 401 }
+      )
+    }
+
+    // 401 - invalid token
+    if (token === "invalid-token") {
+      return HttpResponse.json(
+        { success: false, message: "Authorization failed", data: {} },
+        { status: 401 }
+      )
+    }
+
+    // 404 - token not found
+    if (token === "not-found-token") {
+      return HttpResponse.json(
+        { success: false, message: "Property not found or not updated", data: {} },
+        { status: 404 }
+      )
+    }
+
+    // 410 - link expired
+    if (token === "expired-token") {
+      return HttpResponse.json(
+        { success: false, message: "Link is expired" },
+        { status: 410 }
+      )
+    }
+
+    // 500 - server error
+    if (token === "error-token") {
+      return HttpResponse.json(
+        { success: false, message: "Internal server error", data: {} },
+        { status: 500 }
+      )
+    }
+
+    // 200 - success
+    return HttpResponse.json(
+      { message: "User Verified successfully" },
+      { status: 200 }
+    )
   }),
 ];

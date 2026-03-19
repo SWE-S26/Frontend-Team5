@@ -1,4 +1,5 @@
 // This file should not be changed and is defined only once
+// This file should not be changed and is defined only once
 // this is an instance from axios created using axios.create()
 
 import axios from "axios"
@@ -23,6 +24,7 @@ const api = axios.create({
   },
 })
 
+// 401: token expired, attempt refresh (skip public routes)
 // 401: token expired, attempt refresh (skip public routes)
 api.interceptors.response.use(
   (response) => response,
