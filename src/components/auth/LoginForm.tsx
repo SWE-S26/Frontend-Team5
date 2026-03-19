@@ -47,6 +47,9 @@ export default function LoginForm({
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
+  const emailSchema = z.string().email("Please enter a valid email address")
+  const [emailError, setEmailError] = useState("")
+
   const [userExists, setUserExists] = useState(false);
   const [passwordError, setPasswordError] = useState("")
 
@@ -103,8 +106,16 @@ export default function LoginForm({
 
   const handleContinueFromEmail = useCallback(async () => {
     setLoginSuccess(false);
+    
+    const result = emailSchema.safeParse(email)
+    if (!result.success) {
+      setEmailError(result.error.issues[0].message)
+      return
+    }
+    setEmailError("")
+
     const res = await findEmail(email)
-    if (!res) return // error occurred, hook already set error state
+    if (!res) return
     setUserExists(res.data.exists)
     setStep("password")
   }, [email, findEmail]);
@@ -402,12 +413,16 @@ export default function LoginForm({
               setIsEmailEverFocused(true);
             }}
             onBlur={() => setIsEmailFocused(false)}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError("") }}
             className={`w-full bg-transparent p-2 border-none outline-none text-white-smoke text-base ${
               isEmailActive ? "pt-4" : "pt-0"
             } ${isPasswordStep ? "opacity-80" : ""}`}
           />
         </div>
+
+        {!isPasswordStep && emailError && (
+          <p className="text-red-500 text-xs">{emailError}</p>
+        )}
 
         {isPasswordStep && (
           <div className="relative bg-chinese-black border border-white/30 rounded p-3 h-16 flex flex-col justify-center animate-in slide-in-from-top-2">
