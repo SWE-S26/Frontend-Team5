@@ -85,7 +85,7 @@ export interface ForgetPasswordRequest {
 export interface ForgetPasswordResponse {
   success: boolean;
   message: string;
-  data: {};
+  data: null | {};
 }
 
 /* (5) "/api/auth/v1/reset-password" */
@@ -95,9 +95,7 @@ export interface ResetPasswordRequest {
 }
 
 export interface ResetPasswordResponse {
-  success: boolean;
-  message: string;
-  data: {};
+  message: string
 }
 
 /* (6) "/api/auth/v1/logout" */
@@ -112,7 +110,6 @@ export interface GoogleCallbackRequest {
   code: string;
   scope?: string;
 }
-
 export interface GoogleCallbackResponse {
   status: string;
   incompleteToken?: string;
@@ -132,8 +129,15 @@ export interface GoogleVerifyCodeRequest {
   pendingToken: string;
   code: string;
 }
-
 export interface GoogleAuthFinalizeResponse {
   message: string;
   data: {};
+}
+
+/* (10) "/api/auth/v1/verify-email" */
+export interface VerifyEmailRequest {
+  token: string  // sent as query param not body
+}
+export interface VerifyEmailResponse {
+  message: string
 }

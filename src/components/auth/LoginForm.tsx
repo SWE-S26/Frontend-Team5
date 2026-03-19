@@ -6,6 +6,7 @@ import { FcGoogle } from "react-icons/fc";
 import { IoChevronBack, IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import RegisterDetailsForm from "./RegisterDetailsForm";
+import { z } from "zod"
 import DetailsValidationForm from "./DetailsValidationForm";
 
 import {
@@ -42,6 +43,25 @@ export default function LoginForm() {
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
   const [userExists, setUserExists] = useState(false);
+  const [passwordError, setPasswordError] = useState("")
+
+  const passwordSchema = z
+    .string()
+    .min(8, "Password must be at least 8 characters long")
+    .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
+    .regex(/[0-9]/, "Password must contain at least one number")
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character")
+
+  const validatePassword = (value: string) => {
+    const result = passwordSchema.safeParse(value)
+    if (!result.success) {
+      setPasswordError(result.error.issues[0].message)
+      return false
+    }
+    setPasswordError("")
+    return true
+  }
+
   const [googleIncompleteToken, setGoogleIncompleteToken] = useState("");
   const [googlePendingToken, setGooglePendingToken] = useState("");
   const [googleEmail, setGoogleEmail] = useState("");
@@ -146,6 +166,7 @@ export default function LoginForm() {
         setTimeout(() => router.push("/home"), 1500);
       }
     } else {
+      if (!validatePassword(password)) return  // ← validate before proceeding
       setRegisterError(null);
       setStep("register-details");
     }
@@ -439,7 +460,10 @@ export default function LoginForm() {
               <input
                 type={showPassword ? "text" : "password"}
                 value={password}
-                onChange={(e) => setPassword(e.target.value)}
+                onChange={(e) => {
+                  setPassword(e.target.value)
+                  if (!userExists && passwordError) validatePassword(e.target.value)
+                }}
                 onFocus={() => setIsPasswordFocused(true)}
                 onBlur={() => setIsPasswordFocused(false)}
                 autoFocus
@@ -457,6 +481,10 @@ export default function LoginForm() {
               </button>
             </div>
           </div>
+        )}
+
+        {isPasswordStep && !userExists && passwordError && (
+          <p className="text-red-500 text-xs">{passwordError}</p>
         )}
 
         <button
