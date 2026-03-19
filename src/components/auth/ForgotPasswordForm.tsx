@@ -1,8 +1,12 @@
 "use client";
 
+import { z } from "zod";
+import { useState } from "react";
 import { IoChevronBack } from "react-icons/io5";
 import { ForgotPasswordFormProps } from "@/types/auth.types";
 import { useForgetPassword } from "@/hooks/useAuth";
+
+const emailSchema = z.string().email("Please enter a valid email address")
 
 export default function ForgotPasswordForm({
   email,
@@ -13,7 +17,16 @@ export default function ForgotPasswordForm({
   const isEmailActive = email.length > 0;
   const { forgetPassword, loading, error } = useForgetPassword();
 
+  const [emailError, setEmailError] = useState("")
+  
+
   const handleSendLink = async () => {
+    const result = emailSchema.safeParse(email)
+    if (!result.success) {
+      setEmailError(result.error.issues[0].message)
+      return
+    }
+    setEmailError("")
     const res = await forgetPassword(email);
     if (res) onSuccess?.();
   };
@@ -42,10 +55,12 @@ export default function ForgotPasswordForm({
             data-testid="forget-password-email-input"
             type="email"
             value={email}
-            onChange={(e) => setEmail(e.target.value)}
+            onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError("") }}
             className={`w-full bg-transparent border-none outline-none text-white-smoke text-base ${isEmailActive ? "pt-4" : "pt-0"}`}
           />
         </div>
+
+        {emailError && <p className="text-red-500 text-xs">{emailError}</p>}
 
         <p className="text-[14px] text-white-smoke leading-relaxed">
           If the email address is in our database, we will send you an email to
