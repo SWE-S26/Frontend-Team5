@@ -98,6 +98,24 @@ export default function LoginForm({
   const [isUnverified, setIsUnverified] = useState(false)
   const router = useRouter();
 
+  const getPostAuthPath = useCallback((result?: any) => {
+    if (typeof window === "undefined") return "/home";
+
+    const authClient = window.localStorage.getItem("beatza:auth-client");
+    if (authClient?.toLowerCase() !== "android") return "/home";
+
+    const payload = result?.data ?? result ?? {};
+    const accessToken = payload.accessToken ?? payload.authToken ?? payload.token;
+    const refreshToken = payload.refreshToken ?? payload.refresh_token;
+
+    const params = new URLSearchParams();
+    if (accessToken) params.set("accessToken", String(accessToken));
+    if (refreshToken) params.set("refreshToken", String(refreshToken));
+
+    const suffix = params.toString();
+    return suffix ? `/cross-callback?${suffix}` : "/cross-callback";
+  }, []);
+
   const handleGoogleSignIn = useCallback(() => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
     const url = `${baseUrl}/api/auth/v1/google`;
@@ -127,7 +145,8 @@ export default function LoginForm({
       if (res?.message === "Authenticated successfully") {
         onAuthSuccess?.();
         setLoginSuccess(true);
-        setTimeout(() => router.push("/home"), 1500);
+        const target = getPostAuthPath(res);
+        setTimeout(() => router.push(target), 1500);
         return
       }
     } else {
@@ -173,10 +192,11 @@ export default function LoginForm({
       if (res) {
         onAuthSuccess?.();
         setLoginSuccess(true);
-        setTimeout(() => router.push("/home"), 600);
+        const target = getPostAuthPath(res);
+        setTimeout(() => router.push(target), 600);
       }
     },
-    [completeGoogleSignup, googleIncompleteToken, onAuthSuccess, router],
+    [completeGoogleSignup, getPostAuthPath, googleIncompleteToken, onAuthSuccess, router],
   );
 
   const handleGoogleVerify = useCallback(async () => {
@@ -185,9 +205,10 @@ export default function LoginForm({
     if (res) {
       onAuthSuccess?.();
       setLoginSuccess(true);
-      setTimeout(() => router.push("/home"), 600);
+      const target = getPostAuthPath(res);
+      setTimeout(() => router.push(target), 600);
     }
-  }, [googlePendingToken, googleCode, onAuthSuccess, verifyGoogleCode, router]);
+  }, [googlePendingToken, googleCode, getPostAuthPath, onAuthSuccess, verifyGoogleCode, router]);
 
   const handleQrSignIn = useCallback(() => {
     router.push("/qr-login");
