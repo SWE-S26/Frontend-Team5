@@ -122,13 +122,21 @@ export default function LoginForm({
       typeof window !== "undefined"
         ? window.localStorage.getItem("beatza:auth-client")
         : null;
+    const urlClient =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("client")
+        : null;
+    const isAndroidClient =
+      authClient?.toLowerCase() === "android" ||
+      urlClient?.toLowerCase() === "android";
 
     const googleUrl = new URL(
       "/api/auth/v1/google",
       baseUrl || window.location.origin,
     );
 
-    if (authClient?.toLowerCase() === "android") {
+    if (isAndroidClient) {
+      window.localStorage.setItem("beatza:auth-client", "Android");
       googleUrl.searchParams.set("client", "Android");
     }
 
