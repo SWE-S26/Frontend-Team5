@@ -370,7 +370,7 @@ export function useQRLogin() {
 
         if (intervalRef.current) clearInterval(intervalRef.current);
       }
-    }, 3000);
+    }, 5000);
   }, [qrCode]);
 
   //Stop polling manually
