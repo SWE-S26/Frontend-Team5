@@ -3,7 +3,7 @@
 import { usePathname } from "next/navigation";
 import Image from "next/image";
 import Link from "next/link";
-import TabsNavbar from "./TabsNavbar";
+import TabsNavbar from "../TabsNavbar";
 
 interface NavbarLeftProps {
   isLoggedIn: boolean;

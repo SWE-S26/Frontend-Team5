@@ -1,6 +1,6 @@
 /* ----------- Components ----------- */
 import HeroBanner from "@/components/landing-page/HeroBanner";
-import NavbarCenter from "@/components/layout/navbar/NavbarCenter";
+import NavbarCenter from "@/components/layout/navbar/main-navbar/NavbarCenter";
 import Button from "@/components/ui/Button"
 
 
