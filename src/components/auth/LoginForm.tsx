@@ -1,13 +1,15 @@
 "use client";
 
-import { useState, useCallback, useEffect } from "react";
+import { useState, useCallback, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
+
 import { FcGoogle } from "react-icons/fc";
 import { IoChevronBack, IoEyeOutline, IoEyeOffOutline, IoQrCode } from "react-icons/io5";
+
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import RegisterDetailsForm from "./RegisterDetailsForm";
-import { z } from "zod"
 import DetailsValidationForm from "./DetailsValidationForm";
+import { z } from "zod"
 
 import {
   useFindEmail,
@@ -53,6 +55,21 @@ export default function LoginForm({
   const [userExists, setUserExists] = useState(false);
   const [passwordError, setPasswordError] = useState("")
 
+  // ref to hold latest step so handleSubmit never captures a stale closure value
+  const stepRef = useRef(step);
+  useEffect(() => {
+    stepRef.current = step;
+  }, [step]);
+
+  // mobile browsers to fire blur/re-render cycles that stale-close handleSubmit
+  const passwordRef = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (step === "password") {
+      const timer = setTimeout(() => passwordRef.current?.focus(), 100);
+      return () => clearTimeout(timer);
+    }
+  }, [step]);
+
   const passwordSchema = z
     .string()
     .min(8, "Password must be at least 8 characters long")
@@ -97,6 +114,12 @@ export default function LoginForm({
   const { resendVerificationEmail, loading: resendLoading, success: resendSuccess } = useResendVerificationEmail();
   const [isUnverified, setIsUnverified] = useState(false)
   const router = useRouter();
+
+  //refs for loading states so handleSubmit always reads fresh values
+  const emailLoadingRef = useRef(emailLoading);
+  const loginLoadingRef = useRef(loginLoading);
+  useEffect(() => { emailLoadingRef.current = emailLoading; }, [emailLoading]);
+  useEffect(() => { loginLoadingRef.current = loginLoading; }, [loginLoading]);
 
   const getPostAuthPath = useCallback((result?: any) => {
     if (typeof window === "undefined") return "/home";
@@ -278,7 +301,6 @@ export default function LoginForm({
             details.gender
           );
 
-          // Any resolved response is treated as success unless it explicitly reports success=false.
           if (res?.success === false) {
             const message = res?.message || "Could not create account. Please try again.";
             if (/already|exists|conflict|registered/i.test(message)) {
@@ -370,27 +392,27 @@ export default function LoginForm({
   }
 
   const isPasswordStep = step === "password";
-
   const isBusy = isPasswordStep ? loginLoading : emailLoading;
-
   const handleSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
-      if (isBusy) return;
 
-      if (isPasswordStep) {
+      const currentStep = stepRef.current;
+      const currentlyBusy =
+        currentStep === "password"
+          ? loginLoadingRef.current
+          : emailLoadingRef.current;
+
+      if (currentlyBusy) return;
+
+      if (currentStep === "password") {
         await handleContinueFromPassword();
         return;
       }
 
       await handleContinueFromEmail();
     },
-    [
-      handleContinueFromEmail,
-      handleContinueFromPassword,
-      isBusy,
-      isPasswordStep,
-    ],
+    [handleContinueFromEmail, handleContinueFromPassword],
   );
 
   return (
@@ -519,6 +541,7 @@ export default function LoginForm({
             <div className="flex items-center">
               <input
                 data-testid="password-input"
+                ref={passwordRef}
                 type={showPassword ? "text" : "password"}
                 value={password}
                 autoCapitalize="none"
@@ -531,7 +554,6 @@ export default function LoginForm({
                 }}
                 onFocus={() => setIsPasswordFocused(true)}
                 onBlur={() => setIsPasswordFocused(false)}
-                autoFocus
                 className={`w-full bg-transparent border-none outline-none text-white-smoke text-base ${
                   isPasswordActive ? "pt-4" : "pt-0"
                 }`}
@@ -594,7 +616,6 @@ export default function LoginForm({
       {(googleCompleteError || googleError) && (
         <p className="mt-3 text-sm text-red-400">{googleCompleteError || googleError}</p>
       )}
-
 
       {isPasswordStep && userExists && (
         <button
