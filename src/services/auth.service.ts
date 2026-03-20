@@ -10,7 +10,8 @@ import {
   GoogleCompleteRequest,
   GoogleVerifyCodeRequest,GoogleAuthFinalizeResponse,
   VerifyEmailRequest, VerifyEmailResponse,
-  ResendVerificationEmailRequest, ResendVerificationEmailResponse
+  ResendVerificationEmailRequest, ResendVerificationEmailResponse,
+  GenerateQRcodeResponse, LoginWithQRcodeRequest, LoginWithQRcodeResponse,
 } from "@/types/auth.types";
 
 export const authService = {
@@ -35,7 +36,7 @@ export const authService = {
     api.post<ResetPasswordResponse>("/api/auth/v1/reset-password", data),
 
   /* (6) */
-  logout: () => 
+  logout: () =>
     api.get<LogoutResponse>("/api/auth/v1/logout"),
 
   /* (7) */
@@ -57,4 +58,12 @@ export const authService = {
   /* (11) */
   resendVerificationEmail: (data: ResendVerificationEmailRequest) =>
     api.post<ResendVerificationEmailResponse>("/api/auth/v1/resend-verification-email", data),
+
+  /* (12) */
+  generateQRcode: () =>
+    api.get<GenerateQRcodeResponse>("/api/auth/v1/cross/desktop",),
+
+  /* (13) */
+  loginWithQRcode: (data: LoginWithQRcodeRequest) =>
+    api.post<LoginWithQRcodeResponse>("/api/auth/v1/cross/desktop/poll", data),
 };
