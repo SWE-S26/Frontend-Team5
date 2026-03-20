@@ -1,4 +1,4 @@
-import { useState, useCallback } from "react";
+import { useState, useCallback, useRef } from "react";
 import { authService } from "@/services/auth.service";
 import { authStore } from "@/store/authStore";
 
@@ -287,4 +287,98 @@ export function useResendVerificationEmail() {
   }, [])
 
   return { resendVerificationEmail, loading, error, success }
+}
+
+export function useQRLogin() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [qrCode, setQrCode] = useState<string | null>(null);
+  const [expiresIn, setExpiresIn] = useState<number | null>(null);
+  const [status, setStatus] = useState<"idle" | "waiting" | "success" | "expired">("idle");
+
+  const intervalRef = useRef<NodeJS.Timeout | null>(null);
+
+  //Generate QR
+  const generateQR = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    setStatus("idle");
+
+    try {
+      const res = await authService.generateQRcode();
+
+      const qrPayload = res.data.pendingToken ?? res.data.data;
+      if (!qrPayload?.qrCode) {
+        throw new Error("QR payload missing from response");
+      }
+
+      const { qrCode, expiresIn } = qrPayload;
+
+      setQrCode(qrCode);
+      setExpiresIn(typeof expiresIn === "number" ? expiresIn : 120);
+      setStatus("waiting");
+
+      return res.data;
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Something went wrong";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  //Polling
+  const startPolling = useCallback(() => {
+    if (!qrCode) return;
+
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+
+    setError(null);
+
+    intervalRef.current = setInterval(async () => {
+      try {
+        const res = await authService.loginWithQRcode({ qrCode });
+
+        const message = res.data.message.toLowerCase();
+
+        if (message.includes("successful")) {
+          setStatus("success");
+          setError(null);
+          authStore.setAuthenticated(true);
+
+          if (intervalRef.current) clearInterval(intervalRef.current);
+        }
+
+        if (message.includes("expired")) {
+          setStatus("expired");
+          setError(null);
+
+          if (intervalRef.current) clearInterval(intervalRef.current);
+        }
+
+      } catch (err: any) {
+        const message = (err.response?.data?.message || "Polling failed").toLowerCase();
+
+        if (message.includes("expired")) {
+          setStatus("expired");
+          setError(null);
+        } else {
+          setError(err.response?.data?.message || "Polling failed");
+        }
+
+        if (intervalRef.current) clearInterval(intervalRef.current);
+      }
+    }, 3000);
+  }, [qrCode]);
+
+  //Stop polling manually
+  const stopPolling = useCallback(() => {
+    if (intervalRef.current) {
+      clearInterval(intervalRef.current);
+    }
+  }, []);
+
+  return { generateQR, startPolling, stopPolling, qrCode, expiresIn, status, loading, error,};
 }
