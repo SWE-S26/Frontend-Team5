@@ -25,7 +25,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
   return (
     <div
-      className={`fixed inset-0 z-50 flex items-center justify-center bg-login transition-opacity duration-500 ease-in-out ${
+      className={`fixed inset-0 z-50 flex items-start sm:items-center justify-center overflow-y-auto p-4 sm:p-0 bg-login transition-opacity duration-500 ease-in-out ${
         animate ? "opacity-100" : "opacity-0"
       }`}
     >
@@ -42,7 +42,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
 
       {/* Modal Content */}
       <div
-        className={`relative w-full max-w-110 pb-10 p-8 bg-chinese-black text-white-smoke shadow-2xl border rounded border-white/10 transform transition-transform duration-500 ${
+        className={`relative mt-6 sm:mt-0 w-full max-w-110 max-h-[95vh] overflow-y-auto pb-10 p-6 sm:p-8 bg-chinese-black text-white-smoke shadow-2xl border rounded border-white/10 transform transition-transform duration-500 ${
           animate ? "translate-y-0" : "-translate-y-[150vh]"
         }`}
       >
