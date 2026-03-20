@@ -373,6 +373,26 @@ export default function LoginForm({
 
   const isBusy = isPasswordStep ? loginLoading : emailLoading;
 
+  const handleSubmit = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+      if (isBusy) return;
+
+      if (isPasswordStep) {
+        await handleContinueFromPassword();
+        return;
+      }
+
+      await handleContinueFromEmail();
+    },
+    [
+      handleContinueFromEmail,
+      handleContinueFromPassword,
+      isBusy,
+      isPasswordStep,
+    ],
+  );
+
   return (
     <div data-testid="Login-Form" className="w-full text-white-smoke transition-all duration-300">
       <div className="relative flex items-center mb-6">
@@ -393,13 +413,13 @@ export default function LoginForm({
         )}
 
         {isEmailEverFocused && !isPasswordStep && (
-          <h1 className="absolute pl-20 p-12 text-[18px] font-semibold">
+          <h1 className="absolute pl-20 p-12 text-[18px] font-semibold pointer-events-none">
             Sign in or create an account
           </h1>
         )}
 
         {isPasswordStep && (
-          <h1 className="absolute pl-30 p-12 text-[18px] font-semibold">
+          <h1 className="absolute pl-30 p-12 text-[18px] font-semibold pointer-events-none">
             {userExists ? "Welcome back!" : "Create an account"}
           </h1>
         )}
@@ -441,7 +461,7 @@ export default function LoginForm({
         </div>
       )}
 
-      <div className="space-y-4">
+      <form className="space-y-4" onSubmit={handleSubmit}>
         <div
           className={`relative transition-all duration-300 rounded p-3 h-16 flex flex-col justify-center ${
             isPasswordStep
@@ -463,6 +483,10 @@ export default function LoginForm({
             type="email"
             value={email}
             disabled={isPasswordStep}
+            autoCapitalize="none"
+            autoCorrect="off"
+            spellCheck={false}
+            enterKeyHint="next"
             onFocus={() => {
               setIsEmailFocused(true);
               setIsEmailEverFocused(true);
@@ -497,6 +521,10 @@ export default function LoginForm({
                 data-testid="password-input"
                 type={showPassword ? "text" : "password"}
                 value={password}
+                autoCapitalize="none"
+                autoCorrect="off"
+                spellCheck={false}
+                enterKeyHint="go"
                 onChange={(e) => {
                   setPassword(e.target.value)
                   if (!userExists && passwordError) validatePassword(e.target.value)
@@ -526,7 +554,7 @@ export default function LoginForm({
 
         <button
           data-testid="continue-button-login"
-          onClick={isPasswordStep ? handleContinueFromPassword : handleContinueFromEmail}
+          type="submit"
           disabled={
             isBusy ||
             (isPasswordStep ? !password.trim() : !email.trim())
@@ -539,7 +567,7 @@ export default function LoginForm({
         >
           {isBusy ? "Please wait..." : "Continue"}
         </button>
-      </div>
+      </form>
 
       {loginSuccess && isPasswordStep && (
         <p className="mt-3 text-sm text-green-400">Signed in successfully. Redirecting...</p>
