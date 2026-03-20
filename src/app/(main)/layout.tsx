@@ -1,5 +1,5 @@
 // this file is created to add navbar to all pages inside /(main) folder to avoid adding navbar manually to each page
-import Navbar from "@/components/layout/navbar/Navbar";
+import Navbar from "@/components/layout/navbar/main-navbar/Navbar";
 import PlayerBar from "@/components/layout/player/PlayerBar";
 export default function MainLayout({
   children,
