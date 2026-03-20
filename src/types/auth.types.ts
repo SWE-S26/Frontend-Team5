@@ -161,10 +161,6 @@ export interface GenerateQRcodeResponse {
     qrCode: string;
     expiresIn: number;
   };
-  data?: {
-    qrCode: string;
-    expiresIn: number;
-  };
 }
 
 /* (13) "/api/auth/v1/cross/desktop/poll" */
