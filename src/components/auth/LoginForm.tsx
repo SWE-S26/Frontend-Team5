@@ -3,7 +3,7 @@
 import { useState, useCallback, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { FcGoogle } from "react-icons/fc";
-import { IoChevronBack, IoEyeOutline, IoEyeOffOutline } from "react-icons/io5";
+import { IoChevronBack, IoEyeOutline, IoEyeOffOutline, IoQrCode } from "react-icons/io5";
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import RegisterDetailsForm from "./RegisterDetailsForm";
 import { z } from "zod"
@@ -177,6 +177,10 @@ export default function LoginForm({
       setTimeout(() => router.push("/home"), 600);
     }
   }, [googlePendingToken, googleCode, onAuthSuccess, verifyGoogleCode, router]);
+
+  const handleQrSignIn = useCallback(() => {
+    router.push("/qr-login");
+  }, [router]);
 
   useEffect(() => {
     if (loginError?.toLowerCase().includes("not verified") ||
@@ -365,6 +369,15 @@ export default function LoginForm({
               className="w-full h-11 cursor-pointer bg-white-smoke text-chinese-black rounded flex items-center justify-center gap-3 font-semibold text-sm"
             >
               <FcGoogle size={20} /> Continue with Google
+            </button>
+
+            <button
+              data-testid="signin-qrCode"
+              type="button"
+              onClick={handleQrSignIn}
+              className="w-full h-11 cursor-pointer bg-[#F97316] text-chinese-black rounded flex items-center justify-center gap-3 font-semibold text-sm"
+            >
+              <IoQrCode size={20} /> Continue with QrCode
             </button>
           </div>
           <div className="relative mb-6 flex justify-start">

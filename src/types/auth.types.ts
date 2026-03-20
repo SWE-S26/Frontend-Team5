@@ -150,3 +150,29 @@ export interface ResendVerificationEmailRequest {
 export interface ResendVerificationEmailResponse {
   message: string
 }
+
+/* (12) "/api/auth/v1/cross/desktop" */
+export interface GenerateQRcodeRequest {
+}
+export interface GenerateQRcodeResponse {
+  success?: boolean,
+  message: string;
+  pendingToken?: {
+    qrCode: string;
+    expiresIn: number;
+  };
+  data?: {
+    qrCode: string;
+    expiresIn: number;
+  };
+}
+
+/* (13) "/api/auth/v1/cross/desktop/poll" */
+export interface LoginWithQRcodeRequest {
+  qrCode: string;
+}
+export interface LoginWithQRcodeResponse {
+  success?: boolean;
+  message: string;
+  data?: null | {};
+}

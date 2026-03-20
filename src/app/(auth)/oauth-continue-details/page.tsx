@@ -41,7 +41,7 @@ function OAuthContinueDetailsForm() {
   };
 
   return (
-    <main className="min-h-dvh bg-login px-4 py-8">
+    <main className="min-h-dvh bg-chinese-black px-4 py-8">
       <div className="mx-auto mt-12 w-full max-w-xl">
         {!incompleteToken ? (
           <section className="rounded-sm border border-white/10 bg-chinese-black px-8 py-10 text-white-smoke">

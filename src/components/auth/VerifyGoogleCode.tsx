@@ -93,7 +93,7 @@ function VerifyGoogleCodeInner() {
   };
 
   return (
-    <main data-testid="Verify-Google-Code" className="relative min-h-dvh bg-login">
+    <main data-testid="Verify-Google-Code" className="relative min-h-dvh bg-chinese-black">
       <div className="mx-auto flex min-h-dvh w-full items-center justify-center px-4 py-8">
         <section className="w-full max-w-md rounded-sm border border-white/10 bg-chinese-black px-8 py-10 text-white-smoke shadow-[0_30px_90px_rgba(0,0,0,0.45)]">
           <h1 className="text-center text-xl font-bold leading-snug tracking-tight">
