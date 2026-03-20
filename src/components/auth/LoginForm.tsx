@@ -118,8 +118,21 @@ export default function LoginForm({
 
   const handleGoogleSignIn = useCallback(() => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
-    const url = `${baseUrl}/api/auth/v1/google`;
-    window.location.href = url;
+    const authClient =
+      typeof window !== "undefined"
+        ? window.localStorage.getItem("beatza:auth-client")
+        : null;
+
+    const googleUrl = new URL(
+      "/api/auth/v1/google",
+      baseUrl || window.location.origin,
+    );
+
+    if (authClient?.toLowerCase() === "android") {
+      googleUrl.searchParams.set("client", "Android");
+    }
+
+    window.location.href = googleUrl.toString();
   }, []);
 
   const handleContinueFromEmail = useCallback(async () => {
