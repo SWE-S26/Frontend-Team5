@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import LoginForm from "@/components/auth/LoginForm";
 
-export default function SignIn() {
+function SignInContent() {
   const searchParams = useSearchParams();
 
   useEffect(() => {
@@ -21,8 +21,16 @@ export default function SignIn() {
   return (
     <div>
       <div className="flex mt-40 mx-auto max-w-110">
-        <LoginForm/>
+        <LoginForm />
       </div>
     </div>
-  )
+  );
+}
+
+export default function SignIn() {
+  return (
+    <Suspense fallback={<div className="mt-40" />}>
+      <SignInContent />
+    </Suspense>
+  );
 }
