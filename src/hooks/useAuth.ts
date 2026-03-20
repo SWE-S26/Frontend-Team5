@@ -307,7 +307,7 @@ export function useQRLogin() {
     try {
       const res = await authService.generateQRcode();
 
-      const qrPayload = res.data.pendingToken ?? res.data.data;
+      const qrPayload = res.data.pendingToken;
       if (!qrPayload?.qrCode) {
         throw new Error("QR payload missing from response");
       }
