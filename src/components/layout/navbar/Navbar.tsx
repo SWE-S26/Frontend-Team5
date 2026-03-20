@@ -1,30 +1,31 @@
-"use client"
-import NavbarLeft from "./NavbarLeft"
-import NavbarCenter from "./NavbarCenter"
-import NavbarRight from "./NavbarRight"
-import { useAuthStore } from "@/store/authStore"
+"use client";
+
+import { useAuthStore } from "@/store/authStore";
+
+import NavbarLeft from "./NavbarLeft";
+import NavbarCenter from "./NavbarCenter";
+import NavbarRight from "./NavbarRight";
 
 interface NavbarProps {
-  className?: string
+  className?: string;
 }
 
-
 export default function Navbar({ className }: NavbarProps) {
-  const { isAuthenticated } = useAuthStore()
+  const { isAuthenticated } = useAuthStore();
 
   return (
-    <div  data-testid="Navbar" className={`flex justify-center w-full ${className}`}>
+    <div data-testid="Navbar" className={`flex justify-center w-full ${className}`}>
       <div className="flex items-center pt-1 w-full max-w-302">
         <div className="flex-none">
-          <NavbarLeft isLoggedIn={isAuthenticated}/>
+          <NavbarLeft isLoggedIn={isAuthenticated} />
         </div>
         <div className="flex-1">
-          <NavbarCenter/>
+          <NavbarCenter />
         </div>
         <div className="flex-none">
-          <NavbarRight isLoggedIn={isAuthenticated}/>
+          <NavbarRight isLoggedIn={isAuthenticated} />
         </div>
       </div>
     </div>
-  )
+  );
 }
