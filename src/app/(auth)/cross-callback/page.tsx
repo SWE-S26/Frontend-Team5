@@ -110,14 +110,7 @@ function CrossPlatformCallbackContent() {
       }
 
       const timeoutId = window.setTimeout(() => {
-        const iframe = document.createElement("iframe");
-        iframe.style.display = "none";
-        iframe.src = deepLink;
-        document.body.appendChild(iframe);
-
-        window.setTimeout(() => {
-          document.body.removeChild(iframe);
-        }, 1000);
+        window.location.href = deepLink;
 
         window.setTimeout(() => {
           router.replace("/home");
