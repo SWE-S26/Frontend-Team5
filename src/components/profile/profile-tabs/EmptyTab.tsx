@@ -5,7 +5,7 @@ export default function (){
         <div className="py-2 ">
     <h2 className="font-bold text-lg">Seems a little quiet over here</h2>
         </div>
-    <button className="bg-white text-black  font-extrabold  rounded px-3 py-2 "> Upload now </button>
+    <button className="bg-white text-black  font-extrabold  rounded px-3 py-2 cursor-pointer hover:bg-white-smoke/80"> Upload now </button>
     </div>
     )
 }
