@@ -1,3 +1,4 @@
+import FeedCard from "@/components/layout/feed-cards/FeedCard";
 import SausageWaveform from "@/components/ui/SausageWaveform";
 import WaveformTest from "@/components/WaveformTest";
 import { main } from "framer-motion/m";
@@ -13,6 +14,8 @@ export default function Feed() {
     <div className="flex justify-between">
       <div className="w-[68%]">
         <h1>Feed</h1>
+        <FeedCard />
+        <br />
         <SausageWaveform />
       </div>
 
