@@ -5,6 +5,7 @@ import { useAuthStore } from "@/store/authStore";
 import NavbarLeft from "./NavbarLeft";
 import NavbarCenter from "./NavbarCenter";
 import NavbarRight from "./NavbarRight";
+import MobileNavbar from "./MobileNavbar";
 
 interface NavbarProps {
   className?: string;
@@ -23,7 +24,9 @@ export default function Navbar({ className }: NavbarProps) {
 
   return (
     <div data-testid="Navbar" className={`flex justify-center w-full ${className}`}>
-      <div className="flex items-center pt-1 w-full max-w-302">
+
+      {/* Desktop */}
+      <div className="hidden md:flex items-center pt-1 w-full max-w-302">
         <div className="flex-none">
           <NavbarLeft isLoggedIn={isAuthenticated} />
         </div>
@@ -34,6 +37,12 @@ export default function Navbar({ className }: NavbarProps) {
           <NavbarRight isLoggedIn={isAuthenticated} />
         </div>
       </div>
+
+      {/* Mobile */}
+      <div className="flex md:hidden w-full">
+        <MobileNavbar isLoggedIn={isAuthenticated} />
+      </div>
+
     </div>
   );
 }

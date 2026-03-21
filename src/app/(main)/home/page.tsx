@@ -7,12 +7,12 @@ export const metadata: Metadata = {
 export default function Home() {
   return (
     <div className="flex justify-between">
-      <div className="w-[68%]">
+      <div className="w-full md:w-[68%]">
         <MediaCardCarousel />
         <MediaCardCarousel />
       </div>
 
-      <div className="w-[27.75%]">
+      <div className="hidden md:block md:w-[27.75%]">
         <MediaCardCarousel />
       </div>
     </div>

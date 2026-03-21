@@ -12,11 +12,11 @@ export const metadata: Metadata = {
 export default function Feed() {
   return (
     <div className="flex justify-between">
-      <div className="w-[68%]">
+      <div className="w-full md:w-[68%]">
         <WaveformCard />
       </div>
 
-      <div className="w-[27.75%]"></div>
+      <div className="hidden md:block md:w-[27.75%]"></div>
     </div>
   );
 }
