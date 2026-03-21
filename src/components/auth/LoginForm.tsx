@@ -126,9 +126,10 @@ export default function LoginForm({
     let target = "/home";
 
     if (typeof window !== "undefined") {
-      const authClient = window.localStorage.getItem("beatza:auth-client");
+      const urlClient = new URLSearchParams(window.location.search).get("client")?.toLowerCase();
 
-      if (authClient?.toLowerCase() === "android") {
+      if (urlClient === "android") {
+        window.localStorage.setItem("beatza:auth-client", "Android");
         const payload = result?.data ?? result ?? {};
         const accessToken = payload.accessToken ?? payload.authToken ?? payload.token;
         const refreshToken = payload.refreshToken ?? payload.refresh_token;
@@ -149,17 +150,11 @@ export default function LoginForm({
 
   const handleGoogleSignIn = useCallback(() => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
-    const authClient =
-      typeof window !== "undefined"
-        ? window.localStorage.getItem("beatza:auth-client")
-        : null;
     const urlClient =
       typeof window !== "undefined"
         ? new URLSearchParams(window.location.search).get("client")
         : null;
-    const isAndroidClient =
-      authClient?.toLowerCase() === "android" ||
-      urlClient?.toLowerCase() === "android";
+    const isAndroidClient = urlClient?.toLowerCase() === "android";
 
     const googleUrl = new URL(
       "/api/auth/v1/google",
@@ -169,6 +164,8 @@ export default function LoginForm({
     if (isAndroidClient) {
       window.localStorage.setItem("beatza:auth-client", "Android");
       googleUrl.searchParams.set("client", "Android");
+    } else if (typeof window !== "undefined") {
+      window.localStorage.removeItem("beatza:auth-client");
     }
 
     window.location.href = googleUrl.toString();
