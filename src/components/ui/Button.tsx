@@ -1,8 +1,8 @@
 import React from "react";
 
 interface ButtonProps {
-  children: React.ReactNode;
-  onClick?: () => void;
+  children?: React.ReactNode;
+  onClick?: (e: React.MouseEvent) => void;
   className?: string;
   type?: "button" | "submit" | "reset";
   icon?: React.ReactNode;
@@ -19,11 +19,13 @@ const Button: React.FC<ButtonProps> = ({
     <button
       type={type}
       onClick={onClick}
-      className={`inline-flex items-center text-sm font-bold rounded-sm bg-off-black py-1.5 px-3 mr-4 hover:text-silver transition ${className}`}
+      className={` group/scbutton text-sm font-bold rounded-sm py-1.5 px-3 cursor-pointer ${className}`}
     >
-      {icon && <span className="mr-2">{icon}</span>}
+      <span className="flex items-center group-hover/scbutton:opacity-60 transition">
+        {icon && <span className={`${children ? "mr-2" : ""}`}>{icon}</span>}
 
-      {children}
+        {children}
+      </span>
     </button>
   );
 };
