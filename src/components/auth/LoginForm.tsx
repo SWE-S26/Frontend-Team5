@@ -116,9 +116,28 @@ export default function LoginForm({
   const [isUnverified, setIsUnverified] = useState(false)
   const router = useRouter();
 
-  const navigateToPostAuth = useCallback(() => {
+  const navigateToPostAuth = useCallback((result?: any) => {
+    let target = "/home";
+
+    if (typeof window !== "undefined") {
+      const authClient = window.localStorage.getItem("beatza:auth-client")?.toLowerCase();
+
+      if (authClient === "android") {
+        const payload = result?.data ?? result ?? {};
+        const accessToken = payload.accessToken ?? payload.authToken ?? payload.token;
+        const refreshToken = payload.refreshToken ?? payload.refresh_token;
+
+        const params = new URLSearchParams();
+        if (accessToken) params.set("accessToken", String(accessToken));
+        if (refreshToken) params.set("refreshToken", String(refreshToken));
+
+        const suffix = params.toString();
+        target = suffix ? `/cross-callback?${suffix}` : "/cross-callback";
+      }
+    }
+
     startTransition(() => {
-      router.replace("/home");
+      router.replace(target);
     });
   }, [router, startTransition]);
 
@@ -129,11 +148,27 @@ export default function LoginForm({
 
   const handleGoogleSignIn = useCallback(() => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
+    const authClient =
+      typeof window !== "undefined"
+        ? window.localStorage.getItem("beatza:auth-client")
+        : null;
+    const urlClient =
+      typeof window !== "undefined"
+        ? new URLSearchParams(window.location.search).get("client")
+        : null;
+    const isAndroidClient =
+      authClient?.toLowerCase() === "android" ||
+      urlClient?.toLowerCase() === "android";
 
     const googleUrl = new URL(
       "/api/auth/v1/google",
       baseUrl || window.location.origin,
     );
+
+    if (isAndroidClient) {
+      window.localStorage.setItem("beatza:auth-client", "Android");
+      googleUrl.searchParams.set("client", "Android");
+    }
 
     window.location.href = googleUrl.toString();
   }, []);
@@ -161,7 +196,7 @@ export default function LoginForm({
       if (res?.message === "Authenticated successfully") {
         onAuthSuccess?.();
         setLoginSuccess(true);
-        navigateToPostAuth();
+        navigateToPostAuth(res);
         return
       }
     } else {
@@ -207,7 +242,7 @@ export default function LoginForm({
       if (res) {
         onAuthSuccess?.();
         setLoginSuccess(true);
-        navigateToPostAuth();
+        navigateToPostAuth(res);
       }
     },
     [completeGoogleSignup, googleIncompleteToken, onAuthSuccess, navigateToPostAuth],
@@ -219,7 +254,7 @@ export default function LoginForm({
     if (res) {
       onAuthSuccess?.();
       setLoginSuccess(true);
-      navigateToPostAuth();
+      navigateToPostAuth(res);
     }
   }, [googlePendingToken, googleCode, onAuthSuccess, verifyGoogleCode, navigateToPostAuth]);
 
