@@ -19,8 +19,7 @@ function SignInContent() {
     const accessToken =
       searchParams.get("accessToken") ||
       searchParams.get("token");
-    const refreshToken =
-      searchParams.get("refreshToken") ||
+    const refreshToken = searchParams.get("refreshToken");
     const error = searchParams.get("error");
     const errorDescription =
       searchParams.get("error_description") ||
@@ -58,7 +57,7 @@ function SignInContent() {
       window.localStorage.removeItem("beatza:auth-client");
     }
   }, [hasHydrated, isAuthenticated, searchParams, router]);
-
+  
   if (!hasHydrated || isAuthenticated) {
     return <div className="mt-40" />;
   }
