@@ -42,14 +42,14 @@ export default function SausageWaveform() {
 
     scwRef.current.generateFromJson(samples, {
       ...base,
-      wave_color: "#888888",
+      wave_color: "#ffffff",
       half: "top",
       onComplete: (png: string) => setBgTop(png),
     });
 
     scwRef.current.generateFromJson(samples, {
       ...base,
-      wave_color: "#888888",
+      wave_color: "#ffffff",
       half: "bottom",
       onComplete: (png: string) => setBgBottom(png),
     });
@@ -156,13 +156,13 @@ export default function SausageWaveform() {
         {/* Grey top half — background, always full width */}
         <img
           src={bgTop ?? undefined}
-          className="absolute inset-0 w-full h-full opacity-30 grayscale brightness-200"
+          className="absolute inset-0 w-full h-full opacity-80 grayscale brightness-200"
         />
 
         {/* Grey bottom half — background, always full width */}
         <img
           src={bgBottom ?? undefined}
-          className="absolute inset-0 w-full h-full opacity-30 grayscale brightness-200"
+          className="absolute inset-0 w-full h-full opacity-80 grayscale brightness-200"
         />
 
         {/* Gradient top — shown on played portion (left of progress) */}

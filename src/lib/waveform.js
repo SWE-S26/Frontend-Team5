@@ -232,7 +232,7 @@ var SoundCloudWaveform = {
     var x = i + w / 2;
 
     var dividerY = Math.floor(canvasHeight * 0.55);
-    var gap = 1;
+    var gap = 0.7;
 
     var topH = Math.min(h * 0.7, dividerY - gap);
     var bottomH = Math.min(topH * 0.4, canvasHeight - dividerY - gap);
