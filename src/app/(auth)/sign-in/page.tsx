@@ -25,36 +25,32 @@ function SignInContent() {
       searchParams.get("error_description") ||
       searchParams.get("message");
     const hasCallbackPayload = Boolean(accessToken || refreshToken || error);
-    const isAndroidClient = client === "android" || storedClient === "android";
+    const isExplicitAndroidClient = client === "android";
+    const isAndroidClient = isExplicitAndroidClient || (hasCallbackPayload && storedClient === "android");
 
-    if (hasCallbackPayload) {
+    if (hasCallbackPayload && isAndroidClient) {
       const params = new URLSearchParams();
       if (accessToken) params.set("accessToken", accessToken);
       if (refreshToken) params.set("refreshToken", refreshToken);
       if (error) params.set("error", error);
       if (errorDescription) params.set("error_description", errorDescription);
 
-      if (isAndroidClient) {
-        window.localStorage.setItem("beatza:auth-client", "Android");
-      }
+      window.localStorage.setItem("beatza:auth-client", "Android");
 
       const suffix = params.toString();
       router.replace(suffix ? `/cross-callback?${suffix}` : "/cross-callback");
       return;
     }
 
-    if (isAndroidClient) {
+    if (isExplicitAndroidClient) {
       window.localStorage.setItem("beatza:auth-client", "Android");
-      return;
+    } else if (!hasCallbackPayload) {
+      window.localStorage.removeItem("beatza:auth-client");
     }
 
     if (isAuthenticated) {
       router.replace("/home");
       return;
-    }
-
-    if (client && client !== "android") {
-      window.localStorage.removeItem("beatza:auth-client");
     }
   }, [hasHydrated, isAuthenticated, searchParams, router]);
   
