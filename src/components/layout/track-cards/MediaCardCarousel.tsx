@@ -1,7 +1,6 @@
 "use client";
 
 import Card from "@/components/ui/Card";
-import { time } from "console";
 import { useRef, useState } from "react";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi";
 
