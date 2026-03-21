@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useCallback, useEffect, useRef } from "react";
+import { useState, useCallback, useEffect, useRef, useTransition } from "react";
 import { useRouter } from "next/navigation";
 
 import { FcGoogle } from "react-icons/fc";
@@ -93,6 +93,7 @@ export default function LoginForm({
   const [googleDisplayName, setGoogleDisplayName] = useState("");
   const [googleCode, setGoogleCode] = useState("");
   const [googleError, setGoogleError] = useState<string | null>(null);
+  const [isNavigating, startTransition] = useTransition();
 
   const isEmailActive = isEmailFocused || email.length > 0;
   const isPasswordActive = isPasswordFocused || password.length > 0;
@@ -115,53 +116,24 @@ export default function LoginForm({
   const [isUnverified, setIsUnverified] = useState(false)
   const router = useRouter();
 
-  //refs for loading states so handleSubmit always reads fresh values
+  const navigateToPostAuth = useCallback(() => {
+    startTransition(() => {
+      router.replace("/home");
+    });
+  }, [router, startTransition]);
+
   const emailLoadingRef = useRef(emailLoading);
   const loginLoadingRef = useRef(loginLoading);
   useEffect(() => { emailLoadingRef.current = emailLoading; }, [emailLoading]);
   useEffect(() => { loginLoadingRef.current = loginLoading; }, [loginLoading]);
 
-  const getPostAuthPath = useCallback((result?: any) => {
-    if (typeof window === "undefined") return "/home";
-
-    const authClient = window.localStorage.getItem("beatza:auth-client");
-    if (authClient?.toLowerCase() !== "android") return "/home";
-
-    const payload = result?.data ?? result ?? {};
-    const accessToken = payload.accessToken ?? payload.authToken ?? payload.token;
-    const refreshToken = payload.refreshToken ?? payload.refresh_token;
-
-    const params = new URLSearchParams();
-    if (accessToken) params.set("accessToken", String(accessToken));
-    if (refreshToken) params.set("refreshToken", String(refreshToken));
-
-    const suffix = params.toString();
-    return suffix ? `/cross-callback?${suffix}` : "/cross-callback";
-  }, []);
-
   const handleGoogleSignIn = useCallback(() => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
-    const authClient =
-      typeof window !== "undefined"
-        ? window.localStorage.getItem("beatza:auth-client")
-        : null;
-    const urlClient =
-      typeof window !== "undefined"
-        ? new URLSearchParams(window.location.search).get("client")
-        : null;
-    const isAndroidClient =
-      authClient?.toLowerCase() === "android" ||
-      urlClient?.toLowerCase() === "android";
 
     const googleUrl = new URL(
       "/api/auth/v1/google",
       baseUrl || window.location.origin,
     );
-
-    if (isAndroidClient) {
-      window.localStorage.setItem("beatza:auth-client", "Android");
-      googleUrl.searchParams.set("client", "Android");
-    }
 
     window.location.href = googleUrl.toString();
   }, []);
@@ -189,8 +161,7 @@ export default function LoginForm({
       if (res?.message === "Authenticated successfully") {
         onAuthSuccess?.();
         setLoginSuccess(true);
-        const target = getPostAuthPath(res);
-        setTimeout(() => router.push(target), 1500);
+        navigateToPostAuth();
         return
       }
     } else {
@@ -198,7 +169,7 @@ export default function LoginForm({
       setRegisterError(null);
       setStep("register-details");
     }
-  }, [userExists, email, password, login, onAuthSuccess, router]);
+  }, [userExists, email, password, login, onAuthSuccess, navigateToPostAuth]);
 
   const handleBackToEmail = useCallback(() => {
     setStep("email");
@@ -236,11 +207,10 @@ export default function LoginForm({
       if (res) {
         onAuthSuccess?.();
         setLoginSuccess(true);
-        const target = getPostAuthPath(res);
-        setTimeout(() => router.push(target), 600);
+        navigateToPostAuth();
       }
     },
-    [completeGoogleSignup, getPostAuthPath, googleIncompleteToken, onAuthSuccess, router],
+    [completeGoogleSignup, googleIncompleteToken, onAuthSuccess, navigateToPostAuth],
   );
 
   const handleGoogleVerify = useCallback(async () => {
@@ -249,10 +219,9 @@ export default function LoginForm({
     if (res) {
       onAuthSuccess?.();
       setLoginSuccess(true);
-      const target = getPostAuthPath(res);
-      setTimeout(() => router.push(target), 600);
+      navigateToPostAuth();
     }
-  }, [googlePendingToken, googleCode, getPostAuthPath, onAuthSuccess, verifyGoogleCode, router]);
+  }, [googlePendingToken, googleCode, onAuthSuccess, verifyGoogleCode, navigateToPostAuth]);
 
   const handleQrSignIn = useCallback(() => {
     router.push("/qr-login");
@@ -392,7 +361,7 @@ export default function LoginForm({
   }
 
   const isPasswordStep = step === "password";
-  const isBusy = isPasswordStep ? loginLoading : emailLoading;
+  const isBusy = (isPasswordStep ? loginLoading : emailLoading) || isNavigating;
   const handleSubmit = useCallback(
     async (event: React.FormEvent<HTMLFormElement>) => {
       event.preventDefault();
@@ -592,7 +561,9 @@ export default function LoginForm({
       </form>
 
       {loginSuccess && isPasswordStep && (
-        <p className="mt-3 text-sm text-green-400">Signed in successfully. Redirecting...</p>
+        <p className="mt-3 text-sm text-green-400">
+          {isNavigating ? "Signed in successfully. Loading your home page..." : "Signed in successfully."}
+        </p>
       )}
 
       {loginError && isPasswordStep && !loginSuccess && (
