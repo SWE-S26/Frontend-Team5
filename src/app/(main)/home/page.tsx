@@ -1,23 +1,20 @@
-import { Metadata } from "next"
-import MediaCardCarousel from "@/components/layout/MediaCardCarousel";
+import { Metadata } from "next";
+import MediaCardCarousel from "@/components/layout/track-cards/MediaCardCarousel";
 export const metadata: Metadata = {
   title: "Discover the top streamed music and songs online on BeatZa",
-}
+};
 
 export default function Home() {
   return (
     <div className="flex justify-between">
+      <div className="w-full md:w-[68%]">
+        <MediaCardCarousel />
+        <MediaCardCarousel />
+      </div>
 
-      <div className="w-[68%]">
-        <h1>Home</h1>
-        <MediaCardCarousel />
+      <div className="hidden md:block md:w-[27.75%]">
         <MediaCardCarousel />
       </div>
-      
-      <div className="w-[27.75%]">
-        <MediaCardCarousel />
-      </div>
-    
     </div>
-  )
+  );
 }

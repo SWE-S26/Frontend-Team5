@@ -1,0 +1,65 @@
+name: Build and Deploy Frontend
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Login to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v5
+        with:
+          context: .
+          push: ${{ github.event_name == 'push' }}
+          tags: ghcr.io/swe-s26/frontend-team5:latest
+          build-args: |
+            NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
+            NEXT_PUBLIC_USE_MSW=${{ secrets.NEXT_PUBLIC_USE_MSW }}
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: build-and-push
+    if: github.event_name == 'push'
+
+    steps:
+      - name: Deploy to Azure VM
+        uses: appleboy/ssh-action@master
+        env:
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
+          AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+        with:
+          host: ${{ secrets.VM_IP }}
+          username: azureuser
+          key: ${{ secrets.VM_SSH_KEY }}
+          envs: GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,AUTH_SECRET
+          script: |
+            echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            {
+                echo "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}"
+                echo "GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}"
+                echo "AUTH_SECRET=${AUTH_SECRET}"
+            } > ~/beatza/.env.frontend
+
+            cd ~/beatza
+            docker pull ghcr.io/swe-s26/frontend-team5:latest
+            docker compose up -d --no-deps --force-recreate frontend
+            docker image prune -f

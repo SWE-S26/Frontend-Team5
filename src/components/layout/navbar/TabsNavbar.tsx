@@ -1,4 +1,5 @@
 "use client";
+
 import { usePathname } from "next/navigation";
 import TabsButton from "@/components/ui/TabsButton";
 
@@ -14,12 +15,13 @@ interface TabsNavbarProps {
   pathname?: string;
   textSize?: string;
   className?: string;
-
   activeTab?: string;
   onTabChange?: (tab: string) => void;
-
   tabsWrapperClassName?: string;
 }
+
+const DEFAULT_WRAPPER_CLASS = "flex items-center gap-2";
+const DEFAULT_CLASS = "flex items-center gap-2 border-b border-chinese-black";
 
 export default function TabsNavbar({
   tabs,
@@ -28,19 +30,17 @@ export default function TabsNavbar({
   className = "",
   activeTab,
   onTabChange,
-  tabsWrapperClassName = "flex items-center gap-2",
+  tabsWrapperClassName = DEFAULT_WRAPPER_CLASS,
 }: TabsNavbarProps) {
   const currentPathname = usePathname();
   const resolvedPathname = pathname ?? currentPathname;
-
   const isControlled = activeTab !== undefined && onTabChange !== undefined;
 
   return (
-    <div className={className || "flex items-center gap-2 border-b border-chinese-black"}>
+    <div className={className || DEFAULT_CLASS}>
       <div className={tabsWrapperClassName}>
         {tabs.map((tab) => {
           const tabValue = tab.value ?? tab.label;
-
           return (
             <TabsButton
               key={`${tab.href}-${tab.label}`}
