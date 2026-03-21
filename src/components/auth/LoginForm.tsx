@@ -116,13 +116,19 @@ export default function LoginForm({
   const [isUnverified, setIsUnverified] = useState(false)
   const router = useRouter();
 
+  //refs for loading states so handleSubmit always reads fresh values
+  const emailLoadingRef = useRef(emailLoading);
+  const loginLoadingRef = useRef(loginLoading);
+  useEffect(() => { emailLoadingRef.current = emailLoading; }, [emailLoading]);
+  useEffect(() => { loginLoadingRef.current = loginLoading; }, [loginLoading]);
+
   const navigateToPostAuth = useCallback((result?: any) => {
     let target = "/home";
 
     if (typeof window !== "undefined") {
-      const authClient = window.localStorage.getItem("beatza:auth-client")?.toLowerCase();
+      const authClient = window.localStorage.getItem("beatza:auth-client");
 
-      if (authClient === "android") {
+      if (authClient?.toLowerCase() === "android") {
         const payload = result?.data ?? result ?? {};
         const accessToken = payload.accessToken ?? payload.authToken ?? payload.token;
         const refreshToken = payload.refreshToken ?? payload.refresh_token;
@@ -140,11 +146,6 @@ export default function LoginForm({
       router.replace(target);
     });
   }, [router, startTransition]);
-
-  const emailLoadingRef = useRef(emailLoading);
-  const loginLoadingRef = useRef(loginLoading);
-  useEffect(() => { emailLoadingRef.current = emailLoading; }, [emailLoading]);
-  useEffect(() => { loginLoadingRef.current = loginLoading; }, [loginLoading]);
 
   const handleGoogleSignIn = useCallback(() => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
