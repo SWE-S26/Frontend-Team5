@@ -47,11 +47,6 @@ function SignInContent() {
     } else if (!hasCallbackPayload) {
       window.localStorage.removeItem("beatza:auth-client");
     }
-
-    if (isAuthenticated) {
-      router.replace("/home");
-      return;
-    }
   }, [hasHydrated, isAuthenticated, searchParams, router]);
   
   if (!hasHydrated || isAuthenticated) {
