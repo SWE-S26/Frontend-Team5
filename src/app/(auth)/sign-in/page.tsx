@@ -4,15 +4,12 @@ import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import LoginForm from "@/components/auth/LoginForm";
-import { useAuthStore } from "@/store/authStore";
 
 function SignInContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
-  const { isAuthenticated, hasHydrated } = useAuthStore();
 
   useEffect(() => {
-    if (!hasHydrated) return;
 
     const client = searchParams.get("client")?.toLowerCase();
     const storedClient = window.localStorage.getItem("beatza:auth-client")?.toLowerCase();
@@ -47,12 +44,8 @@ function SignInContent() {
     } else if (!hasCallbackPayload) {
       window.localStorage.removeItem("beatza:auth-client");
     }
-  }, [hasHydrated, isAuthenticated, searchParams, router]);
+  }, [searchParams, router]);
   
-  if (!hasHydrated || isAuthenticated) {
-    return <div className="mt-40" />;
-  }
-
   return (
     <div>
       <div className="flex mt-40 mx-auto max-w-110">
