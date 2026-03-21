@@ -1,7 +1,6 @@
 "use client";
 
 import Card from "@/components/ui/Card";
-import { time } from "console";
 import { useRef, useState } from "react";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi";
 
@@ -64,7 +63,7 @@ export default function MediaCardCarousel() {
     }, 200);
   }
   return (
-    <div className="w-full max-w-6xl py-8">
+    <div className="sm:w-1/5 md:w-full max-w-6xl py-8">
       {" "}
       {/* OM - removed this from className (mx-auto px-4) for alignment purposes, re-add them to see yourself */}
       {/* Title */}
