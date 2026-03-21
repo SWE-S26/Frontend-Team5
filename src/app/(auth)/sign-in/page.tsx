@@ -14,11 +14,6 @@ function SignInContent() {
   useEffect(() => {
     if (!hasHydrated) return;
 
-    if (isAuthenticated) {
-      router.replace("/home");
-      return;
-    }
-
     const client = searchParams.get("client")?.toLowerCase();
     const storedClient = window.localStorage.getItem("beatza:auth-client")?.toLowerCase();
     const isAndroidClient = client === "android" || storedClient === "android";
@@ -46,6 +41,11 @@ function SignInContent() {
         const suffix = params.toString();
         router.replace(suffix ? `/cross-callback?${suffix}` : "/cross-callback");
       }
+      return;
+    }
+
+    if (isAuthenticated) {
+      router.replace("/home");
       return;
     }
 
