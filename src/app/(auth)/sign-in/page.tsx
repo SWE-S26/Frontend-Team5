@@ -4,12 +4,21 @@ import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import LoginForm from "@/components/auth/LoginForm";
+import { useAuthStore } from "@/store/authStore";
 
 function SignInContent() {
   const searchParams = useSearchParams();
   const router = useRouter();
+  const { isAuthenticated, hasHydrated } = useAuthStore();
 
   useEffect(() => {
+    if (!hasHydrated) return;
+
+    if (isAuthenticated) {
+      router.replace("/home");
+      return;
+    }
+
     const client = searchParams.get("client")?.toLowerCase();
     const storedClient = window.localStorage.getItem("beatza:auth-client")?.toLowerCase();
     const isAndroidClient = client === "android" || storedClient === "android";
@@ -43,7 +52,11 @@ function SignInContent() {
     if (client && client !== "android") {
       window.localStorage.removeItem("beatza:auth-client");
     }
-  }, [searchParams, router]);
+  }, [hasHydrated, isAuthenticated, searchParams, router]);
+
+  if (!hasHydrated || isAuthenticated) {
+    return <div className="mt-40" />;
+  }
 
   return (
     <div>

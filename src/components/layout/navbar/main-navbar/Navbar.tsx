@@ -11,7 +11,15 @@ interface NavbarProps {
 }
 
 export default function Navbar({ className }: NavbarProps) {
-  const { isAuthenticated } = useAuthStore();
+  const { isAuthenticated, hasHydrated } = useAuthStore();
+
+  if (!hasHydrated) {
+    return (
+      <div data-testid="Navbar" className={`flex justify-center w-full ${className}`}>
+        <div className="flex items-center pt-1 w-full max-w-302 h-13" />
+      </div>
+    );
+  }
 
   return (
     <div data-testid="Navbar" className={`flex justify-center w-full ${className}`}>

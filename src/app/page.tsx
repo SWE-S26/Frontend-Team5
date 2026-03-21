@@ -1,9 +1,30 @@
+"use client";
+
+import { useEffect } from "react";
+import { useRouter } from "next/navigation";
+
 /* ----------- Components ----------- */
 import HeroBanner from "@/components/landing-page/HeroBanner";
 import NavbarCenter from "@/components/layout/navbar/main-navbar/NavbarCenter";
-import Button from "@/components/ui/Button";
+import Button from "@/components/ui/Button"
+import { useAuthStore } from "@/store/authStore";
+
 
 export default function LandingPage() {
+  const router = useRouter();
+  const { isAuthenticated, hasHydrated } = useAuthStore();
+
+  useEffect(() => {
+    if (!hasHydrated) return;
+    if (isAuthenticated) {
+      router.replace("/home");
+    }
+  }, [hasHydrated, isAuthenticated, router]);
+
+  if (!hasHydrated || isAuthenticated) {
+    return <div className="my-20" />;
+  }
+  
   return (
     <div className="flex justify-center">
       <div className="w-full max-w-310 mt-9">
