@@ -206,6 +206,9 @@ export function useLogout() {
       const res = await authService.logout();
       setSuccess(true);
       authStore.setAuthenticated(false);
+      authStore.setUserId(null);
+      authStore.setDisplayName(null);
+      authStore.setProfileImg(null);
       return res.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Something went wrong";
@@ -237,6 +240,14 @@ export function useGoogleComplete() {
         });
         setSuccess(true);
         authStore.setAuthenticated(true);
+
+        // Google finalize may not include full user object; refresh to sync profile identity.
+        try {
+          const refreshRes = await authService.refreshToken();
+          syncAuthUserFromRefresh(refreshRes.data);
+        } catch {
+        }
+
         return res.data;
       } catch (err: any) {
         const message = err.response?.data?.message || "Something went wrong";
@@ -266,6 +277,14 @@ export function useGoogleVerifyCode() {
         const res = await authService.googleVerifyCode({ pendingToken, code });
         setSuccess(true);
         authStore.setAuthenticated(true);
+
+        // Google verify may not include full user object; refresh to sync profile identity.
+        try {
+          const refreshRes = await authService.refreshToken();
+          syncAuthUserFromRefresh(refreshRes.data);
+        } catch {
+        }
+
         return res.data;
       } catch (err: any) {
         const message = err.response?.data?.message || "Something went wrong";
