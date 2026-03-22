@@ -38,6 +38,12 @@ export function useLogin() {
     setSuccess(null);
     try {
       const res = await authService.login({ email, password });
+
+      // call refresh token to get userId and set fresh access token
+      const refreshRes = await authService.refreshToken()
+      const userId = refreshRes.data.data.user.id
+      authStore.setUserId(userId)
+
       setSuccess(res.data.success ?? true);
       authStore.setAuthenticated(true);
       return res.data;

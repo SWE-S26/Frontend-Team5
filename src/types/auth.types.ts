@@ -39,6 +39,28 @@ export interface DetailsValidationFormProps {
   onBackToLogin: () => void;
   onSendAgain?: () => void;
 }
+export interface RefreshTokenResponse {
+  message: string
+  data: {
+    user: {
+      id:           string
+      displayName:  string
+      role:         string
+      profileLink:  string
+      profileImg:   {
+        imgLink:   string
+        publicId:  string
+      }
+      subscription: {
+        subscriptionType: string
+        quota: {
+          unlimited:   boolean
+          usedSeconds: number
+        }
+      }
+    }
+  }
+}
 
 //* ======================== API Integration ======================== */
 

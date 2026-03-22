@@ -36,7 +36,7 @@ const ICON_BTN_CLASS = "text-silver text-xl font-bold hover:text-white-smoke tra
 export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   const router = useRouter();
   const { logout, loading, success } = useLogout();
-  const { profileImgLink } = useAuthStore();
+  const { profileImgLink, userId } = useAuthStore();
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
@@ -47,7 +47,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   }, [success, router]);
 
   const profileItems: DropdownItem[] = useMemo(() => [
-    { label: "Profile",        icon: <FaUser />,                 onClick: () => router.push("/profile/1")         },
+    { label: "Profile",        icon: <FaUser />,                 onClick: () => router.push(`/profile/${userId}`) },
     { label: "Likes",          icon: <FaHeart />,                onClick: () => router.push("/library/likes")     },
     { label: "Playlists",      icon: <BiSolidCopy />,            onClick: () => router.push("/library/playlists") },
     { label: "Stations",       icon: <HiMiniSignal />,           onClick: () => router.push("/library/stations")  },
