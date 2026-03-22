@@ -2,6 +2,36 @@ import axios from "axios"
 import { useState, useCallback, useRef } from "react";
 import { authService } from "@/services/auth.service";
 import { authStore } from "@/store/authStore";
+import { RefreshTokenResponse } from "@/types/auth.types";
+
+type AuthUserShape = {
+  id?: string;
+  displayName?: string;
+  profileImg?: {
+    imgLink?: string;
+  };
+};
+
+function extractAuthUser(payload: any): AuthUserShape | null {
+  return (
+    payload?.data?.user ||
+    payload?.user ||
+    payload?.data?.data?.user ||
+    payload?.data ||
+    null
+  );
+}
+
+function syncAuthUser(user: AuthUserShape | null) {
+  if (!user) return;
+  if (user.id) authStore.setUserId(user.id);
+  authStore.setDisplayName(user.displayName || null);
+  authStore.setProfileImg(user.profileImg?.imgLink || null);
+}
+
+function syncAuthUserFromRefresh(refreshRes: RefreshTokenResponse) {
+  syncAuthUser(extractAuthUser(refreshRes));
+}
 
 export function useFindEmail() {
   const [loading, setLoading] = useState(false);
@@ -38,14 +68,19 @@ export function useLogin() {
     setSuccess(null);
     try {
       const res = await authService.login({ email, password });
-
-      // call refresh token to get userId and set fresh access token
-      const refreshRes = await authService.refreshToken()
-      const userId = refreshRes.data.data.user.id
-      authStore.setUserId(userId)
-
       setSuccess(res.data.success ?? true);
       authStore.setAuthenticated(true);
+
+      //backend return user info from login directly.
+      syncAuthUser(extractAuthUser(res.data));
+
+      // Keep refresh, but don't block successful login on refresh failure.
+      try {
+        const refreshRes = await authService.refreshToken();
+        syncAuthUserFromRefresh(refreshRes.data);
+      } catch {
+      }
+
       return res.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Something went wrong";
@@ -141,7 +176,7 @@ export function useResetPassword() {
           newPassword,
           signOutEverywhere,
         });
-        setSuccess(true)  // ← if no error thrown, it's a success
+        setSuccess(true)
         return res.data;
       } catch (err: any) {
         const message = err.response?.data?.message || "Something went wrong";

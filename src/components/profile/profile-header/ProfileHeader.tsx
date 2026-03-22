@@ -8,22 +8,26 @@ import Button from "@/components/ui/Button"
 import AvatarUpload from "./AvatarUpload"
 import CoverPhotoUpload from "./CoverPhotoUpload"
 import { useGetProfile } from "@/hooks/useProfile"
-import { authStore } from "@/store/authStore"
+import { authStore, useAuthStore } from "@/store/authStore"
 
 export default function ProfileHeader() {
   const params = useParams()
-  const userId = params.username as string
+  const rawUserId = params.username as string
+  const userId = rawUserId && rawUserId !== "null" && rawUserId !== "undefined" ? rawUserId : ""
+  const { userId: authUserId, profileImgLink, displayName, hasHydrated } = useAuthStore()
+  const shouldFetchProfile = Boolean(userId && authUserId && authUserId !== userId)
 
   const { getProfile, loading, error, profile } = useGetProfile()
 
   const [coverImage,  setCoverImage]  = useState<string | null>(null)
-  const [avatarImage, setAvatarImage] = useState<string | null>(null)
+  const [avatarImage, setAvatarImage] = useState<string | null>(profileImgLink)
   const [gradient,    setGradient]    = useState("linear-gradient(to right, #c3adb4, #8f6f79)")
 
   useEffect(() => {
-    if (!userId) return
+    if (!hasHydrated) return
+    if (!shouldFetchProfile) return
     getProfile(userId)
-  }, [userId])
+  }, [userId, hasHydrated, shouldFetchProfile, getProfile])
 
   useEffect(() => {
     if (!profile) return
@@ -33,6 +37,16 @@ export default function ProfileHeader() {
     }
     if (profile.bannerImgLink) setCoverImage(profile.bannerImgLink)
   }, [profile])
+
+  useEffect(() => {
+    if (!profileImgLink) return
+    setAvatarImage((prev) => prev || profileImgLink)
+  }, [profileImgLink])
+
+  useEffect(() => {
+    if (!avatarImage) return
+    authStore.setProfileImg(avatarImage)
+  }, [avatarImage])
 
   useEffect(() => {
     if (!avatarImage) return
@@ -50,11 +64,11 @@ export default function ProfileHeader() {
     }
   }, [avatarImage])
 
-  if (loading) return (
+  if (loading && shouldFetchProfile) return (
     <div className="relative w-full h-80 -mt-12.5 bg-off-black animate-pulse" />
   )
 
-  if (error) return (
+  if (error && shouldFetchProfile) return (
     <div className="relative w-full h-80 -mt-12.5 bg-off-black flex items-center justify-center">
       <p className="text-red-400 text-sm">{error}</p>
     </div>
@@ -96,12 +110,12 @@ export default function ProfileHeader() {
       <div className="absolute left-72 bottom-20 -translate-y-1/2">
         <div className="flex flex-col items-start">
           <h1 className="text-3xl font-bold text-white bg-black px-3 py-2">
-            {profile?.displayName || "No Name"}
+            {displayName || profile?.displayName || "No Name"}
           </h1>
           <p className="text-silver font-bold bg-black px-3 py-2">
             {profile?.firstName && profile?.lastName
               ? `${profile.firstName} ${profile.lastName}`
-              : profile?.displayName || "No Name"}
+              : displayName || profile?.displayName || "No Name"}
           </p>
         </div>
         <div className="bg-black inline-block px-3 py-1 absolute -bottom-10">
