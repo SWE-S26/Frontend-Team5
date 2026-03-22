@@ -12,6 +12,7 @@ import ViewMessages from "@/components/messages/ViewMessages";
 import KeyboardShortcutsModal from "@/app/(main)/(more-dropdown)/keyboardShortcuts/keyboardShortcutsModal";
 
 import { useLogout } from "@/hooks/useAuth";
+import { useAuthStore } from "@/store/authStore";
 
 import { MdOutlineExpandMore } from "react-icons/md";
 import { SlBell } from "react-icons/sl";
@@ -35,6 +36,7 @@ const ICON_BTN_CLASS = "text-silver text-xl font-bold hover:text-white-smoke tra
 export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   const router = useRouter();
   const { logout, loading, success } = useLogout();
+  const { profileImgLink } = useAuthStore();
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
@@ -83,7 +85,6 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
 
   return (
     <div className="flex items-center gap-5.5 ml-5 mb-1">
-
       {isLoggedIn ? (
         <>
           <Link data-testid="try_artist_pro" href="/artistpro" className="text-anger text-sm py-2 font-bold hover:text-white-smoke transition-all duration-300">
@@ -99,7 +100,13 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
           <Dropdown testId="profile_dropdown" width="w-40" position="left-0"
             trigger={
               <button data-testid="profile_button" className="text-silver font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2 text-4xl cursor-pointer">
-                <Image src="/profpic.jpg" alt="Profile" width={26} height={26} className="rounded-full w-6.5 h-6.5 object-cover" />
+                <Image
+                  src={profileImgLink || "/profpic.jpg"}
+                  alt="Profile"
+                  width={26}
+                  height={26}
+                  className="rounded-full w-6.5 h-6.5 object-cover"
+                />
                 <MdOutlineExpandMore />
               </button>
             }
@@ -146,7 +153,6 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
 
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
       <KeyboardShortcutsModal isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
-
     </div>
   );
 }

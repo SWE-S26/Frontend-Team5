@@ -30,7 +30,7 @@ export default function PlayerProgress({
       
 
 
-        <span className="text-xs w-[40px] text-right">
+        <span className="text-xs w-10 text-right">
           {formatTime(currentTime || 0)}
         </span>
 
@@ -89,7 +89,7 @@ export default function PlayerProgress({
         
       
 
-        <span className="text-xs w-[40px] text-left">
+        <span className="text-xs w-10 text-left">
           {formatTime(duration || 0)}
         </span>
 
