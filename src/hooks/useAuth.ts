@@ -208,6 +208,7 @@ export function useLogout() {
       authStore.setUserId(null);
       authStore.setDisplayName(null);
       authStore.setProfileImg(null);
+      authStore.setBannerImg(null);
       return res.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Something went wrong";
