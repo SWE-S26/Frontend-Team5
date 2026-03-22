@@ -5,6 +5,7 @@ import { useSyncExternalStore } from "react";
 const STORAGE_KEY     = "beatza:is-authenticated";
 const PROFILE_IMG_KEY = "beatza:profile-img";
 const USER_ID_KEY     = "beatza:user-id";
+const DISPLAY_NAME_KEY = "beatza:display-name";
 
 type Listener = () => void;
 
@@ -12,6 +13,7 @@ let isAuthenticated = false;
 let hasHydrated     = false;
 let profileImgLink: string | null = null;
 let userId: string | null = null;
+let displayName: string | null = null;
 
 const listeners = new Set<Listener>();
 
@@ -20,6 +22,7 @@ type AuthSnapshot = {
   hasHydrated:     boolean;
   profileImgLink:  string | null;
   userId:          string | null;
+  displayName:     string | null;
 };
 
 const serverSnapshot: AuthSnapshot = {
@@ -27,6 +30,7 @@ const serverSnapshot: AuthSnapshot = {
   hasHydrated:     false,
   profileImgLink:  null,
   userId:          null,
+  displayName:     null,
 };
 
 let snapshot: AuthSnapshot = serverSnapshot;
@@ -46,13 +50,15 @@ function syncSnapshot() {
     hasHydrated,
     profileImgLink,
     userId,
+    displayName,
   };
 
   if (
     snapshot.isAuthenticated === nextSnapshot.isAuthenticated &&
     snapshot.hasHydrated     === nextSnapshot.hasHydrated &&
     snapshot.profileImgLink  === nextSnapshot.profileImgLink &&
-    snapshot.userId          === nextSnapshot.userId
+    snapshot.userId          === nextSnapshot.userId &&
+    snapshot.displayName     === nextSnapshot.displayName
   ) return false;
 
   snapshot = nextSnapshot;
@@ -65,12 +71,14 @@ function hydrateFromStorage() {
   const nextValue        = readPersistedAuthState();
   const nextImg          = window.localStorage.getItem(PROFILE_IMG_KEY);
   const nextUserId       = window.localStorage.getItem(USER_ID_KEY);
+  const nextDisplayName  = window.localStorage.getItem(DISPLAY_NAME_KEY);
   const authChanged      = isAuthenticated !== nextValue;
   const hydrationChanged = !hasHydrated;
 
   isAuthenticated = nextValue;
   profileImgLink  = nextImg;
   userId          = nextUserId;
+  displayName     = nextDisplayName;
   hasHydrated     = true;
 
   if (syncSnapshot() && (authChanged || hydrationChanged)) {
@@ -108,6 +116,16 @@ function setUserId(id: string | null) {
   if (syncSnapshot()) emitChange();
 }
 
+function setDisplayName(name: string | null) {
+  if (displayName === name) return;
+  displayName = name;
+  if (typeof window !== "undefined") {
+    if (name) window.localStorage.setItem(DISPLAY_NAME_KEY, name);
+    else      window.localStorage.removeItem(DISPLAY_NAME_KEY);
+  }
+  if (syncSnapshot()) emitChange();
+}
+
 function getSnapshot() {
   return snapshot;
 }
@@ -141,6 +159,10 @@ function subscribe(listener: Listener) {
       userId = event.newValue;
       if (syncSnapshot()) emitChange();
     }
+    if (event.key === DISPLAY_NAME_KEY) {
+      displayName = event.newValue;
+      if (syncSnapshot()) emitChange();
+    }
   };
 
   window.addEventListener("storage", onStorage);
@@ -156,6 +178,7 @@ export const authStore = {
   setAuthenticated,
   setProfileImg,
   setUserId,
+  setDisplayName,
 };
 
 export function useAuthStore() {
@@ -165,8 +188,10 @@ export function useAuthStore() {
     hasHydrated:     snapshot.hasHydrated,
     profileImgLink:  snapshot.profileImgLink,
     userId:          snapshot.userId,
+    displayName:     snapshot.displayName,
     setAuthenticated,
     setProfileImg,
     setUserId,
+    setDisplayName,
   };
 }

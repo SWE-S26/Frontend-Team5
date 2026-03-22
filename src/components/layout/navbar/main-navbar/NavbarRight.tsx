@@ -46,8 +46,10 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
     if (success) router.push("/");
   }, [success, router]);
 
+  const profileTarget = userId ? `/profile/${userId}` : "/home";
+
   const profileItems: DropdownItem[] = useMemo(() => [
-    { label: "Profile",        icon: <FaUser />,                 onClick: () => router.push(`/profile/${userId}`) },
+    { label: "Profile",        icon: <FaUser />,                 onClick: () => router.push(profileTarget), disabled: !userId },
     { label: "Likes",          icon: <FaHeart />,                onClick: () => router.push("/library/likes")     },
     { label: "Playlists",      icon: <BiSolidCopy />,            onClick: () => router.push("/library/playlists") },
     { label: "Stations",       icon: <HiMiniSignal />,           onClick: () => router.push("/library/stations")  },
@@ -57,7 +59,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
     { label: "Tracks",         icon: <PiWaveformBold />,         onClick: () => router.push("/artists")           },
     { label: "Insights",       icon: <ImStatsBars />,            onClick: () => console.log("done")               },
     { label: "Distribute",     icon: <BsArrowsExpandVertical />, onClick: () => router.push("/artistpro")         },
-  ], [router]);
+  ], [router, profileTarget, userId]);
 
   const moreItems: DropdownItem[] = useMemo(() => [
     { label: "About us",           onClick: () => console.log("done")          },
