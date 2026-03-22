@@ -14,7 +14,7 @@ export default function ProfileHeader() {
   const params = useParams()
   const rawUserId = params.username as string
   const userId = rawUserId && rawUserId !== "null" && rawUserId !== "undefined" ? rawUserId : ""
-  const { userId: authUserId, profileImgLink, displayName, hasHydrated } = useAuthStore()
+  const { userId: authUserId, profileImgLink, bannerImgLink, displayName, hasHydrated } = useAuthStore()
   const shouldFetchProfile = Boolean(userId && authUserId && authUserId !== userId)
 
   const { getProfile, loading, error, profile } = useGetProfile()
@@ -30,12 +30,22 @@ export default function ProfileHeader() {
   }, [userId, hasHydrated, shouldFetchProfile, getProfile])
 
   useEffect(() => {
+    if (!hasHydrated) return
+    if (bannerImgLink) {
+      setCoverImage(bannerImgLink)
+    }
+  }, [hasHydrated, bannerImgLink])
+
+  useEffect(() => {
     if (!profile) return
     if (profile.profileImgLink) {
       setAvatarImage(profile.profileImgLink)
-      authStore.setProfileImg(profile.profileImgLink) // ← set globally
+      authStore.setProfileImg(profile.profileImgLink)
     }
-    if (profile.bannerImgLink) setCoverImage(profile.bannerImgLink)
+    if (profile.bannerImgLink) {
+      setCoverImage(profile.bannerImgLink)
+      authStore.setBannerImg(profile.bannerImgLink)
+    }
   }, [profile])
 
   useEffect(() => {
@@ -46,6 +56,10 @@ export default function ProfileHeader() {
   useEffect(() => {
     if (!avatarImage) return
     authStore.setProfileImg(avatarImage)
+  }, [avatarImage])
+
+  useEffect(() => {
+    authStore.setBannerImg(avatarImage)
   }, [avatarImage])
 
   useEffect(() => {
