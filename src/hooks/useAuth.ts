@@ -3,6 +3,7 @@ import { useState, useCallback, useRef } from "react";
 import { authService } from "@/services/auth.service";
 import { authStore } from "@/store/authStore";
 import { RefreshTokenResponse } from "@/types/auth.types";
+import { useRouter } from "next/navigation";
 
 type AuthUserShape = {
   id?: string;
@@ -61,6 +62,7 @@ export function useLogin() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
+  const router = useRouter();
 
   const login = useCallback(async (email: string, password: string) => {
     setLoading(true);
@@ -80,6 +82,8 @@ export function useLogin() {
         syncAuthUserFromRefresh(refreshRes.data);
       } catch {}
 
+      router.push("/home");
+
       return res.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Something went wrong";
@@ -88,7 +92,7 @@ export function useLogin() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [router]);
 
   return { login, loading, error, success };
 }
@@ -226,6 +230,7 @@ export function useGoogleComplete() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
+  const router = useRouter();
 
   const completeGoogleSignup = useCallback(
     async (incompleteToken: string, dateOfBirth: string, gender: string) => {
@@ -247,6 +252,8 @@ export function useGoogleComplete() {
           syncAuthUserFromRefresh(refreshRes.data);
         } catch {}
 
+        router.push("/home");
+
         return res.data;
       } catch (err: any) {
         const message = err.response?.data?.message || "Something went wrong";
@@ -256,7 +263,7 @@ export function useGoogleComplete() {
         setLoading(false);
       }
     },
-    [],
+    [router],
   );
 
   return { completeGoogleSignup, loading, error, success };
@@ -266,6 +273,7 @@ export function useGoogleVerifyCode() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
+  const router = useRouter();
 
   const verifyGoogleCode = useCallback(
     async (pendingToken: string, code: string) => {
@@ -283,6 +291,8 @@ export function useGoogleVerifyCode() {
           syncAuthUserFromRefresh(refreshRes.data);
         } catch {}
 
+        router.push("/home");
+
         return res.data;
       } catch (err: any) {
         const message = err.response?.data?.message || "Something went wrong";
@@ -292,7 +302,7 @@ export function useGoogleVerifyCode() {
         setLoading(false);
       }
     },
-    [],
+    [router],
   );
 
   return { verifyGoogleCode, loading, error, success };
@@ -359,6 +369,8 @@ export function useQRLogin() {
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
+  const router = useRouter();
+
   //Generate QR
   const generateQR = useCallback(async () => {
     setLoading(true);
@@ -417,6 +429,8 @@ export function useQRLogin() {
           }
 
           if (intervalRef.current) clearInterval(intervalRef.current);
+
+          router.push("/home");
         }
 
         if (message.includes("expired")) {
@@ -439,7 +453,7 @@ export function useQRLogin() {
         if (intervalRef.current) clearInterval(intervalRef.current);
       }
     }, 5000);
-  }, [qrCode]);
+  }, [qrCode, router]);
 
   //Stop polling manually
   const stopPolling = useCallback(() => {
