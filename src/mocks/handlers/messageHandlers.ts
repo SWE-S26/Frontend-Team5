@@ -1,6 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import { mockConversations, mockMessages } from '@/mocks/message'
-import { MessageContentType } from '@/types/messageTypes'
+import { MessageContentType } from '@/types/message.types'
 
 export const messageHandlers = [
 

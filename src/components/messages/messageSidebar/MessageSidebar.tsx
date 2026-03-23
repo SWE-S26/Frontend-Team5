@@ -1,10 +1,10 @@
 'use client'
 import { useState} from 'react'
-import NewMessageButton from './NewMessageButton'
 import NewMessagePopUP from '../NewMessagePopUP'
 import MessagePerview from './MessagePerview'
 import { useConversations } from '@/hooks/messages/useConversations'
-import { Conversation } from '@/types/messageTypes'
+import { Conversation } from '@/types/message.types'
+import Button from '@/components/ui/Button'
 
 interface MessageSidebarProps {
   onSelect: (userId: string) => void
@@ -27,7 +27,9 @@ const MessageSidebar = ({ onSelect, selectedUserId, conversations, markAsRead }:
             <div className='flex flex-col w-full px-2 py-3'>
                 <div className='flex justify-between ml-2 mb-4'>
                     <p className='text-3xl font-bold text-white-smoke'>Messages</p>
-                    <NewMessageButton onClick={() => setIsOpen(true)} />
+                    <Button className="bg-white-smoke text-chinese-black cursor-pointer " onClick={() => setIsOpen(true)}>
+                        New
+                    </Button>
                 </div>
                 <NewMessagePopUP isOpen={isOpen} onClose={() => setIsOpen(false)} />
                 {conversations.map((conversation) => (

@@ -2,7 +2,7 @@
 import { useState } from 'react'
 import SendButton from '../SendButton'
 import { useSendMessage } from '@/hooks/messages/useSendMessages'
-import { Message } from '@/types/messageTypes'
+import { Message } from '@/types/message.types'
 import { send } from 'process'
 
 interface ConversationInputProps {

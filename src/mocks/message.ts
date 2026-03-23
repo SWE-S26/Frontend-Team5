@@ -1,4 +1,4 @@
-import { Message, Conversation } from "@/types/messageTypes";
+import { Message, Conversation } from "@/types/message.types";
 
 export const mockConversations: Conversation[] = [
   {

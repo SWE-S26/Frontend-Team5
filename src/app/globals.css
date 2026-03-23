@@ -1,5 +1,4 @@
 @import "tailwindcss";
-@plugin 'tailwind-scrollbar-hide';
 
 :root {
   /* soundcloud color palete (Default: Dark Mode) */
@@ -75,3 +74,4 @@ body {
     scrollbar-width: none;
   }
 }
+@plugin 'tailwind-scrollbar-hide';
