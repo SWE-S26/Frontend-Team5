@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import Dropdown, { DropdownItem } from "@/components/ui/Dropdown";
 import Button from "@/components/ui/Button";
 import AuthModal from "@/components/auth/AuthModal";
-import ViewMessages from "@/components/messages/ViewMessages";
+import ViewMessages from "@/components/messages/messageSidebar/ViewMessages";
 import KeyboardShortcutsModal from "@/app/(main)/(more-dropdown)/keyboardShortcuts/keyboardShortcutsModal";
 
 import { useLogout } from "@/hooks/useAuth";
