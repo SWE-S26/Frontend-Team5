@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import { mockConversations, mockMessages } from '@/mocks/message'
+import { MessageContentType } from '@/types/messageTypes'
 
 export const messageHandlers = [
 
@@ -27,6 +28,8 @@ export const messageHandlers = [
         content: body.content,
         createdAt: new Date().toISOString(),
         isRead: false,
+        type: 'text' as MessageContentType,
+        metadata: undefined,
         }
         mockMessages.push(newMessage)
         return HttpResponse.json(newMessage, { status: 201 })

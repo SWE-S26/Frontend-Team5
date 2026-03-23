@@ -2,13 +2,13 @@
 import Link from "next/link";
 import Dropdown from "@/components/ui/Dropdown";
 import AuthModal from "@/components/auth/AuthModal";
-import ViewMessages from "@/components/messages/ViewMessages"
+import ViewMessages from "@/components/messages/messageSidebar/ViewMessages"
 
 
 
 import KeyboardShortcutsModal from "@/app/(main)/(more-dropdown)/keyboardShortcuts/keyboardShortcutsModal";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { DropdownItem } from "@/components/ui/Dropdown";
 import Button from "@/components/ui/Button"
 
@@ -37,7 +37,19 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   const router = useRouter();
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
-  const [isMessagesOpen, setIsMessagesOpen] = useState(false)
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
+  const messagesRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+  const handleClickOutside = (e: MouseEvent) => {
+    if (messagesRef.current && !messagesRef.current.contains(e.target as Node)) {
+      setIsMessagesOpen(false);
+    }
+  };
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   return (
     <div className="flex items-center gap-5.5 ml-5 mb-1">
       {isLoggedIn ? (
@@ -92,22 +104,19 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
             <SlBell />
           </button>
           
-          <button className="text-silver text-xl  hover:text-white-smoke transition-all duration-300 flex items-center gap-2">
-            <div className="relative">
-          <button 
-            className="text-silver text-xl  hover:text-white-smoke transition-all duration-300 flex items-center gap-2"
+          <div className="relative" ref={messagesRef}>
+          <button
+            className="text-silver text-xl hover:text-white-smoke transition-all duration-300 flex items-center gap-2"
             onClick={() => setIsMessagesOpen((prev) => !prev)}
           >
             <GrMailOption />
           </button>
-
           {isMessagesOpen && (
-            <div className="absolute right-0 top-8 z-15 w-100">
+            <div className="absolute right-0 top-8 z-15 w-100 h-20-">
               <ViewMessages />
             </div>
-            )}
+          )}
         </div>
-          </button>
         </>
       ) : (
         // not logged in

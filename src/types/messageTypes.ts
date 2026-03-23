@@ -1,3 +1,6 @@
+
+export type MessageContentType = 'text' | 'link' | 'sc_track' | 'sc_playlist' | 'sc_album'
+
 export type Message = {
   id: string;
   senderId: string;
@@ -5,6 +8,12 @@ export type Message = {
   content: string;
   createdAt: string;
   isRead: boolean;
+  type: MessageContentType;
+  metadata?: {
+    embedUrl?: string;
+    title?: string;
+    thumbnail?: string;
+  };
 }
 
 export type Conversation = {

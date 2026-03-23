@@ -29,6 +29,7 @@ export const mockMessages: Message[] = [
     content: "hi",
     createdAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
     isRead: true,
+    type: 'text',
   },
   {
     id: "msg-2",
@@ -37,6 +38,7 @@ export const mockMessages: Message[] = [
     content: "hey! how are you?",
     createdAt: new Date(Date.now() - 5 * 60 * 1000).toISOString(),
     isRead: true,
+    type: 'text',
   },
   {
     id: "msg-3",
@@ -45,6 +47,7 @@ export const mockMessages: Message[] = [
     content: "nsns",
     createdAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
     isRead: true,
+    type: 'text',
   },
   {
     id: "msg-4",
@@ -53,6 +56,7 @@ export const mockMessages: Message[] = [
     content: "sjssk",
     createdAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
     isRead: true,
+    type: 'link',
   },
   {
     id: "msg-5",
@@ -61,6 +65,7 @@ export const mockMessages: Message[] = [
     content: "test",
     createdAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
     isRead: true,
+    type: 'link',
   },
   {
     id: "msg-6",
@@ -69,5 +74,6 @@ export const mockMessages: Message[] = [
     content: "https://on.soundcloud.com/FuhHb5otZh2mFklx",
     createdAt: new Date(Date.now() - 10 * 60 * 1000).toISOString(),
     isRead: false,
+    type: 'link',
   },
 ];

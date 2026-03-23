@@ -16,5 +16,9 @@
         })
     }, [userId])
 
-    return { messages }
+    const addMessage = (message: Message) => {
+        setMessages((prev) => [...prev, message])
+        }
+
+    return { messages, addMessage }
     }

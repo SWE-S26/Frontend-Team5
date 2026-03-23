@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
 import ThemeProvider from "@/components/theme/ThemeProvider"
+import MSWProvider from '@/components/MSWProvider'
 import "./globals.css";
 
 const inter = Inter({
@@ -26,7 +27,9 @@ export default function RootLayout({
     >
       <body className="antialiased">
         <ThemeProvider>
-          {children}
+          <MSWProvider>
+            {children}
+          </MSWProvider>
         </ThemeProvider>
         <div className="h-12"/>
       </body>
