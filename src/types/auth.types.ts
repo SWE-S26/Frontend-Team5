@@ -192,5 +192,23 @@ export interface LoginWithQRcodeRequest {
 export interface LoginWithQRcodeResponse {
   success?: boolean;
   message: string;
-  data?: null | {};
+  data?: {
+    user: {
+      id: string;
+      displayName: string;
+      role: string;
+      profileLink: string;
+      profileImg: {
+        imgLink: string;
+        publicId: string;
+      };
+      subscription: {
+        subscriptionType: string;
+        quota: {
+          unlimited: boolean;
+          usedSeconds: number;
+        };
+      };
+    };
+  };
 }

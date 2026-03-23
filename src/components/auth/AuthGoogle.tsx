@@ -4,7 +4,7 @@ import { useEffect } from "react";
 import { useAuthStore } from "@/store/authStore";
 
 export default function AuthGoogle() {
-  const { setAuthenticated, setUserId, setDisplayName, setProfileImg } = useAuthStore();
+  const { setAuthenticated, setUserId, setDisplayName, setProfileImg, setBannerImg } = useAuthStore();
 
   useEffect(() => {
     let active = true;
@@ -26,6 +26,7 @@ export default function AuthGoogle() {
           if (user?.id) setUserId(user.id);
           setDisplayName(user?.displayName || null);
           setProfileImg(user?.profileImg?.imgLink || null);
+          setBannerImg(user?.profileImg?.imgLink || null);
           setAuthenticated(true);
           return;
         }
@@ -35,6 +36,7 @@ export default function AuthGoogle() {
           setUserId(null);
           setDisplayName(null);
           setProfileImg(null);
+          setBannerImg(null);
         }
       } catch {
       }
@@ -43,7 +45,7 @@ export default function AuthGoogle() {
     return () => {
       active = false;
     };
-  }, [setAuthenticated, setUserId, setDisplayName, setProfileImg]);
+  }, [setAuthenticated, setUserId, setDisplayName, setProfileImg, setBannerImg]);
 
   return null;
 }

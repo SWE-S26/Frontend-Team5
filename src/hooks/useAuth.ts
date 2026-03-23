@@ -1,4 +1,4 @@
-import axios from "axios"
+import axios from "axios";
 import { useState, useCallback, useRef } from "react";
 import { authService } from "@/services/auth.service";
 import { authStore } from "@/store/authStore";
@@ -78,8 +78,7 @@ export function useLogin() {
       try {
         const refreshRes = await authService.refreshToken();
         syncAuthUserFromRefresh(refreshRes.data);
-      } catch {
-      }
+      } catch {}
 
       return res.data;
     } catch (err: any) {
@@ -176,7 +175,7 @@ export function useResetPassword() {
           newPassword,
           signOutEverywhere,
         });
-        setSuccess(true)
+        setSuccess(true);
         return res.data;
       } catch (err: any) {
         const message = err.response?.data?.message || "Something went wrong";
@@ -209,6 +208,7 @@ export function useLogout() {
       authStore.setUserId(null);
       authStore.setDisplayName(null);
       authStore.setProfileImg(null);
+      authStore.setBannerImg(null);
       return res.data;
     } catch (err: any) {
       const message = err.response?.data?.message || "Something went wrong";
@@ -245,8 +245,7 @@ export function useGoogleComplete() {
         try {
           const refreshRes = await authService.refreshToken();
           syncAuthUserFromRefresh(refreshRes.data);
-        } catch {
-        }
+        } catch {}
 
         return res.data;
       } catch (err: any) {
@@ -282,8 +281,7 @@ export function useGoogleVerifyCode() {
         try {
           const refreshRes = await authService.refreshToken();
           syncAuthUserFromRefresh(refreshRes.data);
-        } catch {
-        }
+        } catch {}
 
         return res.data;
       } catch (err: any) {
@@ -301,53 +299,53 @@ export function useGoogleVerifyCode() {
 }
 
 export function useVerifyEmail() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState<string | null>(null)
-  const [success, setSuccess] = useState<boolean | null>(null)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
 
   const verifyEmail = useCallback(async (token: string) => {
-    setLoading(true)
-    setError(null)
-    setSuccess(null)
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
     try {
-      const res = await authService.verifyEmail(token)
-      setSuccess(true)
-      return res.data
+      const res = await authService.verifyEmail(token);
+      setSuccess(true);
+      return res.data;
     } catch (err: any) {
-      const message = err.response?.data?.message || "Something went wrong"
-      setError(message)
-      setSuccess(false)
+      const message = err.response?.data?.message || "Something went wrong";
+      setError(message);
+      setSuccess(false);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
-  return { verifyEmail, loading, error, success }
+  return { verifyEmail, loading, error, success };
 }
 
 export function useResendVerificationEmail() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError]     = useState<string | null>(null)
-  const [success, setSuccess] = useState<boolean | null>(null)
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
 
   const resendVerificationEmail = useCallback(async (email: string) => {
-    setLoading(true)
-    setError(null)
-    setSuccess(null)
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
     try {
-      const res = await authService.resendVerificationEmail({ email })
-      setSuccess(true)
-      return res.data
+      const res = await authService.resendVerificationEmail({ email });
+      setSuccess(true);
+      return res.data;
     } catch (err: any) {
-      const message = err.response?.data?.message || "Something went wrong"
-      setError(message)
-      setSuccess(false)
+      const message = err.response?.data?.message || "Something went wrong";
+      setError(message);
+      setSuccess(false);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [])
+  }, []);
 
-  return { resendVerificationEmail, loading, error, success }
+  return { resendVerificationEmail, loading, error, success };
 }
 
 export function useQRLogin() {
@@ -355,7 +353,9 @@ export function useQRLogin() {
   const [error, setError] = useState<string | null>(null);
   const [qrCode, setQrCode] = useState<string | null>(null);
   const [expiresIn, setExpiresIn] = useState<number | null>(null);
-  const [status, setStatus] = useState<"idle" | "waiting" | "success" | "expired">("idle");
+  const [status, setStatus] = useState<
+    "idle" | "waiting" | "success" | "expired"
+  >("idle");
 
   const intervalRef = useRef<NodeJS.Timeout | null>(null);
 
@@ -401,13 +401,20 @@ export function useQRLogin() {
     intervalRef.current = setInterval(async () => {
       try {
         const res = await authService.loginWithQRcode({ qrCode });
-
         const message = res.data.message.toLowerCase();
 
         if (message.includes("successful")) {
           setStatus("success");
           setError(null);
+
           authStore.setAuthenticated(true);
+
+          const user = res.data.data?.user;
+          if (user) {
+            authStore.setUserId(user.id);
+            authStore.setDisplayName(user.displayName);
+            authStore.setProfileImg(user.profileImg?.imgLink ?? null);
+          }
 
           if (intervalRef.current) clearInterval(intervalRef.current);
         }
@@ -415,12 +422,12 @@ export function useQRLogin() {
         if (message.includes("expired")) {
           setStatus("expired");
           setError(null);
-
           if (intervalRef.current) clearInterval(intervalRef.current);
         }
-
       } catch (err: any) {
-        const message = (err.response?.data?.message || "Polling failed").toLowerCase();
+        const message = (
+          err.response?.data?.message || "Polling failed"
+        ).toLowerCase();
 
         if (message.includes("expired")) {
           setStatus("expired");
@@ -441,5 +448,14 @@ export function useQRLogin() {
     }
   }, []);
 
-  return { generateQR, startPolling, stopPolling, qrCode, expiresIn, status, loading, error,};
+  return {
+    generateQR,
+    startPolling,
+    stopPolling,
+    qrCode,
+    expiresIn,
+    status,
+    loading,
+    error,
+  };
 }

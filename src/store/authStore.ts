@@ -4,6 +4,7 @@ import { useSyncExternalStore } from "react";
 
 const STORAGE_KEY     = "beatza:is-authenticated";
 const PROFILE_IMG_KEY = "beatza:profile-img";
+const BANNER_IMG_KEY = "beatza:banner-img";
 const USER_ID_KEY     = "beatza:user-id";
 const DISPLAY_NAME_KEY = "beatza:display-name";
 
@@ -14,6 +15,7 @@ let hasHydrated     = false;
 let profileImgLink: string | null = null;
 let userId: string | null = null;
 let displayName: string | null = null;
+let bannerImgLink: string | null = null;
 
 const listeners = new Set<Listener>();
 
@@ -21,6 +23,7 @@ type AuthSnapshot = {
   isAuthenticated: boolean;
   hasHydrated:     boolean;
   profileImgLink:  string | null;
+  bannerImgLink: string | null;
   userId:          string | null;
   displayName:     string | null;
 };
@@ -29,6 +32,7 @@ const serverSnapshot: AuthSnapshot = {
   isAuthenticated: false,
   hasHydrated:     false,
   profileImgLink:  null,
+  bannerImgLink: null,
   userId:          null,
   displayName:     null,
 };
@@ -49,17 +53,20 @@ function syncSnapshot() {
     isAuthenticated,
     hasHydrated,
     profileImgLink,
+    bannerImgLink,
     userId,
     displayName,
   };
 
   if (
     snapshot.isAuthenticated === nextSnapshot.isAuthenticated &&
-    snapshot.hasHydrated     === nextSnapshot.hasHydrated &&
-    snapshot.profileImgLink  === nextSnapshot.profileImgLink &&
-    snapshot.userId          === nextSnapshot.userId &&
-    snapshot.displayName     === nextSnapshot.displayName
-  ) return false;
+    snapshot.hasHydrated === nextSnapshot.hasHydrated &&
+    snapshot.profileImgLink === nextSnapshot.profileImgLink &&
+    snapshot.bannerImgLink === nextSnapshot.bannerImgLink &&
+    snapshot.userId === nextSnapshot.userId &&
+    snapshot.displayName === nextSnapshot.displayName
+  )
+    return false;
 
   snapshot = nextSnapshot;
   return true;
@@ -70,6 +77,7 @@ function hydrateFromStorage() {
 
   const nextValue        = readPersistedAuthState();
   const nextImg          = window.localStorage.getItem(PROFILE_IMG_KEY);
+  const nextBannerImg    = window.localStorage.getItem(BANNER_IMG_KEY);
   const nextUserId       = window.localStorage.getItem(USER_ID_KEY);
   const nextDisplayName  = window.localStorage.getItem(DISPLAY_NAME_KEY);
   const authChanged      = isAuthenticated !== nextValue;
@@ -77,6 +85,7 @@ function hydrateFromStorage() {
 
   isAuthenticated = nextValue;
   profileImgLink  = nextImg;
+  bannerImgLink   = nextBannerImg;
   userId          = nextUserId;
   displayName     = nextDisplayName;
   hasHydrated     = true;
@@ -102,6 +111,16 @@ function setProfileImg(imgLink: string | null) {
   if (typeof window !== "undefined") {
     if (imgLink) window.localStorage.setItem(PROFILE_IMG_KEY, imgLink);
     else         window.localStorage.removeItem(PROFILE_IMG_KEY);
+  }
+  if (syncSnapshot()) emitChange();
+}
+
+function setBannerImg(imgLink: string | null) {
+  if (bannerImgLink === imgLink) return;
+  bannerImgLink = imgLink;
+  if (typeof window !== "undefined") {
+    if (imgLink) window.localStorage.setItem(BANNER_IMG_KEY, imgLink);
+    else         window.localStorage.removeItem(BANNER_IMG_KEY);
   }
   if (syncSnapshot()) emitChange();
 }
@@ -155,6 +174,10 @@ function subscribe(listener: Listener) {
       profileImgLink = event.newValue;
       if (syncSnapshot()) emitChange();
     }
+    if (event.key === BANNER_IMG_KEY) {
+      bannerImgLink = event.newValue;
+      if (syncSnapshot()) emitChange();
+    }
     if (event.key === USER_ID_KEY) {
       userId = event.newValue;
       if (syncSnapshot()) emitChange();
@@ -177,6 +200,7 @@ export const authStore = {
   getAuthenticated: () => getSnapshot(),
   setAuthenticated,
   setProfileImg,
+  setBannerImg,
   setUserId,
   setDisplayName,
 };
@@ -187,10 +211,12 @@ export function useAuthStore() {
     isAuthenticated: snapshot.isAuthenticated,
     hasHydrated:     snapshot.hasHydrated,
     profileImgLink:  snapshot.profileImgLink,
+    bannerImgLink:   snapshot.bannerImgLink,
     userId:          snapshot.userId,
     displayName:     snapshot.displayName,
     setAuthenticated,
     setProfileImg,
+    setBannerImg,
     setUserId,
     setDisplayName,
   };

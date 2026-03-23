@@ -30,7 +30,11 @@ export const authHandlers = [
     }
 
     // 200 - success
-    const existingEmails = ["test@test.com", "omar@beatza.com", "unverified@test.com"];
+    const existingEmails = [
+      "test@test.com",
+      "omar@beatza.com",
+      "unverified@test.com",
+    ];
     const exists = existingEmails.includes(body.email);
     return HttpResponse.json(
       { data: { exists }, message: "Email exists in the system" },
@@ -112,9 +116,14 @@ export const authHandlers = [
     // 403 - email not verified
     if (body.email === "unverified@test.com") {
       return HttpResponse.json(
-        { success: false, message: "Email not verified. Please verify your email before logging in.", data: {} },
-        { status: 403 }
-      )
+        {
+          success: false,
+          message:
+            "Email not verified. Please verify your email before logging in.",
+          data: {},
+        },
+        { status: 403 },
+      );
     }
 
     // 200 - success (tokens are typically set via httpOnly cookies)
@@ -365,8 +374,8 @@ export const authHandlers = [
     // 200 - success (to test add a token in your url: {reset-password?token=valid-token})
     return HttpResponse.json(
       { message: "Password reset successfully" },
-      { status: 200 }
-    )
+      { status: 200 },
+    );
   }),
 
   /* (6) */
@@ -389,89 +398,197 @@ export const authHandlers = [
       /verify-email?token=invalid-token -> Authorization failed
       /verify-email                     -> Invalid link
     */
-    const url = new URL(request.url)
-    const token = url.searchParams.get("token")
+    const url = new URL(request.url);
+    const token = url.searchParams.get("token");
 
     // 400 - missing token
     if (!token) {
       return HttpResponse.json(
         { success: false, message: "Authorization failed", data: {} },
-        { status: 401 }
-      )
+        { status: 401 },
+      );
     }
 
     // 401 - invalid token
     if (token === "invalid-token") {
       return HttpResponse.json(
         { success: false, message: "Authorization failed", data: {} },
-        { status: 401 }
-      )
+        { status: 401 },
+      );
     }
 
     // 404 - token not found
     if (token === "not-found-token") {
       return HttpResponse.json(
-        { success: false, message: "Property not found or not updated", data: {} },
-        { status: 404 }
-      )
+        {
+          success: false,
+          message: "Property not found or not updated",
+          data: {},
+        },
+        { status: 404 },
+      );
     }
 
     // 410 - link expired
     if (token === "expired-token") {
       return HttpResponse.json(
         { success: false, message: "Link is expired" },
-        { status: 410 }
-      )
+        { status: 410 },
+      );
     }
 
     // 500 - server error
     if (token === "error-token") {
       return HttpResponse.json(
         { success: false, message: "Internal server error", data: {} },
-        { status: 500 }
-      )
+        { status: 500 },
+      );
     }
 
     // 200 - success
     return HttpResponse.json(
       { message: "User Verified successfully" },
-      { status: 200 }
-    )
+      { status: 200 },
+    );
   }),
 
   /* (11) */
-  http.post(`${BASE}/api/auth/v1/resend-verification-email`, async ({ request }) => {
-    const body = (await request.json()) as { email: string }
+  http.post(
+    `${BASE}/api/auth/v1/resend-verification-email`,
+    async ({ request }) => {
+      const body = (await request.json()) as { email: string };
 
-    // 404 - email not found
-    if (!body.email || !body.email.includes("@")) {
+      // 404 - email not found
+      if (!body.email || !body.email.includes("@")) {
+        return HttpResponse.json(
+          { message: "User not found" },
+          { status: 404 },
+        );
+      }
+
+      // 500 - server error simulation
+      if (body.email === "error@test.com") {
+        return HttpResponse.json(
+          { message: "Internal server error" },
+          { status: 500 },
+        );
+      }
+
+      // 404 - unregistered email
+      const registeredEmails = ["test@test.com", "omar@beatza.com"];
+      if (!registeredEmails.includes(body.email)) {
+        return HttpResponse.json(
+          { message: "User not found" },
+          { status: 404 },
+        );
+      }
+
+      // 200 - success
       return HttpResponse.json(
-        { message: "User not found" },
-        { status: 404 }
-      )
+        { message: "Verification email sent successfully" },
+        { status: 200 },
+      );
+    },
+  ),
+  
+  /* (12) Generate QR Code for Cross-Device Login */
+  http.get(`${BASE}/api/auth/v1/cross/desktop`, async () => {
+    // 429 - rate limit
+    if (Math.random() > 0.98) {
+      return HttpResponse.json(
+        { message: "Too many requests, please try again later" },
+        { status: 429 },
+      );
     }
 
-    // 500 - server error simulation
-    if (body.email === "error@test.com") {
+    // 500 - server error
+    if (Math.random() > 0.99) {
       return HttpResponse.json(
         { message: "Internal server error" },
-        { status: 500 }
-      )
+        { status: 500 },
+      );
     }
 
-    // 404 - unregistered email
-    const registeredEmails = ["test@test.com", "omar@beatza.com"]
-    if (!registeredEmails.includes(body.email)) {
-      return HttpResponse.json(
-        { message: "User not found" },
-        { status: 404 }
-      )
-    }
-
-    // 200 - success
+    // 200 - generate QR payload
+    const pendingToken = "qr-" + Math.random().toString(36).slice(2, 10);
     return HttpResponse.json(
-      { message: "Verification email sent successfully" },
-      { status: 200 }
-    )
+      {
+        message: "QR code generated successfully",
+        data: {
+          pendingToken: {
+            qrCode: pendingToken,
+            expiresIn: 120,
+            createdAt: new Date().toISOString(),
+          },
+        },
+      },
+      { status: 200 },
+    );
+  }),
+
+  /* (13) Poll QR Login Status */
+  http.post(`${BASE}/api/auth/v1/cross/desktop/poll`, async ({ request }) => {
+    const body = (await request.json()) as { qrCode: string };
+
+    // 400 - missing qrCode
+    if (!body.qrCode) {
+      return HttpResponse.json(
+        { message: "QR code is required", status: "error" },
+        { status: 400 },
+      );
+    }
+
+    // Simulate different polling states based on qrCode value
+    // Use qrCode suffix to control behavior for testing:
+    // - qr-success-* -> successful login
+    // - qr-expired-* -> expired
+    // - qr-pending-* -> still waiting (default)
+    // - qr-error-* -> server error
+
+    if (body.qrCode.startsWith("qr-error-")) {
+      return HttpResponse.json(
+        { message: "Internal server error", status: "error" },
+        { status: 500 },
+      );
+    }
+
+    if (
+      body.qrCode.startsWith("qr-expired-") ||
+      body.qrCode.endsWith("-expired")
+    ) {
+      return HttpResponse.json(
+        { message: "QR code has expired", status: "expired" },
+        { status: 410 },
+      );
+    }
+
+    if (
+      body.qrCode.startsWith("qr-success-") ||
+      body.qrCode.endsWith("-success")
+    ) {
+      // Simulate successful login after polling
+      return HttpResponse.json(
+        {
+          message: "Login successful",
+          status: "success",
+          data: {
+            user: {
+              id: "user-123",
+              displayName: "QR Login User",
+              email: "qruser@test.com",
+              profileImg: { imgLink: "https://example.com/qr-avatar.jpg" },
+            },
+          },
+        },
+        { status: 200 },
+      );
+    }
+
+    // Default: still pending/waiting for scan
+    return HttpResponse.json(
+      { message: "Waiting for QR code scan", status: "pending" },
+      { status: 200 },
+    );
   }),
 ];
+
