@@ -1,30 +1,29 @@
 @import "tailwindcss";
 
-
 :root {
   /* soundcloud color palete (Default: Dark Mode) */
-  --bg              : #121212; /* chinese black */
-  --fg              : #ffffff; /* white smoke   */
-  --silver          : #8d8d8d;
-  --off-black       : #303030;
-  --brilliant-orange: #FF9533;
-  --crusta          : #FF7F34;
-  --papaya          : #FE6D35;
-  --inferno         : #FF5836;
-  --anger           : #FF4137;
-  --gentle-peach    : #FFE9E1;
-  --login           : rgba(255, 255, 255, 0.4);
-  --back            : rgb(48, 48, 48);
+  --bg: #121212; /* chinese black */
+  --fg: #ffffff; /* white smoke   */
+  --silver: #8d8d8d;
+  --off-black: #303030;
+  --brilliant-orange: #ff9533;
+  --crusta: #ff7f34;
+  --papaya: #fe6d35;
+  --inferno: #ff5836;
+  --anger: #ff4137;
+  --gentle-peach: #ffe9e1;
+  --login: rgba(255, 255, 255, 0.4);
+  --back: rgb(48, 48, 48);
 }
 
 [data-theme="light"] {
   /* Light Mode */
-  --bg       : #ffffff;
-  --fg       : #121212;
+  --bg: #ffffff;
+  --fg: #121212;
   --off-black: #e7e7e7;
-  --login    : rgba(0, 0, 0, 0.5);
-  --back     : rgb(233, 231, 231);
-  --silver   : #656565;
+  --login: rgba(0, 0, 0, 0.5);
+  --back: rgb(233, 231, 231);
+  --silver: #656565;
 }
 
 /* @media is used for dark mode */
@@ -41,23 +40,23 @@
      -> normally you say "bg-black"
      -> for any of colors below such as chinese black you do "bg-chinese-black"
   */
-  --color-chinese-black   : var(--bg);
-  --color-white-smoke     : var(--fg);
-  --color-login           : var(--login);
-  --color-back            : var(--back);
-  --color-silver          : var(--silver);
-  --color-off-black       : var(--off-black); 
+  --color-chinese-black: var(--bg);
+  --color-white-smoke: var(--fg);
+  --color-login: var(--login);
+  --color-back: var(--back);
+  --color-silver: var(--silver);
+  --color-off-black: var(--off-black);
   --color-brilliant-orange: var(--brilliant-orange);
-  --color-crusta          : var(--crusta);
-  --color-papaya          : var(--papaya);
-  --color-inferno         : var(--inferno);
-  --color-anger           : var(--anger);
-  --color-gentle-peach    : var(--gentle-peach);
-  --color-crusta          : var(--crusta);
-  --color-papaya          : var(--papaya);
-  --color-inferno         : var(--inferno);
-  --color-anger           : var(--anger);
-  --color-gentle-peach    : var(--gentle-peach);
+  --color-crusta: var(--crusta);
+  --color-papaya: var(--papaya);
+  --color-inferno: var(--inferno);
+  --color-anger: var(--anger);
+  --color-gentle-peach: var(--gentle-peach);
+  --color-crusta: var(--crusta);
+  --color-papaya: var(--papaya);
+  --color-inferno: var(--inferno);
+  --color-anger: var(--anger);
+  --color-gentle-peach: var(--gentle-peach);
 }
 
 body {
@@ -75,16 +74,3 @@ body {
     scrollbar-width: none;
   }
 }
-
-
-@layer utilities {
-  .no-scrollbar::-webkit-scrollbar {
-    display: none;
-  }
-  .no-scrollbar {
-    -ms-overflow-style: none;
-    scrollbar-width: none;
-  }
-}
-
-

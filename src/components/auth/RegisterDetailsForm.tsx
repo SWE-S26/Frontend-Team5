@@ -9,13 +9,16 @@ const MONTHS = [
   "July", "August", "September", "October", "November", "December",
 ];
 
-const GENDERS = ["Man", "Woman", "Max Verstappen", "Prefer not to say"];
+const GENDERS = ["Male", "Female"];
 
 const DAYS = Array.from({ length: 31 }, (_, i) => i + 1);
 const YEARS = Array.from({ length: 100 }, (_, i) => new Date().getFullYear() - i);
 
 export default function RegisterDetailsForm({
   email,
+  requireDisplayName = true,
+  submitError,
+  isSubmitting = false,
   onBack,
   onComplete,
 }: RegisterDetailsFormProps) {
@@ -29,7 +32,7 @@ export default function RegisterDetailsForm({
   const [isNameActive, setIsNameActive] = useState(displayName.length > 0);
 
   const isValid =
-    displayName.trim().length > 0 &&
+    (!requireDisplayName || displayName.trim().length > 0) &&
     month !== "" &&
     day !== "" &&
     year !== "" &&
@@ -42,46 +45,51 @@ export default function RegisterDetailsForm({
   };
 
   return (
-    <div className="w-full text-white-smoke transition-all duration-300">
-      <button
-        onClick={onBack}
-        className="mb-4 -ml-2 p-2 bg-[#303030] rounded-full transition-colors cursor-pointer"
-      >
-        <IoChevronBack size={26} />
-      </button>
+    <div data-testid="Register-Details-Form" className="w-full text-white-smoke transition-all duration-300">
+      <div className="relative flex items-center mb-6">
+        <button data-testid="back-to-login-button-details"
+          onClick={onBack}
+          className="mb-4 -ml-2 p-2 bg-[#303030] rounded-full transition-colors cursor-pointer"
+        >
+          <IoChevronBack size={26} />
+        </button>
 
-      <h1 className="text-[28px] font-bold leading-tight mb-6 text-left">
-        Tell us more about you
-      </h1>
+        <h1 className="text-[24px] ml-6 mt-3 font-semibold leading-tight mb-6 text-left">
+          Tell us more about you
+        </h1>
+      </div>
 
       <div className="space-y-4">
         {/* Display Name */}
-        <div>
-          <div className="relative bg-chinese-black border border-white/10 rounded p-3 h-16 flex flex-col justify-center">
-            <label
-              className={`absolute left-3 transition-all duration-200 text-gray-400 font-bold tracking-wider pointer-events-none ${
-                isNameActive || displayName.length > 0
-                  ? "text-[10px] top-2"
-                  : "text-[12px] top-1/2 -translate-y-1/2"
-              }`}
-            >
-              Display name
-            </label>
-            <input
-              type="text"
-              value={displayName}
-              onFocus={() => setIsNameActive(true)}
-              onBlur={() => setIsNameActive(displayName.length > 0)}
-              onChange={(e) => setDisplayName(e.target.value)}
-              className={`w-full bg-transparent border-none outline-none text-white-smoke text-base ${
-                isNameActive || displayName.length > 0 ? "pt-4" : "pt-0"
-              }`}
-            />
+        {requireDisplayName && (
+          <div>
+            <div className="relative bg-chinese-black border border-white/10 rounded p-3 h-16 flex flex-col justify-center">
+              <label
+                className={`absolute left-3 transition-all duration-200 text-gray-400 font-bold tracking-wider pointer-events-none ${
+                  isNameActive || displayName.length > 0
+                    ? "text-[10px] top-2"
+                    : "text-[12px] top-1/2 -translate-y-1/2"
+                }`}
+              >
+                Display name
+              </label>
+              <input
+                data-testid="DisplayName-input"
+                type="text"
+                value={displayName}
+                onFocus={() => setIsNameActive(true)}
+                onBlur={() => setIsNameActive(displayName.length > 0)}
+                onChange={(e) => setDisplayName(e.target.value)}
+                className={`w-full bg-transparent border-none outline-none text-white-smoke text-base ${
+                  isNameActive || displayName.length > 0 ? "pt-4" : "pt-0"
+                }`}
+              />
+            </div>
+            <p className="text-[12px] text-gray-400 mt-1.5 leading-relaxed">
+              Your display name can be anything you like. Your name or artist name are good choices.
+            </p>
           </div>
-          <p className="text-[12px] text-gray-400 mt-1.5 leading-relaxed">
-            Your display name can be anything you like. Your name or artist name are good choices.
-          </p>
-        </div>
+        )}
 
         {/* Date of Birth */}
         <div>
@@ -169,16 +177,18 @@ export default function RegisterDetailsForm({
         </div>
 
         {/* Continue Button */}
-        <button
+        {submitError ? <p className="text-red-400 text-sm">{submitError}</p> : null}
+
+        <button data-testid="continue-button-details"
           onClick={handleContinue}
-          disabled={!isValid}
+          disabled={!isValid || isSubmitting}
           className={`w-full h-12 font-bold rounded transition-all duration-200 ${
-            isValid
+            isValid && !isSubmitting
               ? "bg-white-smoke text-chinese-black cursor-pointer"
               : "bg-white-smoke/60 text-chinese-black cursor-not-allowed"
           }`}
         >
-          Continue
+          {isSubmitting ? "Continuing..." : "Continue"}
         </button>
       </div>
     </div>

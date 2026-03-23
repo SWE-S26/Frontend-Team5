@@ -1,7 +1,6 @@
 "use client";
 
 import Card from "@/components/ui/Card";
-import { time } from "console";
 import { useRef, useState } from "react";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi";
 
@@ -64,10 +63,13 @@ export default function MediaCardCarousel() {
     }, 200);
   }
   return (
-    <div className="w-full max-w-6xl py-8"> {/* OM - removed this from className (mx-auto px-4) for alignment purposes, re-add them to see yourself */}
+    <div className="sm:w-1/5 md:w-full max-w-6xl py-8">
+      {" "}
+      {/* OM - removed this from className (mx-auto px-4) for alignment purposes, re-add them to see yourself */}
       {/* Title */}
-      <h2 className="text-[22px] font-bold pb-4 text-white">Featured Tracks</h2>
-
+      <h2 className="text-[22px] font-bold pb-4 text-white-smoke">
+        Featured Tracks
+      </h2>
       <div className="relative group/carousel">
         {/* Carousel Container */}
         <div
@@ -98,9 +100,9 @@ export default function MediaCardCarousel() {
           <button
             onClick={() => scroll("right")}
             onMouseEnter={() => handleMouseEnter("right")}
-            className="flex group/right items-center justify-center absolute right-2 top-[105px] -translate-y-1/2 w-[33px] h-[33px] bg-[#303030] rounded-full z-10 cursor-pointer"
+            className="flex group/right items-center justify-center absolute right-2 top-[105px] -translate-y-1/2 w-[33px] h-[33px] bg-off-black rounded-full z-10 cursor-pointer"
           >
-            <HiOutlineChevronRight className="text-white text-l group-hover/right:text-[#838383]" />
+            <HiOutlineChevronRight className="text-white-smoke text-l group-hover/right:text-[#838383]" />
           </button>
         )}
 
@@ -109,9 +111,9 @@ export default function MediaCardCarousel() {
           <button
             onClick={() => scroll("left")}
             onMouseEnter={() => handleMouseEnter("left")}
-            className="flex group/left items-center justify-center absolute left-2 top-[105px] -translate-y-1/2 w-[33px] h-[33px] bg-[#303030] rounded-full z-10 cursor-pointer"
+            className="flex group/left items-center justify-center absolute left-2 top-[105px] -translate-y-1/2 w-[33px] h-[33px] bg-off-black rounded-full z-10 cursor-pointer"
           >
-            <HiOutlineChevronLeft className="text-white text-l group-hover/left:text-[#838383]" />
+            <HiOutlineChevronLeft className="text-white-smoke text-l group-hover/left:text-[#838383]" />
           </button>
         )}
       </div>
