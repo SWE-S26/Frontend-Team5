@@ -74,4 +74,12 @@ body {
     scrollbar-width: none;
   }
 }
-@plugin 'tailwind-scrollbar-hide';
+
+.scrollbar-hide {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
+
+.scrollbar-hide::-webkit-scrollbar {
+  display: none;
+}
