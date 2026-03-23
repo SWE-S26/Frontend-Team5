@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import ThemeProvider from "@/components/theme/ThemeProvider"
 import MockProvider from "@/components/MSWProvider"
 import AuthGoogle from "@/components/auth/AuthGoogle"
+import MSWProvider from '@/components/MSWProvider'
 import "./globals.css";
 
 const inter = Inter({
@@ -33,8 +34,10 @@ export default function RootLayout({
         <MockProvider>
           <ThemeProvider>
             <AuthGoogle />
+            <MSWProvider>
             {children}
-          </ThemeProvider>
+            </MSWProvider>
+        </ThemeProvider>
         </MockProvider>
         <div className="h-12"/>
       </body>
