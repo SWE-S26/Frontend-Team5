@@ -64,7 +64,6 @@ const ProfilePage = ({ params }: Props) => {
 
   return (
     <div>
-
       <ProfileHeader />
       <div className="flex items-center justify-between mb-4">
         <TabsNavbar tabs={profileTabs} activeTab={activeTab} onTabChange={setActiveTab}
@@ -142,9 +141,8 @@ const ProfilePage = ({ params }: Props) => {
 
 
       
-
     </div>
-  );
-};
+  )
+}
 
-export default ProfilePage;
+export default ProfilePage
