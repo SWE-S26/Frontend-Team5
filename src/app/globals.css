@@ -74,3 +74,4 @@ body {
     scrollbar-width: none;
   }
 }
+@plugin 'tailwind-scrollbar-hide';

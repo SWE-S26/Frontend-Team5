@@ -1,4 +1,4 @@
-import { Message, Conversation, SendMessagePayload } from '@/types/messageTypes'
+import { Message, Conversation, SendMessagePayload } from '@/types/message.types'
 
 export async function getConversations(): Promise<Conversation[]> {
   const res = await fetch('/api/message')
@@ -38,3 +38,5 @@ export async function archiveConversation(userId: string): Promise<void> {
   const res = await fetch(`/api/message/conversation/${userId}/archive`, { method: 'PATCH' })
   if (!res.ok) throw new Error('Failed to archive conversation')
 }
+
+

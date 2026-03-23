@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -8,7 +8,7 @@ import { useRouter } from "next/navigation";
 import Dropdown, { DropdownItem } from "@/components/ui/Dropdown";
 import Button from "@/components/ui/Button";
 import AuthModal from "@/components/auth/AuthModal";
-import ViewMessages from "@/components/messages/ViewMessages";
+import ViewMessages from "@/components/messages/messageSidebar/ViewMessages";
 import KeyboardShortcutsModal from "@/app/(main)/(more-dropdown)/keyboardShortcuts/keyboardShortcutsModal";
 
 import { useLogout } from "@/hooks/useAuth";
@@ -41,6 +41,17 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isMessagesOpen,  setIsMessagesOpen]  = useState(false);
+
+  const messagesRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+  const handleClickOutside = (e: MouseEvent) => {
+    if (messagesRef.current && !messagesRef.current.contains(e.target as Node)) {
+      setIsMessagesOpen(false);
+    }
+  };
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   useEffect(() => {
     if (success) router.push("/");
@@ -119,16 +130,18 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
             <SlBell />
           </button>
 
-          <button data-testid="messages" className={ICON_BTN_CLASS} onClick={() => setIsMessagesOpen((prev) => !prev)}>
-            <div className="relative">
-              <GrMailOption />
-              {isMessagesOpen && (
-                <div className="absolute right-0 top-8 z-15 w-100">
-                  <ViewMessages />
-                </div>
-              )}
-            </div>
-          </button>
+          <div className="relative" ref={messagesRef}>
+            <button data-testid="messages" className={ICON_BTN_CLASS} onClick={() => setIsMessagesOpen((prev) => !prev)}>
+              <div className="relative">
+                <GrMailOption />
+                {isMessagesOpen && (
+                  <div className="absolute right-0 top-8 z-15 w-100 h-20-">
+                    <ViewMessages />
+                  </div>
+                )}
+              </div>
+            </button>
+          </div>
         </>
       ) : (
         <>
