@@ -20,7 +20,7 @@ export default function PlayerNextUp() {
   }
 
   return (
-    <div className="flex items-center gap-4 sm:gap-6 text-white flex-shrink-0">
+    <div className="flex items-center gap-4 sm:gap-6 text-white shrink-0">
 
       <button onClick={handleLike} className={`${liked ? "text-anger" : "text-white"} cursor-pointer hover:text-silver`}>
         <IoIosHeart size={16} />

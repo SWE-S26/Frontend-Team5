@@ -1,6 +1,6 @@
     import { useState, useEffect } from 'react'
-    import { Message } from '@/types/messageTypes'
-    import { getConversation, markAsRead } from '@/services/messageService'
+    import { Message } from '@/types/message.types'
+    import { getConversation, markAsRead } from '@/services/message.service'
 
     export const useMessages = (userId: string | null) => {
     const [messages, setMessages] = useState<Message[]>([])
@@ -16,5 +16,9 @@
         })
     }, [userId])
 
-    return { messages }
+    const addMessage = (message: Message) => {
+        setMessages((prev) => [...prev, message])
+        }
+
+    return { messages, addMessage }
     }

@@ -1,26 +1,35 @@
 'use client'
-import { useState, useEffect } from 'react'
-import NewMessageButton from './NewMessageButton'
-import NewMessagePopUP from './NewMessagePopUP'
+import { useState} from 'react'
+import NewMessagePopUP from '../NewMessagePopUP'
 import MessagePerview from './MessagePerview'
 import { useConversations } from '@/hooks/messages/useConversations'
-const MessageSidebar = () => {
+import { Conversation } from '@/types/message.types'
+import Button from '@/components/ui/Button'
+
+interface MessageSidebarProps {
+  onSelect: (userId: string) => void
+  selectedUserId: string | null
+  conversations: Conversation[]
+  markAsRead: (userId: string) => void
+}
+const MessageSidebar = ({ onSelect, selectedUserId, conversations, markAsRead }: MessageSidebarProps) => {
     const [isOpen, setIsOpen] = useState(false)
-    const [selectedId, setSelectedId] = useState<string | null>(null)
-    const { conversations, markAsRead } = useConversations()
+    
 
     const handleSelect = (userId: string) => {
-        setSelectedId(userId)
         markAsRead(userId)
+        onSelect(userId)
     }
-
+    
 
     return (
         <>
             <div className='flex flex-col w-full px-2 py-3'>
                 <div className='flex justify-between ml-2 mb-4'>
                     <p className='text-3xl font-bold text-white-smoke'>Messages</p>
-                    <NewMessageButton onClick={() => setIsOpen(true)} />
+                    <Button className="bg-white-smoke text-chinese-black cursor-pointer " onClick={() => setIsOpen(true)}>
+                        New
+                    </Button>
                 </div>
                 <NewMessagePopUP isOpen={isOpen} onClose={() => setIsOpen(false)} />
                 {conversations.map((conversation) => (
@@ -32,7 +41,7 @@ const MessageSidebar = () => {
                         lastMessage={conversation.lastMessage}
                         lastMessageAt={conversation.lastMessageAt}
                         isUnread={conversation.isUnread}
-                        isActive={selectedId === conversation.userId}
+                        isActive={selectedUserId === conversation.userId}
                         onClick={() => handleSelect(conversation.userId)}
                     />
                 ))}

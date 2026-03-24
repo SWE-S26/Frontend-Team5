@@ -1,6 +1,6 @@
     import { useState, useEffect } from 'react'
-    import { Conversation } from '@/types/messageTypes'
-    import { getConversations } from '@/services/messageService'
+    import { Conversation } from '@/types/message.types'
+    import { getConversations } from '@/services/message.service'
 
     export const useConversations = () => {
     const [conversations, setConversations] = useState<Conversation[]>([])

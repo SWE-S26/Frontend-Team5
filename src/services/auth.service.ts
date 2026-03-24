@@ -12,9 +12,14 @@ import {
   VerifyEmailRequest, VerifyEmailResponse,
   ResendVerificationEmailRequest, ResendVerificationEmailResponse,
   GenerateQRcodeResponse, LoginWithQRcodeRequest, LoginWithQRcodeResponse,
+  RefreshTokenResponse
 } from "@/types/auth.types";
 
 export const authService = {
+
+  refreshToken: () =>
+    api.get<RefreshTokenResponse>("/api/auth/v1/refresh-token"),
+
   /* (1) */
   findEmail: (data: FindEmailRequest) =>
     api.post<FindEmailResponse>("/api/auth/v1/find-email", data),

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState, useMemo } from "react";
+import { useEffect, useState, useMemo, useRef } from "react";
 import Link from "next/link";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
@@ -8,10 +8,11 @@ import { useRouter } from "next/navigation";
 import Dropdown, { DropdownItem } from "@/components/ui/Dropdown";
 import Button from "@/components/ui/Button";
 import AuthModal from "@/components/auth/AuthModal";
-import ViewMessages from "@/components/messages/ViewMessages";
+import ViewMessages from "@/components/messages/messageSidebar/ViewMessages";
 import KeyboardShortcutsModal from "@/app/(main)/(more-dropdown)/keyboardShortcuts/keyboardShortcutsModal";
 
 import { useLogout } from "@/hooks/useAuth";
+import { useAuthStore } from "@/store/authStore";
 
 import { MdOutlineExpandMore } from "react-icons/md";
 import { SlBell } from "react-icons/sl";
@@ -35,17 +36,31 @@ const ICON_BTN_CLASS = "text-silver text-xl font-bold hover:text-white-smoke tra
 export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   const router = useRouter();
   const { logout, loading, success } = useLogout();
+  const { profileImgLink, userId } = useAuthStore();
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false);
   const [isMessagesOpen,  setIsMessagesOpen]  = useState(false);
 
+  const messagesRef = useRef<HTMLDivElement>(null);
+  useEffect(() => {
+  const handleClickOutside = (e: MouseEvent) => {
+    if (messagesRef.current && !messagesRef.current.contains(e.target as Node)) {
+      setIsMessagesOpen(false);
+    }
+  };
+  document.addEventListener("mousedown", handleClickOutside);
+  return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
+
   useEffect(() => {
     if (success) router.push("/");
   }, [success, router]);
 
+  const profileTarget = userId ? `/profile/${userId}` : "/home";
+
   const profileItems: DropdownItem[] = useMemo(() => [
-    { label: "Profile",        icon: <FaUser />,                 onClick: () => router.push("/profile/1")         },
+    { label: "Profile",        icon: <FaUser />,                 onClick: () => router.push(profileTarget), disabled: !userId },
     { label: "Likes",          icon: <FaHeart />,                onClick: () => router.push("/library/likes")     },
     { label: "Playlists",      icon: <BiSolidCopy />,            onClick: () => router.push("/library/playlists") },
     { label: "Stations",       icon: <HiMiniSignal />,           onClick: () => router.push("/library/stations")  },
@@ -55,7 +70,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
     { label: "Tracks",         icon: <PiWaveformBold />,         onClick: () => router.push("/artists")           },
     { label: "Insights",       icon: <ImStatsBars />,            onClick: () => console.log("done")               },
     { label: "Distribute",     icon: <BsArrowsExpandVertical />, onClick: () => router.push("/artistpro")         },
-  ], [router]);
+  ], [router, profileTarget, userId]);
 
   const moreItems: DropdownItem[] = useMemo(() => [
     { label: "About us",           onClick: () => console.log("done")          },
@@ -83,7 +98,6 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
 
   return (
     <div className="flex items-center gap-5.5 ml-5 mb-1">
-
       {isLoggedIn ? (
         <>
           <Link data-testid="try_artist_pro" href="/artistpro" className="text-anger text-sm py-2 font-bold hover:text-white-smoke transition-all duration-300">
@@ -99,7 +113,13 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
           <Dropdown testId="profile_dropdown" width="w-40" position="left-0"
             trigger={
               <button data-testid="profile_button" className="text-silver font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2 text-4xl cursor-pointer">
-                <Image src="/profpic.jpg" alt="Profile" width={26} height={26} className="rounded-full w-6.5 h-6.5 object-cover" />
+                <Image
+                  src={profileImgLink || "/profpic.jpg"}
+                  alt="Profile"
+                  width={26}
+                  height={26}
+                  className="rounded-full w-6.5 h-6.5 object-cover"
+                />
                 <MdOutlineExpandMore />
               </button>
             }
@@ -110,16 +130,18 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
             <SlBell />
           </button>
 
-          <button data-testid="messages" className={ICON_BTN_CLASS} onClick={() => setIsMessagesOpen((prev) => !prev)}>
-            <div className="relative">
-              <GrMailOption />
-              {isMessagesOpen && (
-                <div className="absolute right-0 top-8 z-15 w-100">
-                  <ViewMessages />
-                </div>
-              )}
-            </div>
-          </button>
+          <div className="relative" ref={messagesRef}>
+            <button data-testid="messages" className={ICON_BTN_CLASS} onClick={() => setIsMessagesOpen((prev) => !prev)}>
+              <div className="relative">
+                <GrMailOption />
+                {isMessagesOpen && (
+                  <div className="absolute right-0 top-8 z-15 w-100 h-20-">
+                    <ViewMessages />
+                  </div>
+                )}
+              </div>
+            </button>
+          </div>
         </>
       ) : (
         <>
@@ -146,7 +168,6 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
 
       <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
       <KeyboardShortcutsModal isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
-
     </div>
   );
 }

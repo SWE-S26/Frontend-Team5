@@ -8,7 +8,7 @@ import { usePathname, useRouter } from "next/navigation";
 import AuthModal from "@/components/auth/AuthModal";
 import Button from "@/components/ui/Button";
 import MiniPlayer from "@/components/layout/player/MiniPlayer";
-import ViewMessages from "@/components/messages/ViewMessages";
+import ViewMessages from "@/components/messages/messageSidebar/ViewMessages";
 import { useLogout } from "@/hooks/useAuth";
 
 import { RxHamburgerMenu } from "react-icons/rx";
