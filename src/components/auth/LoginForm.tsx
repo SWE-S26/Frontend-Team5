@@ -269,6 +269,30 @@ export default function LoginForm({
     }
   }, [loginError])
 
+  const isPasswordStep = step === "password";
+  const isBusy = (isPasswordStep ? loginLoading : emailLoading) || isNavigating;
+  const handleSubmit = useCallback(
+    async (event: React.FormEvent<HTMLFormElement>) => {
+      event.preventDefault();
+
+      const currentStep = stepRef.current;
+      const currentlyBusy =
+        currentStep === "password"
+          ? loginLoadingRef.current
+          : emailLoadingRef.current;
+
+      if (currentlyBusy) return;
+
+      if (currentStep === "password") {
+        await handleContinueFromPassword();
+        return;
+      }
+
+      await handleContinueFromEmail();
+    },
+    [handleContinueFromEmail, handleContinueFromPassword],
+  );
+
   if (step === "validation") {
     return (
       <DetailsValidationForm
@@ -393,30 +417,6 @@ export default function LoginForm({
     );
   }
 
-  const isPasswordStep = step === "password";
-  const isBusy = (isPasswordStep ? loginLoading : emailLoading) || isNavigating;
-  const handleSubmit = useCallback(
-    async (event: React.FormEvent<HTMLFormElement>) => {
-      event.preventDefault();
-
-      const currentStep = stepRef.current;
-      const currentlyBusy =
-        currentStep === "password"
-          ? loginLoadingRef.current
-          : emailLoadingRef.current;
-
-      if (currentlyBusy) return;
-
-      if (currentStep === "password") {
-        await handleContinueFromPassword();
-        return;
-      }
-
-      await handleContinueFromEmail();
-    },
-    [handleContinueFromEmail, handleContinueFromPassword],
-  );
-
   return (
     <div data-testid="Login-Form" className="w-full text-white-smoke transition-all duration-300">
       <div className="relative flex items-center mb-6">
@@ -485,7 +485,7 @@ export default function LoginForm({
         </div>
       )}
 
-      <form className="space-y-4" onSubmit={handleSubmit}>
+      <form className="space-y-4" onSubmit={handleSubmit} noValidate>
         <div
           className={`relative transition-all duration-300 rounded p-3 h-16 flex flex-col justify-center ${
             isPasswordStep

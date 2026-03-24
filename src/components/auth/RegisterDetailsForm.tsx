@@ -41,7 +41,11 @@ export default function RegisterDetailsForm({
   const handleContinue = () => {
     if (!isValid) return;
     const dob = `${year}-${String(MONTHS.indexOf(month) + 1).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
-    onComplete({ displayName: displayName.trim(), dob, gender });
+    onComplete({
+      displayName: requireDisplayName ? displayName.trim() : "",
+      dob,
+      gender,
+    });
   };
 
   return (
