@@ -22,11 +22,19 @@
         )
     }
 
+    const markAsUnread = (userId: string) => {
+            setConversations(prev =>
+                prev.map(c => c.userId === userId ? { ...c, isUnread: true } : c)
+            )
+        }
+
+
+
     const archiveConversation = (userId: string) => {
         setConversations((prev) =>
         prev.filter((c) => c.userId !== userId)
         )
     }
 
-    return { conversations, markAsRead, archiveConversation }
+    return { conversations, markAsRead, markAsUnread, archiveConversation }
     }

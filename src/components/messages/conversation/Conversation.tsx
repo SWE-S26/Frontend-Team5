@@ -8,13 +8,15 @@ interface ConversationProps {
     userId: string
     username: string
     avatarUrl: string
+    markAsUnread: (userId: string) => void
+    markAsRead: (userId: string) => void
 }
-const Conversation = ({ userId, username, avatarUrl }: ConversationProps) => {
+const Conversation = ({ userId, username, avatarUrl, markAsUnread, markAsRead }: ConversationProps) => {
     const { messages , addMessage } = useMessages(userId)
     const MY_ID = 'me-123'
     return (
         <div className="flex flex-col h-screen">
-            <ConversationHeader username={username} userId={userId} />
+            <ConversationHeader username={username} userId={userId} markAsUnread={markAsUnread} markAsRead={markAsRead  }/>
             <div className="flex-1 overflow-y-auto scrollbar-hide ">
             {messages.map((message) => (
                 <MessageBubble

@@ -10,7 +10,7 @@ import { useState , useEffect} from 'react'
 
 const page = () => {
   const [isOpen, setIsOpen] = useState(false)
-  const { conversations, markAsRead } = useConversations()
+  const { conversations, markAsRead , markAsUnread } = useConversations()
   const [selectedUserId, setSelectedUserId] = useState<string | null>(null)
   const selectedConversation = conversations.find(c => c.userId === selectedUserId)
 
@@ -43,6 +43,8 @@ const page = () => {
                   userId={selectedConversation.userId}
                   username={selectedConversation.username}
                   avatarUrl={selectedConversation.avatarUrl}
+                  markAsUnread={markAsUnread}
+                  markAsRead={markAsRead}
                 />
               ) : (
                 <>
