@@ -131,8 +131,8 @@ export default function LoginForm({
       if (urlClient === "android") {
         window.localStorage.setItem("beatza:auth-client", "Android");
         const payload = result?.data ?? result ?? {};
-        const accessToken = payload.accessToken ?? payload.authToken ?? payload.token;
-        const refreshToken = payload.refreshToken ?? payload.refresh_token;
+        const accessToken = payload.accessToken;
+        const refreshToken = payload.refreshToken;
 
         const params = new URLSearchParams();
         if (accessToken) params.set("accessToken", String(accessToken));
