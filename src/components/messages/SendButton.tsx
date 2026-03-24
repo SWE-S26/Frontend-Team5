@@ -1,7 +1,7 @@
 
 'use client'
 interface SendButtonProps {
-  onClick: () => void
+  onClick?: () => void
 }
 const SendButton = ({ onClick }: SendButtonProps) => {
   return (
