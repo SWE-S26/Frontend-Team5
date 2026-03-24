@@ -14,6 +14,9 @@
   --gentle-peach: #ffe9e1;
   --login: rgba(255, 255, 255, 0.4);
   --back: rgb(48, 48, 48);
+  --progress-track-color: #4f4f4f;
+  --volume1:#1a1a1a;
+  --volume-bar:#3a3a3a;
 }
 
 [data-theme="light"] {
@@ -24,6 +27,9 @@
   --login: rgba(0, 0, 0, 0.5);
   --back: rgb(233, 231, 231);
   --silver: #656565;
+  --progress-track-color: #c7c7c7;
+  --volume1:white;
+  --volume-bar: #c7c7c7;
 }
 
 /* @media is used for dark mode */
@@ -40,6 +46,7 @@
      -> normally you say "bg-black"
      -> for any of colors below such as chinese black you do "bg-chinese-black"
   */
+  
   --color-chinese-black: var(--bg);
   --color-white-smoke: var(--fg);
   --color-login: var(--login);
@@ -57,6 +64,10 @@
   --color-inferno: var(--inferno);
   --color-anger: var(--anger);
   --color-gentle-peach: var(--gentle-peach);
+
+  --color-progress-track: var(--progress-track);
+  --color-volume1: var(--volume1);
+  --color-volume-bar: var(--volume-bar);
 }
 
 body {
