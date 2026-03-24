@@ -15,26 +15,26 @@ export default function PlayerNextUp() {
     setLiked(newLiked)
     if (newLiked) {
       setShowToast(true)
-      setTimeout(() => setShowToast(false), 3000)
+      setTimeout(() => setShowToast(false), 6000)
     }
   }
 
   return (
-    <div className="flex items-center gap-4 sm:gap-6 text-white shrink-0">
+    <div className="flex items-center gap-4 sm:gap-6 text-white-smoke shrink-0">
 
-      <button onClick={handleLike} className={`${liked ? "text-anger" : "text-white"} cursor-pointer hover:text-silver`}>
+      <button onClick={handleLike} className={`${liked ? "text-anger" : "text-white-smoke"} cursor-pointer hover:text-silver`}>
         <IoIosHeart size={16} />
       </button>
 
       {/* Toast */}
-      <div className={`fixed top-23 right-6 border border-silver bg-[#2c2c2c] text-white px-2 py-2 rounded shadow-lg flex items-center gap-3 transform transition-all duration-300 ease-out ${showToast ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8 pointer-events-none"}`}>
+      <div className={`fixed top-23 right-6 border border-silver bg-off-black text-white-smoke px-2 py-2 rounded shadow-lg flex items-center gap-3 transform transition-all duration-300 ease-out ${showToast ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8 pointer-events-none"}`}>
         <img
           src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF7MG32vJAUlDYjqVgOEN8EQp1MFWX7_dqAw&s"
           className="w-15 h-15 rounded object-cover"
         />
         <div>
           <p className="font-semibold">ياه - تامر عاشور - Tamer Ashour</p>
-          <p className="text-sm text-gray-400">was saved to <span className="font-semibold text-white">your Library.</span></p>
+          <p className="text-sm text-gray-400">was saved to <span className="font-semibold text-white-smoke">your Library.</span></p>
         </div>
       </div>
 
@@ -74,7 +74,7 @@ export default function PlayerNextUp() {
           <line x1="2" y1="14" x2="24" y2="14" strokeWidth="2.5" strokeLinecap="round" />
           <line x1="2" y1="20" x2="24" y2="20" strokeWidth="2.5" strokeLinecap="round" />
         </svg>
-        <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-2 py-[2px] bg-[#f3f3f3] text-black text-xs border border-gray-400 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-50">
+        <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-2 py-[2px] bg-[#f3f3f3] text-chinese-black text-xs border border-gray-400 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-50">
           Next Up
         </span>
       </button>

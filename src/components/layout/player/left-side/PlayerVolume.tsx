@@ -12,19 +12,19 @@ export default function PlayerVolume({ volume, setVolume }: Props) {
 
         <div className="absolute bottom-full left-1/2 -translate-x-1/2 z-50 opacity-0 group-hover:opacity-100 pointer-events-none group-hover:pointer-events-auto transition-opacity duration-200 pb-3">
 
-            <div className="bg-[#1a1a1a] border border-white/10 rounded px-4 py-4 flex flex-col items-center shadow-2xl">
+            <div className="bg-volume1 border border-white-smoke/10 rounded px-4 py-4 flex flex-col items-center shadow-2xl">
             
                 <div className="relative h-28 w-4 flex items-center justify-center">
              
-                    <div className="absolute w-[4px] h-full bg-[#3a3a3a] rounded-full" />
+                    <div className="absolute w-[4px] h-full bg-off-black rounded-full" />
 
                     <div
-                    className="absolute bottom-0 w-[4px] bg-white rounded-full transition-all"
+                    className="absolute bottom-0 w-[4px] bg-white-smoke rounded-full transition-all"
                     style={{ height: `${volume}%` }}
                     />
 
                     <div
-                    className="absolute w-4 h-4 bg-black rounded-full border border-white shadow-md pointer-events-none transition-all"
+                    className="absolute w-4 h-4 bg-chinese-black rounded-full border border-white-smoke shadow-md pointer-events-none transition-all"
                     style={{ bottom: `calc(${volume}% - 7px)` }}
                     />
 
@@ -44,7 +44,7 @@ export default function PlayerVolume({ volume, setVolume }: Props) {
             </div>
 
             <div className="flex justify-center">
-            <div className="w-3 h-3 bg-[#1a1a1a] rotate-45 -mt-1.5" />
+            <div className="w-3 h-3 bg-volume1 rotate-45 -mt-1.5" />
             </div>
 
         </div>

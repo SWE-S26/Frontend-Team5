@@ -11,7 +11,7 @@ export default function PlayerTrackInfo() {
       <span className="text-silver text-sm font-bold truncate whitespace-nowrap overflow-hidden">
         Aseem
       </span>
-      <span className="text-white text-sm truncate whitespace-nowrap overflow-hidden">
+      <span className="text-white-smoke text-sm truncate whitespace-nowrap overflow-hidden">
         باه - تامر عاشور - Tamer Ashour
       </span>
     </div>

@@ -34,12 +34,12 @@ const [repeatMode, setRepeatMode] = useState(0)
 
                 <button
                 onClick={togglePlay}
-                className="relative group p-2 rounded-full bg-white transition flex items-center justify-center cursor-pointer hover:text-silver"
+                className="relative group p-2 rounded-full bg-white-smoke transition flex items-center justify-center cursor-pointer hover:text-silver"
                 >
                 {isPlaying ?
-                    <GiPauseButton className="w-4 h-4 text-black hover:text-silver ml-px" />
+                    <GiPauseButton className="w-4 h-4 text-chinese-black hover:text-silver ml-px" />
                     :
-                    <IoIosPlay className="w-4 h-4 text-black hover:text-silver ml-px" />
+                    <IoIosPlay className="w-4 h-4 text-chinese-black hover:text-silver ml-px" />
                 }
                 </button>
 
@@ -73,7 +73,7 @@ const [repeatMode, setRepeatMode] = useState(0)
                                         points="14,1 17,4 14,7"
                                         />
                                     </svg>
-                                    <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-anger text-black text-[6px]  flex items-center justify-center leading-none pointer-events-none">
+                                    <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-anger text-chinese-black text-[6px]  flex items-center justify-center leading-none pointer-events-none">
                                         1
                                     </span>
                                     </div> :
@@ -83,7 +83,7 @@ const [repeatMode, setRepeatMode] = useState(0)
                                     <polyline strokeLinecap="round" strokeLinejoin="round" points="14,1 17,4 14,7" />
                                     </svg> :
                 
-                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 26 26" className="w-5 h-5 text-white hover:text-silver fill-none stroke-current stroke-2 -scale-y-100 -scale-x-100">
+                                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="-1 -1 26 26" className="w-5 h-5 text-white-smoke hover:text-silver fill-none stroke-current stroke-2 -scale-y-100 -scale-x-100">
                                     <path strokeLinecap="round" strokeLinejoin="round" 
                                         d="M17 4h-7a7 7 0 000 14h7a7 7 0 000-14z" />
                                     <polyline strokeLinecap="round" strokeLinejoin="round" points="14,1 17,4 14,7" />

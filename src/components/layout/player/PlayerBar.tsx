@@ -68,7 +68,7 @@ const handleVolume = (v: number) => {
 
   return (
 
-    <div className="hidden md:flex justify-center fixed bottom-0 w-full h-11.75 bg-[#3a3a3a] z-1000">
+    <div className="hidden md:flex justify-center fixed bottom-0 w-full h-11.75 bg-[var(--off-black)] z-1000">
  
       <div className="flex items-center w-full max-w-302 justify-between">
         <audio

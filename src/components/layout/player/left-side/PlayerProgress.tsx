@@ -46,7 +46,7 @@ export default function PlayerProgress({
       border-radius: 1px;
       outline: none;
       cursor: pointer;
-      background: linear-gradient(to right, #f95a16 var(--progress), #4f4f4f var(--progress));
+      background: linear-gradient(to right, var(--inferno) var(--progress), var(--progress-track-color) var(--progress));
     }
     .progress-range::-webkit-slider-thumb {
       -webkit-appearance: none;
@@ -54,8 +54,8 @@ export default function PlayerProgress({
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: black;
-      border: 1px solid #f95a16;
+      background: var(--bg);
+      border: 1px solid var(--inferno);
       opacity: 0;
       transition: opacity 0.2s;
       cursor: pointer;
@@ -64,8 +64,8 @@ export default function PlayerProgress({
       width: 10px;
       height: 10px;
       border-radius: 50%;
-      background: black;
-      border: 1px solid #f95a16;
+      background: var(--bg);
+      border: 1px solid var(--inferno);
       border: none;
       opacity: 0;
       transition: opacity 0.2s;
