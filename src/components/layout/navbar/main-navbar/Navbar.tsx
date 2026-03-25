@@ -1,25 +1,26 @@
-"use client";
+"use client"
 
-import { useAuthStore } from "@/store/authStore";
+import { useAppSelector } from "@/store/hooks"
 
-import NavbarLeft from "./NavbarLeft";
-import NavbarCenter from "./NavbarCenter";
-import NavbarRight from "./NavbarRight";
-import MobileNavbar from "./MobileNavbar";
+import NavbarLeft from "./NavbarLeft"
+import NavbarCenter from "./NavbarCenter"
+import NavbarRight from "./NavbarRight"
+import MobileNavbar from "./MobileNavbar"
 
 interface NavbarProps {
-  className?: string;
+  className?: string
 }
 
 export default function Navbar({ className }: NavbarProps) {
-  const { isAuthenticated, hasHydrated } = useAuthStore();
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+  const hasHydrated = useAppSelector((state) => state.auth.hasHydrated)
 
   if (!hasHydrated) {
     return (
       <div data-testid="Navbar" className={`flex justify-center w-full ${className}`}>
         <div className="flex items-center pt-1 w-full max-w-302 h-13" />
       </div>
-    );
+    )
   }
 
   return (
@@ -44,5 +45,5 @@ export default function Navbar({ className }: NavbarProps) {
       </div>
 
     </div>
-  );
+  )
 }
