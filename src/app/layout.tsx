@@ -3,6 +3,7 @@ import { Inter } from "next/font/google";
 import ThemeProvider from "@/components/theme/ThemeProvider"
 import MockProvider from "@/components/MSWProvider"
 import AuthGoogle from "@/components/auth/AuthGoogle"
+import ReduxProvider from "@/components/ReduxProvider"
 import "./globals.css";
 
 const inter = Inter({
@@ -14,7 +15,7 @@ export const metadata: Metadata = {
   title: "My BeatZa App",
   description: "Craving Tunes",
   icons: {
-    icon: "/beatza.png",
+    icon: "/app-logo/beatza.png",
   },
 };
 
@@ -30,12 +31,14 @@ export default function RootLayout({
       suppressHydrationWarning
     >
       <body className="antialiased">
-        <MockProvider>
-          <ThemeProvider>
-            <AuthGoogle />
-            {children}
-          </ThemeProvider>
-        </MockProvider>
+        <ReduxProvider>
+          <MockProvider>
+            <ThemeProvider>
+              <AuthGoogle />
+              {children}
+            </ThemeProvider>
+          </MockProvider>
+        </ReduxProvider>
         <div className="h-12"/>
       </body>
     </html>

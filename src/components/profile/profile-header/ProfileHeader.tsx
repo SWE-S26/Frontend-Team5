@@ -8,13 +8,23 @@ import Button from "@/components/ui/Button"
 import AvatarUpload from "./AvatarUpload"
 import CoverPhotoUpload from "./CoverPhotoUpload"
 import { useGetProfile } from "@/hooks/useProfile"
-import { authStore, useAuthStore } from "@/store/authStore"
+import { useAppSelector, useAppDispatch } from "@/store/hooks"
+import { setProfileImgLink, setBannerImgLink } from "@/store/slices/authSlice"
 
 export default function ProfileHeader() {
+  const dispatch = useAppDispatch()
   const params = useParams()
   const rawUserId = params.username as string
   const userId = rawUserId && rawUserId !== "null" && rawUserId !== "undefined" ? rawUserId : ""
-  const { userId: authUserId, profileImgLink, bannerImgLink, displayName, hasHydrated } = useAuthStore()
+
+  // reading the logged-in user's data from Redux
+  const authUserId = useAppSelector((state) => state.auth.userId)
+  const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
+  const bannerImgLink = useAppSelector((state) => state.auth.bannerImgLink)
+  const displayName = useAppSelector((state) => state.auth.displayName)
+  const hasHydrated = useAppSelector((state) => state.auth.hasHydrated)
+
+  // true when viewing someone else's profile — needs an API fetch
   const shouldFetchProfile = Boolean(userId && authUserId && authUserId !== userId)
 
   const { getProfile, loading, error, profile } = useGetProfile()
@@ -31,22 +41,20 @@ export default function ProfileHeader() {
 
   useEffect(() => {
     if (!hasHydrated) return
-    if (bannerImgLink) {
-      setCoverImage(bannerImgLink)
-    }
+    if (bannerImgLink) setCoverImage(bannerImgLink)
   }, [hasHydrated, bannerImgLink])
 
   useEffect(() => {
     if (!profile) return
     if (profile.profileImgLink) {
       setAvatarImage(profile.profileImgLink)
-      authStore.setProfileImg(profile.profileImgLink)
+      dispatch(setProfileImgLink(profile.profileImgLink))
     }
     if (profile.bannerImgLink) {
       setCoverImage(profile.bannerImgLink)
-      authStore.setBannerImg(profile.bannerImgLink)
+      dispatch(setBannerImgLink(profile.bannerImgLink))
     }
-  }, [profile])
+  }, [profile, dispatch])
 
   useEffect(() => {
     if (!profileImgLink) return
@@ -55,12 +63,13 @@ export default function ProfileHeader() {
 
   useEffect(() => {
     if (!avatarImage) return
-    authStore.setProfileImg(avatarImage)
-  }, [avatarImage])
+    dispatch(setProfileImgLink(avatarImage))
+  }, [avatarImage, dispatch])
 
   useEffect(() => {
-    authStore.setBannerImg(avatarImage)
-  }, [avatarImage])
+    // keeps banner in sync when avatar changes
+    dispatch(setBannerImgLink(avatarImage ?? null))
+  }, [avatarImage, dispatch])
 
   useEffect(() => {
     if (!avatarImage) return

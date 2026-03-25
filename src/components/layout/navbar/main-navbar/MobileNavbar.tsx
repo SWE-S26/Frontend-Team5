@@ -10,6 +10,7 @@ import Button from "@/components/ui/Button";
 import MiniPlayer from "@/components/layout/player/MiniPlayer";
 import ViewMessages from "@/components/messages/messageSidebar/ViewMessages";
 import { useLogout } from "@/hooks/useAuth";
+import { useAppSelector } from "@/store/hooks";
 
 import { RxHamburgerMenu } from "react-icons/rx";
 import { IoCloseOutline } from "react-icons/io5";
@@ -33,23 +34,10 @@ interface MobileNavbarProps {
 const MENU_LINK_CLASS = "flex items-center gap-3 text-white-smoke font-bold py-3 border-b border-off-black hover:text-silver transition-all duration-300 cursor-pointer w-full text-left";
 
 const BOTTOM_TABS = [
-  { href: "/home",    label: "Home",    icon: <GoHome className="text-2xl" />                 },
-  { href: "/feed",    label: "Feed",    icon: <MdOutlineFeed className="text-2xl" />          },
+  { href: "/home",    label: "Home",    icon: <GoHome className="text-2xl" />                },
+  { href: "/feed",    label: "Feed",    icon: <MdOutlineFeed className="text-2xl" />         },
   { href: "/library", label: "Library", icon: <MdOutlineLibraryMusic className="text-2xl" /> },
   { href: "/search",  label: "Search",  icon: <CiSearch className="text-2xl" />              },
-];
-
-const PROFILE_ITEMS = [
-  { label: "Profile",        icon: <FaUser />,                 href: "/profile/1"         },
-  { label: "Likes",          icon: <FaHeart />,                href: "/library/likes"     },
-  { label: "Playlists",      icon: <BiSolidCopy />,            href: "/library/playlists" },
-  { label: "Stations",       icon: <HiMiniSignal />,           href: "/library/stations"  },
-  { label: "Following",      icon: <FaUserCheck />,            href: "/library/following" },
-  { label: "Who to follow",  icon: <FaUserPlus />,             href: null                 },
-  { label: "Try Artist Pro", icon: <FaStar />,                 href: "/artistpro"         },
-  { label: "Tracks",         icon: <PiWaveformBold />,         href: "/artists"           },
-  { label: "Insights",       icon: <ImStatsBars />,            href: null                 },
-  { label: "Distribute",     icon: <BsArrowsExpandVertical />, href: "/artistpro"         },
 ];
 
 export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
@@ -57,10 +45,30 @@ export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
   const router = useRouter();
   const { logout, loading } = useLogout();
 
+  // only pulling the two fields this component actually needs
+  const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
+  const userId = useAppSelector((state) => state.auth.userId)
+  const displayName = useAppSelector((state) => state.auth.displayName)
+
   const [isMenuOpen,        setIsMenuOpen]        = useState(false);
   const [isAuthModalOpen,   setIsAuthModalOpen]   = useState(false);
   const [isProfileExpanded, setIsProfileExpanded] = useState(false);
   const [isMessagesOpen,    setIsMessagesOpen]    = useState(false);
+
+  const profileTarget = userId ? `/profile/${userId}` : "/home"
+
+  const PROFILE_ITEMS = [
+    { label: "Profile",        icon: <FaUser />,                 href: profileTarget, disabled: !userId },
+    { label: "Likes",          icon: <FaHeart />,                href: "/library/likes"     },
+    { label: "Playlists",      icon: <BiSolidCopy />,            href: "/library/playlists" },
+    { label: "Stations",       icon: <HiMiniSignal />,           href: "/library/stations"  },
+    { label: "Following",      icon: <FaUserCheck />,            href: "/library/following" },
+    { label: "Who to follow",  icon: <FaUserPlus />,             href: null                 },
+    { label: "Try Artist Pro", icon: <FaStar />,                 href: "/artistpro"         },
+    { label: "Tracks",         icon: <PiWaveformBold />,         href: "/artists"           },
+    { label: "Insights",       icon: <ImStatsBars />,            href: null                 },
+    { label: "Distribute",     icon: <BsArrowsExpandVertical />, href: "/artistpro"         },
+  ];
 
   const closeMenu = () => {
     setIsMenuOpen(false);
@@ -77,7 +85,7 @@ export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
       {/* Fixed top bar */}
       <div className="fixed top-0 left-0 right-0 z-40 bg-chinese-black flex items-center justify-between px-4 py-2 w-full">
         <Link href={isLoggedIn ? "/home" : "/"}>
-          <Image src="/beatza.png" alt="BeatZa" width={44} height={44} />
+          <Image src="/app-logo/beatza.png" alt="BeatZa" width={44} height={44} />
         </Link>
 
         <div className="flex items-center gap-4">
@@ -145,8 +153,8 @@ export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
               onClick={() => setIsProfileExpanded((prev) => !prev)}
               className="flex items-center gap-3 w-full mb-4 cursor-pointer"
             >
-              <Image src="/profpic.jpg" alt="Profile" width={40} height={40} className="rounded-full w-10 h-10 object-cover" />
-              <span className="text-white-smoke font-bold flex-1 text-left">Username</span>
+              <Image src={profileImgLink || "/profpic.jpg"} alt="Profile" width={40} height={40} className="rounded-full w-10 h-10 object-cover" />
+              <span className="text-white-smoke font-bold flex-1 text-left">{displayName || "No Name"}</span>
               {isProfileExpanded
                 ? <MdOutlineExpandLess className="text-silver text-xl" />
                 : <MdOutlineExpandMore className="text-silver text-xl" />

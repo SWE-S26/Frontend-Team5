@@ -67,7 +67,7 @@ export default function HeroBanner() {
       {/* static top bar — logo + buttons */}
       <div className="relative z-20 flex items-center justify-between px-8 pt-7">
         <div className="flex items-center">
-          <img src="/beatza.png" alt="BeatZa" className="w-12 mr-2 mt-1"/>
+          <img src="/app-logo/beatza.png" alt="BeatZa" className="w-12 mr-2 mt-1"/>
           <h1 className="text-white-smoke font-bold text-sm mt-1">CRAVING TUNES</h1>
         </div>
         <div className="flex gap-3">

@@ -163,7 +163,7 @@ export default function CrossPlatformCallbackPage() {
         <div className="mx-auto flex h-full w-full max-w-7xl items-center">
           <div className="flex h-full w-60 items-center bg-chinese-black px-5">
             <img
-              src="/beatza.png"
+              src="/app-logo/beatza.png"
               alt="BeatZa logo"
               width={56}
               height={56}

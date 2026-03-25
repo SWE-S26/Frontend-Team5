@@ -10,6 +10,7 @@ const PUBLIC_ROUTES = [
   "/api/auth/v1/forgot-password",
   "/api/auth/v1/reset-password",
   "/api/auth/v1/logout",
+  "/api/auth/v1/refresh-token",
   "/api/auth/v1/google/callback",
   "/api/auth/v1/google/complete",
   "/api/auth/v1/google/verify-code",
@@ -29,14 +30,17 @@ const api = axios.create({
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const isPublic = PUBLIC_ROUTES.some(route => error.config?.url?.includes(route))
+    const originalRequest = error.config
+    const isPublic = PUBLIC_ROUTES.some(route => originalRequest?.url?.includes(route))
 
-    if (error.response?.status === 401 && !isPublic) {
+    if (error.response?.status === 401 && !isPublic && !originalRequest._retry) {
+      originalRequest._retry = true
+
       await axios.get( 
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/v1/refresh-token`,
         { withCredentials: true }
       )
-      return axios({ ...error.config, withCredentials: true })
+      return api(originalRequest)
     }
     return Promise.reject(error)
   }
