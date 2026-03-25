@@ -14,6 +14,12 @@ export default function LandingPage() {
   const router = useRouter();
   const { isAuthenticated, hasHydrated } = useAuthStore();
 
+  useEffect(() => {
+    if (hasHydrated && isAuthenticated) {
+      router.replace("/home");
+    }
+  }, [hasHydrated, isAuthenticated, router]);
+
   if (!hasHydrated) {
     return (
       <div className="min-h-screen flex items-center justify-center bg-chinese-black">
