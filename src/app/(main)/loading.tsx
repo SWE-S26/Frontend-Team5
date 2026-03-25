@@ -1,9 +1,22 @@
+import Image from "next/image"
+
 export default function MainLoading() {
   return (
-    <div className="mt-24 flex w-full items-center justify-center">
-      <div className="rounded-md border border-white/10 bg-chinese-black px-4 py-3 text-sm text-silver">
-        Loading...
-      </div>
+    <div className="flex items-center justify-center min-h-screen">
+      <Image
+        src="/app-logo/whitelogo.png"
+        alt="BeatZa"
+        width={200}
+        height={200}
+        className="logo-dark"
+      />
+      <Image
+        src="/app-logo/blacklogo.png"
+        alt="BeatZa"
+        width={200}
+        height={200}
+        className="logo-light"
+      />
     </div>
-  );
+  )
 }

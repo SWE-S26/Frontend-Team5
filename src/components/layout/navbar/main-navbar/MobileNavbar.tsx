@@ -85,7 +85,7 @@ export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
       {/* Fixed top bar */}
       <div className="fixed top-0 left-0 right-0 z-40 bg-chinese-black flex items-center justify-between px-4 py-2 w-full">
         <Link href={isLoggedIn ? "/home" : "/"}>
-          <Image src="/beatza.png" alt="BeatZa" width={44} height={44} />
+          <Image src="/app-logo/beatza.png" alt="BeatZa" width={44} height={44} />
         </Link>
 
         <div className="flex items-center gap-4">

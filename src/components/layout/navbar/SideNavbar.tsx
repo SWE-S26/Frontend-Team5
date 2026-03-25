@@ -17,7 +17,7 @@ export default function SideNavbar() {
   return (
     <aside className="fixed left-0 top-0 h-full w-16 bg-off-black flex flex-col items-center py-4 gap-2 z-50 border-r border-white/5">
       <Link href="/admin-dash" title="Admin Dashboard" className="mb-4">
-        <Image src="/beatza.png" alt="BeatZa" width={40} height={40} />
+        <Image src="/app-logo/beatza.png" alt="BeatZa" width={40} height={40} />
       </Link>
 
       <div className="w-8 border-t border-white/10 mb-2" />

@@ -15,7 +15,7 @@ export const metadata: Metadata = {
   title: "My BeatZa App",
   description: "Craving Tunes",
   icons: {
-    icon: "/beatza.png",
+    icon: "/app-logo/beatza.png",
   },
 };
 
