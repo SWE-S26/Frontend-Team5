@@ -15,17 +15,14 @@ export default function LandingPage() {
   const { isAuthenticated, hasHydrated } = useAuthStore();
 
   useEffect(() => {
-    if (hasHydrated && isAuthenticated) {
+    if (!hasHydrated) return;
+    if (isAuthenticated) {
       router.replace("/home");
     }
   }, [hasHydrated, isAuthenticated, router]);
 
-  if (!hasHydrated) {
-    return (
-      <div className="min-h-screen flex items-center justify-center bg-chinese-black">
-        <div className="animate-spin rounded-full h-12 w-12 border-4 border-white border-t-transparent"></div>
-      </div>
-    );
+  if (!hasHydrated || isAuthenticated) {
+    return <div className="my-20" />;
   }
   
   return (
