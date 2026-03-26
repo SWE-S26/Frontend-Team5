@@ -10,65 +10,77 @@ import CoverPhotoUpload from "./CoverPhotoUpload"
 import { useGetProfile } from "@/hooks/useProfile"
 import { useAppSelector, useAppDispatch } from "@/store/hooks"
 import { setProfileImgLink, setBannerImgLink } from "@/store/slices/authSlice"
+import { setProfile, clearProfile } from "@/store/slices/profileSlice"
 
 export default function ProfileHeader() {
-  const dispatch = useAppDispatch()
-  const params = useParams()
-  const rawUserId = params.username as string
-  const userId = rawUserId && rawUserId !== "null" && rawUserId !== "undefined" ? rawUserId : ""
+  const dispatch   = useAppDispatch()
+  const params     = useParams()
+  const rawUserId  = params.username as string
+  const userId     = rawUserId && rawUserId !== "null" && rawUserId !== "undefined" ? rawUserId : ""
 
-  // reading the logged-in user's data from Redux
-  const authUserId = useAppSelector((state) => state.auth.userId)
-  const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
-  const bannerImgLink = useAppSelector((state) => state.auth.bannerImgLink)
-  const displayName = useAppSelector((state) => state.auth.displayName)
+  const authUserId  = useAppSelector((state) => state.auth.userId)
   const hasHydrated = useAppSelector((state) => state.auth.hasHydrated)
 
-  // true when viewing someone else's profile — needs an API fetch
-  const shouldFetchProfile = Boolean(userId && authUserId && authUserId !== userId)
+  // read display data from profileSlice — populated after API fetch
+  const profileImgLink = useAppSelector((state) => state.profile.profileImgLink)
+  const bannerImgLink  = useAppSelector((state) => state.profile.bannerImgLink)
+  const displayName    = useAppSelector((state) => state.profile.displayName)
+  const firstName      = useAppSelector((state) => state.profile.firstName)
+  const lastName       = useAppSelector((state) => state.profile.lastName)
+  const city           = useAppSelector((state) => state.profile.city)
+  const country        = useAppSelector((state) => state.profile.country)
 
-  const { getProfile, loading, error, profile } = useGetProfile()
+  const { getProfile, loading, error } = useGetProfile()
 
   const [coverImage,  setCoverImage]  = useState<string | null>(null)
-  const [avatarImage, setAvatarImage] = useState<string | null>(profileImgLink)
+  const [avatarImage, setAvatarImage] = useState<string | null>(null)
   const [gradient,    setGradient]    = useState("linear-gradient(to right, #c3adb4, #8f6f79)")
 
   useEffect(() => {
-    if (!hasHydrated) return
-    if (!shouldFetchProfile) return
-    getProfile(userId)
-  }, [userId, hasHydrated, shouldFetchProfile, getProfile])
+    if (!hasHydrated || !userId) return
 
+    // fetch profile and dispatch everything to profileSlice
+    getProfile(userId).then((data) => {
+      if (!data) return
+      dispatch(setProfile({
+        userId:         data.userId,
+        displayName:    data.displayName,
+        firstName:      data.firstName,
+        lastName:       data.lastName,
+        bio:            data.bio,
+        profileLink:    data.profileLink,
+        profileImgLink: data.profileImgLink,
+        bannerImgLink:  data.bannerImgLink,
+        city:           data.city,
+        country:        data.country,
+        links:          data.links,
+        supportLink:    data.supportLink,
+        favoriteGenres: data.favoriteGenres,
+        followersCount: data.followersCount,
+        followedCount:  data.followedCount,
+        tracksCount:    data.trackCount,
+        isOwnProfile:   data.userId === authUserId,
+      }))
+    })
+
+    // clear profileSlice when leaving the page
+    return () => { dispatch(clearProfile()) }
+  }, [userId, hasHydrated])
+
+  // sync local image state from profileSlice
   useEffect(() => {
-    if (!hasHydrated) return
     if (bannerImgLink) setCoverImage(bannerImgLink)
-  }, [hasHydrated, bannerImgLink])
+  }, [bannerImgLink])
 
   useEffect(() => {
-    if (!profile) return
-    if (profile.profileImgLink) {
-      setAvatarImage(profile.profileImgLink)
-      dispatch(setProfileImgLink(profile.profileImgLink))
-    }
-    if (profile.bannerImgLink) {
-      setCoverImage(profile.bannerImgLink)
-      dispatch(setBannerImgLink(profile.bannerImgLink))
-    }
-  }, [profile, dispatch])
-
-  useEffect(() => {
-    if (!profileImgLink) return
-    setAvatarImage((prev) => prev || profileImgLink)
+    if (profileImgLink) setAvatarImage(profileImgLink)
   }, [profileImgLink])
 
+  // when user uploads a new avatar — update authSlice too so navbar stays in sync
   useEffect(() => {
     if (!avatarImage) return
     dispatch(setProfileImgLink(avatarImage))
-  }, [avatarImage, dispatch])
-
-  useEffect(() => {
-    // keeps banner in sync when avatar changes
-    dispatch(setBannerImgLink(avatarImage ?? null))
+    dispatch(setBannerImgLink(avatarImage))
   }, [avatarImage, dispatch])
 
   useEffect(() => {
@@ -80,18 +92,18 @@ export default function ProfileHeader() {
 
     img.onload = () => {
       const colorThief = new ColorThief()
-      const palette = colorThief.getPalette(img, 2)
-      const c1 = `rgb(${palette[0].join(",")})`
-      const c2 = `rgb(${palette[1].join(",")})`
+      const palette    = colorThief.getPalette(img, 2)
+      const c1         = `rgb(${palette[0].join(",")})`
+      const c2         = `rgb(${palette[1].join(",")})`
       setGradient(`linear-gradient(to right, ${c1}, ${c2})`)
     }
   }, [avatarImage])
 
-  if (loading && shouldFetchProfile) return (
+  if (loading) return (
     <div className="relative w-full h-80 -mt-12.5 bg-off-black animate-pulse" />
   )
 
-  if (error && shouldFetchProfile) return (
+  if (error) return (
     <div className="relative w-full h-80 -mt-12.5 bg-off-black flex items-center justify-center">
       <p className="text-red-400 text-sm">{error}</p>
     </div>
@@ -133,19 +145,17 @@ export default function ProfileHeader() {
       <div className="absolute left-72 bottom-20 -translate-y-1/2">
         <div className="flex flex-col items-start">
           <h1 className="text-3xl font-bold text-white bg-black px-3 py-2">
-            {displayName || profile?.displayName || "No Name"}
+            {displayName || "No Name"}
           </h1>
           <p className="text-silver font-bold bg-black px-3 py-2">
-            {profile?.firstName && profile?.lastName
-              ? `${profile.firstName} ${profile.lastName}`
-              : displayName || profile?.displayName || "No Name"}
+            {firstName && lastName
+              ? `${firstName} ${lastName}`
+              : displayName || "No Name"}
           </p>
         </div>
         <div className="bg-black inline-block px-3 py-1 absolute -bottom-10">
           <p className="text-silver font-bold">
-            {profile?.city && profile?.country
-              ? `${profile.city}, ${profile.country}`
-              : "No location"}
+            {city && country ? `${city}, ${country}` : "No location"}
           </p>
         </div>
       </div>

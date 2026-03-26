@@ -1,4 +1,3 @@
-// mocks/handlers/profile.handlers.ts
 import { http, HttpResponse } from "msw"
 
 const BASE = process.env.NEXT_PUBLIC_API_URL
@@ -8,7 +7,6 @@ export const profileHandlers = [
   http.get(`${BASE}/api/profile/v1/:userId`, ({ params }) => {
     const { userId } = params
 
-    // 400 - invalid user ID
     if (!userId || userId === "invalid-id") {
       return HttpResponse.json(
         { success: false, message: "Invalid user ID", code: 400 },
@@ -16,7 +14,6 @@ export const profileHandlers = [
       )
     }
 
-    // 401 - unauthorized
     if (userId === "unauth-id") {
       return HttpResponse.json(
         { success: false, message: "Unauthorized", code: 401 },
@@ -24,7 +21,6 @@ export const profileHandlers = [
       )
     }
 
-    // 403 - private profile
     if (userId === "private-id") {
       return HttpResponse.json(
         { success: false, message: "Profile is private", code: 403 },
@@ -32,7 +28,6 @@ export const profileHandlers = [
       )
     }
 
-    // 404 - user not found
     if (userId === "notfound-id") {
       return HttpResponse.json(
         { success: false, message: "User not found", code: 404 },
@@ -40,27 +35,23 @@ export const profileHandlers = [
       )
     }
 
-    // 200 - success
     return HttpResponse.json({
-      userId:          userId as string,
-      displayName:     "Omar Mahmoud",
-      firstName:       "Omar",
-      lastName:        "Mahmoud",
-      profileLink:     "https://beatza.me/profile/omar",
-      profileImgLink:  "https://picsum.photos/200",
-      bannerImgLink:   "https://picsum.photos/1200/300",
-      bio:             "Music lover and developer",
-      city:            "Cairo",
-      country:         "Egypt",
-      links:           [{ linkId: "1", name: "Twitter", link: "https://twitter.com/omar" }],
-      bannerLinks:     [],
-      supportLink:     "",
-      role:            "Listener",
-      isPaid:          false,
-      favoriteGenres:  ["Hip-Hop", "Jazz"],
-      followersCount:  120,
-      followingsCount: 80,
-      trackCount:      15,
+      userId:         userId as string,
+      displayName:    "Omar Mahmoud",
+      firstName:      "Omar",
+      lastName:       "Mahmoud",
+      profileLink:    "omds2005-1774126647643",
+      profileImgLink: "https://picsum.photos/200",
+      bannerImgLink:  null,              // matches real response (can be null)
+      bio:            "Music lover and developer",
+      city:           "Cairo",
+      country:        "Egypt",
+      links:          [{ linkId: "1", name: "Twitter", link: "https://twitter.com/omar" }],
+      supportLink:    null,              // matches real response (can be null)
+      favoriteGenres: ["Hip-Hop", "Jazz"],
+      followersCount: 120,
+      followedCount:  80,                // was followingsCount
+      trackCount:     15,
     }, { status: 200 })
   }),
 ]

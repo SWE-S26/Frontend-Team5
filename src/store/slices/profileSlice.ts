@@ -1,40 +1,56 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { ProfileLink } from "@/types/profile.types"
 
-// this is for the profile PAGE data — whoever's profile you're viewing
-// separate from authSlice because you can view other people's profiles, not just your own
 interface ProfileState {
-  username: string | null
-  displayName: string | null
-  bio: string | null
+  userId:         string | null
+  username:       string | null
+  displayName:    string | null
+  firstName:      string | null
+  lastName:       string | null
+  bio:            string | null
+  profileLink:    string | null
   profileImgLink: string | null
-  bannerImgLink: string | null
+  bannerImgLink:  string | null
+  city:           string | null
+  country:        string | null
+  links:          ProfileLink[]
+  supportLink:    string | null
+  favoriteGenres: string[]
   followersCount: number
-  followingCount: number
-  tracksCount: number
-  isOwnProfile: boolean   // true when the logged-in user is viewing their own profile
-  isLoading: boolean
-  error: string | null
+  followedCount:  number        // matches actual API field name
+  tracksCount:    number
+  isOwnProfile:   boolean
+  isLoading:      boolean
+  error:          string | null
 }
 
 const initialState: ProfileState = {
-  username: null,
-  displayName: null,
-  bio: null,
+  userId:         null,
+  username:       null,
+  displayName:    null,
+  firstName:      null,
+  lastName:       null,
+  bio:            null,
+  profileLink:    null,
   profileImgLink: null,
-  bannerImgLink: null,
+  bannerImgLink:  null,
+  city:           null,
+  country:        null,
+  links:          [],
+  supportLink:    null,
+  favoriteGenres: [],
   followersCount: 0,
-  followingCount: 0,
-  tracksCount: 0,
-  isOwnProfile: false,
-  isLoading: false,
-  error: null,
+  followedCount:  0,
+  tracksCount:    0,
+  isOwnProfile:   false,
+  isLoading:      false,
+  error:          null,
 }
 
 const profileSlice = createSlice({
   name: "profile",
   initialState,
   reducers: {
-    // called when profile data finishes loading from the API
     setProfile: (state, action: PayloadAction<Partial<ProfileState>>) => {
       return { ...state, ...action.payload }
     },
@@ -47,7 +63,6 @@ const profileSlice = createSlice({
       state.error = action.payload
     },
 
-    // called when navigating away from a profile page
     clearProfile: () => initialState,
   },
 })
