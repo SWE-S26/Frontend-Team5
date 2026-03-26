@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import ThemeProvider from "@/components/theme/ThemeProvider"
-import MockProvider from "@/components/MSWProvider"
-import AuthGoogle from "@/components/auth/AuthGoogle"
-import ReduxProvider from "@/components/ReduxProvider"
+import ThemeProvider from "@/components/theme/ThemeProvider";
+import MockProvider from "@/components/MSWProvider";
+import AuthGoogle from "@/components/auth/AuthGoogle";
+import ReduxProvider from "@/components/ReduxProvider";
+import AntProviders from "@/components/AntProviders";
 import "./globals.css";
 
 const inter = Inter({
@@ -25,21 +26,19 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html
-      lang="en"
-      className={inter.variable}
-      suppressHydrationWarning
-    >
+    <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="antialiased">
         <ReduxProvider>
-          <MockProvider>
-            <ThemeProvider>
-              <AuthGoogle />
-              {children}
-            </ThemeProvider>
-          </MockProvider>
+          <AntProviders>
+            <MockProvider>
+              <ThemeProvider>
+                <AuthGoogle />
+                {children}
+              </ThemeProvider>
+            </MockProvider>
+          </AntProviders>
         </ReduxProvider>
-        <div className="h-12"/>
+        <div className="h-12" />
       </body>
     </html>
   );
