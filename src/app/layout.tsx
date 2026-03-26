@@ -4,7 +4,7 @@ import ThemeProvider from "@/components/theme/ThemeProvider";
 import MockProvider from "@/components/MSWProvider";
 import AuthGoogle from "@/components/auth/AuthGoogle";
 import ReduxProvider from "@/components/ReduxProvider";
-import AntProvider from "@/components/AntProvider";
+import AntProviders from "@/components/AntProviders";
 import "./globals.css";
 
 const inter = Inter({
@@ -29,14 +29,14 @@ export default function RootLayout({
     <html lang="en" className={inter.variable} suppressHydrationWarning>
       <body className="antialiased">
         <ReduxProvider>
-          <AntProvider>
+          <AntProviders>
             <MockProvider>
               <ThemeProvider>
                 <AuthGoogle />
                 {children}
               </ThemeProvider>
             </MockProvider>
-          </AntProvider>
+          </AntProviders>
         </ReduxProvider>
         <div className="h-12" />
       </body>
