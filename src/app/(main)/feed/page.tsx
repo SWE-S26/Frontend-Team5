@@ -4,7 +4,8 @@ import WaveformTest from "@/components/WaveformTest";
 import { main } from "framer-motion/m";
 import { Metadata } from "next";
 import { Main } from "next/document";
-import Script from "next/script";
+// import Script from "next/script";
+import { Switch } from "antd";
 export const metadata: Metadata = {
   title: "Your feed on BeatZa",
 };
@@ -13,6 +14,7 @@ export default function Feed() {
   return (
     <div className="flex justify-between">
       <div className="w-full md:w-[68%]">
+        <Switch></Switch>
         <WaveformCard />
       </div>
 
