@@ -1,30 +1,28 @@
-
 export interface ProfileLink {
   linkId: string
   name:   string
   link:   string
 }
+
 export interface GetProfileResponse {
-  userId:          string
-  displayName:     string
-  firstName:       string
-  lastName:        string
-  profileLink:     string
-  profileImgLink:  string
-  bannerImgLink:   string
-  bio:             string
-  city:            string
-  country:         string
-  links:           ProfileLink[]
-  bannerLinks:     ProfileLink[]
-  supportLink:     string
-  role:            string
-  isPaid:          boolean
-  favoriteGenres:  string[]
-  followersCount:  number
-  followingsCount: number
-  trackCount:      number
+  userId:         string
+  displayName:    string
+  firstName:      string | null
+  lastName:       string | null
+  profileLink:    string
+  profileImgLink: string | null
+  bannerImgLink:  string | null
+  bio:            string | null
+  city:           string | null
+  country:        string | null
+  links:          ProfileLink[]
+  supportLink:    string | null
+  favoriteGenres: string[]
+  followersCount: number
+  followedCount:  number
+  trackCount:     number
 }
+
 export interface GetProfileErrorResponse {
   success: boolean
   message: string
