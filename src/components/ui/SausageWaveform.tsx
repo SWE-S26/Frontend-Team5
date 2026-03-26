@@ -12,13 +12,8 @@ export default function SausageWaveform() {
   const [fgTopFlat, setFgTopFlat] = useState<string | null>(null);
   const [fgBottom, setFgBottom] = useState<string | null>(null);
 
-  // Playback progress as a percentage (0–100)
   const [progress, setProgress] = useState(0);
-
-  // Mouse X position as a percentage (0–100), only active when tracking
   const [hoverPct, setHoverPct] = useState<number | null>(null);
-
-  // Whether the waveform is in "tracking" mode — first click enables, second click disables
   const [isTracking, setIsTracking] = useState(false);
 
   useEffect(() => {
@@ -33,10 +28,11 @@ export default function SausageWaveform() {
   const generateAll = (samples: number[]) => {
     if (!scwRef.current) return;
 
+    // Generate at 2x for crisp rendering on all screens
     const base = {
-      canvas_width: 800,
-      canvas_height: 80,
-      bar_width: 4,
+      canvas_width: 1264, // 632 × 2
+      canvas_height: 120, // 60 × 2
+      bar_width: 8,
       bar_gap: 0.3,
     };
 
@@ -76,25 +72,6 @@ export default function SausageWaveform() {
     });
   };
 
-  const handleJsonArray = (samples: number[]) => {
-    if (!samples || !scwRef.current) return;
-    generateAll(samples);
-  };
-
-  const handleJsonFile = (file: File) => {
-    if (!file || !scwRef.current) return;
-    const reader = new FileReader();
-    reader.onload = (ev) => {
-      try {
-        const samples: number[] = JSON.parse(ev.target?.result as string);
-        handleJsonArray(samples);
-      } catch {
-        alert("Invalid JSON file — expected an array of numbers.");
-      }
-    };
-    reader.readAsText(file);
-  };
-
   const getPct = (e: React.MouseEvent) => {
     if (!containerRef.current) return 0;
     const rect = containerRef.current.getBoundingClientRect();
@@ -106,40 +83,32 @@ export default function SausageWaveform() {
 
   const handleClick = (e: React.MouseEvent) => {
     const pct = getPct(e);
-    setProgress(pct); // always snap progress to click position
-
+    setProgress(pct);
     if (!isTracking) {
-      // First click — snap progress and start tracking
       setIsTracking(true);
       setHoverPct(pct);
     } else {
-      // Second click — snap progress and stop tracking
       setIsTracking(false);
       setHoverPct(null);
     }
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    // Only update hover position if we're in tracking mode
     if (isTracking) {
       setHoverPct(getPct(e));
     }
   };
 
   const handleMouseLeave = () => {
-    // If tracking, keep hoverPct where it is — user left the container mid-track
-    // If not tracking, nothing to clear
     if (!isTracking) {
       setHoverPct(null);
     }
   };
 
-  // Helper: clip left-to-right up to a percentage
   const clipLeft = (pct: number) => ({
     clipPath: `inset(0 ${100 - pct}% 0 0)`,
   });
 
-  // Helper: clip a window between two percentages
   const clipWindow = (fromPct: number, toPct: number) => ({
     clipPath: `inset(0 ${100 - toPct}% 0 ${fromPct}%)`,
   });
@@ -151,51 +120,70 @@ export default function SausageWaveform() {
         onClick={handleClick}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="relative w-full h-20 cursor-pointer select-none"
+        // Fluid width, fixed visual height (60px)
+        className="relative w-full h-[60px] cursor-pointer select-none"
       >
-        {/* Grey top half — background, always full width */}
+        {/* Shared image classes: crisp scaling */}
+        {/* 
+          - w-full h-full: fill the 60px-tall container
+          - image-rendering: auto lets browser smooth the 2x→1x downscale
+          - will-change: transform improves perf during hover/progress updates
+        */}
+        <style jsx global>{`
+          .waveform-img {
+            image-rendering: auto;
+            will-change: transform;
+          }
+        `}</style>
+
+        {/* Grey top half */}
         <img
           src={bgTop ?? undefined}
-          className="absolute inset-0 w-full h-full opacity-80 grayscale brightness-200"
+          className="absolute inset-0 w-full h-full opacity-80 grayscale brightness-200 waveform-img"
+          alt=""
         />
 
-        {/* Grey bottom half — background, always full width */}
+        {/* Grey bottom half */}
         <img
           src={bgBottom ?? undefined}
-          className="absolute inset-0 w-full h-full opacity-80 grayscale brightness-200"
+          className="absolute inset-0 w-full h-full opacity-80 grayscale brightness-200 waveform-img"
+          alt=""
         />
 
-        {/* Gradient top — shown on played portion (left of progress) */}
+        {/* Gradient top — played portion */}
         <img
           src={fgTopGradient ?? undefined}
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full waveform-img"
           style={clipLeft(progress)}
+          alt=""
         />
 
-        {/* Flat top — shown between progress and cursor when cursor is ahead of progress */}
+        {/* Flat top — cursor ahead of progress */}
         {hoverPct !== null && hoverPct > progress && (
           <img
             src={fgTopFlat ?? undefined}
-            className="absolute inset-0 w-full h-full pointer-events-none"
+            className="absolute inset-0 w-full h-full pointer-events-none waveform-img"
             style={clipWindow(progress, hoverPct)}
+            alt=""
           />
         )}
 
-        {/* Flat top — shown between cursor and progress when cursor is behind progress
-            This replaces the gradient under the cursor on the already-played portion */}
+        {/* Flat top — cursor behind progress */}
         {hoverPct !== null && hoverPct <= progress && (
           <img
             src={fgTopFlat ?? undefined}
-            className="absolute inset-0 w-full h-full pointer-events-none"
+            className="absolute inset-0 w-full h-full pointer-events-none waveform-img"
             style={clipWindow(hoverPct, progress)}
+            alt=""
           />
         )}
 
-        {/* Flat bottom — only follows progress, never the cursor */}
+        {/* Flat bottom — follows progress only */}
         <img
           src={fgBottom ?? undefined}
-          className="absolute inset-0 w-full h-full"
+          className="absolute inset-0 w-full h-full waveform-img"
           style={clipLeft(progress)}
+          alt=""
         />
       </div>
     </div>
