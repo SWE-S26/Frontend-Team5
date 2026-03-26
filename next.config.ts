@@ -1,5 +1,7 @@
 import type { NextConfig } from "next";
 
+const isDev = process.env.NEXT_PUBLIC_ENV === "development"
+
 const nextConfig: NextConfig = {
   reactCompiler: true,
   output: "standalone",
@@ -15,6 +17,16 @@ const nextConfig: NextConfig = {
       },
     ],
   },
+  ...(isDev && {
+    async rewrites() {
+      return [
+        {
+          source: "/api/:path*",
+          destination: `https://beatza.me/api/:path*`,
+        },
+      ]
+    },
+  }),
 };
 
 export default nextConfig;
