@@ -1,4 +1,4 @@
-@import "tailwindcss";
+@import "tailwindcss" layer(utilities);
 
 .logo-dark {
   display: block;
@@ -28,8 +28,8 @@
   --login: rgba(255, 255, 255, 0.4);
   --back: rgb(48, 48, 48);
   --progress-track-color: #4f4f4f;
-  --volume1:#1a1a1a;
-  --volume-bar:#3a3a3a;
+  --volume1: #1a1a1a;
+  --volume-bar: #3a3a3a;
 }
 
 [data-theme="light"] {
@@ -41,7 +41,7 @@
   --back: rgb(233, 231, 231);
   --silver: #656565;
   --progress-track-color: #c7c7c7;
-  --volume1:white;
+  --volume1: white;
   --volume-bar: #c7c7c7;
 }
 
@@ -59,7 +59,7 @@
      -> normally you say "bg-black"
      -> for any of colors below such as chinese black you do "bg-chinese-black"
   */
-  
+
   --color-chinese-black: var(--bg);
   --color-white-smoke: var(--fg);
   --color-login: var(--login);
