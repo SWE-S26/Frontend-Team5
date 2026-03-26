@@ -33,30 +33,36 @@ export default function WaveformCard() {
   }
 
   return (
-    <div className="flex items-stretch w-full">
+    <div className="flex items-stretch">
       {/* left side */}
-      <div>
+      <div className="h-full overflow-hidden -m-1 -mb-1.75">
         <Card type="static" />
       </div>
 
       {/* right side */}
-      <div className="flex flex-col flex-1 ml-4 justify-between my-1">
+      <div className="flex flex-col flex-1 ml-6 justify-between">
         {/* top */}
-        <div className="flex items-center mb-2">
+        <div className="flex items-center mb-4">
           <div
             className="w-10 h-10 bg-white-smoke rounded-full flex items-center justify-center cursor-pointer"
             onClick={handlePlayClick}
           >
             {!isPlaying ? (
-              <IoMdPlay className="text-chinese-black text-[23px] ml-1.25" />
+              <IoMdPlay className="text-chinese-black text-[23px] ml-1" />
             ) : (
               <IoMdPause className="text-chinese-black text-[23px]" />
             )}
           </div>
+          <div>
+            <p className="text-xs font-bold text-silver ml-3">Artist Name</p>
+            <p className="text-sm font-bold text-white-smoke ml-3">
+              Track Title
+            </p>
+          </div>
         </div>
 
         {/* middle */}
-        <div>
+        <div className="w-full max-w-[632px] h-[60px] flex-shrink-0">
           <SausageWaveform />
         </div>
 

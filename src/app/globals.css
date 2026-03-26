@@ -104,6 +104,20 @@ body {
   scrollbar-width: none;
 }
 
+.waveform-img {
+  image-rendering: crisp-edges; /* Firefox */
+  image-rendering: pixelated; /* Chrome/Safari */
+  will-change: transform; /* Perf hint for animations */
+}
+
 .scrollbar-hide::-webkit-scrollbar {
   display: none;
+}
+
+.ant-switch .ant-switch-handle::before {
+  transition: opacity 0.1s ease !important;
+}
+
+.ant-switch:hover .ant-switch-handle::before {
+  opacity: 0.7 !important;
 }

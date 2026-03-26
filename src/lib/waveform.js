@@ -58,10 +58,6 @@ var SoundCloudWaveform = {
       this.drawBar(i * barWidth, val);
     }
 
-    // Only draw the divider when rendering both halves together.
-    // When half is "top" or "bottom", each PNG should be fully transparent
-    // except its own bars — drawing the divider would create an opaque
-    // full-width line that appears as a rectangle in the UI.
     if (this.settings.half === undefined) {
       this.drawDivider();
     }
@@ -217,53 +213,61 @@ var SoundCloudWaveform = {
     var canvasHeight = this.settings.canvas.height;
     var dividerY = Math.floor(canvasHeight * 0.55);
     this.settings.context.fillStyle = "#121212";
-    this.settings.context.fillRect(0, dividerY, this.settings.canvas.width, 1);
+
+    // Fixed 3px thickness (no dynamic scaling)
+    var dividerHeight = 2;
+
+    this.settings.context.fillRect(
+      0,
+      dividerY,
+      this.settings.canvas.width,
+      dividerHeight,
+    );
   },
 
   drawBar: function (i, h) {
     var ctx = this.settings.context;
     var canvasHeight = this.settings.canvas.height;
-    var w = this.settings.bar_width;
+    var barWidth = this.settings.bar_width;
 
-    if (this.settings.bar_gap !== 0) {
-      w *= Math.abs(1 - this.settings.bar_gap);
-    }
+    var w =
+      this.settings.bar_gap !== 0
+        ? Math.floor(barWidth * Math.abs(1 - this.settings.bar_gap))
+        : barWidth;
 
-    var x = i + w / 2;
+    var x = i;
 
     var dividerY = Math.floor(canvasHeight * 0.55);
-    var gap = 0.7;
+    var dividerHeight = 2; // Match drawDivider
 
-    var topH = Math.min(h * 0.7, dividerY - gap);
-    var bottomH = Math.min(topH * 0.4, canvasHeight - dividerY - gap);
+    var topH = Math.min(h * 0.7, dividerY);
+    // Bottom bars start AFTER the 2px divider
+    var bottomH = Math.min(topH * 0.4, canvasHeight - dividerY - dividerHeight);
 
     var drawTop = this.settings.half !== "bottom";
     var drawBottom = this.settings.half !== "top";
 
     if (this.settings.wave_color === "gradient") {
       if (drawTop) {
-        var topGrad = ctx.createLinearGradient(
-          0,
-          dividerY - gap - topH,
-          0,
-          dividerY - gap,
-        );
+        var topGrad = ctx.createLinearGradient(0, dividerY - topH, 0, dividerY);
         topGrad.addColorStop(0, "#ff6600");
         topGrad.addColorStop(1, "#ff2200");
         ctx.fillStyle = topGrad;
-        ctx.fillRect(x, dividerY - gap - topH, w, topH);
+        ctx.fillRect(x, dividerY - topH, w, topH);
       }
       if (drawBottom) {
         ctx.fillStyle = "#c49478";
-        ctx.fillRect(x, dividerY + gap, w, bottomH);
+        // Start bottom bars after the 2px divider
+        ctx.fillRect(x, dividerY + dividerHeight, w, bottomH);
       }
     } else {
       ctx.fillStyle = this.settings.wave_color;
       if (drawTop) {
-        ctx.fillRect(x, dividerY - gap - topH, w, topH);
+        ctx.fillRect(x, dividerY - topH, w, topH);
       }
       if (drawBottom) {
-        ctx.fillRect(x, dividerY + gap, w, bottomH);
+        // Start bottom bars after the 2px divider
+        ctx.fillRect(x, dividerY + dividerHeight, w, bottomH);
       }
     }
   },
