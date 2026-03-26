@@ -1,17 +1,17 @@
 # Beatza Frontend
+
 ---
 
 ## Tech Stack
- 
+
 - **Framework:** Next.js (App Router)
 - **Language:** TypeScript
 - **Styling:** Tailwind CSS
 - **Formatting:** Prettier
- 
+
 ---
 
 ## Getting Started
-
 ```bash
 npm install
 npm run dev
@@ -23,29 +23,24 @@ npm run dev
 
 Follow these steps every time you start working on a new feature:
 
-### 1. Pull the latest main
-Always make sure your local main is up to date before creating a branch.
+### 1. Pull the latest dev
+Always make sure your local dev is up to date before creating a branch.
 ```bash
-git checkout main
-git pull origin main
+git checkout dev
+git pull origin dev
 ```
 
 ### 2. Create a new branch
-Create your branch from main using this naming convention:
+Create your branch from dev using this naming convention:
 ```
 {feature-name}
 ```
 
-**Example:**
-```bash
-git checkout -b login-form
-```
-
 **Examples:**
 ```
-JD/login-form
-SA/profile-header
-MK/audio-upload
+login-form
+profile-header
+audio-upload
 ```
 
 ### 3. Work on your feature
@@ -59,48 +54,118 @@ git push origin login-form
 ### 5. Open a Pull Request
 - Go to the repository on GitHub
 - Click **"Compare & pull request"**
-- Add a clear title and description of what you did
+- Add a clear title and description using the PR format below
 - Request a review from a teammate
 - Do **not** merge your own PR
+
+---
+
+## Daily Workflow Rules
+
+These rules apply to every team member, including the team leader, every single day.
+
+### Daily Pull Requests
+- Every member **must** open a pull request by end of day for any changes made that day, no exceptions.
+- All PRs are targeted at the **`dev`** branch.
+
+### Merge Window
+- The team leader reviews and accepts all pending PRs into `dev` **every day between 10–11 PM**.
+
+### Daily Rebase
+- After 11 PM (once all PRs have been merged), every member must rebase their active branches on top of the updated `dev` to stay in sync.
+```bash
+git fetch origin
+git rebase origin/dev
+```
+
+### Protected Branches
+- **No one** is allowed to push directly to `main` or `dev`.
+- **No one** is allowed to rebase from `main`.
+- **No one** is allowed to merge their own pull request.
+
+### Communication Across Other Sub Teams
+- Any communication with members of other sub-teams must go through the frontend team leader first.
+- Do not reach out to other sub-team members directly without notifying the team leader.
 
 ---
 
 ## Commit Convention
 
 Every commit must follow this structure:
-
 ```
-[INITIALS] - [feature] - [v{version}]
+[keyword] - [feature] - [explanation]
 ```
 
 | Part | Description | Example |
 |------|-------------|---------|
-| `INITIALS` | First + Last name initials (uppercase) | `OM` |
-| `feature` | Short description of what was done | `login-form` |
-| `version` | Simple version number | `v1` |
+| `keyword` | Type of change (see table below) | `feat` |
+| `feature` | The feature or area being worked on | `login-form` |
+| `explanation` | Short description of what was done | `add validation logic` |
+
+### Keywords
+
+| Keyword | Meaning |
+|---------|---------|
+| `added` | New feature or functionality |
+| `fixed` | Bug fix |
+| `styled` | UI or styling changes only |
+| `cleaned` | Code restructure with no behavior change |
+| `tested` | Adding or updating tests |
+| `configured` | Config, dependencies, or tooling |
+| `documented` | Documentation only |
+| `reverted` | Reverting a previous commit |
 
 ### Examples
-OM: Omar Mahmoud
 ```bash
-git commit -m "OM - login-form - v1"
-git commit -m "OM - register-form - v1"
-git commit -m "OM - login-form - v2"
-git commit -m "OM - profile-header - v1"
+git commit -m "added - login-form - email and password validation"
+git commit -m "fixed - login-form - submit button not firing"
+git commit -m "styled - navbar - spacing on mobile breakpoint"
+git commit -m "cleaned - auth-store - migrated to redux toolkit"
+git commit -m "tested - login-hook - unit tests for error states"
+git commit -m "configured - prettier - applied formatting across all files"
+git commit -m "documented - readme - updated daily workflow rules"
 ```
 
 ### Rules
-- Increment the version (`v2`, `v3`...) when you update the same feature
 - Keep the feature name **lowercase and hyphenated**
-- Always commit **one logical change** at a time (so that if needed to revert a change, it won't be large)
+- Keep the explanation **short and specific** — one clause, no period
+- Always commit **one logical change** at a time so reverting stays clean
+
+---
+
+## Pull Request Format
+
+Every PR must follow this format:
+```markdown
+## What this PR does
+<!-- One or two sentences summarizing the purpose of this PR -->
+
+## Changes
+<!-- Bullet list of what was added, modified, or removed -->
+-
+-
+-
+
+## Why
+<!-- Explain the reasoning or problem this solves -->
+
+## How to test
+<!-- Step-by-step instructions to manually verify the changes -->
+1.
+2.
+3.
+
+## Notes
+<!-- Optional: edge cases, follow-ups, or things reviewers should watch out for -->
+```
 
 ---
 
 ## Full Example Workflow
-
 ```bash
-# 1. Update main
-git checkout main
-git pull origin main
+# 1. Update dev
+git checkout dev
+git pull origin dev
 
 # 2. Create your branch
 git checkout -b login-form
@@ -109,7 +174,7 @@ git checkout -b login-form
 git add .
 
 # 4. Commit with convention
-git commit -m "OM - login-form - v1"
+git commit -m "feat - login-form - add email and password validation"
 
 # 5. Push branch
 git push origin login-form
@@ -117,43 +182,19 @@ git push origin login-form
 # 6. Open a Pull Request on GitHub
 ```
 
-
-
 ---
-##
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
-## Getting Started
+## Reverting a Branch to a Specific Commit
 
-First, run the development server:
+> ⚠️ Only do this on your **own branch**. Only use this in **emergencies**.
 
+**Step 1 — Find the commit ID:**
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git log --oneline
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+**Step 2 — Reset to that commit and force push:**
+```bash
+git reset --hard <commit-id>
+git push origin <branch-name> --force
+```
