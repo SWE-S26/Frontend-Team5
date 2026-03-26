@@ -18,7 +18,7 @@ export default function AntProviders({
           },
         }}
       >
-        <App>{children}</App>
+        {children}
       </ConfigProvider>
     </AntdRegistry>
   );
