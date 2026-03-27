@@ -2,6 +2,7 @@ import { useState, useCallback } from "react"
 import { profileService } from "@/services/profile.service"
 import { GetProfileResponse } from "@/types/profile.types"
 
+
 export function useGetProfile() {
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState<string | null>(null)

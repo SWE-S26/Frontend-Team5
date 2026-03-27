@@ -8,6 +8,7 @@ import Button from "@/components/ui/Button"
 import AvatarUpload from "./AvatarUpload"
 import CoverPhotoUpload from "./CoverPhotoUpload"
 import { useGetProfile } from "@/hooks/useProfile"
+import { useUpdateProfile } from "@/hooks/useUpdateProfile"
 import { useAppSelector, useAppDispatch } from "@/store/hooks"
 import { setProfileImgLink, setBannerImgLink } from "@/store/slices/authSlice"
 import { setProfile, clearProfile } from "@/store/slices/profileSlice"
@@ -21,7 +22,6 @@ export default function ProfileHeader() {
   const authUserId  = useAppSelector((state) => state.auth.userId)
   const hasHydrated = useAppSelector((state) => state.auth.hasHydrated)
 
-  // read display data from profileSlice — populated after API fetch
   const profileImgLink = useAppSelector((state) => state.profile.profileImgLink)
   const bannerImgLink  = useAppSelector((state) => state.profile.bannerImgLink)
   const displayName    = useAppSelector((state) => state.profile.displayName)
@@ -31,6 +31,7 @@ export default function ProfileHeader() {
   const country        = useAppSelector((state) => state.profile.country)
 
   const { getProfile, loading, error } = useGetProfile()
+  const { updateProfile } = useUpdateProfile()
 
   const [coverImage,  setCoverImage]  = useState<string | null>(null)
   const [avatarImage, setAvatarImage] = useState<string | null>(null)
@@ -39,7 +40,6 @@ export default function ProfileHeader() {
   useEffect(() => {
     if (!hasHydrated || !userId) return
 
-    // fetch profile and dispatch everything to profileSlice
     getProfile(userId).then((data) => {
       if (!data) return
       dispatch(setProfile({
@@ -63,7 +63,6 @@ export default function ProfileHeader() {
       }))
     })
 
-    // clear profileSlice when leaving the page
     return () => { dispatch(clearProfile()) }
   }, [userId, hasHydrated])
 
@@ -76,13 +75,7 @@ export default function ProfileHeader() {
     if (profileImgLink) setAvatarImage(profileImgLink)
   }, [profileImgLink])
 
-  // when user uploads a new avatar — update authSlice too so navbar stays in sync
-  useEffect(() => {
-    if (!avatarImage) return
-    dispatch(setProfileImgLink(avatarImage))
-    dispatch(setBannerImgLink(avatarImage))
-  }, [avatarImage, dispatch])
-
+  // generate gradient from avatar color
   useEffect(() => {
     if (!avatarImage) return
 
@@ -98,6 +91,45 @@ export default function ProfileHeader() {
       setGradient(`linear-gradient(to right, ${c1}, ${c2})`)
     }
   }, [avatarImage])
+
+  // ── Upload handlers ──────────────────────────────────────────────
+
+  const handleAvatarChange = async (file: File, previewUrl: string) => {
+  setAvatarImage(previewUrl)
+
+  const formData = new FormData()
+  formData.append("profileImage", file)
+
+  console.log("Sending:", [...formData.entries()]) // ← add here
+
+  const updated = await updateProfile(formData)
+
+  console.log("Response:", updated) // ← add here
+
+  if (updated?.profileImgLink) {
+    setAvatarImage(updated.profileImgLink)
+    dispatch(setProfileImgLink(updated.profileImgLink))
+  }
+}
+
+  const handleCoverChange = async (file: File, previewUrl: string) => {
+    // 1. Show preview immediately
+    setCoverImage(previewUrl)
+
+    // 2. Build FormData and send to backend
+    const formData = new FormData()
+    formData.append("bannerImage", file) // ← key must match your backend field name
+
+    const updated = await updateProfile(formData)
+
+    // 3. Sync real Cloudinary URL back into store
+    if (updated?.bannerImgLink) {
+      setCoverImage(updated.bannerImgLink)
+      dispatch(setBannerImgLink(updated.bannerImgLink))
+    }
+  }
+
+  // ─────────────────────────────────────────────────────────────────
 
   if (loading) return (
     <div className="relative w-full h-80 -mt-12.5 bg-off-black animate-pulse" />
@@ -119,7 +151,7 @@ export default function ProfileHeader() {
       }
     >
       <div className="absolute top-8 right-6 flex flex-col gap-3">
-        <CoverPhotoUpload onImageChange={setCoverImage}>
+        <CoverPhotoUpload onImageChange={handleCoverChange}>
           <Button className="bg-chinese-black text-white-smoke cursor-pointer">
             Upload header image
           </Button>
@@ -129,7 +161,7 @@ export default function ProfileHeader() {
       <div className="absolute left-10 top-1/2 -translate-y-1/2 group/avatar">
         <AvatarUpload
           avatarImage={avatarImage}
-          onImageChange={setAvatarImage}
+          onImageChange={handleAvatarChange}
           className="relative overflow-hidden"
         >
           <div className="absolute inset-0 bg-gray-400/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity" />

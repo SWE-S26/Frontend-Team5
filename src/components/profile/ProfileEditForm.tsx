@@ -1,25 +1,43 @@
 "use client"
-import { useState, useEffect } from "react"
+import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
 import AvatarUpload from "./profile-header/AvatarUpload"
 import Button from "@/components/ui/Button"
 import { useAppSelector } from "@/store/hooks"
+
+import { useUpdateProfile } from "@/hooks/useUpdateProfile"
+import { setProfile } from "@/store/slices/profileSlice"
+import { useAppDispatch } from "@/store/hooks"
+
+import { IoIosInformationCircle } from "react-icons/io"
+import { IoIosLink } from "react-icons/io"
+import { FiTrash2 } from "react-icons/fi"
 
 interface EditProfilePopUPProps {
   isOpen: boolean
   onClose: () => void
 }
 
+interface LinkItem {
+  linkId: string
+  name:   string
+  link:   string
+}
+
 const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
-  // all data comes from profileSlice — populated by ProfileHeader after API fetch
-  const profileImgLink  = useAppSelector((state) => state.profile.profileImgLink)
-  const displayName     = useAppSelector((state) => state.profile.displayName)
-  const firstName       = useAppSelector((state) => state.profile.firstName)
-  const lastName        = useAppSelector((state) => state.profile.lastName)
-  const profileLink     = useAppSelector((state) => state.profile.profileLink)
-  const city            = useAppSelector((state) => state.profile.city)
-  const country         = useAppSelector((state) => state.profile.country)
-  const bio             = useAppSelector((state) => state.profile.bio)
+  const profileImgLink   = useAppSelector((state) => state.profile.profileImgLink)
+  const displayName      = useAppSelector((state) => state.profile.displayName)
+  const firstName        = useAppSelector((state) => state.profile.firstName)
+  const lastName         = useAppSelector((state) => state.profile.lastName)
+  const profileLink      = useAppSelector((state) => state.profile.profileLink)
+  const city             = useAppSelector((state) => state.profile.city)
+  const country          = useAppSelector((state) => state.profile.country)
+  const bio              = useAppSelector((state) => state.profile.bio)
+  const reduxLinks       = useAppSelector((state) => state.profile.links)
+  const reduxSupportLink = useAppSelector((state) => state.profile.supportLink)
+
+  const [formLinks,   setFormLinks]   = useState<LinkItem[]>([])
+  const [linkErrors,  setLinkErrors]  = useState<Record<string, boolean>>({})
 
   const [avatarImage,     setAvatarImage]     = useState<string | null>(null)
   const [formDisplayName, setFormDisplayName] = useState("")
@@ -30,46 +48,199 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
   const [formCountry,     setFormCountry]      = useState("")
   const [formBio,         setFormBio]          = useState("")
 
-  // when form opens populate all fields from profileSlice
+  const [formSupportLink,     setFormSupportLink]     = useState<string | null>(null)
+  const [showSupportLinkInfo, setShowSupportLinkInfo] = useState(false)
+
+  const [displayNameError, setDisplayNameError] = useState(false)
+  const [profileLinkError, setProfileLinkError] = useState(false)
+  const [showLinksInfo,    setShowLinksInfo]    = useState(false)
+
+  const dispatch = useAppDispatch()
+  const { updateProfile, loading, error } = useUpdateProfile()
+
+  const linksInfoRef       = useRef<HTMLDivElement>(null)
+  const supportLinkInfoRef = useRef<HTMLDivElement>(null)
+
+  // refs to always have latest Redux values without being dependencies
+  const profileImgLinkRef   = useRef(profileImgLink)
+  const displayNameRef      = useRef(displayName)
+  const firstNameRef        = useRef(firstName)
+  const lastNameRef         = useRef(lastName)
+  const profileLinkRef      = useRef(profileLink)
+  const cityRef             = useRef(city)
+  const countryRef          = useRef(country)
+  const bioRef              = useRef(bio)
+  const reduxLinksRef       = useRef(reduxLinks)
+  const reduxSupportLinkRef = useRef(reduxSupportLink)
+
+  // keep refs in sync with Redux
+  useEffect(() => { profileImgLinkRef.current   = profileImgLink },   [profileImgLink])
+  useEffect(() => { displayNameRef.current       = displayName },      [displayName])
+  useEffect(() => { firstNameRef.current         = firstName },        [firstName])
+  useEffect(() => { lastNameRef.current          = lastName },         [lastName])
+  useEffect(() => { profileLinkRef.current       = profileLink },      [profileLink])
+  useEffect(() => { cityRef.current              = city },             [city])
+  useEffect(() => { countryRef.current           = country },          [country])
+  useEffect(() => { bioRef.current               = bio },              [bio])
+  useEffect(() => { reduxLinksRef.current        = reduxLinks },       [reduxLinks])
+  useEffect(() => { reduxSupportLinkRef.current  = reduxSupportLink }, [reduxSupportLink])
+
+  const handleAvatarChange = async (file: File, previewUrl: string) => {
+  setAvatarImage(previewUrl)
+
+  const formData = new FormData()
+  formData.append("profileImage", file)
+
+  const updated = await updateProfile(formData)
+
+  if (updated?.profileImgLink) {
+    setAvatarImage(updated.profileImgLink)
+  }
+}
+  // populate form only when modal opens
   useEffect(() => {
     if (!isOpen) return
-    setAvatarImage(profileImgLink   || null)
-    setFormDisplayName(displayName  || "")
-    setFormProfileLink(profileLink  || "")
-    setFormFirstName(firstName      || "")
-    setFormLastName(lastName        || "")
-    setFormCity(city                || "")
-    setFormCountry(country          || "")
-    setFormBio(bio                  || "")
-  }, [isOpen, profileImgLink, displayName, profileLink, firstName, lastName, city, country, bio])
+    setAvatarImage(profileImgLinkRef.current    || null)
+    setFormDisplayName(displayNameRef.current   || "")
+    setFormProfileLink(profileLinkRef.current   || "")
+    setFormFirstName(firstNameRef.current       || "")
+    setFormLastName(lastNameRef.current         || "")
+    setFormCity(cityRef.current                 || "")
+    setFormCountry(countryRef.current           || "")
+    setFormBio(bioRef.current                   || "")
+    setFormLinks(reduxLinksRef.current          || [])
+    setFormSupportLink(reduxSupportLinkRef.current || null)
+    setLinkErrors({})
+  }, [isOpen])
+
+  // close links info tooltip on outside click
+  useEffect(() => {
+    if (!showLinksInfo) return
+    const handleClickOutside = (e: MouseEvent) => {
+      if (linksInfoRef.current && !linksInfoRef.current.contains(e.target as Node)) {
+        setShowLinksInfo(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [showLinksInfo])
+
+  // close support link info tooltip on outside click
+  useEffect(() => {
+    if (!showSupportLinkInfo) return
+    const handleClickOutside = (e: MouseEvent) => {
+      if (supportLinkInfoRef.current && !supportLinkInfoRef.current.contains(e.target as Node)) {
+        setShowSupportLinkInfo(false)
+      }
+    }
+    document.addEventListener("mousedown", handleClickOutside)
+    return () => document.removeEventListener("mousedown", handleClickOutside)
+  }, [showSupportLinkInfo])
+
+  const handleAddLink = () => {
+    const newLink: LinkItem = { linkId: crypto.randomUUID(), name: "", link: "" }
+    setFormLinks((prev) => [...prev, newLink])
+  }
+
+  const handleRemoveLink = (linkId: string) => {
+    setFormLinks((prev) => prev.filter((l) => l.linkId !== linkId))
+    setLinkErrors((prev) => {
+      const next = { ...prev }
+      delete next[linkId]
+      return next
+    })
+  }
+
+  const handleLinkChange = (linkId: string, field: "link" | "name", value: string) => {
+    setFormLinks((prev) =>
+      prev.map((l) => (l.linkId === linkId ? { ...l, [field]: value } : l))
+    )
+    if (field === "link" && value.trim()) {
+      setLinkErrors((prev) => ({ ...prev, [linkId]: false }))
+    }
+  }
 
   const handleCancel = () => {
-    // reset all fields back to current Redux values and close
-    setAvatarImage(profileImgLink   || null)
-    setFormDisplayName(displayName  || "")
-    setFormProfileLink(profileLink  || "")
-    setFormFirstName(firstName      || "")
-    setFormLastName(lastName        || "")
-    setFormCity(city                || "")
-    setFormCountry(country          || "")
-    setFormBio(bio                  || "")
+    setAvatarImage(profileImgLinkRef.current    || null)
+    setFormDisplayName(displayNameRef.current   || "")
+    setFormProfileLink(profileLinkRef.current   || "")
+    setFormFirstName(firstNameRef.current       || "")
+    setFormLastName(lastNameRef.current         || "")
+    setFormCity(cityRef.current                 || "")
+    setFormCountry(countryRef.current           || "")
+    setFormBio(bioRef.current                   || "")
+    setFormLinks(
+      (reduxLinksRef.current || []).map((l: any) => ({
+        linkId: l.linkId || crypto.randomUUID(),
+        name:   l.name   || "",
+        link:   l.link   || "",
+      }))
+    )
+    setFormSupportLink(reduxSupportLinkRef.current || null)
+    setDisplayNameError(false)
+    setProfileLinkError(false)
+    setLinkErrors({})
     onClose()
   }
 
-  const handleSave = () => {
-    // API call to save changes will go here
-    // dispatch(setProfile({ displayName: formDisplayName, ... })) after API succeeds
-    console.log("saving:", {
-      formDisplayName,
-      formProfileLink,
-      formFirstName,
-      formLastName,
-      formCity,
-      formCountry,
-      formBio,
-      avatarImage,
+  const handleSave = async () => {
+    let hasError = false
+
+    if (!formDisplayName.trim()) { setDisplayNameError(true); hasError = true }
+    if (!formProfileLink.trim()) { setProfileLinkError(true); hasError = true }
+
+    const newLinkErrors: Record<string, boolean> = {}
+    formLinks.forEach((l) => {
+      if (!l.link.trim() || !l.link.includes(".")) {
+        newLinkErrors[l.linkId] = true
+        hasError = true
+      }
     })
-    onClose()
+    setLinkErrors(newLinkErrors)
+
+    if (hasError) return
+
+    const formattedLinks = formLinks.map(({ linkId, name, link }) => {
+      let finalLink = link.trim()
+      if (finalLink.includes("@") && !finalLink.startsWith("http")) {
+        finalLink = `mailto:${finalLink}`
+      } else if (!finalLink.startsWith("http")) {
+        finalLink = `https://${finalLink}`
+      }
+      return { linkId, name, link: finalLink }
+    })
+
+    const res = await updateProfile({
+      displayName:    formDisplayName,
+      profileLink:    formProfileLink,
+      firstName:      formFirstName,
+      lastName:       formLastName,
+      city:           formCity,
+      country:        formCountry,
+      bio:            formBio,
+      profileImgLink: avatarImage || undefined,
+      links:          formattedLinks,
+      supportLink:    formSupportLink || undefined,
+    })
+
+    console.log("API response:", res)
+    console.log("hook error:", error)
+
+    if (res) {
+      dispatch(setProfile({
+        displayName:    res.displayName,
+        profileLink:    res.profileLink,
+        firstName:      res.firstName,
+        lastName:       res.lastName,
+        city:           res.city,
+        country:        res.country,
+        bio:            res.bio,
+        profileImgLink: res.profileImgLink,
+        links:          res.links,
+        supportLink:    res.supportLink,
+      }))
+      onClose()
+    }
   }
 
   return (
@@ -77,7 +248,9 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
       {isOpen && (
         <div
           className="fixed inset-0 bg-white/30 z-[1001] flex items-start pt-10 justify-center"
-          onClick={handleCancel}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) handleCancel()
+          }}
         >
           <button
             className="fixed top-4 right-4 text-white-smoke text-2xl font-bold bg-off-black rounded-full w-11 h-11 flex items-center justify-center hover:text-silver cursor-pointer z-[1002]"
@@ -91,7 +264,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -60 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="flex flex-col w-200 p-6 bg-black rounded-md relative"
+            className="flex flex-col w-200 p-6 bg-black rounded-md relative overflow-y-auto max-h-[90vh]"
             onClick={(e) => e.stopPropagation()}
           >
             <p className="text-xl text-white-smoke font-bold mb-6">
@@ -101,7 +274,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
             <div className="flex gap-6 mb-4">
               <AvatarUpload
                 avatarImage={avatarImage}
-                onImageChange={setAvatarImage}
+                onImageChange={handleAvatarChange}
                 className="relative overflow-hidden"
               >
                 <div className="absolute inset-0 bg-gray-400/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity" />
@@ -120,30 +293,55 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                     Display name <span className="text-red-500">*</span>
                   </p>
                   <input
-                    value={formDisplayName}
-                    onChange={(e) => setFormDisplayName(e.target.value)}
-                    className="w-full bg-off-black px-3 py-2 text-white-smoke rounded"
+                    value={formDisplayName || ""}
+                    onChange={(e) => {
+                      setFormDisplayName(e.target.value)
+                      if (e.target.value.trim()) setDisplayNameError(false)
+                    }}
+                    className={`w-full bg-off-black px-3 py-2 text-white-smoke rounded border ${
+                      displayNameError ? "border-red-500" : "border-transparent"
+                    }`}
                     placeholder="Display name"
                   />
+                  {displayNameError && (
+                    <p className="text-red-500 text-sm mt-1">
+                      Enter your display name. You can change it later.
+                    </p>
+                  )}
                 </div>
 
                 <div>
                   <p className="text-sm text-white-smoke font-bold mb-1">
                     Profile URL <span className="text-red-500">*</span>
                   </p>
-                  <input
-                    value={formProfileLink}
-                    onChange={(e) => setFormProfileLink(e.target.value)}
-                    className="w-full bg-off-black px-3 py-2 text-white-smoke rounded"
-                    placeholder="your-profile-link"
-                  />
+                  <div className={`flex items-center bg-off-black rounded border ${
+                    profileLinkError ? "border-red-500" : "border-transparent"
+                  }`}>
+                    <span className="text-silver px-3 py-2 whitespace-nowrap border-r border-zinc-700 select-none">
+                      beatza.me/
+                    </span>
+                    <input
+                      value={formProfileLink || ""}
+                      onChange={(e) => {
+                        setFormProfileLink(e.target.value)
+                        if (e.target.value.trim()) setProfileLinkError(false)
+                      }}
+                      className="flex-1 bg-transparent px-3 py-2 text-white-smoke outline-none"
+                      placeholder="your-profile-link"
+                    />
+                  </div>
+                  {profileLinkError && (
+                    <p className="text-red-500 text-sm mt-1">
+                      Enter your profile URL. You can change it later.
+                    </p>
+                  )}
                 </div>
 
                 <div className="flex gap-2">
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">First name</p>
                     <input
-                      value={formFirstName}
+                      value={formFirstName || ""}
                       onChange={(e) => setFormFirstName(e.target.value)}
                       className="w-full bg-off-black px-3 py-2 text-white-smoke rounded"
                       placeholder="First name"
@@ -152,7 +350,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">Last name</p>
                     <input
-                      value={formLastName}
+                      value={formLastName || ""}
                       onChange={(e) => setFormLastName(e.target.value)}
                       className="w-full bg-off-black px-3 py-2 text-white-smoke rounded"
                       placeholder="Last name"
@@ -164,7 +362,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">City</p>
                     <input
-                      value={formCity}
+                      value={formCity || ""}
                       onChange={(e) => setFormCity(e.target.value)}
                       className="w-full bg-off-black px-3 py-2 text-white-smoke rounded"
                       placeholder="City"
@@ -173,7 +371,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">Country</p>
                     <input
-                      value={formCountry}
+                      value={formCountry || ""}
                       onChange={(e) => setFormCountry(e.target.value)}
                       className="w-full bg-off-black px-3 py-2 text-white-smoke rounded"
                       placeholder="Country"
@@ -194,16 +392,132 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
               </div>
             </div>
 
-            <p className="text-sm text-white-smoke font-bold mb-2">Your links</p>
-            <div className="flex gap-3 mb-5">
-              <button className="bg-off-black text-white-smoke px-4 py-2 rounded cursor-pointer">
-                Add link
+            {/* Your links header with info tooltip */}
+            <div ref={linksInfoRef} className="flex items-center gap-2 mb-2 relative">
+              <p className="text-sm text-white-smoke font-bold">Your links</p>
+              <button
+                onClick={() => setShowLinksInfo((prev) => !prev)}
+                className="text-silver hover:text-white-smoke transition-colors cursor-pointer"
+              >
+                <IoIosInformationCircle />
               </button>
-              <button className="bg-white text-black px-4 py-2 rounded cursor-pointer">
-                Add support link
-              </button>
+              {showLinksInfo && (
+                <div className="absolute left-16 -top-2 z-10 w-64 bg-zinc-700 text-white-smoke text-sm rounded-md px-4 py-3 shadow-lg">
+                  Add links to your website and social network profiles to help your audience find you wherever you are.
+                </div>
+              )}
             </div>
 
+            {/* Add link / Add support link buttons */}
+            <div className="flex gap-3 mb-3">
+              <button
+                onClick={handleAddLink}
+                className="bg-off-black text-white-smoke px-4 py-2 rounded cursor-pointer"
+              >
+                Add link
+              </button>
+
+              {formSupportLink === null && (
+                <button
+                  onClick={() => setFormSupportLink("")}
+                  className="bg-white text-black px-4 py-2 rounded cursor-pointer"
+                >
+                  Add support link
+                </button>
+              )}
+            </div>
+
+            {/* Links list */}
+            {formLinks.length > 0 && (
+              <div className="flex flex-col gap-3 mb-3">
+                {formLinks.map((l) => (
+                  <div key={l.linkId} className="flex items-start gap-2">
+                    <span className="text-silver mt-2.5">
+                      <IoIosLink />
+                    </span>
+
+                    <div className="flex-1 flex flex-col gap-1">
+                      <input
+                        value={l.link || ""}
+                        onChange={(e) => handleLinkChange(l.linkId, "link", e.target.value)}
+                        placeholder="Web or email address *"
+                        className={`w-full bg-off-black px-3 py-2 text-white-smoke rounded border ${
+                          linkErrors[l.linkId] ? "border-red-500" : "border-transparent"
+                        }`}
+                      />
+                      {linkErrors[l.linkId] && (
+                        <p className="text-red-500 text-sm">Enter a web or email address.</p>
+                      )}
+                    </div>
+
+                    <input
+                      value={l.name || ""}
+                      onChange={(e) => handleLinkChange(l.linkId, "name", e.target.value)}
+                      placeholder="Short title"
+                      className="w-40 bg-off-black px-3 py-2 text-white-smoke rounded border border-transparent"
+                    />
+
+                    <button
+                      onClick={() => handleRemoveLink(l.linkId)}
+                      className="text-silver bg-off-black transition-colors mt-2 cursor-pointer rounded border border-transparent hover:text-red-400"
+                    >
+                      <FiTrash2 />
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Support link input row */}
+            {formSupportLink !== null && (
+              <div className="flex flex-col gap-1 mb-5">
+                <div className="flex items-center gap-2">
+                  <span className="text-silver">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                      <circle cx="12" cy="12" r="10" />
+                      <line x1="12" y1="8" x2="12" y2="16" />
+                      <line x1="8" y1="12" x2="16" y2="12" />
+                    </svg>
+                  </span>
+
+                  <input
+                    value={formSupportLink}
+                    onChange={(e) => setFormSupportLink(e.target.value)}
+                    placeholder="e.g.: https://paypal.me/username"
+                    className="flex-1 bg-off-black px-3 py-2 text-white-smoke rounded border border-transparent"
+                  />
+
+                  {/* info icon with tooltip */}
+                  <div ref={supportLinkInfoRef} className="relative">
+                    <button
+                      onClick={() => setShowSupportLinkInfo((prev) => !prev)}
+                      className="text-silver hover:text-white-smoke transition-colors cursor-pointer"
+                    >
+                      <IoIosInformationCircle />
+                    </button>
+                    {showSupportLinkInfo && (
+                      <div className="absolute right-0 -top-2 z-10 w-64 bg-zinc-700 text-white-smoke text-sm rounded-md px-4 py-3 shadow-lg">
+                        Add a link to your support page so fans can support you directly.
+                      </div>
+                    )}
+                  </div>
+
+                  <button
+                    onClick={() => setFormSupportLink(null)}
+                    className="text-silver bg-off-black transition-colors cursor-pointer rounded border border-transparent hover:text-red-400"
+                  >
+                    <FiTrash2 />
+                  </button>
+                </div>
+
+                <p className="text-silver text-xs ml-6">
+                  Supported platforms: PayPal, Cash app, Venmo, Bandcamp, Shopify, Kickstarter, Patreon, and Gofundme.{" "}
+                  <a href="#" className="text-blue-400 hover:underline">Learn more</a>
+                </p>
+              </div>
+            )}
+
+            {/* Footer buttons */}
             <div className="flex justify-end gap-3">
               <button
                 onClick={handleCancel}
@@ -213,9 +527,10 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
               </button>
               <button
                 onClick={handleSave}
-                className="bg-white text-black px-4 py-2 rounded cursor-pointer"
+                disabled={loading}
+                className="bg-white text-black px-4 py-2 rounded cursor-pointer disabled:opacity-50"
               >
-                Save changes
+                {loading ? "Saving..." : "Save changes"}
               </button>
             </div>
 

@@ -28,3 +28,35 @@ export interface GetProfileErrorResponse {
   message: string
   code:    number
 }
+
+export interface UpdateProfileRequest {
+  displayName?: string;
+  firstName?: string;
+  lastName?: string;
+  profileLink?: string;
+  bio?: string;
+  city?: string;
+  country?: string;
+  profileImgLink?: string;
+  bannerImgLink?: string;
+  links?: ProfileLink[];
+  bannerLinks?: ProfileLink[];
+  supportLink?: string;
+  favoriteGenres?: string[];
+}
+
+export interface UpdateProfileResponse {
+  displayName: string;
+  firstName: string;
+  lastName: string;
+  profileLink: string;
+  bio: string;
+  city: string;
+  country: string;
+  profileImgLink: string;
+  bannerImgLink: string;
+  links: ProfileLink[];
+  bannerLinks: ProfileLink[];
+  supportLink: string;
+  favoriteGenres: string[];
+}

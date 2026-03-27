@@ -4,11 +4,10 @@ import React, { useRef } from "react"
 
 interface CoverProps {
   children?: React.ReactNode
-  onImageChange: (image: string) => void
+  onImageChange: (file: File, previewUrl: string) => void // ← updated
 }
 
 export default function CoverPhotoUpload({ children, onImageChange }: CoverProps) {
-
   const fileInputRef = useRef<HTMLInputElement>(null)
 
   const openFilePicker = () => {
@@ -19,8 +18,8 @@ export default function CoverPhotoUpload({ children, onImageChange }: CoverProps
     const file = e.target.files?.[0]
 
     if (file) {
-      const imageUrl = URL.createObjectURL(file)
-      onImageChange(imageUrl)
+      const previewUrl = URL.createObjectURL(file)
+      onImageChange(file, previewUrl) // ← pass both
     }
   }
 
