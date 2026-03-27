@@ -36,10 +36,11 @@ export default function ProfileHeader() {
   const [coverImage,  setCoverImage]  = useState<string | null>(null)
   const [avatarImage, setAvatarImage] = useState<string | null>(null)
   const [gradient,    setGradient]    = useState("linear-gradient(to right, #c3adb4, #8f6f79)")
-
+  const isOwnProfile = useAppSelector((state) => state.profile.isOwnProfile)
   useEffect(() => {
     if (!hasHydrated || !userId) return
 
+    dispatch(setProfile({ isLoading: true }))
     getProfile(userId).then((data) => {
       if (!data) return
       dispatch(setProfile({
@@ -60,6 +61,7 @@ export default function ProfileHeader() {
         followedCount:  data.followedCount,
         tracksCount:    data.trackCount,
         isOwnProfile:   data.userId === authUserId,
+        isLoading:    false, 
       }))
     })
 
@@ -90,7 +92,14 @@ export default function ProfileHeader() {
       const c2         = `rgb(${palette[1].join(",")})`
       setGradient(`linear-gradient(to right, ${c1}, ${c2})`)
     }
-  }, [avatarImage])
+
+    if(!isOwnProfile) return
+
+    dispatch(setProfileImgLink(avatarImage))
+    dispatch(setBannerImgLink(bannerImgLink))
+    
+
+  }, [avatarImage, dispatch, isOwnProfile])
 
   // ── Upload handlers ──────────────────────────────────────────────
 
