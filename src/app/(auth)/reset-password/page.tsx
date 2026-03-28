@@ -4,6 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense, useEffect, useState } from "react";
 import { useResetPassword } from "@/hooks/useAuth";
+import { useAppDispatch } from "@/store/hooks"
+import { clearAuth } from "@/store/slices/authSlice"
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
@@ -30,6 +32,8 @@ function ResetPasswordForm() {
   const canSave = password.trim().length >= 8 && confirmPassword.trim().length >= 8;
 
   const { resetPassword, loading, error } = useResetPassword();
+
+  const dispatch = useAppDispatch()
 
   const validatePassword = (value: string) => {
     const result = passwordSchema.safeParse(value)
@@ -60,6 +64,7 @@ function ResetPasswordForm() {
     const result = await resetPassword(token, password, signOutEverywhere)
     if (result?.message === "Password reset successfully") {
       setIsSuccess(true)
+      dispatch(clearAuth()) // wipe Redux auth state
       setTimeout(() => router.push("/"), 2000)
     }
   }
