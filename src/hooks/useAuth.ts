@@ -448,3 +448,28 @@ export function useDeleteAccount() {
 
   return { handleDeleteAccount, isLoading, error };
 }
+
+export function useForgotPasswordLoggedIn() {
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState<string | null>(null)
+  const [success, setSuccess] = useState<boolean | null>(null)
+
+  const forgotPasswordLoggedIn = useCallback(async () => {
+    setLoading(true)
+    setError(null)
+    setSuccess(null)
+    try {
+      const res = await authService.forgotPasswordLoggedIn()
+      setSuccess(true)
+      return res.data
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Something went wrong"
+      setError(message)
+      setSuccess(false)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  return { forgotPasswordLoggedIn, loading, error, success }
+}

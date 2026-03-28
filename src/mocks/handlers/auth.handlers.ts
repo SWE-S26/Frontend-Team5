@@ -128,9 +128,19 @@ export const authHandlers = [
 
     // 200 - success (tokens are typically set via httpOnly cookies)
     return HttpResponse.json(
-      { success: true, message: "Authenticated successfully", data: {} },
+      {
+        success: true,
+        message: "Authenticated successfully",
+        data: {
+          user: {
+            id:          "mock-user-id-123",
+            displayName: "Omar Mahmoud",
+            profileImg:  { imgLink: "https://picsum.photos/200" },
+          }
+        }
+      },
       { status: 200 },
-    );
+    )
   }),
 
   /* (3) */
@@ -390,6 +400,22 @@ export const authHandlers = [
     );
   }),
 
+  /* (7) refresh token - called by AuthGoogle on every page load */
+  http.get(`${BASE}/api/auth/v1/refresh-token`, () => {
+    return HttpResponse.json(
+      {
+        data: {
+          user: {
+            id:          "mock-user-id-123",
+            displayName: "Omar Mahmoud",
+            profileImg:  { imgLink: "https://picsum.photos/200" },
+          }
+        }
+      },
+      { status: 200 }
+    )
+  }),
+
   /* (10) */
   http.get(`${BASE}/api/auth/v1/verify-email`, async ({ request }) => {
     /*
@@ -498,5 +524,13 @@ export const authHandlers = [
       { message: "Account deleted successfully" },
       { status: 200 },
     );
+  }),
+
+  /* (15) */
+  http.get(`${BASE}/api/auth/v1/forgot-password/logged-in`, () => {
+    return HttpResponse.json(
+      { message: "Password reset email sent successfully" },
+      { status: 200 }
+    )
   }),
 ];
