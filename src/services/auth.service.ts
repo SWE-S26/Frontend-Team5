@@ -76,4 +76,8 @@ export const authService = {
   /* (14) */
   deleteAccount: () =>
     api.delete<DeleteAccountResponse>("/api/auth/v1/delete-account"),
+
+  /* (15) */
+  forgotPasswordLoggedIn: () =>
+  api.get("/api/auth/v1/forgot-password/logged-in"),
 };
