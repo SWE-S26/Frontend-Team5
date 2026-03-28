@@ -212,3 +212,8 @@ export interface LoginWithQRcodeResponse {
     };
   };
 }
+
+/* (14) "/api/auth/v1/delete-account" */
+export interface DeleteAccountResponse {
+  message: string;
+}

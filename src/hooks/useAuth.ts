@@ -425,3 +425,26 @@ export function useQRLogin() {
 
   return { generateQR, startPolling, stopPolling, qrCode, expiresIn, status, loading, error }
 }
+
+export function useDeleteAccount() {
+  const dispatch = useAppDispatch();
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const handleDeleteAccount = async (onSuccess?: () => void) => {
+    setIsLoading(true);
+    setError(null);
+
+    try {
+      await authService.deleteAccount();
+      dispatch(clearAuth());
+      onSuccess?.();
+    } catch {
+      setError("Something went wrong. Please try again.");
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  return { handleDeleteAccount, isLoading, error };
+}

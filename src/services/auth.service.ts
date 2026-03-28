@@ -12,7 +12,8 @@ import {
   VerifyEmailRequest, VerifyEmailResponse,
   ResendVerificationEmailRequest, ResendVerificationEmailResponse,
   GenerateQRcodeResponse, LoginWithQRcodeRequest, LoginWithQRcodeResponse,
-  RefreshTokenResponse
+  RefreshTokenResponse,
+  DeleteAccountResponse 
 } from "@/types/auth.types";
 
 export const authService = {
@@ -71,4 +72,8 @@ export const authService = {
   /* (13) */
   loginWithQRcode: (data: LoginWithQRcodeRequest) =>
     api.post<LoginWithQRcodeResponse>("/api/auth/v1/cross/desktop/poll", data),
+
+  /* (14) */
+  deleteAccount: () =>
+    api.delete<DeleteAccountResponse>("/api/auth/v1/delete-account"),
 };
