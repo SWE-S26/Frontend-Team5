@@ -1,10 +1,14 @@
 "use client"
 import { useState } from "react"
-import ThemeSwitcher from "@/components/theme/ThemeSwitcher"
+import ThemeSwitcher from "@/components/settings/theme/ThemeSwitcher"
 import Button from "@/components/ui/Button"
+import DeleteAccountModal from "@/components/settings/DeleteAccountModal";
 
 export default function Settings() {
-  const [emailSent, setEmailSent] = useState(false)
+  const [emailSent, setEmailSent] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
+
+
   
   return (
     <div className="bg-chinese-black">
@@ -24,6 +28,16 @@ export default function Settings() {
           Send password-reset link
         </Button>
       </div>
+      <Button 
+        className="text-red-500 text-sm cursor-pointer"
+        onClick={() => setDeleteModalOpen(true)}
+      >
+        Delete Account
+      </Button>
+      <DeleteAccountModal
+        isOpen={deleteModalOpen}
+        onClose={() => setDeleteModalOpen(false)}
+      />
     </div>
   )
 }

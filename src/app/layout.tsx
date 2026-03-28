@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { Inter } from "next/font/google";
-import ThemeProvider from "@/components/theme/ThemeProvider";
+import ThemeProvider from "@/components/settings/theme/ThemeProvider";
 import MockProvider from "@/components/MSWProvider";
 import AuthGoogle from "@/components/auth/AuthGoogle";
 import ReduxProvider from "@/components/ReduxProvider";

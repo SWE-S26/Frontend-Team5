@@ -491,5 +491,12 @@ export const authHandlers = [
     },
   ),
 
+  /* (14) */
+  http.delete(`${BASE}/api/auth/v1/delete-account`, async () => {
+    // 200 - success
+    return HttpResponse.json(
+      { message: "Account deleted successfully" },
+      { status: 200 },
+    );
+  }),
 ];
-
