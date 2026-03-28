@@ -5,7 +5,7 @@ import React, { useRef, useState } from "react";
 interface AvatarProps {
   children?: React.ReactNode;
   className?: string;
-  onImageChange: (image: string) => void;
+  onImageChange: (file: File, previewUrl: string) => void; // ← updated
   avatarImage?: string | null;
 }
 
@@ -21,16 +21,13 @@ export default function AvatarUpload({ children, className, onImageChange, avata
     const file = e.target.files?.[0];
 
     if (file) {
-      const imageUrl = URL.createObjectURL(file);
-      setImage(imageUrl);
-
-      
-      onImageChange(imageUrl);
+      const previewUrl = URL.createObjectURL(file);
+      setImage(previewUrl);
+      onImageChange(file, previewUrl); // ← pass both File + preview URL
     }
   };
 
   const displayImage = image || avatarImage;
-  
 
   return (
     <div
