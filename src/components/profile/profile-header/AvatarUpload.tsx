@@ -1,53 +1,67 @@
 "use client";
 
-import React, { useRef, useState } from "react";
+import React, { useRef, useState, forwardRef, useImperativeHandle } from "react";
 
 interface AvatarProps {
   children?: React.ReactNode;
   className?: string;
-  onImageChange: (file: File, previewUrl: string) => void; // ← updated
+  onImageChange: (file: File, previewUrl: string) => void;
   avatarImage?: string | null;
+  disableClick?: boolean; // ← new
 }
 
-export default function AvatarUpload({ children, className, onImageChange, avatarImage }: AvatarProps) {
-  const [image, setImage] = useState<string | null>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
+export interface AvatarUploadHandle {
+  openFilePicker: () => void; // ← expose trigger
+}
 
-  const openFilePicker = () => {
-    fileInputRef.current?.click();
-  };
+const AvatarUpload = forwardRef<AvatarUploadHandle, AvatarProps>(
+  ({ children, className, onImageChange, avatarImage, disableClick = false }, ref) => {
+    const [image, setImage] = useState<string | null>(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0];
+    const openFilePicker = () => {
+      fileInputRef.current?.click();
+    };
 
-    if (file) {
-      const previewUrl = URL.createObjectURL(file);
-      setImage(previewUrl);
-      onImageChange(file, previewUrl); // ← pass both File + preview URL
-    }
-  };
+    useImperativeHandle(ref, () => ({ openFilePicker }));
 
-  const displayImage = image || avatarImage;
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0];
+      if (file) {
+        const previewUrl = URL.createObjectURL(file);
+        setImage(previewUrl);
+        onImageChange(file, previewUrl);
+      }
+    };
 
-  return (
-    <div
-      className={`w-48 h-48 rounded-full bg-linear-to-br from-[#8f6f79] to-[#c3adb4] flex items-center justify-center shadow-lg overflow-hidden ${className}`}
-    >
-      {displayImage && (
-        <img src={displayImage} alt="avatar" className="w-full h-full object-cover" />
-      )}
+    const displayImage = image || avatarImage;
 
-      <div onClick={openFilePicker} className="cursor-pointer">
-        {children}
+    return (
+      <div
+        className={`w-48 h-48 rounded-full bg-linear-to-br from-[#8f6f79] to-[#c3adb4] flex items-center justify-center shadow-lg overflow-hidden ${className}`}
+      >
+        {displayImage && (
+          <img src={displayImage} alt="avatar" className="w-full h-full object-cover" />
+        )}
+
+        <div
+          onClick={disableClick ? undefined : openFilePicker}
+          className={disableClick ? "" : "cursor-pointer"}
+        >
+          {children}
+        </div>
+
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          className="hidden"
+        />
       </div>
+    );
+  }
+);
 
-      <input
-        type="file"
-        accept="image/*"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        className="hidden"
-      />
-    </div>
-  );
-}
+AvatarUpload.displayName = "AvatarUpload";
+export default AvatarUpload;

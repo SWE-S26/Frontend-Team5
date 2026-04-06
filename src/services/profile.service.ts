@@ -1,5 +1,5 @@
 import api from "@/lib/api"
-import { GetProfileResponse, UpdateProfileRequest, UpdateProfileResponse } from "@/types/profile.types";
+import { GetProfileResponse, UpdateProfileRequest, UpdateProfileResponse, UpdateProfileImagesRequest, UpdateProfileImagesResponse } from "@/types/profile.types";
 
 export const profileService = {
   getProfile: (userId: string) =>
@@ -15,4 +15,16 @@ export const profileService = {
           : {}),
       },
     }),
+
+    updateProfileImages: (data: UpdateProfileImagesRequest) => {
+    const formData = new FormData()
+
+    if (data.profileImage)     formData.append("profileImage",    data.profileImage)
+    if (data.bannerImage)      formData.append("bannerImage",     data.bannerImage)
+    if (data.removeProfileImg) formData.append("removeProfileImg","true")  // ← string not boolean
+    if (data.removeBannerImg)  formData.append("removeBannerImg", "true")  // ← string not boolean
+
+    return api.patch<UpdateProfileImagesResponse>(`/api/profile/v1/images`, formData)
+    // ← no need to manually set Content-Type, axios sets it automatically with the boundary for FormData
+  },
 }

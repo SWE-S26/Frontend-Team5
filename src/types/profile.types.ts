@@ -60,3 +60,15 @@ export interface UpdateProfileResponse {
   supportLink: string;
   favoriteGenres: string[];
 }
+
+export interface UpdateProfileImagesRequest {
+  profileImage?: File
+  bannerImage?: File
+  removeProfileImg?: boolean
+  removeBannerImg?: boolean
+}
+
+export interface UpdateProfileImagesResponse {
+  profileImgLink: string | null
+  bannerImgLink:  string | null
+}
