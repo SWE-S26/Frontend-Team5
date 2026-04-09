@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useRef, useState, forwardRef, useImperativeHandle } from "react";
+import { useAppSelector } from "@/store/hooks"
+
 
 interface AvatarProps {
   children?: React.ReactNode;
@@ -36,6 +38,9 @@ const AvatarUpload = forwardRef<AvatarUploadHandle, AvatarProps>(
 
     const displayImage = image || avatarImage;
 
+    const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
+
+
     return (
       <div
         className={`w-48 h-48 rounded-full bg-linear-to-br from-[#8f6f79] to-[#c3adb4] flex items-center justify-center shadow-lg overflow-hidden ${className}`}
@@ -44,21 +49,26 @@ const AvatarUpload = forwardRef<AvatarUploadHandle, AvatarProps>(
           <img src={displayImage} alt="avatar" className="w-full h-full object-cover" />
         )}
 
-        <div
-          onClick={disableClick ? undefined : openFilePicker}
-          className={disableClick ? "" : "cursor-pointer"}
-        >
-          {children}
-        </div>
+       {isOwn && (
+          <>
+            <div
+              onClick={disableClick ? undefined : openFilePicker}
+              className={disableClick ? "" : "cursor-pointer"}
+            >
+              {children}
+            </div>
 
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          className="hidden"
-        />
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </>
+        )}
       </div>
+      
     );
   }
 );

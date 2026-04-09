@@ -54,6 +54,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
   const [displayNameError, setDisplayNameError] = useState(false)
   const [profileLinkError, setProfileLinkError] = useState(false)
   const [showLinksInfo,    setShowLinksInfo]    = useState(false)
+  const [isDirty, setIsDirty] = useState(false)
 
   const dispatch = useAppDispatch()
   const { updateProfile, loading, error } = useUpdateProfile()
@@ -105,9 +106,19 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
     setFormCity(cityRef.current                 || "")
     setFormCountry(countryRef.current           || "")
     setFormBio(bioRef.current                   || "")
-    setFormLinks(reduxLinksRef.current          || [])
+    setFormLinks(
+      (reduxLinksRef.current || []).map((l: any) => ({
+        linkId: l.linkId || crypto.randomUUID(),
+        name: l.name || "",
+        link: l.link?.startsWith("mailto:")
+          ? l.link.replace("mailto:", "")
+          : l.link || "",
+      }))
+    )
     setFormSupportLink(reduxSupportLinkRef.current || null)
     setLinkErrors({})
+
+    setIsDirty(false)
   }, [isOpen])
 
   // close links info tooltip on outside click
@@ -137,6 +148,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
   const handleAddLink = () => {
     const newLink: LinkItem = { linkId: crypto.randomUUID(), name: "", link: "" }
     setFormLinks((prev) => [...prev, newLink])
+    setIsDirty(true)
   }
 
   const handleRemoveLink = (linkId: string) => {
@@ -146,6 +158,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
       delete next[linkId]
       return next
     })
+    setIsDirty(true)
   }
 
   const handleLinkChange = (linkId: string, field: "link" | "name", value: string) => {
@@ -155,6 +168,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
     if (field === "link" && value.trim()) {
       setLinkErrors((prev) => ({ ...prev, [linkId]: false }))
     }
+    setIsDirty(true)
   }
 
   const handleCancel = () => {
@@ -181,48 +195,48 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
   }
 
   const handleSave = async () => {
-    let hasError = false
+  let hasError = false;
 
-    if (!formDisplayName.trim()) { setDisplayNameError(true); hasError = true }
-    if (!formProfileLink.trim()) { setProfileLinkError(true); hasError = true }
+  if (!formDisplayName.trim()) {
+    setDisplayNameError(true);
+    hasError = true;
+  }
+  if (!formProfileLink.trim()) {
+    setProfileLinkError(true);
+    hasError = true;
+  }
 
-    const newLinkErrors: Record<string, boolean> = {}
-    formLinks.forEach((l) => {
-      if (!l.link.trim() || !l.link.includes(".")) {
-        newLinkErrors[l.linkId] = true
-        hasError = true
-      }
-    })
-    setLinkErrors(newLinkErrors)
+  if (hasError) return;
 
-    if (hasError) return
-
-    const formattedLinks = formLinks.map(({ linkId, name, link }) => {
-      let finalLink = link.trim()
+  // Format links
+  const formattedLinks = formLinks
+    .filter((l) => l.link.trim())
+    .map(({ linkId, name, link }) => {
+      let finalLink = link.trim();
       if (finalLink.includes("@") && !finalLink.startsWith("http")) {
-        finalLink = `mailto:${finalLink}`
+        finalLink = `mailto:${finalLink}`;
       } else if (!finalLink.startsWith("http")) {
-        finalLink = `https://${finalLink}`
+        finalLink = `https://${finalLink}`;
       }
-      return { linkId, name, link: finalLink }
-    })
+      return { linkId, name, link: finalLink };
+    });
 
-    const res = await updateProfile({
-      displayName:    formDisplayName,
-      profileLink:    formProfileLink,
-      firstName:      formFirstName,
-      lastName:       formLastName,
-      city:           formCity,
-      country:        formCountry,
-      bio:            formBio,
-      bannerLinks:    formattedLinks,
-      links:          formattedLinks,
-      supportLink:    formSupportLink || undefined,
-    })
+  // Required fields + optional fields (null if empty)
+  const updateData: any = {
+    displayName:  formDisplayName,
+    profileLink:  formProfileLink,
+    firstName:    formFirstName.trim() || null,
+    lastName:     formLastName.trim()  || null,
+    city:         formCity.trim()      || null,
+    country:      formCountry.trim()   || null,
+    bio:          formBio.trim()       || null,
+    links:        formattedLinks.length ? formattedLinks : null,
+    bannerLinks:  formattedLinks.length ? formattedLinks : null,
+    supportLink:  formSupportLink?.trim() || null,
+  };
 
-    console.log("API response:", res)
-    console.log("hook error:", error)
-
+  try {
+    const res = await updateProfile(updateData);
     if (res) {
       dispatch(setProfile({
         displayName:    res.displayName,
@@ -232,14 +246,17 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
         city:           res.city,
         country:        res.country,
         bio:            res.bio,
-        bannerLinks:    res.bannerLinks?.length ? res.bannerLinks : formattedLinks, 
+        bannerLinks:    res.bannerLinks?.length ? res.bannerLinks : [],
         profileImgLink: res.profileImgLink,
         links:          res.links,
         supportLink:    res.supportLink,
-      }))
-      onClose()
+      }));
+      onClose();
     }
+  } catch (err) {
+    console.error("Failed to save profile:", err);
   }
+};
 
   return (
     <AnimatePresence>
@@ -262,7 +279,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -60 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="flex flex-col w-200 p-6 bg-black rounded-md relative overflow-y-auto max-h-[90vh]"
+            className="flex flex-col w-200 p-6 bg-black rounded-md relative overflow-y-auto max-h-[90vh] scrollbar-hide"
             onClick={(e) => e.stopPropagation()}
           >
             <p className="text-xl text-white-smoke font-bold mb-6">
@@ -294,6 +311,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                     value={formDisplayName || ""}
                     onChange={(e) => {
                       setFormDisplayName(e.target.value)
+                      setIsDirty(true)
                       if (e.target.value.trim()) setDisplayNameError(false)
                     }}
                     className={`w-full bg-off-black px-3 py-2 text-white-smoke rounded border ${
@@ -322,6 +340,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                       value={formProfileLink || ""}
                       onChange={(e) => {
                         setFormProfileLink(e.target.value)
+                        setIsDirty(true)
                         if (e.target.value.trim()) setProfileLinkError(false)
                       }}
                       className="flex-1 bg-transparent px-3 py-2 text-white-smoke outline-none"
@@ -340,7 +359,10 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                     <p className="text-sm text-white-smoke font-bold mb-1">First name</p>
                     <input
                       value={formFirstName || ""}
-                      onChange={(e) => setFormFirstName(e.target.value)}
+                      onChange={(e) => {
+                        setFormFirstName(e.target.value)
+                        setIsDirty(true)
+                      }}
                       className="w-full bg-off-black px-3 py-2 text-white-smoke rounded"
                       placeholder="First name"
                     />
@@ -349,7 +371,10 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                     <p className="text-sm text-white-smoke font-bold mb-1">Last name</p>
                     <input
                       value={formLastName || ""}
-                      onChange={(e) => setFormLastName(e.target.value)}
+                      onChange={(e) => {
+                        setFormLastName(e.target.value)
+                        setIsDirty(true)
+                      }}
                       className="w-full bg-off-black px-3 py-2 text-white-smoke rounded"
                       placeholder="Last name"
                     />
@@ -361,7 +386,10 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                     <p className="text-sm text-white-smoke font-bold mb-1">City</p>
                     <input
                       value={formCity || ""}
-                      onChange={(e) => setFormCity(e.target.value)}
+                      onChange={(e) => {
+                        setFormCity(e.target.value)
+                        setIsDirty(true)
+                      }}
                       className="w-full bg-off-black px-3 py-2 text-white-smoke rounded"
                       placeholder="City"
                     />
@@ -370,7 +398,10 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                     <p className="text-sm text-white-smoke font-bold mb-1">Country</p>
                     <input
                       value={formCountry || ""}
-                      onChange={(e) => setFormCountry(e.target.value)}
+                      onChange={(e) => {
+                        setFormCountry(e.target.value)
+                        setIsDirty(true)
+                      }}
                       className="w-full bg-off-black px-3 py-2 text-white-smoke rounded"
                       placeholder="Country"
                     />
@@ -381,7 +412,10 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                   <p className="text-sm text-white-smoke font-bold mb-1">Bio</p>
                   <textarea
                     value={formBio}
-                    onChange={(e) => setFormBio(e.target.value)}
+                    onChange={(e) => {
+                      setFormBio(e.target.value)
+                      setIsDirty(true)
+                    }}
                     className="w-full h-20 bg-off-black px-3 py-2 text-white-smoke rounded resize-none text-sm"
                     placeholder="Tell the world a little bit about yourself. The shorter the better."
                   />
@@ -406,26 +440,6 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
               )}
             </div>
 
-            {/* Add link / Add support link buttons */}
-            <div className="flex gap-3 mb-3">
-              <button
-                onClick={handleAddLink}
-                className="bg-off-black text-white-smoke px-4 py-2 rounded cursor-pointer"
-              >
-                Add link
-              </button>
-
-              {formSupportLink === null && (
-                <button
-                  onClick={() => setFormSupportLink("")}
-                  className="bg-white text-black px-4 py-2 rounded cursor-pointer"
-                >
-                  Add support link
-                </button>
-              )}
-            </div>
-
-            {/* Links list */}
             {formLinks.length > 0 && (
               <div className="flex flex-col gap-3 mb-3">
                 {formLinks.map((l) => (
@@ -437,7 +451,10 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                     <div className="flex-1 flex flex-col gap-1">
                       <input
                         value={l.link || ""}
-                        onChange={(e) => handleLinkChange(l.linkId, "link", e.target.value)}
+                        onChange={(e) => {
+                          handleLinkChange(l.linkId, "link", e.target.value)
+                          setIsDirty(true)
+                        }}
                         placeholder="Web or email address *"
                         className={`w-full bg-off-black px-3 py-2 text-white-smoke rounded border ${
                           linkErrors[l.linkId] ? "border-red-500" : "border-transparent"
@@ -450,7 +467,10 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
 
                     <input
                       value={l.name || ""}
-                      onChange={(e) => handleLinkChange(l.linkId, "name", e.target.value)}
+                      onChange={(e) => {
+                        handleLinkChange(l.linkId, "name", e.target.value)
+                        setIsDirty(true)
+                      }}
                       placeholder="Short title"
                       className="w-40 bg-off-black px-3 py-2 text-white-smoke rounded border border-transparent"
                     />
@@ -480,7 +500,10 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
 
                   <input
                     value={formSupportLink}
-                    onChange={(e) => setFormSupportLink(e.target.value)}
+                    onChange={(e) => {
+                      setFormSupportLink(e.target.value)
+                      setIsDirty(true)
+                    }}
                     placeholder="e.g.: https://paypal.me/username"
                     className="flex-1 bg-off-black px-3 py-2 text-white-smoke rounded border border-transparent"
                   />
@@ -515,6 +538,29 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
               </div>
             )}
 
+            {/* Add link / Add support link buttons */}
+            <div className="flex gap-3 mb-3">
+              <button
+                onClick={handleAddLink}
+                className="bg-off-black text-white-smoke px-4 py-2 rounded cursor-pointer"
+              >
+                Add link
+              </button>
+
+              <button
+                  onClick={() => setFormSupportLink("")}
+                  disabled={formSupportLink !== null}
+                  className="bg-white text-black px-4 py-2 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                >
+                  Add support link
+              </button>
+            </div>
+
+            {/* Links list */}
+            
+
+            
+
             {/* Footer buttons */}
             <div className="flex justify-end gap-3">
               <button
@@ -525,7 +571,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
               </button>
               <button
                 onClick={handleSave}
-                disabled={loading}
+                disabled={loading || !isDirty}
                 className="bg-white text-black px-4 py-2 rounded cursor-pointer disabled:opacity-50"
               >
                 {loading ? "Saving..." : "Save changes"}
