@@ -43,7 +43,7 @@ function CrossPlatformCallbackContent() {
     const displayName =
       searchParams.get("displayName") ||
       undefined;
-    const hasAnyToken = Boolean(token || accessToken || refreshToken || pendingToken);
+    const hasAnyToken = Boolean(token || accessToken || refreshToken || pendingToken || incompleteToken || displayName);
 
     return {
       token,
