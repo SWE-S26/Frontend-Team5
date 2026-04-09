@@ -1,14 +1,23 @@
-import WaveformTest from "@/components/ui/SausageWaveform"
+
+import Card from "@/components/layout/track-cards/WaveformCard"
+
 
 interface Item { id: string; title: string; artist: string; img: string }
 interface Props { items: Item[] }
 
 export default function All({ items }: Props) {
   return (
+    <>
     <div className="flex flex-col gap-4">
       {items.map((item) => (
-        <WaveformTest key={item.id} />
+        <Card key={item.id} />
       ))}
     </div>
+
+    <div className="flex justify-center">
+        <img src="/app-logo/whitelogo.png" alt="App Logo" className="w-12 h-8 mt-8 opacity-50" />
+    </div>
+    </>
+    
   )
 }
