@@ -6,6 +6,7 @@ import Link from "next/link"
 
 import HeroBanner from "@/components/landing-page/HeroBanner"
 import NavbarCenter from "@/components/layout/navbar/main-navbar/NavbarCenter"
+import NeverStopListening from "@/components/landing-page/NeverStopListening"
 import Button from "@/components/ui/Button"
 import { useAppSelector } from "@/store/hooks"
 
@@ -49,6 +50,8 @@ export default function LandingPage() {
         </div>
 
         <div className="my-20" />
+
+        <NeverStopListening />
       </div>
     </div>
   )
