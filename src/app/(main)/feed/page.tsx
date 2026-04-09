@@ -3,6 +3,8 @@ import { main } from "framer-motion/m";
 import { Metadata } from "next";
 import { Main } from "next/document";
 import { ConfigProvider, Switch } from "antd";
+import FeedHeader from "@/components/layout/track-cards/FeedHeader";
+import { PopoverProvider } from "@/components/layout/track-cards/PopoverContext";
 
 export const metadata: Metadata = {
   title: "Your feed on BeatZa",
@@ -38,6 +40,10 @@ export default function Feed() {
             </ConfigProvider>
           </div>
         </div>
+
+        <PopoverProvider>
+          <FeedHeader />
+        </PopoverProvider>
 
         <WaveformCard />
       </div>
