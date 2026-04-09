@@ -6,7 +6,7 @@ import AuthModal from "@/components/auth/AuthModal";
 
 const slides = [
   {
-    image: "/hero-banner/placeholder1.jpeg",
+    image: "/landing-page/hero-banner/placeholder1.jpeg",
     artist: "DC the Don",
     title: "SoundCloud Artist Pro",
     heading: ["Discover.", "Get Discovered."],
@@ -14,7 +14,7 @@ const slides = [
     buttons: [{ label: "Get Started", href: "/explore" }],
   },
   {
-    image: "/hero-banner/placeholder2.jpeg",
+    image: "/landing-page/hero-banner/placeholder2.jpeg",
     artist: "1900Rugrat",
     title: "Ascending Artist",
     heading: ["It all starts with", "an upload."],
@@ -22,7 +22,7 @@ const slides = [
     buttons: [{ label: "Upload", href: "/upload" }, { label: "Explore Artist Pro", href: "/artistpro" }],
   },
   {
-    image: "/hero-banner/placeholder3.jpeg",
+    image: "/landing-page/hero-banner/placeholder3.jpeg",
     artist: "Crayon",
     title: "Ascending Artist",
     heading: ["Where every music", "scene lives."],
