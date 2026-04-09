@@ -10,16 +10,16 @@ export default function NeverStopListening() {
 
         {/* ── Left: devices ───────────────────────────────────────── */}
         {/* Layout from reference: phone-back top-left, phone-front bottom-left, tablet right */}
-        <div className="w-[70%] flex relative">
+        <div className="w-[70%] flex relative h-85">
 
-          {/* Phone back — taller, slight left tilt, behind */}
-          <IPhoneMockup className="absolute z-10" />
+          {/* Android front — overlapping, slight right tilt, in front */}
+          <AndroidMockup className="absolute left-10 top-50 z-30" screenImage="/landing-page/mock-phone/Mobile2.png"/>
 
-          {/* Phone front — overlapping, slight right tilt, in front */}
-          <AndroidMockup className="..." />
+          {/* iPhone back — taller, slight left tilt, behind */}
+          <IPhoneMockup className="absolute -left-10 top-25 z-20" screenImage="/landing-page/mock-phone/Mobile1.png"/>
 
-          {/* Tablet — right side, upright */}
-          <IPadMockup className="absolute z-10" />
+          {/* iPad — right side, upright */}
+          <IPadMockup className="absolute right-35 top-38 z-10" screenImage="/landing-page/mock-phone/Mobile3.jpeg"/>
 
         </div>
 
@@ -29,7 +29,7 @@ export default function NeverStopListening() {
             Never stop listening
           </h2>
 
-          <div className="w-12 h-[3px] bg-gradient-to-r from-[#FF5500] to-[#FF8800] mb-5 rounded-full" />
+          <div className="w-12 h-0.75 bg-linear-to-r from-[#FF5500] to-[#FF8800] mb-5 rounded-full" />
 
           <p className="text-[15px] font-semibold text-[#1a1a1a] leading-relaxed mb-8">
             Beatza is available on Web, iOS, Android, Sonos, Chromecast, and Xbox One.
