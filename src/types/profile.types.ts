@@ -5,22 +5,26 @@ export interface ProfileLink {
 }
 
 export interface GetProfileResponse {
-  userId:         string
-  displayName:    string
-  firstName:      string | null
-  lastName:       string | null
-  profileLink:    string
-  profileImgLink: string | null
-  bannerImgLink:  string | null
-  bio:            string | null
-  city:           string | null
-  country:        string | null
-  links:          ProfileLink[]
-  supportLink:    string | null
-  favoriteGenres: string[]
-  followersCount: number
-  followedCount:  number
-  trackCount:     number
+  userId:          string
+  displayName:     string
+  firstName:       string | null
+  lastName:        string | null
+  profileLink:     string
+  profileImgLink:  string | null
+  bannerImgLink:   string | null
+  bio:             string | null
+  city:            string | null
+  country:         string | null
+  links:           ProfileLink[]
+  bannerLinks:     ProfileLink[]
+  supportLink:     string | null
+  role:            string
+  isPaid:          boolean
+  isPrivate:       boolean
+  favoriteGenres:  string[]
+  followersCount:  number
+  followingsCount: number
+  trackCount:      number
 }
 
 export interface GetProfileErrorResponse {
@@ -30,33 +34,62 @@ export interface GetProfileErrorResponse {
 }
 
 export interface UpdateProfileRequest {
-  displayName?: string;
-  firstName?: string;
-  lastName?: string;
-  profileLink?: string;
-  bio?: string;
-  city?: string;
-  country?: string;
-  profileImgLink?: string;
-  bannerImgLink?: string;
-  links?: ProfileLink[];
-  bannerLinks?: ProfileLink[];
-  supportLink?: string;
-  favoriteGenres?: string[];
+  displayName?:    string
+  firstName?:      string
+  lastName?:       string
+  profileLink?:    string
+  bio?:            string
+  city?:           string
+  country?:        string
+  links?:          ProfileLink[]
+  bannerLinks?:    ProfileLink[]
+  supportLink?:    string
+  favoriteGenres?: string[]
+  isPrivate?:      boolean
 }
 
 export interface UpdateProfileResponse {
-  displayName: string;
-  firstName: string;
-  lastName: string;
-  profileLink: string;
-  bio: string;
-  city: string;
-  country: string;
-  profileImgLink: string;
-  bannerImgLink: string;
-  links: ProfileLink[];
-  bannerLinks: ProfileLink[];
-  supportLink: string;
-  favoriteGenres: string[];
+  displayName:    string
+  firstName:      string
+  lastName:       string
+  profileLink:    string
+  bio:            string
+  city:           string
+  country:        string
+  profileImgLink: string
+  bannerImgLink:  string
+  links:          ProfileLink[]
+  bannerLinks:    ProfileLink[]
+  supportLink:    string
+  favoriteGenres: string[]
+}
+
+export interface UpdateProfileImagesRequest {
+  profileImage?:    File
+  bannerImage?:     File
+  removeProfileImg?: boolean
+  removeBannerImg?:  boolean
+}
+
+export interface UpdateProfileImagesResponse {
+  userId:          string
+  displayName:     string
+  firstName:       string | null
+  lastName:        string | null
+  profileLink:     string
+  profileImgLink:  string | null
+  bannerImgLink:   string | null
+  bio:             string | null
+  city:            string | null
+  country:         string | null
+  links:           ProfileLink[]
+  bannerLinks:     ProfileLink[]
+  supportLink:     string | null
+  role:            string
+  isPaid:          boolean
+  isPrivate:       boolean
+  favoriteGenres:  string[]
+  followersCount:  number
+  followingsCount: number
+  trackCount:      number
 }

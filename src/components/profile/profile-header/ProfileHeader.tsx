@@ -1,14 +1,17 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useParams } from "next/navigation"
 import ColorThief from "color-thief-browser"
 
 import Button from "@/components/ui/Button"
-import AvatarUpload from "./AvatarUpload"
-import CoverPhotoUpload from "./CoverPhotoUpload"
+import AvatarUpload, { AvatarUploadHandle } from "./AvatarUpload"
+import CoverPhotoUpload, { CoverUploadHandle } from "./CoverPhotoUpload"
+
 import { useGetProfile } from "@/hooks/useProfile"
 import { useUpdateProfile } from "@/hooks/useUpdateProfile"
+import { useUpdateProfileImages } from "@/hooks/useUpdateProfileImages"
+
 import { useAppSelector, useAppDispatch } from "@/store/hooks"
 import { setProfileImgLink, setBannerImgLink } from "@/store/slices/authSlice"
 import { setProfile, clearProfile } from "@/store/slices/profileSlice"
@@ -32,11 +35,59 @@ export default function ProfileHeader() {
 
   const { getProfile, loading, error } = useGetProfile()
   const { updateProfile } = useUpdateProfile()
-
+  const { updateProfileImages } = useUpdateProfileImages()
+  const coverRef = useRef<CoverUploadHandle>(null)
+const coverMenuRef = useRef<HTMLDivElement>(null)
+const [showCoverMenu, setShowCoverMenu] = useState(false)
+  
+  const avatarRef = useRef<AvatarUploadHandle>(null)
+  const avatarMenuRef = useRef<HTMLDivElement>(null)
+  const [showAvatarMenu, setShowAvatarMenu] = useState(false)
   const [coverImage,  setCoverImage]  = useState<string | null>(null)
   const [avatarImage, setAvatarImage] = useState<string | null>(null)
   const [gradient,    setGradient]    = useState("linear-gradient(to right, #c3adb4, #8f6f79)")
   const isOwnProfile = useAppSelector((state) => state.profile.isOwnProfile)
+  
+
+
+  useEffect(() => {
+  const handleClickOutside = (e: MouseEvent) => {
+    if (coverMenuRef.current && !coverMenuRef.current.contains(e.target as Node)) {
+      setShowCoverMenu(false)
+    }
+  }
+  document.addEventListener("mousedown", handleClickOutside)
+  return () => document.removeEventListener("mousedown", handleClickOutside)
+}, [])
+
+// add delete handler
+const handleDeleteCover = async () => {
+  setShowCoverMenu(false)
+  setCoverImage(null)
+  await updateProfileImages({ removeBannerImg: true })
+  dispatch(setBannerImgLink(""))
+}
+
+
+  useEffect(() => {
+  const handleClickOutside = (e: MouseEvent) => {
+    if (avatarMenuRef.current && !avatarMenuRef.current.contains(e.target as Node)) {
+      setShowAvatarMenu(false)
+    }
+  }
+  document.addEventListener("mousedown", handleClickOutside)
+  return () => document.removeEventListener("mousedown", handleClickOutside)
+}, [])
+
+// fix delete — clear local state AND reset gradient
+const handleDeleteAvatar = async () => {
+  setShowAvatarMenu(false)
+  setAvatarImage(null)
+  setGradient("linear-gradient(to right, #c3adb4, #8f6f79)")
+  dispatch(setProfileImgLink(""))
+
+  await updateProfileImages({ removeProfileImg: true })
+}
   useEffect(() => {
     if (!hasHydrated || !userId) return
 
@@ -58,7 +109,7 @@ export default function ProfileHeader() {
         supportLink:    data.supportLink,
         favoriteGenres: data.favoriteGenres,
         followersCount: data.followersCount,
-        followedCount:  data.followedCount,
+        
         tracksCount:    data.trackCount,
         isOwnProfile:   data.userId === authUserId,
         isLoading:    false, 
@@ -106,14 +157,7 @@ export default function ProfileHeader() {
   const handleAvatarChange = async (file: File, previewUrl: string) => {
   setAvatarImage(previewUrl)
 
-  const formData = new FormData()
-  formData.append("profileImage", file)
-
-  console.log("Sending:", [...formData.entries()]) // ← add here
-
-  const updated = await updateProfile(formData)
-
-  console.log("Response:", updated) // ← add here
+  const updated = await updateProfileImages({ profileImage: file })
 
   if (updated?.profileImgLink) {
     setAvatarImage(updated.profileImgLink)
@@ -121,22 +165,16 @@ export default function ProfileHeader() {
   }
 }
 
-  const handleCoverChange = async (file: File, previewUrl: string) => {
-    // 1. Show preview immediately
-    setCoverImage(previewUrl)
+const handleCoverChange = async (file: File, previewUrl: string) => {
+  setCoverImage(previewUrl)
 
-    // 2. Build FormData and send to backend
-    const formData = new FormData()
-    formData.append("bannerImage", file) // ← key must match your backend field name
+  const updated = await updateProfileImages({ bannerImage: file })
 
-    const updated = await updateProfile(formData)
-
-    // 3. Sync real Cloudinary URL back into store
-    if (updated?.bannerImgLink) {
-      setCoverImage(updated.bannerImgLink)
-      dispatch(setBannerImgLink(updated.bannerImgLink))
-    }
+  if (updated?.bannerImgLink) {
+    setCoverImage(updated.bannerImgLink)
+    dispatch(setBannerImgLink(updated.bannerImgLink))
   }
+}
 
   // ─────────────────────────────────────────────────────────────────
 
@@ -159,29 +197,99 @@ export default function ProfileHeader() {
           : { background: gradient }
       }
     >
-      <div className="absolute top-8 right-6 flex flex-col gap-3">
-        <CoverPhotoUpload onImageChange={handleCoverChange}>
-          <Button className="bg-chinese-black text-white-smoke cursor-pointer">
-            Upload header image
-          </Button>
-        </CoverPhotoUpload>
-      </div>
+      <div
+  ref={coverMenuRef}
+  className="absolute top-8 right-6 flex flex-col gap-3"
+>
+  <CoverPhotoUpload
+    ref={coverRef}
+    onImageChange={handleCoverChange}
+    disableClick
+  >
+    <Button
+      className="bg-chinese-black text-white-smoke cursor-pointer"
+      onClick={(e) => {
+        e.stopPropagation()
+        setShowCoverMenu((prev) => !prev)
+      }}
+    >
+      Upload header image
+    </Button>
+  </CoverPhotoUpload>
 
-      <div className="absolute left-10 top-1/2 -translate-y-1/2 group/avatar">
-        <AvatarUpload
-          avatarImage={avatarImage}
-          onImageChange={handleAvatarChange}
-          className="relative overflow-hidden"
+  {showCoverMenu && (
+    <div className="absolute right-0 top-[110%] z-50 w-48 bg-[#111] border border-white/10 rounded-sm shadow-2xl overflow-hidden">
+      <button
+        onClick={() => {
+          setShowCoverMenu(false)
+          coverRef.current?.openFilePicker()
+        }}
+        className="w-full text-left px-4 py-3 text-sm font-semibold text-white hover:bg-white/5 transition-colors border-b border-white/5"
+      >
+        Replace image
+      </button>
+
+      {coverImage && (
+        <button
+          onClick={handleDeleteCover}
+          className="w-full text-left px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
         >
-          <div className="absolute inset-0 bg-gray-400/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity" />
-          <Button
-            className={`bg-chinese-black text-white-smoke absolute bottom-9 right-9 cursor-pointer 
-              ${avatarImage ? "opacity-0 group-hover/avatar:opacity-100" : "opacity-100"}`}
-          >
-            Upload image
-          </Button>
-        </AvatarUpload>
-      </div>
+          Delete image
+        </button>
+      )}
+    </div>
+  )}
+</div>
+
+     <div
+  className="absolute left-10 top-1/2 -translate-y-1/2 group/avatar"
+  ref={avatarMenuRef}
+>
+  <AvatarUpload
+    ref={avatarRef}
+    avatarImage={avatarImage}
+    onImageChange={handleAvatarChange}
+    className="relative overflow-hidden"
+    disableClick={isOwnProfile}
+  >
+    <div className="absolute inset-0 bg-gray-400/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity" />
+    <Button
+      className={`bg-chinese-black text-white-smoke absolute bottom-9 right-9 cursor-pointer 
+        ${avatarImage ? "opacity-0 group-hover/avatar:opacity-100" : "opacity-100"}`}
+      onClick={(e) => {
+        e.stopPropagation()
+        setShowAvatarMenu((prev) => !prev)
+      }}
+    >
+      Upload image
+    </Button>
+  </AvatarUpload>
+
+  {isOwnProfile && showAvatarMenu && (
+    <div className="absolute left-1/2 -translate-x-1/2 top-[85%] z-50 w-48 bg-[#111] border border-white/10 rounded-sm shadow-2xl overflow-hidden">
+      
+
+      <button
+        onClick={() => {
+          setShowAvatarMenu(false)
+          avatarRef.current?.openFilePicker()
+        }}
+        className="w-full text-left px-4 py-3 text-sm font-semibold text-white hover:bg-white/5 transition-colors border-b border-white/5"
+      >
+        Replace image
+      </button>
+
+      {avatarImage && (
+        <button
+          onClick={handleDeleteAvatar}
+          className="w-full text-left px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
+        >
+          Delete image
+        </button>
+      )}
+    </div>
+  )}
+</div>
 
       <div className="absolute left-72 bottom-20 -translate-y-1/2">
         <div className="flex flex-col items-start">

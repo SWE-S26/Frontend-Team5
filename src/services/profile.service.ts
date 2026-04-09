@@ -1,18 +1,21 @@
 import api from "@/lib/api"
-import { GetProfileResponse, UpdateProfileRequest, UpdateProfileResponse } from "@/types/profile.types";
+import { GetProfileResponse, UpdateProfileRequest, UpdateProfileResponse, UpdateProfileImagesRequest, UpdateProfileImagesResponse } from "@/types/profile.types";
 
 export const profileService = {
   getProfile: (userId: string) =>
     api.get<GetProfileResponse>(`/api/profile/v1/${userId}`),
 
   updateProfile: (data: UpdateProfileRequest | FormData) =>
-    api.patch<UpdateProfileResponse>(`/api/profile/v1`, data, {
-      headers: {
-        // Let the browser set Content-Type automatically for FormData
-        // For plain objects it will default to application/json
-        ...(data instanceof FormData
-          ? { "Content-Type": "multipart/form-data" }
-          : {}),
-      },
-    }),
+    api.patch<UpdateProfileResponse>(`/api/profile/v1`, data),
+
+  updateProfileImages: (data: UpdateProfileImagesRequest) => {
+    const formData = new FormData()
+
+    if (data.profileImage)     formData.append("profileImage",    data.profileImage)
+    if (data.bannerImage)      formData.append("bannerImage",     data.bannerImage)
+    if (data.removeProfileImg) formData.append("removeProfileImg","true")
+    if (data.removeBannerImg)  formData.append("removeBannerImg", "true")
+
+    return api.patch<UpdateProfileImagesResponse>(`/api/profile/v1/images`, formData)
+  },
 }

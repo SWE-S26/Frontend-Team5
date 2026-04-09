@@ -1,41 +1,54 @@
 "use client"
 
-import React, { useRef } from "react"
+import React, { useRef, forwardRef, useImperativeHandle } from "react"
 
 interface CoverProps {
   children?: React.ReactNode
-  onImageChange: (file: File, previewUrl: string) => void // ← updated
+  onImageChange: (file: File, previewUrl: string) => void
+  disableClick?: boolean
 }
 
-export default function CoverPhotoUpload({ children, onImageChange }: CoverProps) {
-  const fileInputRef = useRef<HTMLInputElement>(null)
+export interface CoverUploadHandle {
+  openFilePicker: () => void
+}
 
-  const openFilePicker = () => {
-    fileInputRef.current?.click()
-  }
+const CoverPhotoUpload = forwardRef<CoverUploadHandle, CoverProps>(
+  ({ children, onImageChange, disableClick = false }, ref) => {
+    const fileInputRef = useRef<HTMLInputElement>(null)
 
-  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const file = e.target.files?.[0]
-
-    if (file) {
-      const previewUrl = URL.createObjectURL(file)
-      onImageChange(file, previewUrl) // ← pass both
+    const openFilePicker = () => {
+      fileInputRef.current?.click()
     }
-  }
 
-  return (
-    <div>
-      <div onClick={openFilePicker} className="cursor-pointer">
-        {children}
+    useImperativeHandle(ref, () => ({ openFilePicker }))
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+      const file = e.target.files?.[0]
+      if (file) {
+        const previewUrl = URL.createObjectURL(file)
+        onImageChange(file, previewUrl)
+      }
+    }
+
+    return (
+      <div>
+        <div
+          onClick={disableClick ? undefined : openFilePicker}
+          className={disableClick ? "" : "cursor-pointer"}
+        >
+          {children}
+        </div>
+        <input
+          type="file"
+          accept="image/*"
+          ref={fileInputRef}
+          onChange={handleFileChange}
+          className="hidden"
+        />
       </div>
+    )
+  }
+)
 
-      <input
-        type="file"
-        accept="image/*"
-        ref={fileInputRef}
-        onChange={handleFileChange}
-        className="hidden"
-      />
-    </div>
-  )
-}
+CoverPhotoUpload.displayName = "CoverPhotoUpload"
+export default CoverPhotoUpload
