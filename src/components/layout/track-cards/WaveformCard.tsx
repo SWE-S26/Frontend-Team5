@@ -6,10 +6,16 @@ import SausageWaveform from "@/components/ui/SausageWaveform";
 import Tooltip from "@/components/ui/Tooltip";
 import MoreDropdown from "@/components/ui/MoreDropdown";
 
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
+import { Avatar } from "antd";
 
+import { motion, AnimatePresence } from "framer-motion";
+
+import { useAppSelector } from "@/store/hooks";
+
+import { UserOutlined } from "@ant-design/icons";
 import { IoIosMore, IoMdPlay, IoMdPause } from "react-icons/io";
-import { HiHeart } from "react-icons/hi";
+import { HiHeart, HiOutlinePaperAirplane } from "react-icons/hi";
 import { LuRepeat2, LuShare } from "react-icons/lu";
 import { TbCopy } from "react-icons/tb";
 import { ListStart } from "lucide-react";
@@ -17,25 +23,22 @@ import { RiPlayListAddLine } from "react-icons/ri";
 import { BiStation } from "react-icons/bi";
 
 export default function WaveformCard() {
-  const [isLiked, setIsLiked] = useState<boolean>(false);
-  const [isPlaying, setIsPlaying] = useState<boolean>(false);
+  const [isLiked, setIsLiked] = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [showComments, setShowComments] = useState(false);
+  const [canComment, setCanComment] = useState(false);
 
-  function handleLikeClick(e: React.MouseEvent) {
-    e.stopPropagation();
-    setIsLiked((l) => !l);
-    console.log("Like clicked!");
-  }
+  const commentBoxRef = useRef<HTMLInputElement>(null);
+  const commentButtonRef = useRef<HTMLButtonElement>(null);
 
-  function handleMoreClick() {
-    // e.stopPropagation();
-    console.log("More options clicked!");
-  }
+  const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
 
-  function handlePlayClick(e: React.MouseEvent) {
-    e.stopPropagation();
-    setIsPlaying((p) => !p);
-    console.log("Play clicked!");
-  }
+  const handleInputChange = () => {
+    if (!commentBoxRef.current || !commentButtonRef.current) return;
+
+    const comment = commentBoxRef.current.value.trim();
+    setCanComment(comment.length > 0);
+  };
 
   return (
     <div className="flex items-stretch">
@@ -45,12 +48,12 @@ export default function WaveformCard() {
       </div>
 
       {/* right side */}
-      <div className="flex flex-col flex-1 ml-6 justify-between">
+      <div className="flex flex-col flex-1 ml-6">
         {/* top */}
         <div className="flex items-center mb-4">
           <div
             className="w-10 h-10 bg-white-smoke rounded-full flex items-center justify-center cursor-pointer"
-            onClick={handlePlayClick}
+            onClick={() => setIsPlaying(!isPlaying)}
           >
             {!isPlaying ? (
               <IoMdPlay className="text-chinese-black text-[23px] ml-1" />
@@ -64,16 +67,61 @@ export default function WaveformCard() {
           </div>
         </div>
 
-        {/* middle */}
-        <div className="w-full max-w-[632px] h-[60px] shrink-0">
+        {/* waveform */}
+        <div
+          className="w-full max-w-[632px] h-[60px] shrink-0 cursor-pointer"
+          onClick={() => setShowComments(true)}
+        >
           <SausageWaveform />
         </div>
 
-        {/* bottom */}
-        <div className="flex items-center">
+        {/* comment box */}
+        <AnimatePresence>
+          {showComments && (
+            <motion.div
+              initial={{ y: -20, opacity: 0 }}
+              animate={{ y: 0, opacity: 1 }}
+              exit={{ y: -20, opacity: 0 }}
+              transition={{ duration: 0.25, ease: "easeOut" }}
+              className="flex items-center mt-4 mb-4"
+            >
+              <Avatar
+                size="large"
+                icon={
+                  profileImgLink ? (
+                    <img src={profileImgLink} alt="Profile" />
+                  ) : (
+                    <UserOutlined />
+                  )
+                }
+              />
+              <input
+                type="text"
+                ref={commentBoxRef}
+                onInput={handleInputChange}
+                placeholder="Write a comment"
+                className="ml-2 flex-1 bg-off-black rounded px-4 py-2 text-sm text-white-smoke caret-brilliant-orange outline outline-1 outline-transparent focus:outline-white-smoke/50 transition-[outline-color] duration-200 ease-in-out"
+              />
+              <Button
+                ref={commentButtonRef}
+                disabled={!canComment}
+                className="ml-2 bg-off-black text-chinese-black font-bold py-2 px-4 rounded hover:bg-opacity-80"
+              >
+                <HiOutlinePaperAirplane className="text-[20px] text-white-smoke rotate-45" />
+              </Button>
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* buttons below (move down with layout animation) */}
+        <motion.div
+          layout
+          transition={{ layout: { duration: 0.3, ease: "easeInOut" } }}
+          className="flex items-center mt-auto"
+        >
           <Tooltip label="Like">
             <Button
-              onClick={handleLikeClick}
+              onClick={() => setIsLiked(!isLiked)}
               className="bg-off-black mr-4"
               icon={<HiHeart className="text-[16px]" />}
             >
@@ -116,7 +164,6 @@ export default function WaveformCard() {
               {
                 label: "Add to Next up",
                 icon: <ListStart size={19} className="scale-x-[-1]" />,
-                onClick: handleMoreClick,
               },
               {
                 label: "Add to Playlist",
@@ -127,7 +174,7 @@ export default function WaveformCard() {
               { label: "Station", icon: <BiStation className="text-lg" /> },
             ]}
           />
-        </div>
+        </motion.div>
       </div>
     </div>
   );
