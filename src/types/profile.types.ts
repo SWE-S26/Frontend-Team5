@@ -38,6 +38,7 @@ export interface UpdateProfileRequest {
   firstName?:      string
   lastName?:       string
   profileLink?:    string
+  profileImgLink?:  string | null
   bio?:            string
   city?:           string
   country?:        string
