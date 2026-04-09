@@ -6,7 +6,8 @@ import ColorThief from "color-thief-browser"
 
 import Button from "@/components/ui/Button"
 import AvatarUpload, { AvatarUploadHandle } from "./AvatarUpload"
-import CoverPhotoUpload from "./CoverPhotoUpload"
+import CoverPhotoUpload, { CoverUploadHandle } from "./CoverPhotoUpload"
+
 import { useGetProfile } from "@/hooks/useProfile"
 import { useUpdateProfile } from "@/hooks/useUpdateProfile"
 import { useUpdateProfileImages } from "@/hooks/useUpdateProfileImages"
@@ -35,6 +36,9 @@ export default function ProfileHeader() {
   const { getProfile, loading, error } = useGetProfile()
   const { updateProfile } = useUpdateProfile()
   const { updateProfileImages } = useUpdateProfileImages()
+  const coverRef = useRef<CoverUploadHandle>(null)
+const coverMenuRef = useRef<HTMLDivElement>(null)
+const [showCoverMenu, setShowCoverMenu] = useState(false)
   
   const avatarRef = useRef<AvatarUploadHandle>(null)
   const avatarMenuRef = useRef<HTMLDivElement>(null)
@@ -44,6 +48,27 @@ export default function ProfileHeader() {
   const [gradient,    setGradient]    = useState("linear-gradient(to right, #c3adb4, #8f6f79)")
   const isOwnProfile = useAppSelector((state) => state.profile.isOwnProfile)
   
+
+
+  useEffect(() => {
+  const handleClickOutside = (e: MouseEvent) => {
+    if (coverMenuRef.current && !coverMenuRef.current.contains(e.target as Node)) {
+      setShowCoverMenu(false)
+    }
+  }
+  document.addEventListener("mousedown", handleClickOutside)
+  return () => document.removeEventListener("mousedown", handleClickOutside)
+}, [])
+
+// add delete handler
+const handleDeleteCover = async () => {
+  setShowCoverMenu(false)
+  setCoverImage(null)
+  await updateProfileImages({ removeBannerImg: true })
+  dispatch(setBannerImgLink(""))
+}
+
+
   useEffect(() => {
   const handleClickOutside = (e: MouseEvent) => {
     if (avatarMenuRef.current && !avatarMenuRef.current.contains(e.target as Node)) {
@@ -84,7 +109,7 @@ const handleDeleteAvatar = async () => {
         supportLink:    data.supportLink,
         favoriteGenres: data.favoriteGenres,
         followersCount: data.followersCount,
-        followedCount:  data.followedCount,
+        
         tracksCount:    data.trackCount,
         isOwnProfile:   data.userId === authUserId,
         isLoading:    false, 
@@ -172,13 +197,49 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
           : { background: gradient }
       }
     >
-      <div className="absolute top-8 right-6 flex flex-col gap-3">
-        <CoverPhotoUpload onImageChange={handleCoverChange}>
-          <Button className="bg-chinese-black text-white-smoke cursor-pointer">
-            Upload header image
-          </Button>
-        </CoverPhotoUpload>
-      </div>
+      <div
+  ref={coverMenuRef}
+  className="absolute top-8 right-6 flex flex-col gap-3"
+>
+  <CoverPhotoUpload
+    ref={coverRef}
+    onImageChange={handleCoverChange}
+    disableClick
+  >
+    <Button
+      className="bg-chinese-black text-white-smoke cursor-pointer"
+      onClick={(e) => {
+        e.stopPropagation()
+        setShowCoverMenu((prev) => !prev)
+      }}
+    >
+      Upload header image
+    </Button>
+  </CoverPhotoUpload>
+
+  {showCoverMenu && (
+    <div className="absolute right-0 top-[110%] z-50 w-48 bg-[#111] border border-white/10 rounded-sm shadow-2xl overflow-hidden">
+      <button
+        onClick={() => {
+          setShowCoverMenu(false)
+          coverRef.current?.openFilePicker()
+        }}
+        className="w-full text-left px-4 py-3 text-sm font-semibold text-white hover:bg-white/5 transition-colors border-b border-white/5"
+      >
+        Replace image
+      </button>
+
+      {coverImage && (
+        <button
+          onClick={handleDeleteCover}
+          className="w-full text-left px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
+        >
+          Delete image
+        </button>
+      )}
+    </div>
+  )}
+</div>
 
      <div
   className="absolute left-10 top-1/2 -translate-y-1/2 group/avatar"
