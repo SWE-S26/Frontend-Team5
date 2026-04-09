@@ -12,6 +12,8 @@ type BridgePayload = {
   accessToken?: string;
   refreshToken?: string;
   pendingToken?: string;
+  incompleteToken?:string;
+  displayName?: string;
 };
 
 function CrossPlatformCallbackContent() {
@@ -38,6 +40,9 @@ function CrossPlatformCallbackContent() {
     const incompleteToken =
       searchParams.get("incompleteToken") ||
       undefined;
+    const displayName =
+      searchParams.get("displayName") ||
+      undefined;
     const hasAnyToken = Boolean(token || accessToken || refreshToken || pendingToken);
 
     return {
@@ -49,6 +54,7 @@ function CrossPlatformCallbackContent() {
       errorDescription,
       hasAnyToken,
       incompleteToken,
+      displayName,
     };
   }, [searchParams]);
 
@@ -86,6 +92,8 @@ function CrossPlatformCallbackContent() {
       accessToken: tokenParams.accessToken,
       refreshToken: tokenParams.refreshToken,
       pendingToken: tokenParams.pendingToken,
+      incompleteToken: tokenParams.incompleteToken,
+      displayName: tokenParams.displayName,
     };
 
     postToReceivers(payload);
@@ -104,6 +112,9 @@ function CrossPlatformCallbackContent() {
       if (tokenParams.incompleteToken) {
         deepLinkParams.set("incompleteToken", tokenParams.incompleteToken);
       }
+      if (tokenParams.displayName) {
+        deepLinkParams.set("displayName", tokenParams.displayName);
+      }
 
       const deepLink = `beatza://auth?${deepLinkParams.toString()}`;
 
@@ -116,6 +127,7 @@ function CrossPlatformCallbackContent() {
             refreshToken: tokenParams.refreshToken,
             incompleteToken: tokenParams.incompleteToken,
             pendingToken: tokenParams.pendingToken,
+            displayName: tokenParams.displayName,
           }),
         );
       }

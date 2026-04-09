@@ -61,7 +61,7 @@ export default function HeroBanner() {
             className="relative w-full h-full shrink-0"
             style={{ backgroundImage: `url(${slide.image})`, backgroundSize: "cover", backgroundPosition: "center" }}
           >
-            <div className="absolute inset-0 bg-black/40" />
+            <div className="absolute inset-0 bg-black/10" />
 
             {/* slide content — fixed layout so every slide aligns identically */}
             <div className="relative z-10 flex flex-col justify-between h-3/4 px-8 pt-22 pb-6">
