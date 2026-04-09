@@ -33,7 +33,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
   const city             = useAppSelector((state) => state.profile.city)
   const country          = useAppSelector((state) => state.profile.country)
   const bio              = useAppSelector((state) => state.profile.bio)
-  const reduxLinks       = useAppSelector((state) => state.profile.links)
+  const reduxLinks       = useAppSelector((state) => state.profile.bannerLinks)
   const reduxSupportLink = useAppSelector((state) => state.profile.supportLink)
 
   const [formLinks,   setFormLinks]   = useState<LinkItem[]>([])
@@ -215,6 +215,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
       city:           formCity,
       country:        formCountry,
       bio:            formBio,
+      bannerLinks:    formattedLinks,
       links:          formattedLinks,
       supportLink:    formSupportLink || undefined,
     })
@@ -231,6 +232,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
         city:           res.city,
         country:        res.country,
         bio:            res.bio,
+        bannerLinks:    res.bannerLinks?.length ? res.bannerLinks : formattedLinks, 
         profileImgLink: res.profileImgLink,
         links:          res.links,
         supportLink:    res.supportLink,
