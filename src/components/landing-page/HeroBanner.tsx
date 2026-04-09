@@ -50,7 +50,7 @@ export default function HeroBanner() {
   return (
     <div className="relative w-full rounded-2xl overflow-hidden h-111.5">
 
-      {/* sliding track — all slides side by side */}
+      {/* sliding track */}
       <div
         className="absolute inset-0 flex transition-transform duration-500 ease-in-out"
         style={{ transform: `translateX(-${current * 100}%)` }}
@@ -61,41 +61,44 @@ export default function HeroBanner() {
             className="relative w-full h-full shrink-0"
             style={{ backgroundImage: `url(${slide.image})`, backgroundSize: "cover", backgroundPosition: "center" }}
           >
-            {/* dark overlay per slide */}
             <div className="absolute inset-0 bg-black/40" />
 
-            {/* slide content */}
-            <div className="relative z-10 flex flex-col h-3/4 px-8 pt-22">
+            {/* slide content — fixed layout so every slide aligns identically */}
+            <div className="relative z-10 flex flex-col justify-between h-3/4 px-8 pt-22 pb-6">
+              {/* heading + description — fixed block */}
               <div className="max-w-xl">
                 <h1 className="text-white-smoke text-[60px] font-bold leading-tight">{slide.heading[0]}</h1>
                 <h1 className="text-white-smoke text-[60px] font-bold leading-tight -mt-3">{slide.heading[1]}</h1>
                 <p className="text-white-smoke text-[17px] font-bold mt-4">{slide.description}</p>
               </div>
 
-              <div className="flex gap-4 mt-12">
-                {slide.buttons.map((btn, j) => (
-                  <Link key={j} href={btn.label === "Get Started" ? "#" : btn.href}>
-                    <Button
-                      className={`px-3 py-1.5 text-[17px] cursor-pointer ${j === 0 ? "bg-white-smoke text-chinese-black" : "text-white-smoke hover:text-white-smoke"}`}
-                      onClick={btn.label === "Get Started" ? () => setIsAuthModalOpen(true) : undefined}
-                    >
-                      {btn.label}
-                    </Button>
-                  </Link>
-                ))}
-              </div>
+              {/* buttons + artist credit — always on the same row at the bottom */}
+              <div className="flex items-center gap-6 mt-8">
+                <div className="flex gap-4">
+                  {slide.buttons.map((btn, j) => (
+                    <Link key={j} href={btn.label === "Get Started" ? "#" : btn.href}>
+                      <Button
+                        className={`px-3 py-1.5 text-[17px] cursor-pointer ${j === 0 ? "bg-white-smoke text-chinese-black" : "text-white-smoke hover:text-white-smoke"}`}
+                        onClick={btn.label === "Get Started" ? () => setIsAuthModalOpen(true) : undefined}
+                      >
+                        {btn.label}
+                      </Button>
+                    </Link>
+                  ))}
+                </div>
 
-              {/* artist credit */}
-              <div className="absolute bottom-5 right-8 text-left">
-                <p className="text-white-smoke font-bold text-sm">{slide.artist}</p>
-                <p className="text-white-smoke/70 text-xs">{slide.title}</p>
+                {/* artist credit — inline with buttons */}
+                <div className="ml-auto text-left">
+                  <p className="text-white-smoke font-bold text-sm">{slide.artist}</p>
+                  <p className="text-white-smoke/70 text-xs">{slide.title}</p>
+                </div>
               </div>
             </div>
           </div>
         ))}
       </div>
 
-      {/* static top bar — never slides */}
+      {/* static top bar */}
       <div className="relative z-20 flex items-center justify-between px-8 pt-7">
         <div className="flex items-center">
           <img src="/app-logo/beatza.png" alt="BeatZa" className="w-12 mr-2 mt-1"/>
@@ -114,7 +117,7 @@ export default function HeroBanner() {
         </div>
       </div>
 
-      {/* static dots — never slides */}
+      {/* static dots */}
       <div className="absolute bottom-5.5 left-1/2 -translate-x-1/2 z-20 flex gap-4">
         {slides.map((_, i) => (
           <button key={i} onClick={() => goToSlide(i)}
