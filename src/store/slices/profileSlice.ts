@@ -7,6 +7,7 @@ interface ProfileState {
   displayName:    string | null
   firstName:      string | null
   lastName:       string | null
+  role:           string | null
   bio:            string | null
   profileLink:    string | null
   profileImgLink: string | null
@@ -31,6 +32,7 @@ const initialState: ProfileState = {
   displayName:    null,
   firstName:      null,
   lastName:       null,
+  role:           null,
   bio:            null,
   profileLink:    null,
   profileImgLink: null,

@@ -2,7 +2,7 @@
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
-import { useAppSelector } from "@/store/hooks"
+import { useAppSelector, useAppDispatch } from "@/store/hooks"
 
 import ProfileHeader from "@/components/profile/profile-header/ProfileHeader"
 import ProfileSideBar from "@/components/profile/side-bar/ProfileSideBar"
@@ -79,7 +79,13 @@ const ProfilePage = ({ params }: Props) => {
 
   const isLoading = useAppSelector((state) => state.profile.isLoading)
   const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
-  const artist    = false
+  
+  const role = useAppSelector((state) => state.profile.role)
+
+  const artist = role === "Artist"
+
+   
+  
 
   const handleTabChange = (tab: string) => {
     const current = new URLSearchParams(searchParams.toString())
@@ -131,14 +137,16 @@ const ProfilePage = ({ params }: Props) => {
                   <ProfileEditForm isOpen={openEdit} onClose={() => setOpenEdit(false)} />
                 </>
               ) : (
+                
                 <>
+                
                   {artist && (
                     <button className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center cursor-pointer hover:text-silver h-10">
                       <IoRadio className="w-5 h-5" />
                       <span className="ml-1 text-sm font-bold px-1">Station</span>
                     </button>
                   )}
-
+                   
                   <button
                     onClick={() => setFollowing(!following)}
                     className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"

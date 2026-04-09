@@ -30,6 +30,9 @@ export default function ProfileHeader() {
   const lastName       = useAppSelector((state) => state.profile.lastName)
   const city           = useAppSelector((state) => state.profile.city)
   const country        = useAppSelector((state) => state.profile.country)
+  const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
+
+  
 
   const { getProfile, loading, error } = useGetProfile()
   const { updateProfileImages } = useUpdateProfileImages()
@@ -106,6 +109,7 @@ const handleDeleteAvatar = async () => {
         supportLink:    data.supportLink,
         favoriteGenres: data.favoriteGenres,
         followersCount: data.followersCount,
+        role:           data.role,
         
         tracksCount:    data.trackCount,
         isOwnProfile:   data.userId === authUserId,
@@ -250,6 +254,7 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
     disableClick={isOwnProfile}
   >
     <div className="absolute inset-0 bg-gray-400/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity" />
+    {isOwn && (
     <Button
       className={`bg-chinese-black text-white-smoke absolute bottom-9 right-9 cursor-pointer 
         ${avatarImage ? "opacity-0 group-hover/avatar:opacity-100" : "opacity-100"}`}
@@ -259,7 +264,7 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
       }}
     >
       Upload image
-    </Button>
+    </Button> )}
   </AvatarUpload>
 
   {isOwnProfile && showAvatarMenu && (
@@ -294,14 +299,12 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
             {displayName || "No Name"}
           </h1>
           <p className="text-silver font-bold bg-black px-3 py-2">
-            {firstName && lastName
-              ? `${firstName} ${lastName}`
-              : displayName || "No Name"}
+            {firstName || lastName ? `${firstName || ""} ${lastName || ""}`.trim() : displayName || "No Name"}
           </p>
         </div>
         <div className="bg-black inline-block px-3 py-1 absolute -bottom-10">
           <p className="text-silver font-bold">
-            {city && country ? `${city}, ${country}` : "No location"}
+           {(city || country) ? [city, country].filter(Boolean).join(", ") : "No location"}
           </p>
         </div>
       </div>
