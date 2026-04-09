@@ -35,6 +35,9 @@ function CrossPlatformCallbackContent() {
       searchParams.get("error_description") ||
       searchParams.get("message") ||
       undefined;
+    const incompleteToken =
+      searchParams.get("incompleteToken") ||
+      undefined;
     const hasAnyToken = Boolean(token || accessToken || refreshToken || pendingToken);
 
     return {
@@ -45,6 +48,7 @@ function CrossPlatformCallbackContent() {
       error,
       errorDescription,
       hasAnyToken,
+      incompleteToken,
     };
   }, [searchParams]);
 
@@ -94,6 +98,12 @@ function CrossPlatformCallbackContent() {
       if (tokenParams.refreshToken) {
         deepLinkParams.set("refreshToken", tokenParams.refreshToken);
       }
+      if (tokenParams.pendingToken) {
+        deepLinkParams.set("pendingToken", tokenParams.pendingToken);
+      }
+      if (tokenParams.incompleteToken) {
+        deepLinkParams.set("incompleteToken", tokenParams.incompleteToken);
+      }
 
       const deepLink = `beatza://auth?${deepLinkParams.toString()}`;
 
@@ -104,6 +114,7 @@ function CrossPlatformCallbackContent() {
             token: tokenParams.token,
             accessToken: tokenParams.accessToken,
             refreshToken: tokenParams.refreshToken,
+            incompleteToken: tokenParams.incompleteToken,
             pendingToken: tokenParams.pendingToken,
           }),
         );
