@@ -113,8 +113,12 @@ const handleDeleteAvatar = async () => {
         
         tracksCount:    data.trackCount,
         isOwnProfile:   data.userId === authUserId,
-        isLoading:    false, 
+       
       }))
+    })
+
+    .finally(() => {
+      dispatch(setProfile({ isLoading: false }))  // ← always runs
     })
 
     return () => { dispatch(clearProfile()) }
