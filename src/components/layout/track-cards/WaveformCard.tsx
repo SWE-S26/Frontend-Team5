@@ -3,13 +3,18 @@
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/Card";
 import SausageWaveform from "@/components/ui/SausageWaveform";
+import Tooltip from "@/components/ui/Tooltip";
+import MoreDropdown from "@/components/ui/MoreDropdown";
+
 import { useState } from "react";
 
 import { IoIosMore, IoMdPlay, IoMdPause } from "react-icons/io";
 import { HiHeart } from "react-icons/hi";
 import { LuRepeat2, LuShare } from "react-icons/lu";
 import { TbCopy } from "react-icons/tb";
-import Tooltip from "@/components/ui/Tooltip";
+import { ListStart } from "lucide-react";
+import { RiPlayListAddLine } from "react-icons/ri";
+import { BiStation } from "react-icons/bi";
 
 export default function WaveformCard() {
   const [isLiked, setIsLiked] = useState<boolean>(false);
@@ -21,8 +26,8 @@ export default function WaveformCard() {
     console.log("Like clicked!");
   }
 
-  function handleMoreClick(e: React.MouseEvent) {
-    e.stopPropagation();
+  function handleMoreClick() {
+    // e.stopPropagation();
     console.log("More options clicked!");
   }
 
@@ -54,15 +59,13 @@ export default function WaveformCard() {
             )}
           </div>
           <div>
-            <p className="text-xs font-bold text-silver ml-3">Artist Name</p>
-            <p className="text-sm font-bold text-white-smoke ml-3">
-              Track Title
-            </p>
+            <p className="text-sm font-bold text-silver ml-3">Kanye West</p>
+            <p className="text-sm font-bold text-white-smoke ml-3">I wonder</p>
           </div>
         </div>
 
         {/* middle */}
-        <div className="w-full max-w-[632px] h-[60px] flex-shrink-0">
+        <div className="w-full max-w-[632px] h-[60px] shrink-0">
           <SausageWaveform />
         </div>
 
@@ -101,13 +104,29 @@ export default function WaveformCard() {
             />
           </Tooltip>
 
-          <Tooltip label="More">
-            <Button
-              onClick={handleMoreClick}
-              className="bg-off-black mr-4"
-              icon={<IoIosMore className="text-xl" />}
-            />
-          </Tooltip>
+          <MoreDropdown
+            trigger={
+              <Button
+                className="bg-off-black"
+                icon={<IoIosMore className="text-xl" />}
+              />
+            }
+            tooltipLabel="More"
+            items={[
+              {
+                label: "Add to Next up",
+                icon: <ListStart size={19} className="scale-x-[-1]" />,
+                onClick: handleMoreClick,
+              },
+              {
+                label: "Add to Playlist",
+                icon: (
+                  <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
+                ),
+              },
+              { label: "Station", icon: <BiStation className="text-lg" /> },
+            ]}
+          />
         </div>
       </div>
     </div>

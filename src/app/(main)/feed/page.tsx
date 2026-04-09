@@ -14,7 +14,7 @@ export default function Feed() {
       <div className="w-full md:w-[68%]">
         {/* Top Div */}
         <div className="flex items-center mb-4">
-          <h2 className="flex-1 text-[22px] font-bold text-white-smoke">
+          <h2 className="flex-1 text-[22px] font-bold text-white-smoke text-tracking-[-0.02em]">
             Hear the latest posts from the people you're following:
           </h2>
           <div className="flex items-center gap-2">
@@ -25,8 +25,8 @@ export default function Feed() {
               theme={{
                 components: {
                   Switch: {
-                    colorPrimary: "var(--crusta)",
-                    colorPrimaryHover: "var(--crusta)",
+                    colorPrimary: "var(--inferno)",
+                    colorPrimaryHover: "var(--inferno)",
                     colorTextQuaternary: "var(--silver)",
                     colorTextTertiary: "var(--silver)",
                     handleBg: "var(--bg)",

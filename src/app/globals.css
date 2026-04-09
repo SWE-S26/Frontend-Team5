@@ -108,6 +108,7 @@ body {
   image-rendering: crisp-edges; /* Firefox */
   image-rendering: pixelated; /* Chrome/Safari */
   will-change: transform; /* Perf hint for animations */
+  transition: opacity 150ms ease-out;
 }
 
 .scrollbar-hide::-webkit-scrollbar {

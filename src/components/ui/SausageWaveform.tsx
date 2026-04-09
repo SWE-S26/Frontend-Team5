@@ -15,6 +15,7 @@ export default function SausageWaveform() {
   const [progress, setProgress] = useState(0);
   const [hoverPct, setHoverPct] = useState<number | null>(null);
   const [isTracking, setIsTracking] = useState(false);
+  const [isHoveringTop, setIsHoveringTop] = useState(false);
 
   useEffect(() => {
     import("@/lib/waveform").then((mod) => {
@@ -28,10 +29,9 @@ export default function SausageWaveform() {
   const generateAll = (samples: number[]) => {
     if (!scwRef.current) return;
 
-    // Generate at 2x for crisp rendering on all screens
     const base = {
-      canvas_width: 1264, // 632 × 2
-      canvas_height: 120, // 60 × 2
+      canvas_width: 1264,
+      canvas_height: 120,
       bar_width: 8,
       bar_gap: 0.3,
     };
@@ -45,7 +45,7 @@ export default function SausageWaveform() {
 
     scwRef.current.generateFromJson(samples, {
       ...base,
-      wave_color: "#ffffff",
+      wave_color: "#e5e5e5",
       half: "bottom",
       onComplete: (png: string) => setBgBottom(png),
     });
@@ -59,14 +59,14 @@ export default function SausageWaveform() {
 
     scwRef.current.generateFromJson(samples, {
       ...base,
-      wave_color: "#c49478",
+      wave_color: "#faad87",
       half: "top",
       onComplete: (png: string) => setFgTopFlat(png),
     });
 
     scwRef.current.generateFromJson(samples, {
       ...base,
-      wave_color: "#c49478",
+      wave_color: "#faad87",
       half: "bottom",
       onComplete: (png: string) => setFgBottom(png),
     });
@@ -79,6 +79,13 @@ export default function SausageWaveform() {
       0,
       Math.min(100, ((e.clientX - rect.left) / rect.width) * 100),
     );
+  };
+
+  const getIsHoveringTop = (e: React.MouseEvent) => {
+    if (!containerRef.current) return false;
+    const rect = containerRef.current.getBoundingClientRect();
+    const relativeY = e.clientY - rect.top;
+    return relativeY < rect.height / 2;
   };
 
   const handleClick = (e: React.MouseEvent) => {
@@ -94,6 +101,7 @@ export default function SausageWaveform() {
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
+    setIsHoveringTop(getIsHoveringTop(e));
     if (isTracking) {
       setHoverPct(getPct(e));
     }
@@ -103,6 +111,7 @@ export default function SausageWaveform() {
     if (!isTracking) {
       setHoverPct(null);
     }
+    setIsHoveringTop(false);
   };
 
   const clipLeft = (pct: number) => ({
@@ -113,6 +122,9 @@ export default function SausageWaveform() {
     clipPath: `inset(0 ${100 - toPct}% 0 ${fromPct}%)`,
   });
 
+  // Dynamic opacity for all waveform layers
+  const waveformOpacity = isHoveringTop ? "opacity-100" : "opacity-85";
+
   return (
     <div className="space-y-2">
       <div
@@ -120,40 +132,26 @@ export default function SausageWaveform() {
         onClick={handleClick}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        // Fluid width, fixed visual height (60px)
         className="relative w-full h-[60px] cursor-pointer select-none"
       >
-        {/* Shared image classes: crisp scaling */}
-        {/* 
-          - w-full h-full: fill the 60px-tall container
-          - image-rendering: auto lets browser smooth the 2x→1x downscale
-          - will-change: transform improves perf during hover/progress updates
-        */}
-        <style jsx global>{`
-          .waveform-img {
-            image-rendering: auto;
-            will-change: transform;
-          }
-        `}</style>
-
         {/* Grey top half */}
         <img
           src={bgTop ?? undefined}
-          className="absolute inset-0 w-full h-full opacity-80 grayscale brightness-200 waveform-img"
+          className={`absolute inset-0 w-full h-full grayscale waveform-img ${waveformOpacity}`}
           alt=""
         />
 
         {/* Grey bottom half */}
         <img
           src={bgBottom ?? undefined}
-          className="absolute inset-0 w-full h-full opacity-80 grayscale brightness-200 waveform-img"
+          className={`absolute inset-0 w-full h-full grayscale waveform-img ${waveformOpacity}`}
           alt=""
         />
 
         {/* Gradient top — played portion */}
         <img
           src={fgTopGradient ?? undefined}
-          className="absolute inset-0 w-full h-full waveform-img"
+          className={`absolute inset-0 w-full h-full waveform-img ${waveformOpacity}`}
           style={clipLeft(progress)}
           alt=""
         />
@@ -162,7 +160,7 @@ export default function SausageWaveform() {
         {hoverPct !== null && hoverPct > progress && (
           <img
             src={fgTopFlat ?? undefined}
-            className="absolute inset-0 w-full h-full pointer-events-none waveform-img"
+            className={`absolute inset-0 w-full h-full pointer-events-none waveform-img ${waveformOpacity}`}
             style={clipWindow(progress, hoverPct)}
             alt=""
           />
@@ -172,7 +170,7 @@ export default function SausageWaveform() {
         {hoverPct !== null && hoverPct <= progress && (
           <img
             src={fgTopFlat ?? undefined}
-            className="absolute inset-0 w-full h-full pointer-events-none waveform-img"
+            className={`absolute inset-0 w-full h-full pointer-events-none waveform-img ${waveformOpacity}`}
             style={clipWindow(hoverPct, progress)}
             alt=""
           />
@@ -181,7 +179,7 @@ export default function SausageWaveform() {
         {/* Flat bottom — follows progress only */}
         <img
           src={fgBottom ?? undefined}
-          className="absolute inset-0 w-full h-full waveform-img"
+          className={`absolute inset-0 w-full h-full waveform-img ${waveformOpacity}`}
           style={clipLeft(progress)}
           alt=""
         />
