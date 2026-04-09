@@ -38,7 +38,6 @@ export interface UpdateProfileRequest {
   firstName?:      string
   lastName?:       string
   profileLink?:    string
-  profileImgLink?:  string | null
   bio?:            string
   city?:           string
   country?:        string
@@ -51,23 +50,23 @@ export interface UpdateProfileRequest {
 
 export interface UpdateProfileResponse {
   displayName:    string
-  firstName:      string
-  lastName:       string
+  firstName:      string | null
+  lastName:       string | null
   profileLink:    string
-  bio:            string
-  city:           string
-  country:        string
-  profileImgLink: string
-  bannerImgLink:  string
+  bio:            string | null
+  city:           string | null
+  country:        string | null
+  profileImgLink: string | null
+  bannerImgLink:  string | null
   links:          ProfileLink[]
   bannerLinks:    ProfileLink[]
-  supportLink:    string
+  supportLink:    string | null
   favoriteGenres: string[]
 }
 
 export interface UpdateProfileImagesRequest {
-  profileImage?:    File
-  bannerImage?:     File
+  profileImg?:       File
+  bannerImg?:        File
   removeProfileImg?: boolean
   removeBannerImg?:  boolean
 }

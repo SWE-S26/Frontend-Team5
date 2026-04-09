@@ -5,17 +5,20 @@ export const profileService = {
   getProfile: (userId: string) =>
     api.get<GetProfileResponse>(`/api/profile/v1/${userId}`),
 
-  updateProfile: (data: UpdateProfileRequest | FormData) =>
+  updateProfile: (data: UpdateProfileRequest) =>
     api.patch<UpdateProfileResponse>(`/api/profile/v1`, data),
 
   updateProfileImages: (data: UpdateProfileImagesRequest) => {
     const formData = new FormData()
 
-    if (data.profileImage)     formData.append("profileImage",    data.profileImage)
-    if (data.bannerImage)      formData.append("bannerImage",     data.bannerImage)
-    if (data.removeProfileImg) formData.append("removeProfileImg","true")
-    if (data.removeBannerImg)  formData.append("removeBannerImg", "true")
+    if (data.profileImg) formData.append("profileImg", data.profileImg)
+    if (data.bannerImg)  formData.append("bannerImg",  data.bannerImg)
 
-    return api.patch<UpdateProfileImagesResponse>(`/api/profile/v1/images`, formData)
+    formData.append("removeProfileImg", data.removeProfileImg ? "true" : "false")
+    formData.append("removeBannerImg",  data.removeBannerImg  ? "true" : "false")
+
+    return api.patch<UpdateProfileImagesResponse>(`/api/profile/v1/images`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    })
   },
 }

@@ -26,14 +26,6 @@ const api = axios.create({
   },
 })
 
-// FormData: let axios set Content-Type automatically with correct boundary
-api.interceptors.request.use((config) => {
-  if (config.data instanceof FormData) {
-    delete config.headers["Content-Type"]
-  }
-  return config
-})
-
 // 401: token expired, attempt refresh (skip public routes)
 api.interceptors.response.use(
   (response) => response,

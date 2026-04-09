@@ -8,9 +8,7 @@ import Button from "@/components/ui/Button"
 import AvatarUpload, { AvatarUploadHandle } from "./AvatarUpload"
 import CoverPhotoUpload, { CoverUploadHandle } from "./CoverPhotoUpload"
 
-import { useGetProfile } from "@/hooks/useProfile"
-import { useUpdateProfile } from "@/hooks/useUpdateProfile"
-import { useUpdateProfileImages } from "@/hooks/useUpdateProfileImages"
+import { useGetProfile, useUpdateProfileImages } from "@/hooks/useProfile"
 
 import { useAppSelector, useAppDispatch } from "@/store/hooks"
 import { setProfileImgLink, setBannerImgLink } from "@/store/slices/authSlice"
@@ -34,11 +32,10 @@ export default function ProfileHeader() {
   const country        = useAppSelector((state) => state.profile.country)
 
   const { getProfile, loading, error } = useGetProfile()
-  const { updateProfile } = useUpdateProfile()
   const { updateProfileImages } = useUpdateProfileImages()
   const coverRef = useRef<CoverUploadHandle>(null)
-const coverMenuRef = useRef<HTMLDivElement>(null)
-const [showCoverMenu, setShowCoverMenu] = useState(false)
+  const coverMenuRef = useRef<HTMLDivElement>(null)
+  const [showCoverMenu, setShowCoverMenu] = useState(false)
   
   const avatarRef = useRef<AvatarUploadHandle>(null)
   const avatarMenuRef = useRef<HTMLDivElement>(null)
@@ -84,9 +81,8 @@ const handleDeleteAvatar = async () => {
   setShowAvatarMenu(false)
   setAvatarImage(null)
   setGradient("linear-gradient(to right, #c3adb4, #8f6f79)")
-  dispatch(setProfileImgLink(""))
-
   await updateProfileImages({ removeProfileImg: true })
+  dispatch(setProfileImgLink(""))
 }
   useEffect(() => {
     if (!hasHydrated || !userId) return
@@ -157,7 +153,7 @@ const handleDeleteAvatar = async () => {
   const handleAvatarChange = async (file: File, previewUrl: string) => {
   setAvatarImage(previewUrl)
 
-  const updated = await updateProfileImages({ profileImage: file })
+  const updated = await updateProfileImages({ profileImg: file })
 
   if (updated?.profileImgLink) {
     setAvatarImage(updated.profileImgLink)
@@ -168,7 +164,7 @@ const handleDeleteAvatar = async () => {
 const handleCoverChange = async (file: File, previewUrl: string) => {
   setCoverImage(previewUrl)
 
-  const updated = await updateProfileImages({ bannerImage: file })
+  const updated = await updateProfileImages({ bannerImg: file })
 
   if (updated?.bannerImgLink) {
     setCoverImage(updated.bannerImgLink)

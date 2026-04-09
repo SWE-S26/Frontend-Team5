@@ -5,7 +5,7 @@ import AvatarUpload from "./profile-header/AvatarUpload"
 import Button from "@/components/ui/Button"
 import { useAppSelector } from "@/store/hooks"
 
-import { useUpdateProfile } from "@/hooks/useUpdateProfile"
+import { useUpdateProfile, useUpdateProfileImages } from "@/hooks/useProfile"
 import { setProfile } from "@/store/slices/profileSlice"
 import { useAppDispatch } from "@/store/hooks"
 
@@ -85,18 +85,15 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
   useEffect(() => { reduxLinksRef.current        = reduxLinks },       [reduxLinks])
   useEffect(() => { reduxSupportLinkRef.current  = reduxSupportLink }, [reduxSupportLink])
 
+  const { updateProfileImages } = useUpdateProfileImages()
   const handleAvatarChange = async (file: File, previewUrl: string) => {
-  setAvatarImage(previewUrl)
-
-  const formData = new FormData()
-  formData.append("profileImage", file)
-
-  const updated = await updateProfile(formData)
-
-  if (updated?.profileImgLink) {
-    setAvatarImage(updated.profileImgLink)
+    setAvatarImage(previewUrl)
+    const updated = await updateProfileImages({ profileImg: file })
+    if (updated?.profileImgLink) {
+      setAvatarImage(updated.profileImgLink)
+    }
   }
-}
+
   // populate form only when modal opens
   useEffect(() => {
     if (!isOpen) return
@@ -218,7 +215,6 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
       city:           formCity,
       country:        formCountry,
       bio:            formBio,
-      profileImgLink: avatarImage || undefined,
       links:          formattedLinks,
       supportLink:    formSupportLink || undefined,
     })
