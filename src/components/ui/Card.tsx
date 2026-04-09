@@ -1,7 +1,10 @@
 "use client";
 import { IoIosMore, IoMdPlay, IoMdPause } from "react-icons/io";
+import { RiPlayListAddLine } from "react-icons/ri";
 import { HiHeart } from "react-icons/hi";
 import { useState } from "react";
+import MoreDropdown from "./MoreDropdown";
+import { ListStart } from "lucide-react";
 
 type CardProps = {
   img?: string;
@@ -52,11 +55,9 @@ export default function Card({
                 style={{ backgroundImage: `url(${img})` }}
               />
             )}
-
             {img && (
               <div className="absolute inset-0 bg-white/50 opacity-0 group-hover:opacity-100" />
             )}
-
             {/* Play Button */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white-smoke rounded-full z-10 opacity-0 group/play group-hover:opacity-100 flex items-center justify-center">
               {!isPlaying ? (
@@ -71,7 +72,6 @@ export default function Card({
                 />
               )}
             </div>
-
             {/* Like Button */}
             <div className="absolute bottom-3.25 right-[48.5px] z-30 group/tooltip flex flex-col items-center w-10">
               <HiHeart
@@ -87,18 +87,29 @@ export default function Card({
                 <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-off-black" />
               </div>
             </div>
-
-            {/* More Options Button */}
-            <div className="absolute bottom-3.25 right-2.25 z-30 group/tooltip flex flex-col items-center w-10">
-              <IoIosMore
-                className="text-chinese-black text-[20px] font-bold opacity-0 group-hover:opacity-100 group-hover/tooltip:opacity-50"
-                onClick={handleMoreClick}
+            <div className="absolute bottom-1.25 right-2.25 z-30">
+              <MoreDropdown
+                trigger={
+                  <div className="group/tooltip flex flex-col items-center w-10 cursor-pointer">
+                    <IoIosMore className="text-chinese-black text-[20px] font-bold opacity-0 group-hover:opacity-100 group-hover/tooltip:opacity-50" />
+                  </div>
+                }
+                tooltipLabel="More"
+                items={[
+                  {
+                    label: "Add to Next up",
+                    icon: <ListStart size={19} className="scale-x-[-1]" />,
+                    onClick: () => console.log("next up"),
+                  },
+                  {
+                    label: "Add to Playlist",
+                    icon: (
+                      <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
+                    ),
+                    onClick: () => console.log("playlist"),
+                  },
+                ]}
               />
-
-              <div className="absolute top-full mt-2 px-2 py-1 bg-off-black text-white-smoke text-[11px] rounded opacity-0 group-hover/tooltip:opacity-100 pointer-events-none whitespace-nowrap z-50">
-                More
-                <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-off-black"></div>
-              </div>
             </div>
           </div>
 

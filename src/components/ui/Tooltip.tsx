@@ -32,7 +32,11 @@ export default function Tooltip({ label, children }: TooltipProps) {
     <>
       <div
         ref={triggerRef}
-        onMouseEnter={() => setVisible(true)}
+        onMouseEnter={() => {
+          // Dispatch event to close any open dropdowns
+          document.dispatchEvent(new CustomEvent("tooltip-opening"));
+          setVisible(true);
+        }}
         onMouseLeave={() => setVisible(false)}
       >
         {children}
