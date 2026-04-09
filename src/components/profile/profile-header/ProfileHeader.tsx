@@ -102,6 +102,7 @@ const handleDeleteAvatar = async () => {
         city:           data.city,
         country:        data.country,
         links:          data.links,
+        bannerLinks:    data.bannerLinks,
         supportLink:    data.supportLink,
         favoriteGenres: data.favoriteGenres,
         followersCount: data.followersCount,

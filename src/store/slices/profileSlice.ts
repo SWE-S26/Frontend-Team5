@@ -15,6 +15,7 @@ interface ProfileState {
   country:        string | null
   links:          ProfileLink[]
   supportLink:    string | null
+  bannerLinks:    ProfileLink[]
   favoriteGenres: string[]
   followersCount: number
   followedCount:  number        // matches actual API field name
@@ -38,6 +39,7 @@ const initialState: ProfileState = {
   country:        null,
   links:          [],
   supportLink:    null,
+  bannerLinks:    [],
   favoriteGenres: [],
   followersCount: 0,
   followedCount:  0,
