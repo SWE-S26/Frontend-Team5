@@ -1,7 +1,13 @@
 "use client"
 import { useState, useEffect } from "react"
+import { Check } from "lucide-react"
 
-export default function ThemeSwitcher() {
+interface ThemeSwitcherProps {
+  onThemeChange?: (theme: string) => void
+  saveStatus?: "idle" | "saving" | "saved" | "error"
+}
+
+export default function ThemeSwitcher({ onThemeChange, saveStatus = "idle" }: ThemeSwitcherProps) {
   const [theme, setTheme] = useState("dark")
 
   useEffect(() => {
@@ -37,11 +43,26 @@ export default function ThemeSwitcher() {
     } else {
       document.documentElement.setAttribute("data-theme", value)
     }
+
+    // notify parent to call API
+    onThemeChange?.(value)
   }
 
   return (
     <div className="flex flex-col gap-2">
-      <h2 className="text-white-smoke font-bold mb-2">Change theme</h2>
+      <div className="flex items-center justify-between mb-2">
+        <h2 className="text-white-smoke font-bold">Change theme</h2>
+        <span className={`flex items-center gap-1.5 text-sm text-white-smoke/60 transition-opacity duration-300 ${saveStatus === "idle" ? "opacity-0" : "opacity-100"}`}>
+          {saveStatus === "saving" && (
+            <>
+              <span className="w-3.5 h-3.5 rounded-full border-2 border-white-smoke/30 border-t-white-smoke/80 animate-spin inline-block" />
+              Saving...
+            </>
+          )}
+          {saveStatus === "saved" && (<><Check size={14} strokeWidth={2.5} />Changes saved</>)}
+          {saveStatus === "error" && <span className="text-red-400">Failed to save</span>}
+        </span>
+      </div>
       {["light", "dark", "automatic"].map((option) => (
         <button key={option} onClick={() => changeTheme(option)}
           className="flex items-center gap-3 text-white-smoke font-bold capitalize w-fit transition-all duration-300 group">
