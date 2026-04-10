@@ -5,20 +5,24 @@ import { HiHeart } from "react-icons/hi";
 import { useState } from "react";
 import MoreDropdown from "./MoreDropdown";
 import { ListStart } from "lucide-react";
+import { useLikeTrack } from "@/hooks/useLikes";
 
 type CardProps = {
   img?: string;
   title?: string;
   artist?: string;
+  trackId?: string;
   type?: "interactive" | "static";
 };
 
 export default function Card({
-  img = "/Graduation.jpg",
-  title = "CRISPY CLOUD",
-  artist = "Artist station",
+  img,
+  title,
+  artist,
+  trackId,
   type = "interactive",
 }: CardProps) {
+  const { likeTrack, liked, loading } = useLikeTrack();
   const [isLiked, setIsLiked] = useState<boolean>(false);
   const [isPlaying, setIsPlaying] = useState<boolean>(false);
 
@@ -49,15 +53,23 @@ export default function Card({
       {type === "interactive" ? (
         <div className="flex flex-col max-w-40">
           <div className="relative w-40 aspect-square rounded group cursor-pointer bg-off-black m-1 mb-1.75">
-            {img && (
-              <button
-                className="absolute inset-0 bg-cover bg-center overflow-hidden rounded"
-                style={{ backgroundImage: `url(${img})` }}
-              />
-            )}
-            {img && (
-              <div className="absolute inset-0 transition-all duration-200 bg-white/50 opacity-0 group-hover:opacity-100" />
-            )}
+            <div className="absolute inset-0 rounded overflow-hidden">
+              <div
+                className={`absolute inset-0 rounded overflow-hidden ${
+                  !img ? "bg-gradient-to-br from-off-black to-crusta/70" : ""
+                }`}
+              ></div>
+              {img && (
+                <button
+                  key={img}
+                  className="absolute inset-0 bg-cover bg-center overflow-hidden rounded opacity-0 animate-fade-in"
+                  style={{ backgroundImage: `url(${img})` }}
+                />
+              )}
+              {img && (
+                <div className="absolute inset-0 transition-all duration-200 bg-white/50 opacity-0 group-hover:opacity-100" />
+              )}
+            </div>
             {/* Play Button */}
             <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-16 h-16 bg-white-smoke rounded-full z-10 opacity-0 group/play group-hover:opacity-100 flex items-center justify-center transition-all duration-200">
               {!isPlaying ? (
@@ -116,13 +128,15 @@ export default function Card({
           {/* Card Title */}
           <a
             href="#"
-            className="text-white-smoke no-underline hover:text-gray-300 text-[14px] font-bold tracking-tight pl-1"
+            className="text-white-smoke no-underline hover:text-gray-300 text-[14px] font-bold tracking-tight pl-1 animate-fade-in"
           >
             {title}
           </a>
 
           {/* Artist Name */}
-          <p className="text-silver text-[14px] font-bold pl-1"> {artist}</p>
+          <p className="text-silver text-[14px] font-bold pl-1 animate-fade-in">
+            {artist}
+          </p>
         </div>
       ) : (
         <div className="relative w-40 aspect-square rounded group cursor-pointer bg-off-black m-1 mb-1.75">
