@@ -79,7 +79,7 @@ export default function ProfilePopover({
             className="fixed z-[9999] w-38 rounded border border-silver/50"
           >
             {/* Arrow */}
-            <div className="absolute -top-[5px] left-1/2 -translate-x-1/2 w-3 h-3 bg-off-black border-l border-t border-silver/50 rotate-45" />
+            <div className="absolute -top-[5px] left-1/2 -translate-x-1/2 w-3 h-3 bg-chinese-black border-l border-t border-silver/50 rotate-45" />
 
             {/* Content */}
             <div className="relative z-10 flex flex-col items-center p-4 bg-chinese-black rounded">
