@@ -8,7 +8,7 @@ interface Props { items: Item[] }
 export default function Playlists({ items }: Props) {
   return (
       <>
-      <div className="flex flex-col gap-4">
+      <div className="flex flex-col gap-12">
         {items.map((item) => (
           <Card key={item.id} />
         ))}

@@ -8,7 +8,8 @@ interface Props { items: Item[] }
 export default function All({ items }: Props) {
   return (
     <>
-    <div className="flex flex-col gap-4">
+    <h1 className="text-2xl font-bold mb-4 ">Recent</h1>
+    <div className="flex flex-col gap-12">
       {items.map((item) => (
         <Card key={item.id} />
       ))}
