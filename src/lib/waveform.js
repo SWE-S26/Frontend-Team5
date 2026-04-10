@@ -11,6 +11,7 @@ var SoundCloudWaveform = {
     wave_color: "#666",
     half: undefined,
     download: false,
+    draw_divider: false,
     onComplete: function (png, pixels) {},
   },
 
@@ -20,21 +21,6 @@ var SoundCloudWaveform = {
       this.audioContext = new AudioCtx();
     }
     return this.audioContext;
-  },
-
-  generate: function (file, options) {
-    this._applyOptions(options);
-
-    var reader = new FileReader();
-    reader.onload = function (event) {
-      SoundCloudWaveform._getAudioContext().decodeAudioData(
-        event.target.result,
-        function (buffer) {
-          SoundCloudWaveform.extractBuffer(buffer);
-        },
-      );
-    };
-    reader.readAsArrayBuffer(file);
   },
 
   generateFromJson: function (samples, options) {
@@ -56,10 +42,6 @@ var SoundCloudWaveform = {
       val = Math.max(val, 1);
 
       this.drawBar(i * barWidth, val);
-    }
-
-    if (this.settings.half === undefined) {
-      this.drawDivider();
     }
 
     if (this.settings.download) {
@@ -100,6 +82,7 @@ var SoundCloudWaveform = {
           var blob = new Blob([JSON.stringify(samples, null, 2)], {
             type: "application/json",
           });
+
           var url = URL.createObjectURL(blob);
           var link = document.createElement("a");
           link.href = url;
@@ -109,6 +92,7 @@ var SoundCloudWaveform = {
         },
       );
     };
+
     reader.readAsArrayBuffer(file);
   },
 
@@ -175,10 +159,6 @@ var SoundCloudWaveform = {
       this.drawBar(j, val);
     }
 
-    if (this.settings.half === undefined) {
-      this.drawDivider();
-    }
-
     if (this.settings.download) {
       this.generateImage();
     }
@@ -209,22 +189,6 @@ var SoundCloudWaveform = {
     return Math.sqrt(sum / data.length);
   },
 
-  drawDivider: function () {
-    var canvasHeight = this.settings.canvas.height;
-    var dividerY = Math.floor(canvasHeight * 0.55);
-    this.settings.context.fillStyle = "#121212";
-
-    // Fixed 3px thickness (no dynamic scaling)
-    var dividerHeight = 2;
-
-    this.settings.context.fillRect(
-      0,
-      dividerY,
-      this.settings.canvas.width,
-      dividerHeight,
-    );
-  },
-
   drawBar: function (i, h) {
     var ctx = this.settings.context;
     var canvasHeight = this.settings.canvas.height;
@@ -238,11 +202,9 @@ var SoundCloudWaveform = {
     var x = i;
 
     var dividerY = Math.floor(canvasHeight * 0.55);
-    var dividerHeight = 2; // Match drawDivider
 
     var topH = Math.min(h * 0.7, dividerY);
-    // Bottom bars start AFTER the 2px divider
-    var bottomH = Math.min(topH * 0.4, canvasHeight - dividerY - dividerHeight);
+    var bottomH = Math.min(topH * 0.4, canvasHeight - dividerY);
 
     var drawTop = this.settings.half !== "bottom";
     var drawBottom = this.settings.half !== "top";
@@ -255,19 +217,20 @@ var SoundCloudWaveform = {
         ctx.fillStyle = topGrad;
         ctx.fillRect(x, dividerY - topH, w, topH);
       }
+
       if (drawBottom) {
         ctx.fillStyle = "#c49478";
-        // Start bottom bars after the 2px divider
-        ctx.fillRect(x, dividerY + dividerHeight, w, bottomH);
+        ctx.fillRect(x, dividerY, w, bottomH);
       }
     } else {
       ctx.fillStyle = this.settings.wave_color;
+
       if (drawTop) {
         ctx.fillRect(x, dividerY - topH, w, topH);
       }
+
       if (drawBottom) {
-        // Start bottom bars after the 2px divider
-        ctx.fillRect(x, dividerY + dividerHeight, w, bottomH);
+        ctx.fillRect(x, dividerY, w, bottomH);
       }
     }
   },

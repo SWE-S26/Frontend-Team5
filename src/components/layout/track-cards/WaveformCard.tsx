@@ -72,7 +72,7 @@ export default function WaveformCard() {
           className="w-full max-w-[632px] h-[60px] shrink-0 cursor-pointer"
           onClick={() => setShowComments(true)}
         >
-          <SausageWaveform />
+          <SausageWaveform samplesUrl="/waveform.json" />
         </div>
 
         {/* comment box */}
@@ -113,7 +113,7 @@ export default function WaveformCard() {
           )}
         </AnimatePresence>
 
-        {/* buttons below (move down with layout animation) */}
+        {/* buttons */}
         <motion.div
           layout
           transition={{ layout: { duration: 0.3, ease: "easeInOut" } }}
