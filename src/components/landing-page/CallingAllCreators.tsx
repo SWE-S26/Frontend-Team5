@@ -1,14 +1,15 @@
 import Image from "next/image";
 import Link from "next/link";
+import Button from "@/components/ui/Button";
 
 export default function CallingAllCreators() {
   return (
-    <section className="w-full bg-black overflow-hidden">
-      <div className="max-w-6xl mx-auto px-8 py-16 flex items-center justify-between gap-12">
+    <section className="w-full bg-black">
+      <div className="max-w-6xl mx-auto px-6 flex items-center justify-between h-87">
 
-        {/* ── Left: copy ───────────────────────────────────────────── */}
-        <div className="flex flex-col gap-6 max-w-md">
-          <h2 className="text-white text-[2.8rem] font-light leading-tight">
+        {/* Left: copy */}
+        <div className="flex flex-col gap-3 max-w-md">
+          <h2 className="text-white text-4xl leading-tight">
             Calling all creators
           </h2>
 
@@ -16,17 +17,17 @@ export default function CallingAllCreators() {
             Get on Beatza to connect with fans, share your sounds, and grow your audience. What are you waiting for?
           </p>
 
-          <Link href="/sign-up">
-            <button className="w-fit bg-white text-black font-semibold text-sm px-6 py-3 rounded-sm hover:bg-white-smoke transition-colors cursor-pointer">
+          <Link href="/sign-up" className="pt-8">
+            <Button className="bg-white text-black">
               Find out more
-            </button>
+            </Button>
           </Link>
         </div>
 
-        {/* ── Right: image ─────────────────────────────────────────── */}
-        <div className="relative shrink-0 w-[55%] h-70">
+        {/* Right: image  */}
+        <div className="relative shrink-0 w-[55%] h-100">
           <Image
-            src="/landing-page/calling-all-creators.png"
+            src="/landing-page/CallingAllCreators.png"
             alt="Calling all creators"
             fill
             className="object-contain object-right"

@@ -14,7 +14,6 @@ export default function SettingsLayoutClient({ children }: { children: React.Rea
           { href: "/settings/content",       label: "Content"       },
           { href: "/settings/notifications", label: "Notifications" },
           { href: "/settings/privacy",       label: "Privacy"       },
-          { href: "/settings/advertising",   label: "Advertising"   },
         ]}
       />
       {children}
