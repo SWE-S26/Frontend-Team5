@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useParams } from "next/navigation"
 import ColorThief from "color-thief-browser"
+import AvatarPositionModal from "./Avatarpositionmodal"
 
 import Button from "@/components/ui/Button"
 import AvatarUpload, { AvatarUploadHandle } from "./AvatarUpload"
@@ -33,6 +34,9 @@ export default function ProfileHeader() {
   const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
 
   
+  const [avatarModalOpen,   setAvatarModalOpen]   = useState(false)
+  const [avatarPendingUrl,  setAvatarPendingUrl]  = useState<string | null>(null)
+  const [avatarPendingFile, setAvatarPendingFile] = useState<File | null>(null)
 
   const { getProfile, loading, error } = useGetProfile()
   const { updateProfileImages } = useUpdateProfileImages()
@@ -124,6 +128,8 @@ const handleDeleteAvatar = async () => {
     return () => { dispatch(clearProfile()) }
   }, [userId, hasHydrated])
 
+
+
   // sync local image state from profileSlice
   useEffect(() => {
     if (bannerImgLink) setCoverImage(bannerImgLink)
@@ -160,10 +166,16 @@ const handleDeleteAvatar = async () => {
   // ── Upload handlers ──────────────────────────────────────────────
 
   const handleAvatarChange = async (file: File, previewUrl: string) => {
-  setAvatarImage(previewUrl)
+  setAvatarPendingFile(file)
+  setAvatarPendingUrl(previewUrl)
+  setAvatarModalOpen(true)
+}
 
-  const updated = await updateProfileImages({ profileImg: file })
-
+// 3. add save handler
+const handleAvatarModalSave = async (croppedFile: File, croppedDataUrl: string) => {
+  setAvatarModalOpen(false)
+  setAvatarImage(croppedDataUrl)
+  const updated = await updateProfileImages({ profileImg: croppedFile })
   if (updated?.profileImgLink) {
     setAvatarImage(updated.profileImgLink)
     dispatch(setProfileImgLink(updated.profileImgLink))
@@ -194,6 +206,7 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
   )
 
   return (
+    <>
     <div
       className="relative w-full h-80 group -mt-12.5"
       style={
@@ -312,6 +325,22 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
           </p>
         </div>
       </div>
+
     </div>
+
+    <AvatarPositionModal
+      isOpen={avatarModalOpen}
+      imageUrl={avatarPendingUrl ?? ""}
+      originalFile={avatarPendingFile}
+      onSave={handleAvatarModalSave}
+      onCancel={() => {
+        setAvatarModalOpen(false)
+        setAvatarPendingUrl(null)
+        setAvatarPendingFile(null)
+      }}
+    />
+
+    </>
+    
   )
 }
