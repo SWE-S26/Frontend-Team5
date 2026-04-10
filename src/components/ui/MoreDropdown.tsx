@@ -26,36 +26,54 @@ export default function MoreDropdown({
 }: MoreDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
-  const [coords, setCoords] = useState({ top: 0, left: 0 });
   const [tooltipCoords, setTooltipCoords] = useState({ top: 0, left: 0 });
   const triggerRef = useRef<HTMLDivElement>(null);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const rafRef = useRef<number | null>(null);
 
-  useEffect(() => {
-    if (!isOpen) return;
+  function updatePosition() {
+    if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(() => {
+      const t = triggerRef.current;
+      const d = dropdownRef.current;
+      if (!t || !d) return;
+      const rect = t.getBoundingClientRect();
+      const dropdownHeight = d.offsetHeight ?? 120;
+      const spaceBelow = window.innerHeight - rect.bottom;
+      const openUpward = spaceBelow < dropdownHeight + 8;
 
-    const trigger = triggerRef.current;
-    const dropdown = dropdownRef.current;
-    if (!trigger || !dropdown) return;
-
-    const t = trigger.getBoundingClientRect();
-    const d = dropdown.getBoundingClientRect();
-
-    setCoords({
-      top: t.bottom + window.scrollY,
-      left: t.left + window.scrollX,
+      d.style.top = `${openUpward ? rect.top - dropdownHeight : rect.bottom}px`;
+      d.style.left = `${rect.left}px`;
     });
-  }, [isOpen]);
+  }
 
-  useEffect(() => {
-    if (!showTooltip || isOpen) return;
+  function updateTooltipPosition() {
     const t = triggerRef.current;
     if (!t) return;
     const rect = t.getBoundingClientRect();
     setTooltipCoords({
-      top: rect.bottom + window.scrollY + 8,
-      left: rect.left + window.scrollX + rect.width / 2,
+      top: rect.bottom + 8,
+      left: rect.left + rect.width / 2,
     });
+  }
+
+  function handleOpen() {
+    setIsOpen((o) => !o);
+  }
+
+  useEffect(() => {
+    if (!isOpen) return;
+    requestAnimationFrame(updatePosition);
+    document.addEventListener("scroll", updatePosition, true);
+    return () => document.removeEventListener("scroll", updatePosition, true);
+  }, [isOpen]);
+
+  useEffect(() => {
+    if (!showTooltip || isOpen) return;
+    updateTooltipPosition();
+    document.addEventListener("scroll", updateTooltipPosition, true);
+    return () =>
+      document.removeEventListener("scroll", updateTooltipPosition, true);
   }, [showTooltip, isOpen]);
 
   useEffect(() => {
@@ -80,7 +98,7 @@ export default function MoreDropdown({
     <>
       <div
         ref={triggerRef}
-        onClick={() => setIsOpen((o) => !o)}
+        onClick={handleOpen}
         onMouseEnter={() => tooltipLabel && setShowTooltip(true)}
         onMouseLeave={() => setShowTooltip(false)}
         className="inline-block"
@@ -115,7 +133,7 @@ export default function MoreDropdown({
         createPortal(
           <div
             ref={dropdownRef}
-            style={{ top: coords.top, left: coords.left }}
+            style={{ top: 0, left: 0 }}
             className={`fixed z-[9999] flex flex-col ${width} bg-chinese-black border border-silver/40 rounded-sm py-2`}
           >
             {items.map((item, index) => (
