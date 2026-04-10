@@ -42,7 +42,7 @@
     if (!bio) return null
 
     return (
-        <div className="w-full mt-2 mb-4">
+        <div className="w-full  mb-4">
         <div className="relative">
             <p
             ref={textRef}

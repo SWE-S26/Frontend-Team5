@@ -44,7 +44,7 @@
 
             <a href={supportLink} target="_blank" rel="noopener noreferrer" className="block w-full mt-2">
             <Button
-                className="w-full bg-white-smoke text-black font-bold justify-center"
+                className="w-full bg-white text-black font-bold justify-center"
             >
                 <span className="flex items-center justify-center gap-2 w-full">
                 <BiSolidDollarCircle className="text-lg" />
