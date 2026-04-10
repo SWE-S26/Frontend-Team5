@@ -122,3 +122,17 @@ body {
 .ant-switch:hover .ant-switch-handle::before {
   opacity: 0.7 !important;
 }
+
+/*  ---------- Settings (Account Tab - Notification Tab) ---------- */
+.notif-select, .notif-select *, .notif-select .ant-select-selector,
+.notif-select .ant-select-selection-item, .notif-select .ant-select-selection-placeholder,
+.notif-select input { color: var(--fg) !important; }
+.notif-select,
+.notif-select .ant-select-selector { background-color: var(--back) !important; border-color: rgba(245,245,245,0.5) !important; box-shadow: none !important; }
+.notif-select.ant-select-focused .ant-select-selector { border-color: var(--fg) !important; box-shadow: none !important; }
+.notif-select .ant-select-arrow { color: var(--fg) !important; }
+.notif-dropdown-popup { background-color: var(--back) !important; }
+.notif-dropdown-popup .ant-select-item { color: var(--fg) !important; }
+.notif-dropdown-popup .ant-select-item-option-active { background-color: var(--bg) !important; }
+.notif-dropdown-popup .ant-select-item-option-selected { background-color: var(--bg) !important; }
+.notif-dropdown-popup .ant-select-item-option-selected .ant-select-item-option-content { color: var(--fg) !important; }

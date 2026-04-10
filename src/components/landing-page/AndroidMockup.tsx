@@ -15,7 +15,7 @@ export default function AndroidMockup({ className = "", screenImage }: AndroidMo
         <div className="absolute -right-1.25 top-20 w-1 h-5.5 rounded-r-sm bg-[#FF5500]" />
         <div className="absolute -right-1.25 top-27.5 w-1 h-5.5 rounded-r-sm bg-[#FF5500]" />
 
-        {/* ── Top bar ── */}
+        {/* Top bar */}
         {/* Speaker bar */}
         <div className="absolute top-4 left-20 -translate-x-[70%] w-10 h-1.25 rounded-full bg-[#FF5500]/25" />
         {/* Camera dot */}

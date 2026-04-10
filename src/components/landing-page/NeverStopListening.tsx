@@ -32,7 +32,7 @@ export default function NeverStopListening() {
           <div className="w-12 h-0.75 bg-linear-to-r from-[#FF5500] to-[#FF8800] mb-5 rounded-full" />
 
           <p className="text-[15px] font-semibold text-[#1a1a1a] leading-relaxed mb-8">
-            Beatza is available on Web, iOS, Android, Sonos, Chromecast, and Xbox One.
+            Beatza is available on Web and Android.
           </p>
 
           <div className="flex items-center gap-3">

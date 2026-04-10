@@ -1,12 +1,13 @@
 "use client"
-
-import { useEffect } from "react"
+import { useState, useEffect } from "react"
 import { useRouter } from "next/navigation"
 import Link from "next/link"
 
 import HeroBanner from "@/components/landing-page/HeroBanner"
 import NavbarCenter from "@/components/layout/navbar/main-navbar/NavbarCenter"
 import NeverStopListening from "@/components/landing-page/NeverStopListening"
+import CallingAllCreators from "@/components/landing-page/CallingAllCreators"
+import AuthModal from "@/components/auth/AuthModal";
 import Button from "@/components/ui/Button"
 import { useAppSelector } from "@/store/hooks"
 
@@ -14,6 +15,7 @@ export default function LandingPage() {
   const router = useRouter()
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
   const hasHydrated = useAppSelector((state) => state.auth.hasHydrated)
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
   useEffect(() => {
     if (!hasHydrated) return
@@ -52,7 +54,37 @@ export default function LandingPage() {
         <div className="my-20" />
 
         <NeverStopListening />
+        <CallingAllCreators />
+
+        <div className="flex flex-col items-center gap-4 py-16">
+          <h2 className="text-white text-4xl leading-tight text-center">
+            Thanks for listening. Now join in.
+          </h2>
+
+          <p className="text-white font-bold text-[15px] text-center">
+            Save tracks, follow artists and build playlists. All for free.
+          </p>
+
+          <Button
+            className="bg-white text-black mt-2 px-12 py-3 text-[17px]!"
+            onClick={() => setIsAuthModalOpen(true)}
+          >
+            Create account
+          </Button>
+
+          <div className="flex items-center gap-2 mt-1">
+            <span className="text-white text-sm">Already have an account?</span>
+            <Button
+              className="text-white"
+              onClick={() => setIsAuthModalOpen(true)}
+            >
+              Sign in
+            </Button>
+          </div>
+        </div>
+
       </div>
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
     </div>
   )
 }
