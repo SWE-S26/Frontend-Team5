@@ -5,7 +5,6 @@ import { messageHandlers } from "./handlers/messageHandlers";
 import { tracksHandlers } from "./handlers/tracks.handlers";
 import { profileHandlers } from "./handlers/profile.handlers"
 import { socialHandlers } from "./handlers/social.handlers"
-import { profileHandlers } from "./handlers/profile.handlers";
 import { 
   privacyHandlers, 
   notificationHandlers, 
