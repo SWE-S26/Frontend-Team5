@@ -254,8 +254,8 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
     city:         formCity.trim()      || null,
     country:      formCountry.trim()   || null,
     bio:          formBio.trim()       || null,
-    links:        formattedLinks.length ? formattedLinks : null,
-    bannerLinks:  formattedLinks.length ? formattedLinks : null,
+    links:        formattedLinks,
+    bannerLinks:  formattedLinks,
     supportLink:  formSupportLink?.trim() || null,
   };
 
@@ -303,7 +303,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -60 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="flex flex-col w-200 p-6 bg-black rounded-md relative overflow-y-auto max-h-[90vh] scrollbar-hide"
+            className="flex flex-col w-200 p-6 bg-chinese-black rounded-md relative overflow-y-auto max-h-[90vh] scrollbar-hide"
             onClick={(e) => e.stopPropagation()}
           >
             <p className="text-xl text-white-smoke font-bold mb-6">
@@ -572,7 +572,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
               <button
                   onClick={() => setFormSupportLink("")}
                   disabled={formSupportLink !== null}
-                  className="bg-white text-black px-4 py-2 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="bg-white-smoke text-chinese-black px-4 py-2 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                 >
                   Add support link
               </button>
@@ -594,7 +594,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
               <button
                 onClick={handleSave}
                 disabled={loading || !isDirty}
-                className="bg-white text-black px-4 py-2 rounded cursor-pointer disabled:opacity-50"
+                className="bg-white-smoke text-chinese-black px-4 py-2 rounded cursor-pointer disabled:opacity-50"
               >
                 {loading ? "Saving..." : "Save changes"}
               </button>

@@ -31,6 +31,7 @@ import Reposts from "@/components/profile/profile-tabs/Reposts"
 import BlockPopUp from "@/components/messages/conversation/BlockPopUp"
 import ReportPopUp from "@/components/messages/conversation/ReportPopUp"
 import SpamPopUp from "@/components/messages/conversation/SpamPopUp"
+import Button from "@/components/ui/Button"
 
 interface Props {
   params: { username: string }
@@ -127,7 +128,7 @@ const ProfilePage = ({ params }: Props) => {
           activeTab={activeTab}
           onTabChange={handleTabChange}
           textSize="text-md"
-          className="flex items-center justify-between text-white py-6 px-1"
+          className="flex items-center justify-between text-white-smoke py-6 px-1"
           tabsWrapperClassName="flex space-x-6"
         />
 
@@ -136,28 +137,22 @@ const ProfilePage = ({ params }: Props) => {
             <>
               {isOwn ? (
                 <>
-                  <button
+                  <Button
                     onClick={() => setOpenShare(!openShare)}
-                    className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
+                    className="relative group   bg-off-black font-bold  justify-center  cursor-pointer hover:text-silver "
                   >
                     <LuShare className="w-4 h-4" />
-                    <span className="ml-1 text-sm font-bold px-1">Share</span>
-                    <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-3 py-1 rounded-md bg-[#2C2C2C] text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none shadow-lg z-50">
-                      Share
-                    </span>
-                  </button>
+                    <span className="ml-1 text-sm  px-1 py-0.5">Share</span>
+                  </Button>
                   <SharePopup isOpen={openShare} onClose={() => setOpenShare(false)} />
 
-                  <button
+                  <Button
                     onClick={() => setOpenEdit(true)}
-                    className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center cursor-pointer hover:text-silver h-10"
+                    className="relative group   bg-off-black font-bold  justify-center cursor-pointer hover:text-silver "
                   >
-                    <MdOutlineEdit className="w-5 h-5" />
-                    <span className="ml-1 text-sm font-bold px-1">Edit</span>
-                    <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-3 py-1 rounded-md bg-[#2C2C2C] text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none shadow-lg z-50">
-                      Edit
-                    </span>
-                  </button>
+                    <MdOutlineEdit className="w-5 h-5 " />
+                    <span className="ml-1 text-sm   px-1 py-0.5">Edit</span>
+                  </Button>
                   <ProfileEditForm isOpen={openEdit} onClose={() => setOpenEdit(false)} />
                 </>
               ) : (
@@ -165,15 +160,15 @@ const ProfilePage = ({ params }: Props) => {
                 <>
                 
                   {artist && (
-                    <button className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center cursor-pointer hover:text-silver h-10">
+                    <Button className="relative group font-bold  bg-off-black   justify-center cursor-pointer hover:text-silver ">
                       <IoRadio className="w-5 h-5" />
-                      <span className="ml-1 text-sm font-bold px-1">Station</span>
-                    </button>
+                      <span className="ml-1 text-sm   px-1 py-0.5">Station</span>
+                    </Button>
                   )}
                    
                   <button
                     onClick={() => setFollowing(!following)}
-                    className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
+                    className="relative group p-2 rounded-md bg-white-smoke text-chinese-black transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
                   >
                     {following ? (
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5 fill-current">
@@ -198,7 +193,7 @@ const ProfilePage = ({ params }: Props) => {
 
                   <button
                     onClick={() => setOpenShare(!openShare)}
-                    className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
+                    className="relative group p-2 rounded-md bg-off-black transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
                   >
                     <LuShare className="w-4 h-4" />
                     <span className="ml-1 text-sm font-bold px-1">Share</span>
@@ -210,7 +205,7 @@ const ProfilePage = ({ params }: Props) => {
 
                   <button
                     onClick={() => setOpenMessage(!openMessage)}
-                    className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
+                    className="relative group p-2 rounded-md bg-off-black transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
                   >
                     <FaRegEnvelope className="w-4 h-4" />
                   </button>
@@ -219,13 +214,13 @@ const ProfilePage = ({ params }: Props) => {
                   <div ref={moreMenuRef} className="relative">
                         <button
                           onClick={() => setOpenMoreMenu(!openMoreMenu)}
-                          className={`relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer h-10 ${openMoreMenu ? "text-papaya" : "hover:text-silver"}`}
+                          className={`relative group p-2 rounded-md bg-off-black transition flex items-center justify-center px-4 py-1 cursor-pointer h-10 ${openMoreMenu ? "text-papaya" : "hover:text-silver"}`}
                         >
                           <BsThreeDots className="w-4 h-4" />
                         </button>
 
                         {openMoreMenu && (
-                          <div className="absolute right-0 top-full mt-1 bg-[#1F1F1F] rounded-md shadow-lg z-50 w-auto py-1  whitespace-nowrap">
+                          <div className="absolute right-0 top-full mt-1 bg-off-black rounded-md shadow-lg z-50 w-auto py-1  whitespace-nowrap">
                             <button 
                             onClick={() => {
                                 if (isBlocked) {
