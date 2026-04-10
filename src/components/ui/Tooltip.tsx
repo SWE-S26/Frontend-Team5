@@ -19,8 +19,8 @@ export default function Tooltip({ label, children }: TooltipProps) {
     const rect = triggerRef.current.getBoundingClientRect();
     const tooltipWidth = tooltipRef.current.offsetWidth;
     setCoords({
-      top: rect.bottom + window.scrollY + 8,
-      left: rect.left + window.scrollX + rect.width / 2 - tooltipWidth / 2 - 6,
+      top: rect.bottom + 8,
+      left: rect.left + rect.width / 2 - tooltipWidth / 2 - 6,
     });
   }
 
@@ -28,12 +28,17 @@ export default function Tooltip({ label, children }: TooltipProps) {
     if (visible) updatePosition();
   }, [visible]);
 
+  useEffect(() => {
+    if (!visible) return;
+    document.addEventListener("scroll", updatePosition, true);
+    return () => document.removeEventListener("scroll", updatePosition, true);
+  }, [visible]);
+
   return (
     <>
       <div
         ref={triggerRef}
         onMouseEnter={() => {
-          // Dispatch event to close any open dropdowns
           document.dispatchEvent(new CustomEvent("tooltip-opening"));
           setVisible(true);
         }}
