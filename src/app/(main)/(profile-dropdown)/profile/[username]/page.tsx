@@ -13,6 +13,9 @@ import { MdOutlineEdit } from "react-icons/md"
 import { BsThreeDots } from "react-icons/bs"
 import { IoRadio } from "react-icons/io5"
 import { FaRegEnvelope } from "react-icons/fa6"
+import { useRef, useEffect } from "react"
+import { AiOutlineStop } from "react-icons/ai";
+import { BsExclamationCircle } from "react-icons/bs";
 
 import SharePopup from "@/components/profile/SharePopUp"
 import ProfileEditForm from "@/components/profile/ProfileEditForm"
@@ -25,6 +28,9 @@ import Tracks from "@/components/profile/profile-tabs/Tracks"
 import Albums from "@/components/profile/profile-tabs/Albums"
 import Playlists from "@/components/profile/profile-tabs/Playlists"
 import Reposts from "@/components/profile/profile-tabs/Reposts"
+import BlockPopUp from "@/components/messages/conversation/BlockPopUp"
+import ReportPopUp from "@/components/messages/conversation/ReportPopUp"
+import SpamPopUp from "@/components/messages/conversation/SpamPopUp"
 
 interface Props {
   params: { username: string }
@@ -76,9 +82,16 @@ const ProfilePage = ({ params }: Props) => {
   const [openShare,   setOpenShare]   = useState(false)
   const [openMessage, setOpenMessage] = useState(false)
   const [following,   setFollowing]   = useState(false)
+  const [openMoreMenu, setOpenMoreMenu] = useState(false)
+  const[OpenReport, setIsOpenReport] = useState(false)
+  const [isBlocked, setIsBlocked] = useState(false)
+  const [isSpamOpen, setIsSpamOpen] = useState(false)
+  const [OpenBlock, setOpenBlock] = useState(false)
+  const moreMenuRef = useRef<HTMLDivElement>(null)
 
   const isLoading = useAppSelector((state) => state.profile.isLoading)
   const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
+  const displayName = useAppSelector((state) => state.profile.displayName)
   
   const role = useAppSelector((state) => state.profile.role)
 
@@ -92,6 +105,17 @@ const ProfilePage = ({ params }: Props) => {
     current.set("tab", tab)
     router.push(`?${current.toString()}`, { scroll: false })
   }
+
+  useEffect(() => {
+  if (!openMoreMenu) return
+  const handleClick = (e: MouseEvent) => {
+    if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
+      setOpenMoreMenu(false)
+    }
+  }
+  document.addEventListener("mousedown", handleClick)
+  return () => document.removeEventListener("mousedown", handleClick)
+}, [openMoreMenu])
 
   return (
     <div>
@@ -192,15 +216,69 @@ const ProfilePage = ({ params }: Props) => {
                   </button>
                   <NewMessagePopUP isOpen={openMessage} onClose={() => setOpenMessage(false)} />
 
-                  <button className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10">
-                    <BsThreeDots className="w-4 h-4" />
-                  </button>
+                  <div ref={moreMenuRef} className="relative">
+                        <button
+                          onClick={() => setOpenMoreMenu(!openMoreMenu)}
+                          className={`relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer h-10 ${openMoreMenu ? "text-papaya" : "hover:text-silver"}`}
+                        >
+                          <BsThreeDots className="w-4 h-4" />
+                        </button>
+
+                        {openMoreMenu && (
+                          <div className="absolute right-0 top-full mt-1 bg-[#1F1F1F] rounded-md shadow-lg z-50 w-auto py-1  whitespace-nowrap">
+                            <button 
+                            onClick={() => {
+                                if (isBlocked) {
+                                    setIsBlocked(false)
+                                } else {
+                                    setOpenBlock(true)
+                                }
+                            }}
+                            className={`flex items-center gap-2 w-full px-4 py-2 text-sm  hover:opacity-50 cursor-pointer font-bold ${isBlocked ? "text-papaya" : "text-white-smoke"}`}>
+                              <AiOutlineStop className="h-4 w-4 font-bold " />
+                              {isBlocked ? 'Blocked' : 'Block'} {displayName}
+                            </button>
+
+
+
+
+
+                            
+                            <button 
+                            onClick={() => setIsOpenReport(true)}
+                            className="flex items-center gap-2 w-full px-4 py-2 text-sm text-white-smoke hover:opacity-50 cursor-pointer font-bold">
+                                <BsExclamationCircle className="h-4 w-4 font-bold text-white-smoke" />
+                                Report {displayName}
+                            </button>
+                          </div>
+                        )}
+                  </div>
                 </>
               )}
             </>
           )}
         </div>
       </div>
+
+      <BlockPopUp isOpen={OpenBlock} onClose={() => setOpenBlock(false)} username={displayName || ''} 
+                    onConfirm={() => {
+                    setIsBlocked(true)
+                    setOpenBlock(false)
+                }}/>
+
+            <ReportPopUp 
+                    isOpen={OpenReport} 
+                    onClose={() => setIsOpenReport(false)} 
+                    onSpam={() => {
+                        setIsOpenReport(false)
+                        setIsSpamOpen(true)
+                    }}
+                />
+                <SpamPopUp 
+                    isOpen={isSpamOpen} 
+                    onClose={() => setIsSpamOpen(false)} 
+                    username={displayName  || ''} 
+                />
 
       <div className="flex justify-between">
         <div className="w-[68%]">

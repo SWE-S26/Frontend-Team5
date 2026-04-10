@@ -13,6 +13,10 @@ import { IoIosInformationCircle } from "react-icons/io"
 import { IoIosLink } from "react-icons/io"
 import { FiTrash2 } from "react-icons/fi"
 
+import { FaFacebook, FaInstagram, FaSpotify, FaPaperPlane, FaYoutube, FaTiktok, FaPinterest, FaLinkedin } from "react-icons/fa6"
+import { FaSoundcloud, FaTwitter } from "react-icons/fa6"
+import { IoEarthSharp } from "react-icons/io5"
+
 interface EditProfilePopUPProps {
   isOpen: boolean
   onClose: () => void
@@ -22,6 +26,22 @@ interface LinkItem {
   linkId: string
   name:   string
   link:   string
+}
+
+const getLinkIcon = (link: string) => {
+  const url = link.toLowerCase()
+  if (url.includes("facebook.com"))   return <FaFacebook   className="text-silver mt-2.5" />
+  if (url.includes("instagram.com"))  return <FaInstagram  className="text-silver mt-2.5" />
+  if (url.includes("spotify.com"))    return <FaSpotify    className="text-silver mt-2.5" />
+  if (url.includes("soundcloud.com")) return <FaSoundcloud className="text-silver mt-2.5" />
+  if (url.includes("twitter.com") || url.includes("x.com")) return <FaTwitter className="text-silver mt-2.5" />
+  if (url.includes("youtube.com"))    return <FaYoutube    className="text-silver mt-2.5" />
+  if (url.includes("tiktok.com"))     return <FaTiktok     className="text-silver mt-2.5" />
+  if (url.includes("pinterest.com"))  return <FaPinterest  className="text-silver mt-2.5" />
+  if (url.includes("linkedin.com"))   return <FaLinkedin   className="text-silver mt-2.5" />
+  if (url.startsWith("mailto:") || url.includes("gmail.com") || url.includes("@")) return <FaPaperPlane className="text-silver mt-2.5" />
+  if (url.trim() === "")              return <IoIosLink    className="text-silver mt-2.5" />
+  return <IoEarthSharp className="text-silver mt-2.5" />
 }
 
 const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
@@ -219,7 +239,11 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
         finalLink = `https://${finalLink}`;
       }
       return { linkId, name, link: finalLink };
-    });
+    })  
+    .filter((l: { linkId: string; name: string; link: string }, index: number, self: { linkId: string; name: string; link: string }[]) =>
+    index === self.findIndex((x: { link: string }) => x.link === l.link)
+);
+  
 
   // Required fields + optional fields (null if empty)
   const updateData: any = {
@@ -444,9 +468,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
               <div className="flex flex-col gap-3 mb-3">
                 {formLinks.map((l) => (
                   <div key={l.linkId} className="flex items-start gap-2">
-                    <span className="text-silver mt-2.5">
-                      <IoIosLink />
-                    </span>
+                    <span>{getLinkIcon(l.link)}</span>
 
                     <div className="flex-1 flex flex-col gap-1">
                       <input
@@ -524,7 +546,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                   </div>
 
                   <button
-                    onClick={() => setFormSupportLink(null)}
+                    onClick={() => { setFormSupportLink(null); setIsDirty(true) }}
                     className="text-silver bg-off-black transition-colors cursor-pointer rounded border border-transparent hover:text-red-400"
                   >
                     <FiTrash2 />
