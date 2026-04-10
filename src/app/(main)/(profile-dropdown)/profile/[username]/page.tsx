@@ -3,6 +3,8 @@ import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
 import { useAppSelector, useAppDispatch } from "@/store/hooks"
+import { useFollowUser, useUnfollowUser } from "@/hooks/useSocial"
+import {decrementFollowedCount, incrementFollowedCount } from '@/store/slices/profileSlice'
 
 import ProfileHeader from "@/components/profile/profile-header/ProfileHeader"
 import ProfileSideBar from "@/components/profile/side-bar/ProfileSideBar"
@@ -82,17 +84,23 @@ const ProfilePage = ({ params }: Props) => {
   const [openEdit,    setOpenEdit]    = useState(false)
   const [openShare,   setOpenShare]   = useState(false)
   const [openMessage, setOpenMessage] = useState(false)
-  const [following,   setFollowing]   = useState(false)
   const [openMoreMenu, setOpenMoreMenu] = useState(false)
   const[OpenReport, setIsOpenReport] = useState(false)
   const [isBlocked, setIsBlocked] = useState(false)
   const [isSpamOpen, setIsSpamOpen] = useState(false)
   const [OpenBlock, setOpenBlock] = useState(false)
   const moreMenuRef = useRef<HTMLDivElement>(null)
+  const isFollowed                          = useAppSelector((state) => state.profile.isFollowed)
+  const profileUserId                       = useAppSelector((state) => state.profile.userId)
+  const { followUser,   loading: followLoading   } = useFollowUser()
+  const { unfollowUser, loading: unfollowLoading } = useUnfollowUser()
+  const followButtonLoading = followLoading || unfollowLoading
+  const dispatch = useAppDispatch()
 
   const isLoading = useAppSelector((state) => state.profile.isLoading)
   const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
   const displayName = useAppSelector((state) => state.profile.displayName)
+  
   
   const role = useAppSelector((state) => state.profile.role)
 
@@ -167,10 +175,18 @@ const ProfilePage = ({ params }: Props) => {
                   )}
                    
                   <button
-                    onClick={() => setFollowing(!following)}
+                    onClick={() => {
+                      if (!profileUserId || followButtonLoading) return
+                      if (isFollowed) {
+                          unfollowUser(profileUserId)
+                      } else {
+                          followUser(profileUserId)
+                      }
+                    }}
+                    disabled={followButtonLoading}
                     className="relative group p-2 rounded-md bg-white-smoke text-chinese-black transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
                   >
-                    {following ? (
+                    {isFollowed ? (
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5 fill-current">
                         <circle cx="10" cy="7.5" r="3.5" />
                         <path d="M2 20h16c0-4.4-3.6-8-8-8s-8 3.6-8 8z" />
@@ -184,10 +200,10 @@ const ProfilePage = ({ params }: Props) => {
                       </svg>
                     )}
                     <span className="ml-1 text-sm font-bold px-1">
-                      {following ? "Following" : "Follow"}
+                      {isFollowed ? "Following" : "Follow"}
                     </span>
                     <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-3 py-1 rounded-md bg-[#2C2C2C] text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none shadow-lg z-50">
-                      {following ? "Unfollow" : "Follow"}
+                      {isFollowed ? "Unfollow" : "Follow"}
                     </span>
                   </button>
 
