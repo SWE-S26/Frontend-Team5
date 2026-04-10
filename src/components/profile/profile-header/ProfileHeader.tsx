@@ -112,11 +112,13 @@ const handleDeleteAvatar = async () => {
         bannerLinks:    data.bannerLinks,
         supportLink:    data.supportLink,
         favoriteGenres: data.favoriteGenres,
-        followersCount: data.followersCount,
-        role:           data.role,
-        
-        tracksCount:    data.trackCount,
-        isOwnProfile:   data.userId === authUserId,
+        followersCount:  data.followersCount,
+        followedCount:   data.followedCount,
+        trackCount:      data.trackCount,
+        isFollowed:      data.isFollowed,
+        isBlocked:       data.isBlocked,
+        role:            data.role,
+        isOwnProfile:    data.userId === authUserId,
        
       }))
     })

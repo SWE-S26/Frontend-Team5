@@ -23,8 +23,10 @@ export interface GetProfileResponse {
   isPrivate:       boolean
   favoriteGenres:  string[]
   followersCount:  number
-  followingsCount: number
+  followedCount:   number
   trackCount:      number
+  isFollowed: boolean
+  isBlocked:  boolean
 }
 
 export interface GetProfileErrorResponse {
@@ -62,6 +64,7 @@ export interface UpdateProfileResponse {
   bannerLinks:    ProfileLink[]
   supportLink:    string | null
   favoriteGenres: string[]
+  
 }
 
 export interface UpdateProfileImagesRequest {
@@ -90,6 +93,6 @@ export interface UpdateProfileImagesResponse {
   isPrivate:       boolean
   favoriteGenres:  string[]
   followersCount:  number
-  followingsCount: number
+  followedCount:   number
   trackCount:      number
 }

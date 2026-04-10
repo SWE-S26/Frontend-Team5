@@ -18,9 +18,11 @@ interface ProfileState {
   supportLink:    string | null
   bannerLinks:    ProfileLink[]
   favoriteGenres: string[]
-  followersCount: number
-  followedCount:  number        // matches actual API field name
-  tracksCount:    number
+  followersCount:  number
+  followedCount: number  
+  trackCount:      number  
+  isFollowed:      boolean
+  isBlocked:       boolean
   isOwnProfile:   boolean
   isLoading:      boolean
   error:          string | null
@@ -43,9 +45,11 @@ const initialState: ProfileState = {
   supportLink:    null,
   bannerLinks:    [],
   favoriteGenres: [],
-  followersCount: 0,
-  followedCount:  0,
-  tracksCount:    0,
+  followersCount:  0,
+  followedCount: 0,
+  trackCount:      0,
+  isFollowed:      false,
+  isBlocked:       false,
   isOwnProfile:   false,
   isLoading:      false,
   error:          null,
@@ -59,19 +63,35 @@ const profileSlice = createSlice({
       return { ...state, ...action.payload }
     },
 
-    setProfileLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload
+        setProfileLoading: (state, action: PayloadAction<boolean>) => {
+          state.isLoading = action.payload
+        },
+
+        setProfileError: (state, action: PayloadAction<string | null>) => {
+          state.error = action.payload
+        },
+
+        clearProfile: () => initialState,
+
+        setIsFollowed: (state, action: PayloadAction<boolean>) => {
+      state.isFollowed = action.payload
+      },
+
+      setFollowersCount: (state, action: PayloadAction<number>) => {
+        state.followersCount = action.payload
+      },
+
+      incrementFollowedCount: (state) => {
+    state.followedCount = state.followedCount + 1
+    },
+    decrementFollowedCount: (state) => {
+        state.followedCount = Math.max(0, state.followedCount - 1)
     },
 
-    setProfileError: (state, action: PayloadAction<string | null>) => {
-      state.error = action.payload
-    },
-
-    clearProfile: () => initialState,
   },
 })
 
-export const { setProfile, setProfileLoading, setProfileError, clearProfile } =
+export const { setProfile, setProfileLoading, setProfileError, clearProfile,setIsFollowed,setFollowersCount, incrementFollowedCount, decrementFollowedCount } =
   profileSlice.actions
 
 export default profileSlice.reducer

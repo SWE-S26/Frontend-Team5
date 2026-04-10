@@ -3,6 +3,8 @@ import { setupWorker } from "msw/browser";
 import { authHandlers } from "./handlers/auth.handlers";
 import { messageHandlers } from "./handlers/messageHandlers";
 import { tracksHandlers } from "./handlers/tracks.handlers";
+import { profileHandlers } from "./handlers/profile.handlers"
+import { socialHandlers } from "./handlers/social.handlers"
 import { profileHandlers } from "./handlers/profile.handlers";
 import { 
   privacyHandlers, 
@@ -16,6 +18,7 @@ export const worker = setupWorker(
   ...messageHandlers,
   ...tracksHandlers,
   ...profileHandlers,
+  ...socialHandlers,
   ...privacyHandlers,
   ...notificationHandlers,
   ...accountHandlers,
