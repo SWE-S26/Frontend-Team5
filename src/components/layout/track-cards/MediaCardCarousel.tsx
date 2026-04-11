@@ -1,30 +1,16 @@
 "use client";
 
 import Card from "@/components/ui/Card";
-import { useRef, useState } from "react";
+import { useGetTracks } from "@/hooks/useTracks";
+import { useEffect, useRef, useState } from "react";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi";
 
 export default function MediaCardCarousel() {
-  const cardData = [
-    { img: "/ethan.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/test.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/Graduation.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/ethan.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/test.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/Graduation.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/ethan.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/test.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/Graduation.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/ethan.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/test.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/Graduation.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/ethan.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/test.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/Graduation.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/ethan.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/test.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-    { img: "/Graduation.jpg", title: "CRISPY CLOUD", artist: "Artist station" },
-  ];
+  const { getTracks, loading, error, tracks } = useGetTracks();
+
+  useEffect(() => {
+    getTracks(1, 20);
+  }, [getTracks]);
 
   const carouselRef = useRef<HTMLDivElement>(null);
   const lockAnimationRef = useRef<boolean>(false);
@@ -62,13 +48,16 @@ export default function MediaCardCarousel() {
       }, 300);
     }, 200);
   }
+
+  const skeletonCards = Array.from({ length: 6 });
+
   return (
     <div className="sm:w-1/5 md:w-full max-w-6xl py-8">
       {" "}
       {/* OM - removed this from className (mx-auto px-4) for alignment purposes, re-add them to see yourself */}
       {/* Title */}
       <h2 className="text-[22px] font-bold pb-4 text-white-smoke">
-        Featured Tracks
+        More of what you like
       </h2>
       <div className="relative group/carousel">
         {/* Carousel Container */}
@@ -87,11 +76,22 @@ export default function MediaCardCarousel() {
                   : "translate-x-0"
             }`}
           >
-            {cardData.map((card, index) => (
-              <div key={index} className="flex-none">
-                <Card img={card.img} title={card.title} artist={card.artist} />
-              </div>
-            ))}
+            {loading
+              ? skeletonCards.map((_, index) => (
+                  <div key={index} className="flex-none">
+                    <Card />{" "}
+                  </div>
+                ))
+              : tracks?.map((track) => (
+                  <div key={track._id} className="flex-none">
+                    <Card
+                      img={track.image.imgLink || undefined}
+                      title={track.basicInfo.title}
+                      artist={track.basicInfo.mainArtists[0]}
+                      trackId={track._id}
+                    />
+                  </div>
+                ))}
           </div>
         </div>
 

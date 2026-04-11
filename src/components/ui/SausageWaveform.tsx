@@ -2,7 +2,11 @@
 
 import React, { useEffect, useRef, useState } from "react";
 
-export default function SausageWaveform() {
+export default function SausageWaveform({
+  samplesUrl,
+}: {
+  samplesUrl: string;
+}) {
   const scwRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
@@ -20,11 +24,12 @@ export default function SausageWaveform() {
   useEffect(() => {
     import("@/lib/waveform").then((mod) => {
       scwRef.current = mod.default;
-      fetch("/waveform.json")
+
+      fetch(samplesUrl)
         .then((res) => res.json())
         .then((samples: number[]) => generateAll(samples));
     });
-  }, []);
+  }, [samplesUrl]);
 
   const generateAll = (samples: number[]) => {
     if (!scwRef.current) return;
@@ -84,13 +89,13 @@ export default function SausageWaveform() {
   const getIsHoveringTop = (e: React.MouseEvent) => {
     if (!containerRef.current) return false;
     const rect = containerRef.current.getBoundingClientRect();
-    const relativeY = e.clientY - rect.top;
-    return relativeY < rect.height / 2;
+    return e.clientY - rect.top < rect.height / 2;
   };
 
   const handleClick = (e: React.MouseEvent) => {
     const pct = getPct(e);
     setProgress(pct);
+
     if (!isTracking) {
       setIsTracking(true);
       setHoverPct(pct);
@@ -102,27 +107,41 @@ export default function SausageWaveform() {
 
   const handleMouseMove = (e: React.MouseEvent) => {
     setIsHoveringTop(getIsHoveringTop(e));
-    if (isTracking) {
-      setHoverPct(getPct(e));
-    }
+    if (isTracking) setHoverPct(getPct(e));
   };
 
   const handleMouseLeave = () => {
-    if (!isTracking) {
-      setHoverPct(null);
-    }
+    if (!isTracking) setHoverPct(null);
     setIsHoveringTop(false);
   };
 
-  const clipLeft = (pct: number) => ({
-    clipPath: `inset(0 ${100 - pct}% 0 0)`,
+  const maskLeft = (pct: number) => ({
+    WebkitMaskImage: `linear-gradient(to right, black ${pct}%, transparent ${pct}%)`,
+    maskImage: `linear-gradient(to right, black ${pct}%, transparent ${pct}%)`,
   });
 
-  const clipWindow = (fromPct: number, toPct: number) => ({
-    clipPath: `inset(0 ${100 - toPct}% 0 ${fromPct}%)`,
+  const maskWindow = (from: number, to: number) => ({
+    WebkitMaskImage: `linear-gradient(to right,
+      transparent ${from}%,
+      black ${from}%,
+      black ${to}%,
+      transparent ${to}%
+    )`,
+    maskImage: `linear-gradient(to right,
+      transparent ${from}%,
+      black ${from}%,
+      black ${to}%,
+      transparent ${to}%
+    )`,
   });
 
-  // Dynamic opacity for all waveform layers
+  const imgFix = {
+    transform: "translateZ(0)",
+    backfaceVisibility: "hidden" as const,
+    imageRendering: "auto" as const,
+    mixBlendMode: "normal" as const,
+  };
+
   const waveformOpacity = isHoveringTop ? "opacity-100" : "opacity-85";
 
   return (
@@ -132,57 +151,58 @@ export default function SausageWaveform() {
         onClick={handleClick}
         onMouseMove={handleMouseMove}
         onMouseLeave={handleMouseLeave}
-        className="relative w-full h-[60px] cursor-pointer select-none"
+        className="relative w-full h-[60px] cursor-pointer select-none isolate overflow-hidden"
       >
-        {/* Grey top half */}
+        {/* Background Top */}
         <img
           src={bgTop ?? undefined}
-          className={`absolute inset-0 w-full h-full grayscale waveform-img ${waveformOpacity}`}
+          className="absolute inset-0 w-full h-full grayscale waveform-img z-0"
+          style={imgFix}
           alt=""
         />
 
-        {/* Grey bottom half */}
+        {/* Background Bottom */}
         <img
           src={bgBottom ?? undefined}
-          className={`absolute inset-0 w-full h-full grayscale waveform-img ${waveformOpacity}`}
+          className="absolute inset-0 w-full h-full grayscale waveform-img z-0"
+          style={imgFix}
           alt=""
         />
 
-        {/* Gradient top — played portion */}
+        {/* Foreground Gradient */}
         <img
           src={fgTopGradient ?? undefined}
-          className={`absolute inset-0 w-full h-full waveform-img ${waveformOpacity}`}
-          style={clipLeft(progress)}
+          className={`absolute inset-0 w-full h-full waveform-img z-10 ${waveformOpacity}`}
+          style={{ ...imgFix, ...maskLeft(progress) }}
           alt=""
         />
 
-        {/* Flat top — cursor ahead of progress */}
-        {hoverPct !== null && hoverPct > progress && (
+        {/* Hover Window */}
+        {hoverPct !== null && (
           <img
             src={fgTopFlat ?? undefined}
-            className={`absolute inset-0 w-full h-full pointer-events-none waveform-img ${waveformOpacity}`}
-            style={clipWindow(progress, hoverPct)}
+            className={`absolute inset-0 w-full h-full waveform-img pointer-events-none z-20 ${waveformOpacity}`}
+            style={{
+              ...imgFix,
+              ...maskWindow(
+                Math.min(progress, hoverPct),
+                Math.max(progress, hoverPct),
+              ),
+            }}
             alt=""
           />
         )}
 
-        {/* Flat top — cursor behind progress */}
-        {hoverPct !== null && hoverPct <= progress && (
-          <img
-            src={fgTopFlat ?? undefined}
-            className={`absolute inset-0 w-full h-full pointer-events-none waveform-img ${waveformOpacity}`}
-            style={clipWindow(hoverPct, progress)}
-            alt=""
-          />
-        )}
-
-        {/* Flat bottom — follows progress only */}
+        {/* Bottom Progress */}
         <img
           src={fgBottom ?? undefined}
-          className={`absolute inset-0 w-full h-full waveform-img ${waveformOpacity}`}
-          style={clipLeft(progress)}
+          className={`absolute inset-0 w-full h-full waveform-img z-10 ${waveformOpacity}`}
+          style={{ ...imgFix, ...maskLeft(progress) }}
           alt=""
         />
+
+        {/* Divider */}
+        <div className="absolute bottom-[26px] left-0 w-full h-[1px] bg-chinese-black -translate-y-1/2 z-30 pointer-events-none" />
       </div>
     </div>
   );
