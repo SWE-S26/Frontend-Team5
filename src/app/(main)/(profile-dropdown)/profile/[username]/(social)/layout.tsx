@@ -1,16 +1,48 @@
 'use client'
 import React from 'react'
+import { useEffect } from 'react'
 import { Tabs } from 'antd'
 import type { TabsProps } from 'antd'
 import { useRouter, usePathname, useParams } from 'next/navigation'
-import { useAppSelector } from '@/store/hooks'
+import { useAppSelector, useAppDispatch } from '@/store/hooks'
+import { useGetProfile } from '@/hooks/useProfile'
+import { setProfile, clearProfile } from '@/store/slices/profileSlice'
 
 export default function ProfileLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const pathname = usePathname()
   const { username } = useParams()
-  const displayName = useAppSelector((state) => state.auth.displayName)
- 
+  const dispatch       = useAppDispatch()
+const displayName    = useAppSelector((state) => state.profile.displayName)
+const profileImgLink = useAppSelector((state) => state.profile.profileImgLink)
+const hasHydrated    = useAppSelector((state) => state.auth.hasHydrated)
+const authUserId     = useAppSelector((state) => state.auth.userId)
+const { getProfile } = useGetProfile()
+
+useEffect(() => {
+  if (!hasHydrated || !username) return
+  const userId = username as string
+  dispatch(setProfile({ isLoading: true }))
+  getProfile(userId).then((data) => {
+    if (!data) return
+    dispatch(setProfile({
+      userId:          data.userId,
+      displayName:     data.displayName,
+      profileImgLink:  data.profileImgLink,
+      followersCount:  data.followersCount,
+      followedCount:   data.followedCount,
+      trackCount:      data.trackCount,
+      isFollowed:      data.isFollowed,
+      isBlocked:       data.isBlocked,
+      isOwnProfile:    data.userId === authUserId,
+    }))
+    }).finally(() => {
+      dispatch(setProfile({ isLoading: false }))
+    })
+
+    return () => { dispatch(clearProfile()) }
+  }, [username, hasHydrated])
+  
   const getActiveKey = () => {
     if (pathname.endsWith('/following')) return 'following'
     if (pathname.endsWith('/followers')) return 'followers'
@@ -38,7 +70,11 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
   return (
     <div>
       <div className="flex items-center gap-7 mb-4">
-        <img src="/ethan.jpg" alt="avatar" className="w-20 h-20 rounded-full object-cover" />
+        <img 
+          src={profileImgLink ?? "/ethan.jpg"} 
+          alt="avatar" 
+          className="w-20 h-20 rounded-full object-cover" 
+        />
         <h2 className="text-2xl font-bold">{getTitle()}</h2>
       </div>
 

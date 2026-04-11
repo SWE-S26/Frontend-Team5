@@ -27,6 +27,7 @@ export interface GetProfileResponse {
   trackCount:      number
   isFollowed: boolean
   isBlocked:  boolean
+  amIBlocked: boolean
 }
 
 export interface GetProfileErrorResponse {

@@ -1,19 +1,32 @@
+'use client'
+import { useEffect } from 'react'
+import { useAppSelector } from '@/store/hooks'
+import { useGetFollowers } from '@/hooks/useSocial'
+import UserCardGrid from '@/components/social-graph/UserCardGrid'
 
-import EmptySocial from "@/components/social-graph/EmptySocial"
-import UserCardGrid from "@/components/social-graph/UserCardGrid"
+const FollowersPage = () => {
+  const profileUserId = useAppSelector((state) => state.profile.userId)
+  const { getFollowers, followers, loading } = useGetFollowers()
+  const isOwn        = useAppSelector((state) => state.profile.isOwnProfile)
+  const displayName  = useAppSelector((state) => state.profile.displayName)
 
-const DUMMY_COUNT : number = 1 
+  useEffect(() => {
+    if (profileUserId) {
+      getFollowers(profileUserId)
+    }
+  }, [profileUserId])
 
-const page = () => {
   return (
     <div>
-        {DUMMY_COUNT === 0 
-        ? <EmptySocial type="followers" /> 
-        : <UserCardGrid />
-      }
-        
+      <UserCardGrid
+      users={followers ?? []}
+      loading={loading}
+      emptyType="followers"
+      isOwn={isOwn}
+      displayName={displayName ?? ''}
+    />
     </div>
   )
 }
 
-export default page
+export default FollowersPage

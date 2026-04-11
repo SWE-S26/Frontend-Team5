@@ -54,6 +54,7 @@ export const profileHandlers = [
       trackCount:      15,
       isFollowed:      false,
       isBlocked:       false,
+      amIBlocked:      false,
     }, { status: 200 })
   }),
 ]

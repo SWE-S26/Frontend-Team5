@@ -117,6 +117,7 @@ const handleDeleteAvatar = async () => {
         trackCount:      data.trackCount,
         isFollowed:      data.isFollowed,
         isBlocked:       data.isBlocked,
+        amIBlocked:      data.amIBlocked,
         role:            data.role,
         isOwnProfile:    data.userId === authUserId,
        

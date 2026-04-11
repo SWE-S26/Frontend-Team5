@@ -1,16 +1,32 @@
-import EmptySocial from '@/components/social-graph/EmptySocial'
+'use client'
+import { useEffect } from 'react'
+import { useAppSelector } from '@/store/hooks'
+import { useGetFollowing } from '@/hooks/useSocial'
 import UserCardGrid from '@/components/social-graph/UserCardGrid'
 
-const DUMMY_COUNT : number = 1
-const page = () => {
+const FollowingPage = () => {
+  const profileUserId = useAppSelector((state) => state.profile.userId)
+  const { getFollowing, following, loading } = useGetFollowing()
+  const isOwn        = useAppSelector((state) => state.profile.isOwnProfile)
+  const displayName  = useAppSelector((state) => state.profile.displayName)
+
+  useEffect(() => {
+    if (profileUserId) {
+      getFollowing(profileUserId)
+    }
+  }, [profileUserId])
+
   return (
     <div>
-        {DUMMY_COUNT === 0 
-        ? <EmptySocial type="following" /> 
-        : <UserCardGrid />
-      }
+      <UserCardGrid
+        users={following ?? []}
+        loading={loading}
+        emptyType="following"
+        isOwn={isOwn}
+        displayName={displayName ?? ''}
+      />
     </div>
   )
 }
 
-export default page
+export default FollowingPage
