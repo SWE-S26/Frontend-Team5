@@ -9,6 +9,10 @@ import { useUpdateProfile, useUpdateProfileImages } from "@/hooks/useProfile"
 import { setProfile } from "@/store/slices/profileSlice"
 import { useAppDispatch } from "@/store/hooks"
 
+import Cropper from "react-easy-crop"
+import type { Area } from "react-easy-crop"
+import { useCallback } from "react"
+
 import { IoIosInformationCircle } from "react-icons/io"
 import { IoIosLink } from "react-icons/io"
 import { FiTrash2 } from "react-icons/fi"
@@ -68,6 +72,15 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
   const [formCountry,     setFormCountry]      = useState("")
   const [formBio,         setFormBio]          = useState("")
 
+  const [rawImageUrl,   setRawImageUrl]   = useState<string | null>(null)
+const [rawFile,       setRawFile]       = useState<File | null>(null)
+const [isCropping,    setIsCropping]    = useState(false)
+const [crop,          setCrop]          = useState({ x: 0, y: 0 })
+const [zoom,          setZoom]          = useState(1)
+const [croppedArea,   setCroppedArea]   = useState<Area | null>(null)
+const fileInputRef = useRef<HTMLInputElement>(null)
+
+
   const [formSupportLink,     setFormSupportLink]     = useState<string | null>(null)
   const [showSupportLinkInfo, setShowSupportLinkInfo] = useState(false)
 
@@ -107,13 +120,73 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
   useEffect(() => { reduxSupportLinkRef.current  = reduxSupportLink }, [reduxSupportLink])
 
   const { updateProfileImages } = useUpdateProfileImages()
+
+  async function getCroppedImage(imageSrc: string, croppedAreaPixels: Area, fileName: string): Promise<{ file: File; dataUrl: string }> {
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = "anonymous"
+    img.onload  = () => resolve(img)
+    img.onerror = reject
+    img.src     = imageSrc
+  })
+  const canvas = document.createElement("canvas")
+  canvas.width  = croppedAreaPixels.width
+  canvas.height = croppedAreaPixels.height
+  const ctx = canvas.getContext("2d")
+  if (!ctx) throw new Error("No canvas context")
+  ctx.beginPath()
+  ctx.arc(croppedAreaPixels.width / 2, croppedAreaPixels.height / 2, Math.min(croppedAreaPixels.width, croppedAreaPixels.height) / 2, 0, Math.PI * 2)
+  ctx.clip()
+  ctx.drawImage(image, croppedAreaPixels.x, croppedAreaPixels.y, croppedAreaPixels.width, croppedAreaPixels.height, 0, 0, croppedAreaPixels.width, croppedAreaPixels.height)
+  const dataUrl = canvas.toDataURL("image/png")
+  const blob    = await (await fetch(dataUrl)).blob()
+  const file    = new File([blob], fileName, { type: "image/png" })
+  return { file, dataUrl }
+}
+
+
+
   const handleAvatarChange = async (file: File, previewUrl: string) => {
     setAvatarImage(previewUrl)
+    setIsDirty(true)
     const updated = await updateProfileImages({ profileImg: file })
     if (updated?.profileImgLink) {
       setAvatarImage(updated.profileImgLink)
     }
   }
+
+  
+
+  const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  const file = e.target.files?.[0]
+  if (!file) return
+  const url = URL.createObjectURL(file)
+  setRawFile(file)
+  setRawImageUrl(url)
+  setCrop({ x: 0, y: 0 })
+  setZoom(1)
+  setIsCropping(true)
+  e.target.value = ""
+}
+
+const onCropComplete = useCallback((_: Area, pixels: Area) => {
+  setCroppedArea(pixels)
+}, [])
+
+const handleReplace = useCallback(async () => {
+  if (!croppedArea || !rawFile || !rawImageUrl) return
+  const { file, dataUrl } = await getCroppedImage(rawImageUrl, croppedArea, rawFile.name)
+  await handleAvatarChange(file, dataUrl)
+  setIsCropping(false)
+  setRawImageUrl(null)
+  setRawFile(null)
+}, [croppedArea, rawFile, rawImageUrl])
+
+const handleCancelCrop = () => {
+  setIsCropping(false)
+  setRawImageUrl(null)
+  setRawFile(null)
+}
 
   // populate form only when modal opens
   useEffect(() => {
@@ -291,7 +364,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
             if (e.target === e.currentTarget) handleCancel()
           }}
         >
-          <button
+          <button data-testid="cancel-button-popup"
             className="fixed top-4 right-4 text-white-smoke text-2xl font-bold bg-off-black rounded-full w-11 h-11 flex items-center justify-center hover:text-silver cursor-pointer z-[1002]"
             onClick={handleCancel}
           >
@@ -311,19 +384,74 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
             </p>
 
             <div className="flex gap-6 mb-4">
-              <AvatarUpload
-                avatarImage={avatarImage}
-                onImageChange={handleAvatarChange}
-                className="relative overflow-hidden"
-              >
-                <div className="absolute inset-0 bg-gray-400/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity" />
-                <Button
-                  className={`bg-chinese-black text-white-smoke absolute bottom-9 right-9 cursor-pointer 
-                    ${avatarImage ? "opacity-0 group-hover/avatar:opacity-100" : "opacity-100"}`}
-                >
-                  Upload image
-                </Button>
-              </AvatarUpload>
+              <div className="flex flex-col items-center gap-2 flex-shrink-0">
+  <div className="relative w-40 h-40 group/avatar">
+    {isCropping && rawImageUrl ? (
+      <div className="relative overflow-hidden rounded-full w-40 h-40">
+        <Cropper
+          image={rawImageUrl}
+          crop={crop}
+          zoom={zoom}
+          aspect={1}
+          cropShape="round"
+          showGrid={false}
+          cropSize={{ width: 160, height: 160 }}
+          onCropChange={setCrop}
+          onZoomChange={setZoom}
+          onCropComplete={onCropComplete}
+          style={{
+            containerStyle: { borderRadius: "50%", overflow: "hidden", width: 160, height: 160, background: "#000" },
+            cropAreaStyle:  { border: "none", boxShadow: "none" },
+          }}
+        />
+      </div>
+    ) : (
+      <div
+        className="relative overflow-hidden w-40 h-40 rounded-full cursor-pointer group/avatar"
+        onClick={() => fileInputRef.current?.click()}
+      >
+  {avatarImage ? (
+    <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
+  ) : (
+    <div className="w-full h-full rounded-full bg-off-black flex items-center justify-center">
+      <span className="text-silver text-xs text-center px-2">Upload image</span>
+    </div>
+  )}
+  <div className="absolute inset-0 bg-gray-400/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-full" />
+</div>
+    )}
+  </div>
+
+  {isCropping && (
+    <input data-testid="AvatarZoom-input"
+      type="range"
+      min={1} max={3} step={0.01}
+      value={zoom}
+      onChange={(e) => setZoom(Number(e.target.value))}
+      className="w-30 accent-white-smoke"
+    />
+  )}
+
+  {isCropping ? (
+    <div className="flex gap-2">
+      
+      <Button data-testid="Replace-button-ReplaceAvatarInEditForm"
+        onClick={handleReplace}
+        className="bg-chinese-black text-white-smoke text-xs font-semibold px-3 py-1.5 rounded cursor-pointer"
+      >
+        Replace
+      </Button>
+    </div>
+  ) : null}
+
+  <input data-testid="Avatar-input"
+    ref={fileInputRef}
+    type="file"
+    accept="image/*"
+    className="hidden"
+    onChange={handleFileChange}
+  />
+</div>
 
               <div className="flex-1 flex flex-col gap-3">
 
@@ -331,7 +459,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                   <p className="text-sm text-white-smoke font-bold mb-1">
                     Display name <span className="text-red-500">*</span>
                   </p>
-                  <input
+                  <input data-testid="DisplayName-input"
                     value={formDisplayName || ""}
                     onChange={(e) => {
                       setFormDisplayName(e.target.value)
@@ -360,7 +488,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                     <span className="text-silver px-3 py-2 whitespace-nowrap border-r border-zinc-700 select-none">
                       beatza.me/
                     </span>
-                    <input
+                    <input data-testid="ProfileLink-input"
                       value={formProfileLink || ""}
                       onChange={(e) => {
                         setFormProfileLink(e.target.value)
@@ -381,7 +509,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                 <div className="flex gap-2">
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">First name</p>
-                    <input
+                    <input data-testid="FirstName-input"
                       value={formFirstName || ""}
                       onChange={(e) => {
                         setFormFirstName(e.target.value)
@@ -393,7 +521,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">Last name</p>
-                    <input
+                    <input data-testid="LastName-input"
                       value={formLastName || ""}
                       onChange={(e) => {
                         setFormLastName(e.target.value)
@@ -408,7 +536,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                 <div className="flex gap-2">
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">City</p>
-                    <input
+                    <input data-testid="City-input"
                       value={formCity || ""}
                       onChange={(e) => {
                         setFormCity(e.target.value)
@@ -420,7 +548,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">Country</p>
-                    <input
+                    <input data-testid="Country-input"
                       value={formCountry || ""}
                       onChange={(e) => {
                         setFormCountry(e.target.value)
@@ -451,7 +579,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
             {/* Your links header with info tooltip */}
             <div ref={linksInfoRef} className="flex items-center gap-2 mb-2 relative">
               <p className="text-sm text-white-smoke font-bold">Your links</p>
-              <button
+              <button data-testid="info-button-EditForm"
                 onClick={() => setShowLinksInfo((prev) => !prev)}
                 className="text-silver hover:text-white-smoke transition-colors cursor-pointer"
               >
@@ -471,7 +599,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                     <span>{getLinkIcon(l.link)}</span>
 
                     <div className="flex-1 flex flex-col gap-1">
-                      <input
+                      <input data-testid="Link-input"
                         value={l.link || ""}
                         onChange={(e) => {
                           handleLinkChange(l.linkId, "link", e.target.value)
@@ -487,7 +615,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                       )}
                     </div>
 
-                    <input
+                    <input data-testid="LinkName-input"
                       value={l.name || ""}
                       onChange={(e) => {
                         handleLinkChange(l.linkId, "name", e.target.value)
@@ -497,7 +625,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                       className="w-40 bg-off-black px-3 py-2 text-white-smoke rounded border border-transparent"
                     />
 
-                    <button
+                    <button data-testid="RemoveLink-button-EditForm"
                       onClick={() => handleRemoveLink(l.linkId)}
                       className="text-silver bg-off-black transition-colors mt-2 cursor-pointer rounded border border-transparent hover:text-red-400"
                     >
@@ -520,7 +648,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                     </svg>
                   </span>
 
-                  <input
+                  <input data-testid="SupportLink-input"
                     value={formSupportLink}
                     onChange={(e) => {
                       setFormSupportLink(e.target.value)
@@ -532,7 +660,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
 
                   {/* info icon with tooltip */}
                   <div ref={supportLinkInfoRef} className="relative">
-                    <button
+                    <button  data-testid="info-button-EditForm"
                       onClick={() => setShowSupportLinkInfo((prev) => !prev)}
                       className="text-silver hover:text-white-smoke transition-colors cursor-pointer"
                     >
@@ -545,7 +673,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
                     )}
                   </div>
 
-                  <button
+                  <button data-testid="Remove-button-EditForm"
                     onClick={() => { setFormSupportLink(null); setIsDirty(true) }}
                     className="text-silver bg-off-black transition-colors cursor-pointer rounded border border-transparent hover:text-red-400"
                   >
@@ -562,14 +690,14 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
 
             {/* Add link / Add support link buttons */}
             <div className="flex gap-3 mb-3">
-              <button
+              <button data-testid="AddLink-button-EditForm"
                 onClick={handleAddLink}
                 className="bg-off-black text-white-smoke px-4 py-2 rounded cursor-pointer"
               >
                 Add link
               </button>
 
-              <button
+              <button data-testid="AddSupportLink-button-EditForm"
                   onClick={() => setFormSupportLink("")}
                   disabled={formSupportLink !== null}
                   className="bg-white-smoke text-chinese-black px-4 py-2 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
@@ -585,13 +713,13 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
 
             {/* Footer buttons */}
             <div className="flex justify-end gap-3">
-              <button
+              <button data-testid="cancel-button-EditForm"
                 onClick={handleCancel}
                 className="bg-off-black text-white-smoke px-4 py-2 rounded cursor-pointer"
               >
                 Cancel
               </button>
-              <button
+              <button data-testid="Save-button-EditForm"
                 onClick={handleSave}
                 disabled={loading || !isDirty}
                 className="bg-white-smoke text-chinese-black px-4 py-2 rounded cursor-pointer disabled:opacity-50"

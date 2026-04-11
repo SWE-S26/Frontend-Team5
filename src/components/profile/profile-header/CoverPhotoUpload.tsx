@@ -44,7 +44,7 @@ const CoverPhotoUpload = forwardRef<CoverUploadHandle, CoverProps>(
               {children}
             </div>
 
-            <input
+            <input data-testid="Cover-input"
               type="file"
               accept="image/*"
               ref={fileInputRef}

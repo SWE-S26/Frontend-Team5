@@ -19,7 +19,7 @@ export interface AvatarUploadHandle {
 const AvatarUpload = forwardRef<AvatarUploadHandle, AvatarProps>(
   ({ children, className, onImageChange, avatarImage, disableClick = false }, ref) => {
     // const [image, setImage] = useState<string | null>(null);
-    const fileInputRef = useRef<HTMLInputElement>(null);
+    const fileInputRef = useRef<HTMLInputElement >(null);
 
     const openFilePicker = () => {
       fileInputRef.current?.click();
@@ -54,7 +54,7 @@ const AvatarUpload = forwardRef<AvatarUploadHandle, AvatarProps>(
               {children}
             </div>
 
-            <input
+            <input data-testid="Avatar-input"
               type="file"
               accept="image/*"
               ref={fileInputRef}

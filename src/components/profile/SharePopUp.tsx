@@ -97,7 +97,7 @@ const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
             onClick={(e) => e.stopPropagation()}
           >
           
-            <button
+            <button data-testid="cancel-button-popup"
               className="absolute -top-8 -right-65 text-white text-2xl font-bold bg-off-black rounded-full w-11 h-11 flex items-center justify-center z-[1001] hover:text-silver cursor-pointer"
               onClick={onClose}
             >
@@ -105,7 +105,7 @@ const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
             </button>
 
             <div className="flex gap-6 mb-8">
-              <TabsButton
+              <TabsButton data-testid="Share-button-Bar"
                     href="#"
                     label="Share"
                     pathname=""
@@ -113,7 +113,7 @@ const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
                     onClick={() => setActiveTab("share")}
                 />
 
-                <TabsButton
+                <TabsButton data-testid="Messages-button-Bar"
                     href="#"
                     label="Message"
                     pathname=""
@@ -175,7 +175,7 @@ const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
 
                 {/* Checkbox */}
                 <label className="flex items-center gap-2 text-gray-400 text-sm">
-                  <input 
+                  <input  data-testid="ShortenLink-input"
                     type="checkbox" 
                     className="w-5 h-5 border border-gray-400"
                     onChange={(e) => {
@@ -216,7 +216,7 @@ const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
                 </div>
 
                 <div className="ml-auto">
-                  <SendButton />
+                  <SendButton  data-testid="SendMessage-button"/>
                 </div>
               </>
             )}
