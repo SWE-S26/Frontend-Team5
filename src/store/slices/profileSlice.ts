@@ -23,6 +23,7 @@ interface ProfileState {
   trackCount:      number  
   isFollowed:      boolean
   isBlocked:       boolean
+  amIBlocked:     boolean
   isOwnProfile:   boolean
   isLoading:      boolean
   error:          string | null
@@ -50,6 +51,7 @@ const initialState: ProfileState = {
   trackCount:      0,
   isFollowed:      false,
   isBlocked:       false,
+  amIBlocked:     false,
   isOwnProfile:   false,
   isLoading:      false,
   error:          null,

@@ -34,6 +34,8 @@ import BlockPopUp from "@/components/messages/conversation/BlockPopUp"
 import ReportPopUp from "@/components/messages/conversation/ReportPopUp"
 import SpamPopUp from "@/components/messages/conversation/SpamPopUp"
 import Button from "@/components/ui/Button"
+import { useBlockUser, useUnblockUser } from "@/hooks/useSocial"
+import { setProfile } from "@/store/slices/profileSlice"
 
 interface Props {
   params: { username: string }
@@ -86,15 +88,18 @@ const ProfilePage = ({ params }: Props) => {
   const [openMessage, setOpenMessage] = useState(false)
   const [openMoreMenu, setOpenMoreMenu] = useState(false)
   const[OpenReport, setIsOpenReport] = useState(false)
-  const [isBlocked, setIsBlocked] = useState(false)
   const [isSpamOpen, setIsSpamOpen] = useState(false)
   const [OpenBlock, setOpenBlock] = useState(false)
   const moreMenuRef = useRef<HTMLDivElement>(null)
   const isFollowed                          = useAppSelector((state) => state.profile.isFollowed)
   const profileUserId                       = useAppSelector((state) => state.profile.userId)
+  const isBlocked     = useAppSelector((state) => state.profile.isBlocked)
   const { followUser,   loading: followLoading   } = useFollowUser()
   const { unfollowUser, loading: unfollowLoading } = useUnfollowUser()
   const followButtonLoading = followLoading || unfollowLoading
+  const { blockUser }   = useBlockUser()
+  const { unblockUser } = useUnblockUser()
+  const amIBlocked = useAppSelector((state) => state.profile.amIBlocked)
   const dispatch = useAppDispatch()
 
   const isLoading = useAppSelector((state) => state.profile.isLoading)
@@ -176,13 +181,13 @@ const ProfilePage = ({ params }: Props) => {
                    
                   <button
                     onClick={() => {
-                      if (!profileUserId || followButtonLoading) return
+                      if (!profileUserId || followButtonLoading || amIBlocked) return
                       if (isFollowed) {
                           unfollowUser(profileUserId)
                       } else {
                           followUser(profileUserId)
                       }
-                    }}
+                  }}
                     disabled={followButtonLoading}
                     className="relative group p-2 rounded-md bg-white-smoke text-chinese-black transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
                   >
@@ -238,13 +243,14 @@ const ProfilePage = ({ params }: Props) => {
                         {openMoreMenu && (
                           <div className="absolute right-0 top-full mt-1 bg-off-black rounded-md shadow-lg z-50 w-auto py-1  whitespace-nowrap">
                             <button 
-                            onClick={() => {
-                                if (isBlocked) {
-                                    setIsBlocked(false)
-                                } else {
-                                    setOpenBlock(true)
-                                }
-                            }}
+                            onClick={async () => {
+                                  if (isBlocked) {
+                                      await unblockUser(profileUserId!)
+                                      dispatch(setProfile({ isBlocked: false }))
+                                  } else {
+                                      setOpenBlock(true)
+                                  }
+                              }}
                             className={`flex items-center gap-2 w-full px-4 py-2 text-sm  hover:opacity-50 cursor-pointer font-bold ${isBlocked ? "text-papaya" : "text-white-smoke"}`}>
                               <AiOutlineStop className="h-4 w-4 font-bold " />
                               {isBlocked ? 'Blocked' : 'Block'} {displayName}
@@ -272,10 +278,11 @@ const ProfilePage = ({ params }: Props) => {
       </div>
 
       <BlockPopUp isOpen={OpenBlock} onClose={() => setOpenBlock(false)} username={displayName || ''} 
-                    onConfirm={() => {
-                    setIsBlocked(true)
+                    onConfirm={async () => {
+                    await blockUser(profileUserId!)
+                    dispatch(setProfile({ isBlocked: true }))
                     setOpenBlock(false)
-                }}/>
+                }} />
 
             <ReportPopUp 
                     isOpen={OpenReport} 
