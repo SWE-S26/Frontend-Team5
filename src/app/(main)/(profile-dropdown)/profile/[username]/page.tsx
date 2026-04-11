@@ -293,7 +293,7 @@ const ProfilePage = ({ params }: Props) => {
 
       <div className="flex justify-between">
         <div className="w-[68%]">
-          <div className="mt-10">
+          <div >
 
             {activeTab === "all" && (
               mockAll.length === 0 ? <EmptyTab /> : <All items={mockAll} />

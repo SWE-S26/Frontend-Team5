@@ -4,6 +4,7 @@ import { useEffect, useRef, useState } from "react"
 import { useParams } from "next/navigation"
 import ColorThief from "color-thief-browser"
 import AvatarPositionModal from "./Avatarpositionmodal"
+import AvatarPopup from "./AvatarPopup"
 
 import Button from "@/components/ui/Button"
 import AvatarUpload, { AvatarUploadHandle } from "./AvatarUpload"
@@ -37,6 +38,9 @@ export default function ProfileHeader() {
   const [avatarModalOpen,   setAvatarModalOpen]   = useState(false)
   const [avatarPendingUrl,  setAvatarPendingUrl]  = useState<string | null>(null)
   const [avatarPendingFile, setAvatarPendingFile] = useState<File | null>(null)
+
+
+  const [avatarViewOpen, setAvatarViewOpen] = useState(false)
 
   const { getProfile, loading, error } = useGetProfile()
   const { updateProfileImages } = useUpdateProfileImages()
@@ -226,7 +230,7 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
     onImageChange={handleCoverChange}
     disableClick
   >
-    <Button
+    <Button data-testid="Upload header image-button-CoverPhotoUpload"
       className="bg-chinese-black text-white-smoke cursor-pointer"
       onClick={(e) => {
         e.stopPropagation()
@@ -239,7 +243,7 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
 
   {showCoverMenu && (
     <div className="absolute right-0 top-[110%] z-50 w-48 bg-[#111] border border-white/10 rounded-sm shadow-2xl overflow-hidden">
-      <button
+      <button data-testid="Replace image-button-menuCover"
         onClick={() => {
           setShowCoverMenu(false)
           coverRef.current?.openFilePicker()
@@ -250,7 +254,7 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
       </button>
 
       {coverImage && (
-        <button
+        <button data-testid="Delete image-button-menuCover"
           onClick={handleDeleteCover}
           className="w-full text-left px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
         >
@@ -264,6 +268,9 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
      <div
   className="absolute left-10 top-1/2 -translate-y-1/2 group/avatar"
   ref={avatarMenuRef}
+  onClick={() => {
+    if (avatarImage) setAvatarViewOpen(true)
+  }}
 >
   <AvatarUpload
     ref={avatarRef}
@@ -274,7 +281,7 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
   >
     <div className="absolute inset-0 bg-gray-400/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity" />
     {isOwn && (
-    <Button
+    <Button data-testid="Upload image-button-AvatarUpload"
       className={`bg-chinese-black text-white-smoke absolute bottom-9 right-9 cursor-pointer 
         ${avatarImage ? "opacity-0 group-hover/avatar:opacity-100" : "opacity-100"}`}
       onClick={(e) => {
@@ -290,7 +297,7 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
     <div className="absolute left-1/2 -translate-x-1/2 top-[85%] z-50 w-48 bg-[#111] border border-white/10 rounded-sm shadow-2xl overflow-hidden">
       
 
-      <button
+      <button data-testid="Replace image-button-menuAvatar"
         onClick={() => {
           setShowAvatarMenu(false)
           avatarRef.current?.openFilePicker()
@@ -301,7 +308,7 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
       </button>
 
       {avatarImage && (
-        <button
+        <button data-testid="Delete image-button-menuAvatar"
           onClick={handleDeleteAvatar}
           className="w-full text-left px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
         >
@@ -340,6 +347,11 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
         setAvatarPendingUrl(null)
         setAvatarPendingFile(null)
       }}
+    />
+
+    <AvatarPopup
+      isOpen={avatarViewOpen}
+      onCancel={() => setAvatarViewOpen(false)}
     />
 
     </>

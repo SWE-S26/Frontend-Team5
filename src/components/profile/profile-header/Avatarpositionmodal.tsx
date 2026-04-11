@@ -93,7 +93,7 @@ export default function AvatarPositionModal({
           className="fixed inset-0 bg-white/30 z-[1001] flex items-start pt-25 justify-center"
           onClick={onCancel}
         >
-          <button
+          <button data-testid="cancel-button-popup"
             className="fixed top-4 right-4 text-white text-2xl font-bold bg-off-black rounded-full w-11 h-11 flex items-center justify-center z-[1002] hover:text-silver cursor-pointer"
             onClick={onCancel}
           >
@@ -143,13 +143,13 @@ export default function AvatarPositionModal({
             </div>
 
             <div className="flex justify-end gap-3 mt-2">
-              <button
+              <button data-testid="cancel-button-AvatarPositionModalPopup"
                 onClick={onCancel}
                 className="bg-off-black text-white-smoke px-4 py-2 rounded cursor-pointer hover:text-silver transition-colors"
               >
                 Cancel
               </button>
-              <button
+              <button data-testid="save-button-AvatarPositionModalPopup"
                 onClick={handleSave}
                 className="bg-white text-black px-4 py-2 rounded cursor-pointer hover:bg-gray-200 transition-colors font-semibold"
               >
