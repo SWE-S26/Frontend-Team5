@@ -16,6 +16,7 @@ const PUBLIC_ROUTES = [
   "/api/auth/v1/google/verify-code",
   "/api/auth/v1/cross/desktop",
   "/api/auth/v1/cross/desktop/poll",
+  "/api/tracks/v1",
 ]
 
 const api = axios.create({

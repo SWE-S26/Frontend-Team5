@@ -38,7 +38,6 @@ export default function RootLayout({
             </MockProvider>
           </AntProviders>
         </ReduxProvider>
-        <div className="h-12" />
       </body>
     </html>
   );
