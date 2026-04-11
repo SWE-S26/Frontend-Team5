@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { Select } from "antd";
 import Button from "@/components/ui/Button";
 import InfoPopover from "@/components/settings/InfoPopover"
@@ -286,7 +286,7 @@ export default function Notifications() {
 
   return (
     <>
-      <div className="max-w-2xl text-white-smoke space-y-10">
+      <div className="max-w-2xl text-white-smoke space-y-10 mb-10">
         {renderSection("Activities",          ACTIVITY_ROWS, activities, setActivities)}
         {renderSection("Updates from Beatza", BEATZA_ROWS,   beatza,     setBeatza)}
 
