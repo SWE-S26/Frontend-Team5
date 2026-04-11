@@ -204,7 +204,7 @@ export default function Content() {
   }
 
   return (
-    <div className="max-w-3xl text-white-smoke font-bold space-y-8">
+    <div className="max-w-3xl text-white-smoke font-bold space-y-8 mb-10">
 
       {/* RSS feed */}
       <div>

@@ -1,9 +1,12 @@
 "use client";
 
+import { useEffect } from "react";
 import { Check } from "lucide-react";
 
 import PrivacySettingRow from "@/components/settings/PrivacySettingRow";
+import BlockedUserRow from "@/components/settings/BlockedUserRow";
 import { usePrivacySettings } from "@/hooks/useSettings";
+import { useGetBlockedUsers, useUnblockUser } from "@/hooks/useSocial";
 import { PrivacySettings } from "@/types/settings.types";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -41,9 +44,22 @@ const PRIVACY_SETTINGS: {
 
 export default function Privacy() {
   const { settings, loading, saveStatus, updateSetting } = usePrivacySettings();
+  const { getBlockedUsers, blockedUsers, loading: blockedLoading } = useGetBlockedUsers();
+  const { unblockUser } = useUnblockUser();
+
+  useEffect(() => {
+    getBlockedUsers();
+  }, [getBlockedUsers]);
+
+  const handleUnblock = async (userId: string) => {
+    await unblockUser(userId);
+    getBlockedUsers();
+  };
 
   return (
-    <div className="max-w-3xl text-white-smoke">
+    <div className="max-w-3xl text-white-smoke mb-10">
+
+      {/* Privacy settings */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-bold">Privacy settings</h2>
 
@@ -73,7 +89,7 @@ export default function Privacy() {
       </div>
 
       <div>
-        {PRIVACY_SETTINGS.map((setting, index) => (
+        {PRIVACY_SETTINGS.map((setting) => (
           <PrivacySettingRow
             key={setting.key}
             label={setting.label}
@@ -84,9 +100,29 @@ export default function Privacy() {
         ))}
       </div>
 
+      {/* Blocked users */}
       <div className="pt-15">
-        <h2 className="text-lg font-bold">Blocked users</h2>
+        <h2 className="text-lg font-bold mb-4">Blocked users</h2>
+
+        {blockedLoading ? (
+          <p className="text-sm text-white-smoke/40">Loading...</p>
+        ) : !blockedUsers || blockedUsers.length === 0 ? (
+          <p className="text-sm text-white-smoke/40">You haven't blocked anyone.</p>
+        ) : (
+          <div className="divide-y divide-white-smoke/10">
+            {blockedUsers.map((user) => (
+              <BlockedUserRow
+                key={user.userId}
+                userId={user.userId}
+                displayName={user.displayName}
+                profileImgLink={user.profileImgLink ?? "/placeholder-avatar.png"}
+                onUnblock={() => handleUnblock(user.userId)}
+              />
+            ))}
+          </div>
+        )}
       </div>
+
     </div>
   );
 }
