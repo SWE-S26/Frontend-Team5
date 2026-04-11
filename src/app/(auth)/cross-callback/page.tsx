@@ -12,6 +12,8 @@ type BridgePayload = {
   accessToken?: string;
   refreshToken?: string;
   pendingToken?: string;
+  incompleteToken?:string;
+  displayName?: string;
 };
 
 function CrossPlatformCallbackContent() {
@@ -35,7 +37,13 @@ function CrossPlatformCallbackContent() {
       searchParams.get("error_description") ||
       searchParams.get("message") ||
       undefined;
-    const hasAnyToken = Boolean(token || accessToken || refreshToken || pendingToken);
+    const incompleteToken =
+      searchParams.get("incompleteToken") ||
+      undefined;
+    const displayName =
+      searchParams.get("displayName") ||
+      undefined;
+    const hasAnyToken = Boolean(token || accessToken || refreshToken || pendingToken || incompleteToken || displayName);
 
     return {
       token,
@@ -45,6 +53,8 @@ function CrossPlatformCallbackContent() {
       error,
       errorDescription,
       hasAnyToken,
+      incompleteToken,
+      displayName,
     };
   }, [searchParams]);
 
@@ -82,6 +92,8 @@ function CrossPlatformCallbackContent() {
       accessToken: tokenParams.accessToken,
       refreshToken: tokenParams.refreshToken,
       pendingToken: tokenParams.pendingToken,
+      incompleteToken: tokenParams.incompleteToken,
+      displayName: tokenParams.displayName,
     };
 
     postToReceivers(payload);
@@ -94,6 +106,15 @@ function CrossPlatformCallbackContent() {
       if (tokenParams.refreshToken) {
         deepLinkParams.set("refreshToken", tokenParams.refreshToken);
       }
+      if (tokenParams.pendingToken) {
+        deepLinkParams.set("pendingToken", tokenParams.pendingToken);
+      }
+      if (tokenParams.incompleteToken) {
+        deepLinkParams.set("incompleteToken", tokenParams.incompleteToken);
+      }
+      if (tokenParams.displayName) {
+        deepLinkParams.set("displayName", tokenParams.displayName);
+      }
 
       const deepLink = `beatza://auth?${deepLinkParams.toString()}`;
 
@@ -104,7 +125,9 @@ function CrossPlatformCallbackContent() {
             token: tokenParams.token,
             accessToken: tokenParams.accessToken,
             refreshToken: tokenParams.refreshToken,
+            incompleteToken: tokenParams.incompleteToken,
             pendingToken: tokenParams.pendingToken,
+            displayName: tokenParams.displayName,
           }),
         );
       }

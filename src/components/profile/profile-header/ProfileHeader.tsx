@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react"
 import { useParams } from "next/navigation"
 import ColorThief from "color-thief-browser"
+import AvatarPositionModal from "./Avatarpositionmodal"
 
 import Button from "@/components/ui/Button"
 import AvatarUpload, { AvatarUploadHandle } from "./AvatarUpload"
@@ -30,6 +31,12 @@ export default function ProfileHeader() {
   const lastName       = useAppSelector((state) => state.profile.lastName)
   const city           = useAppSelector((state) => state.profile.city)
   const country        = useAppSelector((state) => state.profile.country)
+  const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
+
+  
+  const [avatarModalOpen,   setAvatarModalOpen]   = useState(false)
+  const [avatarPendingUrl,  setAvatarPendingUrl]  = useState<string | null>(null)
+  const [avatarPendingFile, setAvatarPendingFile] = useState<File | null>(null)
 
   const { getProfile, loading, error } = useGetProfile()
   const { updateProfileImages } = useUpdateProfileImages()
@@ -102,18 +109,28 @@ const handleDeleteAvatar = async () => {
         city:           data.city,
         country:        data.country,
         links:          data.links,
+        bannerLinks:    data.bannerLinks,
         supportLink:    data.supportLink,
         favoriteGenres: data.favoriteGenres,
-        followersCount: data.followersCount,
-        
-        tracksCount:    data.trackCount,
-        isOwnProfile:   data.userId === authUserId,
-        isLoading:    false, 
+        followersCount:  data.followersCount,
+        followedCount:   data.followedCount,
+        trackCount:      data.trackCount,
+        isFollowed:      data.isFollowed,
+        isBlocked:       data.isBlocked,
+        role:            data.role,
+        isOwnProfile:    data.userId === authUserId,
+       
       }))
+    })
+
+    .finally(() => {
+      dispatch(setProfile({ isLoading: false }))  // ← always runs
     })
 
     return () => { dispatch(clearProfile()) }
   }, [userId, hasHydrated])
+
+
 
   // sync local image state from profileSlice
   useEffect(() => {
@@ -151,10 +168,16 @@ const handleDeleteAvatar = async () => {
   // ── Upload handlers ──────────────────────────────────────────────
 
   const handleAvatarChange = async (file: File, previewUrl: string) => {
-  setAvatarImage(previewUrl)
+  setAvatarPendingFile(file)
+  setAvatarPendingUrl(previewUrl)
+  setAvatarModalOpen(true)
+}
 
-  const updated = await updateProfileImages({ profileImg: file })
-
+// 3. add save handler
+const handleAvatarModalSave = async (croppedFile: File, croppedDataUrl: string) => {
+  setAvatarModalOpen(false)
+  setAvatarImage(croppedDataUrl)
+  const updated = await updateProfileImages({ profileImg: croppedFile })
   if (updated?.profileImgLink) {
     setAvatarImage(updated.profileImgLink)
     dispatch(setProfileImgLink(updated.profileImgLink))
@@ -185,6 +208,7 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
   )
 
   return (
+    <>
     <div
       className="relative w-full h-80 group -mt-12.5"
       style={
@@ -249,6 +273,7 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
     disableClick={isOwnProfile}
   >
     <div className="absolute inset-0 bg-gray-400/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity" />
+    {isOwn && (
     <Button
       className={`bg-chinese-black text-white-smoke absolute bottom-9 right-9 cursor-pointer 
         ${avatarImage ? "opacity-0 group-hover/avatar:opacity-100" : "opacity-100"}`}
@@ -258,7 +283,7 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
       }}
     >
       Upload image
-    </Button>
+    </Button> )}
   </AvatarUpload>
 
   {isOwnProfile && showAvatarMenu && (
@@ -293,17 +318,31 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
             {displayName || "No Name"}
           </h1>
           <p className="text-silver font-bold bg-black px-3 py-2">
-            {firstName && lastName
-              ? `${firstName} ${lastName}`
-              : displayName || "No Name"}
+            {firstName || lastName ? `${firstName || ""} ${lastName || ""}`.trim() : displayName || "No Name"}
           </p>
         </div>
         <div className="bg-black inline-block px-3 py-1 absolute -bottom-10">
           <p className="text-silver font-bold">
-            {city && country ? `${city}, ${country}` : "No location"}
+           {(city || country) ? [city, country].filter(Boolean).join(", ") : "No location"}
           </p>
         </div>
       </div>
+
     </div>
+
+    <AvatarPositionModal
+      isOpen={avatarModalOpen}
+      imageUrl={avatarPendingUrl ?? ""}
+      originalFile={avatarPendingFile}
+      onSave={handleAvatarModalSave}
+      onCancel={() => {
+        setAvatarModalOpen(false)
+        setAvatarPendingUrl(null)
+        setAvatarPendingFile(null)
+      }}
+    />
+
+    </>
+    
   )
 }

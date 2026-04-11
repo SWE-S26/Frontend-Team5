@@ -6,7 +6,7 @@ import AuthModal from "@/components/auth/AuthModal";
 
 const slides = [
   {
-    image: "/hero-banner/placeholder1.jpg",
+    image: "/landing-page/hero-banner/placeholder1.jpeg",
     artist: "DC the Don",
     title: "SoundCloud Artist Pro",
     heading: ["Discover.", "Get Discovered."],
@@ -14,7 +14,7 @@ const slides = [
     buttons: [{ label: "Get Started", href: "/explore" }],
   },
   {
-    image: "/hero-banner/placeholder2.jpg",
+    image: "/landing-page/hero-banner/placeholder2.jpeg",
     artist: "1900Rugrat",
     title: "Ascending Artist",
     heading: ["It all starts with", "an upload."],
@@ -22,7 +22,7 @@ const slides = [
     buttons: [{ label: "Upload", href: "/upload" }, { label: "Explore Artist Pro", href: "/artistpro" }],
   },
   {
-    image: "/hero-banner/placeholder3.jpg",
+    image: "/landing-page/hero-banner/placeholder3.jpeg",
     artist: "Crayon",
     title: "Ascending Artist",
     heading: ["Where every music", "scene lives."],
@@ -61,7 +61,7 @@ export default function HeroBanner() {
             className="relative w-full h-full shrink-0"
             style={{ backgroundImage: `url(${slide.image})`, backgroundSize: "cover", backgroundPosition: "center" }}
           >
-            <div className="absolute inset-0 bg-black/40" />
+            <div className="absolute inset-0 bg-black/10" />
 
             {/* slide content — fixed layout so every slide aligns identically */}
             <div className="relative z-10 flex flex-col justify-between h-3/4 px-8 pt-22 pb-6">

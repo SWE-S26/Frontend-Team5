@@ -49,9 +49,11 @@ export const profileHandlers = [
       links:          [{ linkId: "1", name: "Twitter", link: "https://twitter.com/omar" }],
       supportLink:    null,              // matches real response (can be null)
       favoriteGenres: ["Hip-Hop", "Jazz"],
-      followersCount: 120,
-      followedCount:  80,                // was followingsCount
-      trackCount:     15,
+      followersCount:  120,
+      followedCount:   80,
+      trackCount:      15,
+      isFollowed:      false,
+      isBlocked:       false,
     }, { status: 200 })
   }),
 ]

@@ -1,6 +1,8 @@
 "use client";
 
 import React, { useRef, useState, forwardRef, useImperativeHandle } from "react";
+import { useAppSelector } from "@/store/hooks"
+
 
 interface AvatarProps {
   children?: React.ReactNode;
@@ -16,7 +18,7 @@ export interface AvatarUploadHandle {
 
 const AvatarUpload = forwardRef<AvatarUploadHandle, AvatarProps>(
   ({ children, className, onImageChange, avatarImage, disableClick = false }, ref) => {
-    const [image, setImage] = useState<string | null>(null);
+    // const [image, setImage] = useState<string | null>(null);
     const fileInputRef = useRef<HTMLInputElement>(null);
 
     const openFilePicker = () => {
@@ -27,38 +29,42 @@ const AvatarUpload = forwardRef<AvatarUploadHandle, AvatarProps>(
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
-      if (file) {
-        const previewUrl = URL.createObjectURL(file);
-        setImage(previewUrl);
-        onImageChange(file, previewUrl);
-      }
+      if (!file) return;
+      e.target.value = "";
+      const previewUrl = URL.createObjectURL(file);
+      onImageChange(file, previewUrl);
     };
 
-    const displayImage = image || avatarImage;
+    const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
+
 
     return (
       <div
         className={`w-48 h-48 rounded-full bg-linear-to-br from-[#8f6f79] to-[#c3adb4] flex items-center justify-center shadow-lg overflow-hidden ${className}`}
       >
-        {displayImage && (
-          <img src={displayImage} alt="avatar" className="w-full h-full object-cover" />
+        {avatarImage && (
+          <img src={avatarImage} alt="avatar" className="w-full h-full object-cover" />
         )}
+       {isOwn && (
+          <>
+            <div
+              onClick={disableClick ? undefined : openFilePicker}
+              className={disableClick ? "" : "cursor-pointer"}
+            >
+              {children}
+            </div>
 
-        <div
-          onClick={disableClick ? undefined : openFilePicker}
-          className={disableClick ? "" : "cursor-pointer"}
-        >
-          {children}
-        </div>
-
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          className="hidden"
-        />
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </>
+        )}
       </div>
+      
     );
   }
 );

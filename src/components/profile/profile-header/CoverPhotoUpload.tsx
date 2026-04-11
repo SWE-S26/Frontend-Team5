@@ -1,6 +1,7 @@
 "use client"
 
 import React, { useRef, forwardRef, useImperativeHandle } from "react"
+import { useAppSelector } from "@/store/hooks"
 
 interface CoverProps {
   children?: React.ReactNode
@@ -30,21 +31,28 @@ const CoverPhotoUpload = forwardRef<CoverUploadHandle, CoverProps>(
       }
     }
 
+    const isOwn = useAppSelector((state) => state.profile.isOwnProfile)
+
     return (
       <div>
-        <div
-          onClick={disableClick ? undefined : openFilePicker}
-          className={disableClick ? "" : "cursor-pointer"}
-        >
-          {children}
-        </div>
-        <input
-          type="file"
-          accept="image/*"
-          ref={fileInputRef}
-          onChange={handleFileChange}
-          className="hidden"
-        />
+        {isOwn && (
+          <>
+            <div
+              onClick={disableClick ? undefined : openFilePicker}
+              className={disableClick ? "" : "cursor-pointer"}
+            >
+              {children}
+            </div>
+
+            <input
+              type="file"
+              accept="image/*"
+              ref={fileInputRef}
+              onChange={handleFileChange}
+              className="hidden"
+            />
+          </>
+        )}
       </div>
     )
   }
@@ -52,3 +60,4 @@ const CoverPhotoUpload = forwardRef<CoverUploadHandle, CoverProps>(
 
 CoverPhotoUpload.displayName = "CoverPhotoUpload"
 export default CoverPhotoUpload
+

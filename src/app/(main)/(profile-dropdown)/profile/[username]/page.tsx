@@ -2,7 +2,9 @@
 import { useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
-import { useAppSelector } from "@/store/hooks"
+import { useAppSelector, useAppDispatch } from "@/store/hooks"
+import { useFollowUser, useUnfollowUser } from "@/hooks/useSocial"
+import {decrementFollowedCount, incrementFollowedCount } from '@/store/slices/profileSlice'
 
 import ProfileHeader from "@/components/profile/profile-header/ProfileHeader"
 import ProfileSideBar from "@/components/profile/side-bar/ProfileSideBar"
@@ -13,6 +15,9 @@ import { MdOutlineEdit } from "react-icons/md"
 import { BsThreeDots } from "react-icons/bs"
 import { IoRadio } from "react-icons/io5"
 import { FaRegEnvelope } from "react-icons/fa6"
+import { useRef, useEffect } from "react"
+import { AiOutlineStop } from "react-icons/ai";
+import { BsExclamationCircle } from "react-icons/bs";
 
 import SharePopup from "@/components/profile/SharePopUp"
 import ProfileEditForm from "@/components/profile/ProfileEditForm"
@@ -25,6 +30,10 @@ import Tracks from "@/components/profile/profile-tabs/Tracks"
 import Albums from "@/components/profile/profile-tabs/Albums"
 import Playlists from "@/components/profile/profile-tabs/Playlists"
 import Reposts from "@/components/profile/profile-tabs/Reposts"
+import BlockPopUp from "@/components/messages/conversation/BlockPopUp"
+import ReportPopUp from "@/components/messages/conversation/ReportPopUp"
+import SpamPopUp from "@/components/messages/conversation/SpamPopUp"
+import Button from "@/components/ui/Button"
 
 interface Props {
   params: { username: string }
@@ -75,17 +84,47 @@ const ProfilePage = ({ params }: Props) => {
   const [openEdit,    setOpenEdit]    = useState(false)
   const [openShare,   setOpenShare]   = useState(false)
   const [openMessage, setOpenMessage] = useState(false)
-  const [following,   setFollowing]   = useState(false)
+  const [openMoreMenu, setOpenMoreMenu] = useState(false)
+  const[OpenReport, setIsOpenReport] = useState(false)
+  const [isBlocked, setIsBlocked] = useState(false)
+  const [isSpamOpen, setIsSpamOpen] = useState(false)
+  const [OpenBlock, setOpenBlock] = useState(false)
+  const moreMenuRef = useRef<HTMLDivElement>(null)
+  const isFollowed                          = useAppSelector((state) => state.profile.isFollowed)
+  const profileUserId                       = useAppSelector((state) => state.profile.userId)
+  const { followUser,   loading: followLoading   } = useFollowUser()
+  const { unfollowUser, loading: unfollowLoading } = useUnfollowUser()
+  const followButtonLoading = followLoading || unfollowLoading
+  const dispatch = useAppDispatch()
 
   const isLoading = useAppSelector((state) => state.profile.isLoading)
   const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
-  const artist    = false
+  const displayName = useAppSelector((state) => state.profile.displayName)
+  
+  
+  const role = useAppSelector((state) => state.profile.role)
+
+  const artist = role === "Artist"
+
+   
+  
 
   const handleTabChange = (tab: string) => {
     const current = new URLSearchParams(searchParams.toString())
     current.set("tab", tab)
     router.push(`?${current.toString()}`, { scroll: false })
   }
+
+  useEffect(() => {
+  if (!openMoreMenu) return
+  const handleClick = (e: MouseEvent) => {
+    if (moreMenuRef.current && !moreMenuRef.current.contains(e.target as Node)) {
+      setOpenMoreMenu(false)
+    }
+  }
+  document.addEventListener("mousedown", handleClick)
+  return () => document.removeEventListener("mousedown", handleClick)
+}, [openMoreMenu])
 
   return (
     <div>
@@ -97,7 +136,7 @@ const ProfilePage = ({ params }: Props) => {
           activeTab={activeTab}
           onTabChange={handleTabChange}
           textSize="text-md"
-          className="flex items-center justify-between text-white py-6 px-1"
+          className="flex items-center justify-between text-white-smoke py-6 px-1"
           tabsWrapperClassName="flex space-x-6"
         />
 
@@ -106,44 +145,48 @@ const ProfilePage = ({ params }: Props) => {
             <>
               {isOwn ? (
                 <>
-                  <button
+                  <Button
                     onClick={() => setOpenShare(!openShare)}
-                    className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
+                    className="relative group   bg-off-black font-bold  justify-center  cursor-pointer hover:text-silver "
                   >
                     <LuShare className="w-4 h-4" />
-                    <span className="ml-1 text-sm font-bold px-1">Share</span>
-                    <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-3 py-1 rounded-md bg-[#2C2C2C] text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none shadow-lg z-50">
-                      Share
-                    </span>
-                  </button>
+                    <span className="ml-1 text-sm  px-1 py-0.5">Share</span>
+                  </Button>
                   <SharePopup isOpen={openShare} onClose={() => setOpenShare(false)} />
 
-                  <button
+                  <Button
                     onClick={() => setOpenEdit(true)}
-                    className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center cursor-pointer hover:text-silver h-10"
+                    className="relative group   bg-off-black font-bold  justify-center cursor-pointer hover:text-silver "
                   >
-                    <MdOutlineEdit className="w-5 h-5" />
-                    <span className="ml-1 text-sm font-bold px-1">Edit</span>
-                    <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-3 py-1 rounded-md bg-[#2C2C2C] text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none shadow-lg z-50">
-                      Edit
-                    </span>
-                  </button>
+                    <MdOutlineEdit className="w-5 h-5 " />
+                    <span className="ml-1 text-sm   px-1 py-0.5">Edit</span>
+                  </Button>
                   <ProfileEditForm isOpen={openEdit} onClose={() => setOpenEdit(false)} />
                 </>
               ) : (
+                
                 <>
+                
                   {artist && (
-                    <button className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center cursor-pointer hover:text-silver h-10">
+                    <Button className="relative group font-bold  bg-off-black   justify-center cursor-pointer hover:text-silver ">
                       <IoRadio className="w-5 h-5" />
-                      <span className="ml-1 text-sm font-bold px-1">Station</span>
-                    </button>
+                      <span className="ml-1 text-sm   px-1 py-0.5">Station</span>
+                    </Button>
                   )}
-
+                   
                   <button
-                    onClick={() => setFollowing(!following)}
-                    className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
+                    onClick={() => {
+                      if (!profileUserId || followButtonLoading) return
+                      if (isFollowed) {
+                          unfollowUser(profileUserId)
+                      } else {
+                          followUser(profileUserId)
+                      }
+                    }}
+                    disabled={followButtonLoading}
+                    className="relative group p-2 rounded-md bg-white-smoke text-chinese-black transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
                   >
-                    {following ? (
+                    {isFollowed ? (
                       <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" className="w-5 h-5 fill-current">
                         <circle cx="10" cy="7.5" r="3.5" />
                         <path d="M2 20h16c0-4.4-3.6-8-8-8s-8 3.6-8 8z" />
@@ -157,16 +200,16 @@ const ProfilePage = ({ params }: Props) => {
                       </svg>
                     )}
                     <span className="ml-1 text-sm font-bold px-1">
-                      {following ? "Following" : "Follow"}
+                      {isFollowed ? "Following" : "Follow"}
                     </span>
                     <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-3 py-1 rounded-md bg-[#2C2C2C] text-white text-xs font-medium whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none shadow-lg z-50">
-                      {following ? "Unfollow" : "Follow"}
+                      {isFollowed ? "Unfollow" : "Follow"}
                     </span>
                   </button>
 
                   <button
                     onClick={() => setOpenShare(!openShare)}
-                    className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
+                    className="relative group p-2 rounded-md bg-off-black transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
                   >
                     <LuShare className="w-4 h-4" />
                     <span className="ml-1 text-sm font-bold px-1">Share</span>
@@ -178,21 +221,75 @@ const ProfilePage = ({ params }: Props) => {
 
                   <button
                     onClick={() => setOpenMessage(!openMessage)}
-                    className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
+                    className="relative group p-2 rounded-md bg-off-black transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
                   >
                     <FaRegEnvelope className="w-4 h-4" />
                   </button>
                   <NewMessagePopUP isOpen={openMessage} onClose={() => setOpenMessage(false)} />
 
-                  <button className="relative group p-2 rounded-md bg-[#1F1F1F] transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10">
-                    <BsThreeDots className="w-4 h-4" />
-                  </button>
+                  <div ref={moreMenuRef} className="relative">
+                        <button
+                          onClick={() => setOpenMoreMenu(!openMoreMenu)}
+                          className={`relative group p-2 rounded-md bg-off-black transition flex items-center justify-center px-4 py-1 cursor-pointer h-10 ${openMoreMenu ? "text-papaya" : "hover:text-silver"}`}
+                        >
+                          <BsThreeDots className="w-4 h-4" />
+                        </button>
+
+                        {openMoreMenu && (
+                          <div className="absolute right-0 top-full mt-1 bg-off-black rounded-md shadow-lg z-50 w-auto py-1  whitespace-nowrap">
+                            <button 
+                            onClick={() => {
+                                if (isBlocked) {
+                                    setIsBlocked(false)
+                                } else {
+                                    setOpenBlock(true)
+                                }
+                            }}
+                            className={`flex items-center gap-2 w-full px-4 py-2 text-sm  hover:opacity-50 cursor-pointer font-bold ${isBlocked ? "text-papaya" : "text-white-smoke"}`}>
+                              <AiOutlineStop className="h-4 w-4 font-bold " />
+                              {isBlocked ? 'Blocked' : 'Block'} {displayName}
+                            </button>
+
+
+
+
+
+                            
+                            <button 
+                            onClick={() => setIsOpenReport(true)}
+                            className="flex items-center gap-2 w-full px-4 py-2 text-sm text-white-smoke hover:opacity-50 cursor-pointer font-bold">
+                                <BsExclamationCircle className="h-4 w-4 font-bold text-white-smoke" />
+                                Report {displayName}
+                            </button>
+                          </div>
+                        )}
+                  </div>
                 </>
               )}
             </>
           )}
         </div>
       </div>
+
+      <BlockPopUp isOpen={OpenBlock} onClose={() => setOpenBlock(false)} username={displayName || ''} 
+                    onConfirm={() => {
+                    setIsBlocked(true)
+                    setOpenBlock(false)
+                }}/>
+
+            <ReportPopUp 
+                    isOpen={OpenReport} 
+                    onClose={() => setIsOpenReport(false)} 
+                    onSpam={() => {
+                        setIsOpenReport(false)
+                        setIsSpamOpen(true)
+                    }}
+                />
+                <SpamPopUp 
+                    isOpen={isSpamOpen} 
+                    onClose={() => setIsSpamOpen(false)} 
+                    username={displayName  || ''} 
+                />
 
       <div className="flex justify-between">
         <div className="w-[68%]">
