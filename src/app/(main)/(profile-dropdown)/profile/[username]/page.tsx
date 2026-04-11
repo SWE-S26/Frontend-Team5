@@ -150,7 +150,7 @@ const ProfilePage = ({ params }: Props) => {
             <>
               {isOwn ? (
                 <>
-                  <Button
+                  <Button data-testid="share-button"
                     onClick={() => setOpenShare(!openShare)}
                     className="relative group   bg-off-black font-bold  justify-center  cursor-pointer hover:text-silver "
                   >
@@ -159,7 +159,7 @@ const ProfilePage = ({ params }: Props) => {
                   </Button>
                   <SharePopup isOpen={openShare} onClose={() => setOpenShare(false)} />
 
-                  <Button
+                  <Button data-testid="edit-button"
                     onClick={() => setOpenEdit(true)}
                     className="relative group   bg-off-black font-bold  justify-center cursor-pointer hover:text-silver "
                   >
@@ -173,13 +173,13 @@ const ProfilePage = ({ params }: Props) => {
                 <>
                 
                   {artist && (
-                    <Button className="relative group font-bold  bg-off-black   justify-center cursor-pointer hover:text-silver ">
+                    <Button data-testid="station-button" className="relative group font-bold  bg-off-black   justify-center cursor-pointer hover:text-silver ">
                       <IoRadio className="w-5 h-5" />
                       <span className="ml-1 text-sm   px-1 py-0.5">Station</span>
                     </Button>
                   )}
                    
-                  <button
+                  <button data-testid="Follow-button"
                     onClick={() => {
                       if (!profileUserId || followButtonLoading || amIBlocked) return
                       if (isFollowed) {
@@ -212,7 +212,7 @@ const ProfilePage = ({ params }: Props) => {
                     </span>
                   </button>
 
-                  <button
+                  <button data-testid="share-button"
                     onClick={() => setOpenShare(!openShare)}
                     className="relative group p-2 rounded-md bg-off-black transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
                   >
@@ -224,7 +224,7 @@ const ProfilePage = ({ params }: Props) => {
                   </button>
                   <SharePopup isOpen={openShare} onClose={() => setOpenShare(false)} />
 
-                  <button
+                  <button data-testid="SendMsg-button"
                     onClick={() => setOpenMessage(!openMessage)}
                     className="relative group p-2 rounded-md bg-off-black transition flex items-center justify-center px-4 py-1 cursor-pointer hover:text-silver h-10"
                   >
@@ -233,7 +233,7 @@ const ProfilePage = ({ params }: Props) => {
                   <NewMessagePopUP isOpen={openMessage} onClose={() => setOpenMessage(false)} />
 
                   <div ref={moreMenuRef} className="relative">
-                        <button
+                        <button data-testid="ThreeDots-button"
                           onClick={() => setOpenMoreMenu(!openMoreMenu)}
                           className={`relative group p-2 rounded-md bg-off-black transition flex items-center justify-center px-4 py-1 cursor-pointer h-10 ${openMoreMenu ? "text-papaya" : "hover:text-silver"}`}
                         >
@@ -242,7 +242,7 @@ const ProfilePage = ({ params }: Props) => {
 
                         {openMoreMenu && (
                           <div className="absolute right-0 top-full mt-1 bg-off-black rounded-md shadow-lg z-50 w-auto py-1  whitespace-nowrap">
-                            <button 
+                            <button data-testid="Block-button"
                             onClick={async () => {
                                   if (isBlocked) {
                                       await unblockUser(profileUserId!)
@@ -261,7 +261,7 @@ const ProfilePage = ({ params }: Props) => {
 
 
                             
-                            <button 
+                            <button data-testid="Report-button"
                             onClick={() => setIsOpenReport(true)}
                             className="flex items-center gap-2 w-full px-4 py-2 text-sm text-white-smoke hover:opacity-50 cursor-pointer font-bold">
                                 <BsExclamationCircle className="h-4 w-4 font-bold text-white-smoke" />
