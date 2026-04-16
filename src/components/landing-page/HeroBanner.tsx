@@ -48,7 +48,7 @@ export default function HeroBanner() {
   }, [])
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden h-111.5">
+    <div className="relative w-full rounded-2xl overflow-hidden h-[420px] sm:h-111.5">
 
       {/* sliding track */}
       <div
@@ -63,22 +63,20 @@ export default function HeroBanner() {
           >
             <div className="absolute inset-0 bg-black/10" />
 
-            {/* slide content — fixed layout so every slide aligns identically */}
-            <div className="relative z-10 flex flex-col justify-between h-3/4 px-8 pt-22 pb-6">
-              {/* heading + description — fixed block */}
+            {/* slide content */}
+            <div className="relative z-10 flex flex-col justify-between h-3/4 px-4 sm:px-8 pt-16 sm:pt-22 pb-6">
               <div className="max-w-xl">
-                <h1 className="text-white-smoke text-[60px] font-bold leading-tight">{slide.heading[0]}</h1>
-                <h1 className="text-white-smoke text-[60px] font-bold leading-tight -mt-3">{slide.heading[1]}</h1>
-                <p className="text-white-smoke text-[17px] font-bold mt-4">{slide.description}</p>
+                <h1 className="text-white-smoke text-[32px] sm:text-[60px] font-bold leading-tight">{slide.heading[0]}</h1>
+                <h1 className="text-white-smoke text-[32px] sm:text-[60px] font-bold leading-tight -mt-1 sm:-mt-3">{slide.heading[1]}</h1>
+                <p className="text-white-smoke text-[13px] sm:text-[17px] font-bold mt-3 sm:mt-4 line-clamp-3 sm:line-clamp-none">{slide.description}</p>
               </div>
 
-              {/* buttons + artist credit — always on the same row at the bottom */}
-              <div className="flex items-center gap-6 mt-8">
-                <div className="flex gap-4">
+              <div className="flex items-center gap-4 sm:gap-6 mt-6 sm:mt-8">
+                <div className="flex gap-2 sm:gap-4">
                   {slide.buttons.map((btn, j) => (
                     <Link key={j} href={btn.label === "Get Started" ? "#" : btn.href}>
                       <Button
-                        className={`px-3 py-1.5 text-[17px] cursor-pointer ${j === 0 ? "bg-white-smoke text-chinese-black" : "text-white-smoke hover:text-white-smoke"}`}
+                        className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[13px] sm:text-[17px] cursor-pointer ${j === 0 ? "bg-white-smoke text-chinese-black" : "text-white-smoke hover:text-white-smoke"}`}
                         onClick={btn.label === "Get Started" ? () => setIsAuthModalOpen(true) : undefined}
                       >
                         {btn.label}
@@ -87,10 +85,9 @@ export default function HeroBanner() {
                   ))}
                 </div>
 
-                {/* artist credit — inline with buttons */}
                 <div className="ml-auto text-left">
-                  <p className="text-white-smoke font-bold text-sm">{slide.artist}</p>
-                  <p className="text-white-smoke/70 text-xs">{slide.title}</p>
+                  <p className="text-white-smoke font-bold text-xs sm:text-sm">{slide.artist}</p>
+                  <p className="text-white-smoke/70 text-[10px] sm:text-xs">{slide.title}</p>
                 </div>
               </div>
             </div>
@@ -99,29 +96,41 @@ export default function HeroBanner() {
       </div>
 
       {/* static top bar */}
-      <div className="relative z-20 flex items-center justify-between px-8 pt-7">
+      <div className="relative z-20 flex items-center justify-between px-4 sm:px-8 pt-4 sm:pt-7">
         <div className="flex items-center">
-          <img src="/app-logo/beatza.png" alt="BeatZa" className="w-12 mr-2 mt-1"/>
-          <h1 className="text-white-smoke font-bold text-sm mt-1">CRAVING TUNES</h1>
+          <img src="/app-logo/beatza.png" alt="BeatZa" className="w-8 sm:w-12 mr-1.5 sm:mr-2 mt-1"/>
+          <h1 className="text-white-smoke font-bold text-xs sm:text-sm mt-1 hidden sm:block">CRAVING TUNES</h1>
         </div>
-        <div className="flex gap-3">
-          <Button data-testid="landing_sign_in" className="px-4 py-1.5 bg-white-smoke text-chinese-black text-[13px] cursor-pointer" onClick={() => setIsAuthModalOpen(true)}>
+        <div className="flex gap-2 sm:gap-3">
+          <Button
+            data-testid="landing_sign_in"
+            className="px-2.5 sm:px-4 py-1 sm:py-1.5 bg-white-smoke text-chinese-black text-[11px] sm:text-[13px] cursor-pointer"
+            onClick={() => setIsAuthModalOpen(true)}
+          >
             Sign in
           </Button>
-          <Button data-testid="landing_create_account" className="px-3 py-1.5 bg-chinese-black text-white-smoke text-[13px] cursor-pointer" onClick={() => setIsAuthModalOpen(true)}>
+          <Button
+            data-testid="landing_create_account"
+            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-chinese-black text-white-smoke text-[11px] sm:text-[13px] cursor-pointer"
+            onClick={() => setIsAuthModalOpen(true)}
+          >
             Create account
           </Button>
-          <Link data-testid="landing_for_artist" href="/sign-in" className="py-1.5 text-white-smoke font-bold text-[13px] transition-all duration-300 cursor-pointer">
+          <Link
+            data-testid="landing_for_artist"
+            href="/sign-in"
+            className="py-1 sm:py-1.5 text-white-smoke font-bold text-[11px] sm:text-[13px] transition-all duration-300 cursor-pointer hidden sm:block"
+          >
             For Artists
           </Link>
         </div>
       </div>
 
       {/* static dots */}
-      <div className="absolute bottom-5.5 left-1/2 -translate-x-1/2 z-20 flex gap-4">
+      <div className="absolute bottom-5.5 left-1/2 -translate-x-1/2 z-20 flex gap-3 sm:gap-4">
         {slides.map((_, i) => (
           <button key={i} onClick={() => goToSlide(i)}
-            className={`aspect-square h-4 rounded-full border-2 border-white-smoke transition-all duration-300
+            className={`aspect-square h-3 sm:h-4 rounded-full border-2 border-white-smoke transition-all duration-300
                         ${i === current ? "bg-white-smoke" : "bg-transparent"}`}
           />
         ))}
