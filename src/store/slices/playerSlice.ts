@@ -1,66 +1,61 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit";
+import { createSlice } from "@reduxjs/toolkit";
 
-interface Track {
-  id: string;
-  title: string;
-  artist: string;
-  img: string;
-  audioUrl: string;
-}
-
-interface PlayerState {
-  currentTrack: Track | null;
-  isPlaying: boolean;
-  volume: number;
-  progress: number;
-  duration: number;
-}
-
-const initialState: PlayerState = {
-  currentTrack: null,
+const initialState = {
+  tracks: [],
+  index: 0,
   isPlaying: false,
   volume: 1,
-  progress: 0,
-  duration: 0,
+  shuffle: false,
+  loop: "none", // 'none' | 'one' | 'all'
 };
 
 const playerSlice = createSlice({
   name: "player",
   initialState,
   reducers: {
-    setTrack: (state, action: PayloadAction<Track>) => {
-      state.currentTrack = action.payload;
-      state.progress = 0;
-      state.duration = 0;
+    play: (state) => {
       state.isPlaying = true;
     },
-    togglePlay: (state) => {
-      state.isPlaying = !state.isPlaying;
+    pause: (state) => {
+      state.isPlaying = false;
     },
-    setIsPlaying: (state, action: PayloadAction<boolean>) => {
-      state.isPlaying = action.payload;
+    setTrack: (state, action) => {
+      state.index = action.payload;
     },
-    setProgress: (state, action: PayloadAction<number>) => {
-      state.progress = action.payload;
+    next: (state) => {
+      if (state.shuffle) {
+        state.index = Math.floor(Math.random() * state.tracks.length);
+      } else {
+        state.index = (state.index + 1) % state.tracks.length;
+      }
     },
-    setDuration: (state, action: PayloadAction<number>) => {
-      state.duration = action.payload;
+    prev: (state) => {
+      state.index =
+        (state.index - 1 + state.tracks.length) % state.tracks.length;
     },
-    setVolume: (state, action: PayloadAction<number>) => {
+    setVolume: (state, action) => {
       state.volume = action.payload;
     },
-    clearPlayer: () => initialState,
+    toggleShuffle: (state) => {
+      state.shuffle = !state.shuffle;
+    },
+    cycleLoop: (state) => {
+      if (state.loop === "none") state.loop = "all";
+      else if (state.loop === "all") state.loop = "one";
+      else state.loop = "none";
+    },
   },
 });
 
 export const {
+  play,
+  pause,
+  next,
+  prev,
   setTrack,
-  togglePlay,
-  setIsPlaying,
-  setProgress,
-  setDuration,
   setVolume,
-  clearPlayer,
+  toggleShuffle,
+  cycleLoop,
 } = playerSlice.actions;
 
 export default playerSlice.reducer;
