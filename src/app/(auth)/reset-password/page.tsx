@@ -2,7 +2,7 @@
 
 import Image from "next/image";
 import Link from "next/link";
-import { Suspense, useEffect, useState } from "react";
+import { Suspense, useState } from "react";
 import { useResetPassword } from "@/hooks/useAuth";
 import { useAppDispatch } from "@/store/hooks"
 import { clearAuth } from "@/store/slices/authSlice"
@@ -69,19 +69,11 @@ function ResetPasswordForm() {
     }
   }
 
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, []);
-
   return (
-    <main className="h-dvh overflow-hidden bg-[#f2f2f2] text-[#333] flex flex-col">
-      <header className="h-13 bg-chinese-black">
+    <main className="min-h-dvh bg-[#f2f2f2] text-[#333] flex flex-col">
+      <header className="min-h-13 bg-chinese-black px-4 sm:px-0">
         <div className="mx-auto flex h-full w-full max-w-7xl items-center">
-          <div className="flex h-full w-60 items-center bg-chinese-black px-5">
+          <div className="flex h-full w-full max-w-60 items-center bg-chinese-black px-2 sm:px-5">
             <Image
               src="/app-logo/beatza.png"
               alt="BeatZa logo"
@@ -97,7 +89,7 @@ function ResetPasswordForm() {
         </div>
       </header>
 
-      <section className="mx-auto flex w-full max-w-7xl flex-1 items-center justify-center px-4 py-3">
+      <section className="mx-auto flex w-full max-w-7xl flex-1 items-center justify-center px-4 py-5 sm:py-7">
         <div className="w-full max-w-2xl border border-[#d7d7d7] bg-[#f5f5f5] px-5 pb-6 pt-8 shadow-[0_0_0_1px_rgba(255,255,255,0.3)_inset] sm:px-10 sm:pb-8 sm:pt-10">
           
           {isSuccess ? (
@@ -232,7 +224,7 @@ function ResetPasswordForm() {
 
 export default function ResetPasswordPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="min-h-dvh bg-[#f2f2f2]" />}>
       <ResetPasswordForm />
     </Suspense>
   );

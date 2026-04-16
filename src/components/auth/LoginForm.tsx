@@ -35,6 +35,8 @@ export default function LoginForm({
 }: {
   onAuthSuccess?: () => void;
 } = {}) {
+  const [isClientReady, setIsClientReady] = useState(false);
+  const isCaptchaEnabled = isClientReady;
   const [step, setStep] = useState<Step>("email");
   const [validationSource, setValidationSource] = useState<"signup" | "reset-password">("signup");
   const [registerError, setRegisterError] = useState<string | null>(null);
@@ -42,6 +44,12 @@ export default function LoginForm({
   const [password, setPassword] = useState("");
   const [showPassword, setShowPassword] = useState(false);
   const [loginSuccess, setLoginSuccess] = useState(false);
+  const [captchaToken, setCaptchaToken] = useState<string | null>(null);
+  const [captchaError, setCaptchaError] = useState("");
+  const [captchaCode, setCaptchaCode] = useState("");
+  const [captchaInput, setCaptchaInput] = useState("");
+  const [isCaptchaReady, setIsCaptchaReady] = useState(false);
+  const captchaCanvasRef = useRef<HTMLCanvasElement | null>(null);
 
   // Controls UI layout (back button, compact header, hide social buttons) — sticky, never resets on blur
   const [isEmailEverFocused, setIsEmailEverFocused] = useState(false);
@@ -61,6 +69,10 @@ export default function LoginForm({
     stepRef.current = step;
   }, [step]);
 
+  useEffect(() => {
+    setIsClientReady(true);
+  }, []);
+
   // mobile browsers to fire blur/re-render cycles that stale-close handleSubmit
   const passwordRef = useRef<HTMLInputElement>(null);
   useEffect(() => {
@@ -69,6 +81,76 @@ export default function LoginForm({
       return () => clearTimeout(timer);
     }
   }, [step]);
+
+  const generateClientCaptcha = useCallback(() => {
+    const charset = "ABCDEFGHJKLMNPQRSTUVWXYZ23456789";
+    const length = 6;
+    let nextCode = "";
+
+    for (let i = 0; i < length; i += 1) {
+      nextCode += charset[Math.floor(Math.random() * charset.length)];
+    }
+
+    setCaptchaCode(nextCode);
+    setCaptchaInput("");
+    setCaptchaToken(null);
+    setCaptchaError("");
+    setIsCaptchaReady(true);
+  }, []);
+
+  useEffect(() => {
+    if (!captchaCode || !captchaCanvasRef.current) return;
+
+    const canvas = captchaCanvasRef.current;
+    const context = canvas.getContext("2d");
+    if (!context) return;
+
+    context.clearRect(0, 0, canvas.width, canvas.height);
+
+    context.fillStyle = "#111111";
+    context.fillRect(0, 0, canvas.width, canvas.height);
+
+    for (let i = 0; i < 6; i += 1) {
+      context.strokeStyle = `rgba(220,220,220,${0.2 + Math.random() * 0.25})`;
+      context.lineWidth = 1 + Math.random() * 1.6;
+      context.beginPath();
+      context.moveTo(Math.random() * canvas.width, Math.random() * canvas.height);
+      context.lineTo(Math.random() * canvas.width, Math.random() * canvas.height);
+      context.stroke();
+    }
+
+    for (let i = 0; i < 70; i += 1) {
+      context.fillStyle = `rgba(230,230,230,${0.08 + Math.random() * 0.25})`;
+      const x = Math.random() * canvas.width;
+      const y = Math.random() * canvas.height;
+      context.fillRect(x, y, 1.4, 1.4);
+    }
+
+    context.textBaseline = "middle";
+    context.textAlign = "center";
+
+    const startX = 28;
+    const charGap = 22;
+
+    captchaCode.split("").forEach((char, index) => {
+      const x = startX + index * charGap + (Math.random() * 4 - 2);
+      const y = canvas.height / 2 + (Math.random() * 10 - 5);
+      const rotation = (Math.random() * 0.6 - 0.3);
+
+      context.save();
+      context.translate(x, y);
+      context.rotate(rotation);
+      context.font = `${700 + Math.floor(Math.random() * 200)} 24px monospace`;
+      context.fillStyle = `rgba(255,255,255,${0.75 + Math.random() * 0.25})`;
+      context.fillText(char, 0, 0);
+      context.restore();
+    });
+  }, [captchaCode]);
+
+  useEffect(() => {
+    if (!isCaptchaEnabled || step !== "password" || !userExists) return;
+    generateClientCaptcha();
+  }, [isCaptchaEnabled, step, userExists, generateClientCaptcha]);
 
   const passwordSchema = z
     .string()
@@ -189,6 +271,17 @@ export default function LoginForm({
 
   const handleContinueFromPassword = useCallback(async () => {
     if (userExists) {
+      if (isCaptchaEnabled) {
+        const normalizedInput = captchaInput.trim().toUpperCase();
+        if (!normalizedInput || normalizedInput !== captchaCode) {
+          setCaptchaToken(null);
+          setCaptchaError("Please complete CAPTCHA correctly before continuing.");
+          return;
+        }
+
+        setCaptchaToken("client-captcha-ok");
+      }
+
       setIsUnverified(false)
       const res = await login(email, password);
       if (res?.message === "Authenticated successfully") {
@@ -202,7 +295,17 @@ export default function LoginForm({
       setRegisterError(null);
       setStep("register-details");
     }
-  }, [userExists, email, password, login, onAuthSuccess, navigateToPostAuth]);
+  }, [
+    userExists,
+    isCaptchaEnabled,
+    captchaInput,
+    captchaCode,
+    email,
+    password,
+    login,
+    onAuthSuccess,
+    navigateToPostAuth,
+  ]);
 
   const handleBackToEmail = useCallback(() => {
     setStep("email");
@@ -214,6 +317,11 @@ export default function LoginForm({
     setRegisterError(null);
     setGoogleCode("");
     setGoogleError(null);
+    setCaptchaToken(null);
+    setCaptchaError("");
+    setCaptchaInput("");
+    setCaptchaCode("");
+    setIsCaptchaReady(false);
   }, []);
 
   const handleBackToLogin = useCallback(() => {
@@ -227,6 +335,11 @@ export default function LoginForm({
     setEmail("");
     setGoogleCode("");
     setGoogleError(null);
+    setCaptchaToken(null);
+    setCaptchaError("");
+    setCaptchaInput("");
+    setCaptchaCode("");
+    setIsCaptchaReady(false);
   }, []);
 
   const handleGoogleComplete = useCallback(
@@ -419,31 +532,31 @@ export default function LoginForm({
 
   return (
     <div data-testid="Login-Form" className="w-full text-white-smoke transition-all duration-300">
-      <div className="relative flex items-center mb-6">
+      <div className="mb-6 flex items-center gap-2">
         {(isEmailEverFocused || isPasswordStep) && (
           <button
             data-testid="back-to-login-button-login"
             onClick={handleBackToEmail}
-            className="p-2 -ml-2 bg-back rounded-full cursor-pointer z-10"
+            className="shrink-0 rounded-full bg-back p-2 cursor-pointer"
           >
             <IoChevronBack size={26} />
           </button>
         )}
 
         {!isEmailEverFocused && !isPasswordStep && (
-          <h1 className="text-[28px] font-bold leading-tight">
+          <h1 className="text-[24px] font-bold leading-tight sm:text-[28px]">
             Sign in or create an account
           </h1>
         )}
 
         {isEmailEverFocused && !isPasswordStep && (
-          <h1 className="absolute pl-20 p-12 text-[18px] font-semibold pointer-events-none">
+          <h1 className="text-[18px] font-semibold leading-tight pl-7">
             Sign in or create an account
           </h1>
         )}
 
         {isPasswordStep && (
-          <h1 className="absolute pl-30 p-12 text-[18px] font-semibold pointer-events-none">
+          <h1 className="text-[18px] font-semibold leading-tight pl-18">
             {userExists ? "Welcome back!" : "Create an account"}
           </h1>
         )}
@@ -574,6 +687,86 @@ export default function LoginForm({
 
         {isPasswordStep && !userExists && passwordError && (
           <p className="text-red-500 text-xs">{passwordError}</p>
+        )}
+
+        {isPasswordStep && userExists && (
+          <div className="rounded border border-white/20 bg-chinese-black p-3">
+            <p className="text-[11px] font-semibold tracking-wide text-gray-400">CAPTCHA verification</p>
+
+            {isCaptchaEnabled ? (
+              <div className="mt-2 overflow-x-auto" data-testid="captcha-image">
+                <div
+                  className={`origin-top transform-gpu transition-all duration-500 ease-out ${
+                    isCaptchaReady
+                      ? "translate-y-0 scale-100 opacity-100"
+                      : "translate-y-1.5 scale-[0.985] opacity-0"
+                  }`}
+                >
+                  <div className="flex items-center gap-3 rounded border border-white/20 bg-black/20 p-2">
+                    <canvas
+                      ref={captchaCanvasRef}
+                      width={180}
+                      height={56}
+                      className="h-14 w-45 rounded border border-white/20 bg-black"
+                      data-testid="client-captcha-canvas"
+                    />
+                    <button
+                      type="button"
+                      onClick={generateClientCaptcha}
+                      className="text-xs font-medium text-[#699FFF] hover:underline cursor-pointer"
+                    >
+                      Refresh
+                    </button>
+                  </div>
+                  {process.env.NODE_ENV === "test" && (
+                    <p data-testid="client-captcha-code" className="sr-only">
+                      {captchaCode}
+                    </p>
+                  )}
+                  <input
+                    data-testid="client-captcha-input"
+                    type="text"
+                    inputMode="text"
+                    autoCapitalize="characters"
+                    value={captchaInput}
+                    onChange={(e) => {
+                      setCaptchaInput(e.target.value.toUpperCase().replace(/[^A-Z0-9]/g, ""));
+                      if (captchaError) setCaptchaError("");
+                    }}
+                    placeholder="Type code"
+                    className="mt-2 w-full rounded border border-white/20 bg-transparent px-3 py-2 text-sm text-white-smoke outline-none focus:border-white/50"
+                  />
+                </div>
+
+                {!isCaptchaReady && !captchaError ? (
+                  <div className="mt-2 flex items-center gap-2 text-xs text-white-smoke/80 animate-in fade-in duration-300">
+                    <span className="inline-block h-2.5 w-2.5 rounded-full bg-white-smoke/70 animate-pulse" />
+                    <span className="tracking-wide">Loading CAPTCHA...</span>
+                  </div>
+                ) : null}
+              </div>
+            ) : (
+              <p className="mt-2 text-xs text-yellow-300">CAPTCHA is available after the page finishes loading.</p>
+            )}
+
+            {captchaError && (
+              <div className="mt-2 space-y-2">
+                <p className="text-xs text-red-500">{captchaError}</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    setCaptchaToken(null);
+                    setCaptchaError("");
+                    setIsCaptchaReady(false);
+                    generateClientCaptcha();
+                  }}
+                  className="text-xs font-medium text-[#699FFF] hover:underline cursor-pointer"
+                >
+                  Retry CAPTCHA
+                </button>
+              </div>
+            )}
+          </div>
         )}
 
         <button
