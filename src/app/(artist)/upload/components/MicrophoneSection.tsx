@@ -95,10 +95,10 @@ export function MicrophoneSection({
           setMicOpen(!micOpen);
           if (!micOpen) getMicrophones();
         }}
-        className="flex w-full items-center justify-between gap-3 px-5 py-4 cursor-pointer"
+        className="flex w-full flex-wrap items-start justify-between gap-3 px-4 py-4 sm:items-center sm:px-5 cursor-pointer"
       >
         {/* Left: mic icon + dropdown */}
-        <div className="relative" ref={micDropdownRef}>
+        <div className="relative order-1" ref={micDropdownRef}>
           <div
             role="button"
             tabIndex={0}
@@ -133,7 +133,7 @@ export function MicrophoneSection({
           </div>
 
           {micDropdownOpen && (
-            <div className="absolute left-0 top-full mt-2 w-80 rounded-md border border-[#3f4047] bg-[#1b1c20] py-2 shadow-xl z-50">
+            <div className="absolute left-0 top-full z-50 mt-2 w-[min(20rem,calc(100vw-2.5rem))] rounded-md border border-[#3f4047] bg-[#1b1c20] py-2 shadow-xl">
               {microphones.length === 0 ? (
                 <div className="px-4 py-2 text-[13px] text-[#888]">
                   No microphones found
@@ -176,8 +176,8 @@ export function MicrophoneSection({
         </div>
 
         {/* Center text */}
-        <div className="text-center flex-1">
-          <p className="text-[18px] font-extrabold tracking-[-0.02em] text-[#f5f5f5]">
+        <div className="order-3 w-full text-left sm:order-2 sm:flex-1 sm:text-center">
+          <p className="text-[16px] font-extrabold tracking-[-0.02em] text-[#f5f5f5] sm:text-[18px]">
             Or record with a microphone
           </p>
           <p className="mt-1 text-[13px] text-[#ececef]">
@@ -203,7 +203,7 @@ export function MicrophoneSection({
               if (!micOpen) getMicrophones();
             }
           }}
-          className="flex items-center justify-center text-[14px] text-[#d0d0d4] hover:text-[#f2f2f2] transition-all duration-200 cursor-pointer focus:outline-none rounded"
+          className="order-2 ml-auto flex items-center justify-center rounded text-[14px] text-[#d0d0d4] transition-all duration-200 hover:text-[#f2f2f2] focus:outline-none sm:order-3 sm:ml-0 cursor-pointer"
           aria-label={
             micOpen ? "Collapse recording options" : "Expand recording options"
           }
@@ -228,10 +228,10 @@ export function MicrophoneSection({
           )}
 
           {/* Toolbar */}
-          <div className="px-5 py-4">
-            <div className="relative flex items-center justify-between">
+          <div className="px-4 py-4 sm:px-5">
+            <div className="relative flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               {/* Left Icons */}
-              <div className="flex items-center gap-1">
+              <div className="flex items-center justify-center gap-1 sm:justify-start">
                 {isPreviewMode ? (
                   /* Preview mode: back arrow + play + delete */
                   <>
@@ -366,7 +366,7 @@ export function MicrophoneSection({
               </div>
 
               {/* Center Button */}
-              <div className="absolute left-1/2 -translate-x-1/2 flex items-center justify-center">
+              <div className="flex items-center justify-center sm:absolute sm:left-1/2 sm:-translate-x-1/2">
                 {isPreviewMode ? (
                   <button
                     onClick={handleUpload}
@@ -414,7 +414,7 @@ export function MicrophoneSection({
               </div>
 
               {/* Right - Timer */}
-              <div className="flex items-center min-w-12 justify-end">
+              <div className="flex min-w-12 items-center justify-center sm:justify-end">
                 <span className="font-mono text-[13px] font-semibold text-[#f2f2f2]">
                   {formattedRecordingTime}
                 </span>
