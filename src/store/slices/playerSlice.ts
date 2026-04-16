@@ -1,45 +1,101 @@
-import { createSlice } from "@reduxjs/toolkit";
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-const initialState = {
+export type Track = {
+  id: string;
+  url: string;
+  title?: string;
+  artist?: string;
+  img?: string;
+};
+
+type PlayerState = {
+  tracks: Track[];
+  currentTrackId: string | null;
+  currentTrackUrl: string | null;
+  isPlaying: boolean;
+  volume: number;
+  shuffle: boolean;
+  loop: "none" | "one" | "all";
+};
+
+const initialState: PlayerState = {
   tracks: [],
-  index: 0,
+  currentTrackId: null,
+  currentTrackUrl: null,
   isPlaying: false,
   volume: 1,
   shuffle: false,
-  loop: "none", // 'none' | 'one' | 'all'
+  loop: "none",
 };
 
 const playerSlice = createSlice({
   name: "player",
   initialState,
   reducers: {
-    play: (state) => {
+    setTracks(state, action: PayloadAction<Track[]>) {
+      state.tracks = action.payload;
+    },
+
+    setTrack(state, action: PayloadAction<string>) {
+      state.currentTrackId = action.payload;
+    },
+
+    setTrackWithUrl(state, action: PayloadAction<{ id: string; url: string }>) {
+      state.currentTrackId = action.payload.id;
+      state.currentTrackUrl = action.payload.url;
+    },
+
+    play(state) {
       state.isPlaying = true;
     },
-    pause: (state) => {
+
+    pause(state) {
       state.isPlaying = false;
     },
-    setTrack: (state, action) => {
-      state.index = action.payload;
+
+    togglePlay(state) {
+      state.isPlaying = !state.isPlaying;
     },
-    next: (state) => {
+
+    next(state) {
+      if (!state.tracks.length) return;
+
+      const currentIndex = state.tracks.findIndex(
+        (t) => t.id === state.currentTrackId,
+      );
+
       if (state.shuffle) {
-        state.index = Math.floor(Math.random() * state.tracks.length);
-      } else {
-        state.index = (state.index + 1) % state.tracks.length;
+        state.currentTrackId =
+          state.tracks[Math.floor(Math.random() * state.tracks.length)].id;
+        return;
       }
+
+      const nextIndex = (currentIndex + 1) % state.tracks.length;
+      state.currentTrackId = state.tracks[nextIndex].id;
     },
-    prev: (state) => {
-      state.index =
-        (state.index - 1 + state.tracks.length) % state.tracks.length;
+
+    prev(state) {
+      if (!state.tracks.length) return;
+
+      const currentIndex = state.tracks.findIndex(
+        (t) => t.id === state.currentTrackId,
+      );
+
+      const prevIndex =
+        (currentIndex - 1 + state.tracks.length) % state.tracks.length;
+
+      state.currentTrackId = state.tracks[prevIndex].id;
     },
-    setVolume: (state, action) => {
+
+    setVolume(state, action: PayloadAction<number>) {
       state.volume = action.payload;
     },
-    toggleShuffle: (state) => {
+
+    toggleShuffle(state) {
       state.shuffle = !state.shuffle;
     },
-    cycleLoop: (state) => {
+
+    cycleLoop(state) {
       if (state.loop === "none") state.loop = "all";
       else if (state.loop === "all") state.loop = "one";
       else state.loop = "none";
@@ -48,11 +104,14 @@ const playerSlice = createSlice({
 });
 
 export const {
+  setTracks,
+  setTrack,
+  setTrackWithUrl,
   play,
   pause,
+  togglePlay,
   next,
   prev,
-  setTrack,
   setVolume,
   toggleShuffle,
   cycleLoop,
