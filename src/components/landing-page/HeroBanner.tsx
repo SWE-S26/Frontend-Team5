@@ -48,7 +48,7 @@ export default function HeroBanner() {
   }, [])
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden h-[420px] sm:h-111.5">
+    <div className="relative w-full rounded-2xl overflow-hidden h-105 sm:h-111.5">
 
       {/* sliding track */}
       <div
