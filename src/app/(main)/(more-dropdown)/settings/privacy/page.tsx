@@ -57,7 +57,7 @@ export default function Privacy() {
   };
 
   return (
-    <div className="max-w-3xl text-white-smoke mb-10">
+    <div className="w-full max-w-3xl text-white-smoke mb-10">
 
       {/* Privacy settings */}
       <div className="flex items-center justify-between mb-6">

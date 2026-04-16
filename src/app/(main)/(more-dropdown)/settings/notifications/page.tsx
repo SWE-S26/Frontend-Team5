@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { Select } from "antd";
+import { Check } from "lucide-react";
 import Button from "@/components/ui/Button";
 import InfoPopover from "@/components/settings/InfoPopover"
 import CB from "@/components/settings/CB"
@@ -46,7 +47,7 @@ const DROPDOWN_OPTIONS = [
 const INFO_TEXT =
   "If you have disabled 'Receive messages from anyone' in your privacy settings, you will only ever receive messages and notifications from people you follow.";
 
-const CELL = "w-[52px]";
+const CELL = "w-[44px] sm:w-[52px]";
 
 const UI_KEY_TO_API_KEY: Record<string, keyof NotificationSettings> = {
   newFollower:    "newFollower",
@@ -108,8 +109,6 @@ const sectionStateToPatchPayload = (
     })
   );
 
-// ─── Header checked helper ────────────────────────────────────────────────────
-
 const headerChecked = (
   rows: typeof ACTIVITY_ROWS,
   state: SectionState,
@@ -129,7 +128,6 @@ export default function Notifications() {
   const [activities, setActivities] = useState<SectionState | null>(null);
   const [beatza, setBeatza]         = useState<SectionState | null>(null);
 
-  // Snapshot of what was last fetched from the API — used for Cancel rollback
   const [savedActivities, setSavedActivities] = useState<SectionState | null>(null);
   const [savedBeatza, setSavedBeatza]         = useState<SectionState | null>(null);
 
@@ -146,8 +144,6 @@ export default function Notifications() {
   const isDirty =
     JSON.stringify(activities) !== JSON.stringify(savedActivities) ||
     JSON.stringify(beatza)     !== JSON.stringify(savedBeatza);
-
-  // ── Handlers ────────────────────────────────────────────────────────────────
 
   const update = (
     setter: typeof setActivities,
@@ -190,8 +186,6 @@ export default function Notifications() {
     };
 
     updateSettings(payload);
-
-    // Update snapshot so isDirty resets after save
     setSavedActivities(activities);
     setSavedBeatza(beatza);
   };
@@ -201,8 +195,6 @@ export default function Notifications() {
     setBeatza(savedBeatza);
   };
 
-  // ── Render section ───────────────────────────────────────────────────────────
-
   const renderSection = (
     title: string,
     rows: typeof ACTIVITY_ROWS,
@@ -210,10 +202,11 @@ export default function Notifications() {
     setter: typeof setActivities
   ) => (
     <div>
+      {/* Header */}
       <div className="flex items-center mb-2">
-        <span className="flex-1 text-base font-bold text-white-smoke">{title}</span>
+        <span className="flex-1 text-sm sm:text-base font-bold text-white-smoke">{title}</span>
 
-        <div className="flex items-center gap-2 mr-6">
+        <div className="flex items-center gap-1 sm:gap-2 mr-3 sm:mr-6">
           <div className={`${CELL} flex justify-center`}>
             <CB
               checked={headerChecked(rows, state, "email")}
@@ -223,7 +216,7 @@ export default function Notifications() {
           <span className="text-xs font-bold text-white-smoke">Email</span>
         </div>
 
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1 sm:gap-2">
           <div className={`${CELL} flex justify-center`}>
             <CB
               checked={headerChecked(rows, state, "devices")}
@@ -234,16 +227,17 @@ export default function Notifications() {
         </div>
       </div>
 
+      {/* Rows */}
       {rows.map((row) => {
         const devicesVal = state[row.key].devices;
         return (
           <div key={row.key} className="flex items-center py-3 font-bold">
-            <span className="flex-1 text-sm text-white-smoke flex items-center">
-              {row.label}
-              {row.hasInfo && <InfoPopover text={INFO_TEXT} className="w-90"/>}
+            <span className="flex-1 text-xs sm:text-sm text-white-smoke flex items-center min-w-0 pr-2">
+              <span className="truncate sm:whitespace-normal">{row.label}</span>
+              {row.hasInfo && <InfoPopover text={INFO_TEXT} className="w-72 sm:w-90" />}
             </span>
 
-            <div className="flex items-center gap-2 mr-6">
+            <div className="flex items-center gap-1 sm:gap-2 mr-3 sm:mr-6">
               <div className={`${CELL} flex justify-center`}>
                 <CB
                   checked={state[row.key].email}
@@ -253,7 +247,7 @@ export default function Notifications() {
               <span className="text-xs invisible select-none">Email</span>
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1 sm:gap-2">
               <div className={`${CELL} flex justify-center`}>
                 {row.dropdown ? (
                   <Select
@@ -261,7 +255,7 @@ export default function Notifications() {
                     onChange={(val) => update(setter, row.key, "devices", val)}
                     options={DROPDOWN_OPTIONS}
                     size="small"
-                    style={{ width: 110 }}
+                    style={{ width: 90 }}
                     classNames={{ popup: { root: "notif-dropdown-popup" } }}
                     className="notif-select"
                   />
@@ -281,31 +275,50 @@ export default function Notifications() {
   );
 
   if (loading || !activities || !beatza) {
-    return <div className="max-w-2xl text-white-smoke/40 text-sm">Loading...</div>;
+    return <div className="w-full px-4 sm:px-0 text-white-smoke/40 text-sm">Loading...</div>;
   }
 
   return (
-    <>
-      <div className="max-w-2xl text-white-smoke space-y-10 mb-10">
-        {renderSection("Activities",          ACTIVITY_ROWS, activities, setActivities)}
-        {renderSection("Updates from Beatza", BEATZA_ROWS,   beatza,     setBeatza)}
+    <div className="w-full max-w-2xl px-4 sm:px-0 text-white-smoke space-y-10 mb-10">
+      {renderSection("Activities",          ACTIVITY_ROWS, activities, setActivities)}
+      {renderSection("Updates from Beatza", BEATZA_ROWS,   beatza,     setBeatza)}
 
-        <div className="flex justify-end gap-3">
-          <Button
-            onClick={handleCancel}
-            className="text-white-smoke"
-          >
-            Cancel
-          </Button>
-          <Button
-            disabled={!isDirty || saveStatus === "saving"}
-            onClick={handleSave}
-            className="bg-white-smoke text-chinese-black disabled:opacity-40 disabled:cursor-not-allowed"
-          >
-            {saveStatus === "saving" ? "Saving..." : "Save changes"}
-          </Button>
-        </div>
+      <div className="flex items-center justify-end gap-3">
+        <span
+          className={`
+            flex items-center gap-1.5 text-sm text-white-smoke/60 mr-auto
+            transition-opacity duration-300
+            ${saveStatus === "idle" ? "opacity-0" : "opacity-100"}
+          `}
+        >
+          {saveStatus === "saving" && (
+            <>
+              <span className="w-3.5 h-3.5 rounded-full border-2 border-white-smoke/30 border-t-white-smoke/80 animate-spin inline-block" />
+              Saving...
+            </>
+          )}
+          {saveStatus === "saved" && (
+            <>
+              <Check size={14} strokeWidth={2.5} />
+              Changes saved
+            </>
+          )}
+          {saveStatus === "error" && (
+            <span className="text-red-400">Failed to save</span>
+          )}
+        </span>
+
+        <Button onClick={handleCancel} className="text-white-smoke">
+          Cancel
+        </Button>
+        <Button
+          disabled={!isDirty || saveStatus === "saving"}
+          onClick={handleSave}
+          className="bg-white-smoke text-chinese-black disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          {saveStatus === "saving" ? "Saving..." : "Save changes"}
+        </Button>
       </div>
-    </>
+    </div>
   );
 }

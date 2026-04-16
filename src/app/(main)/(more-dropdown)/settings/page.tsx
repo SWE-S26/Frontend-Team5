@@ -2,14 +2,13 @@
 
 import { useState, useEffect, useRef } from "react"
 import { Select } from "antd"
-import { Check } from "lucide-react"
 import ThemeSwitcher from "@/components/settings/theme/ThemeSwitcher"
 import Button from "@/components/ui/Button"
 import DeleteAccountModal from "@/components/settings/DeleteAccountModal"
 import InfoPopover from "@/components/settings/InfoPopover"
 import { useForgotPasswordLoggedIn } from "@/hooks/useAuth"
 import { useAccountSettings } from "@/hooks/useSettings"
-import { Gender, Theme  } from "@/types/settings.types"
+import { Gender, Theme } from "@/types/settings.types"
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
@@ -65,7 +64,6 @@ export default function Settings() {
   const [birthYear,  setBirthYear]  = useState<string>("")
   const [gender,     setGender]     = useState<string>("")
 
-  // Keep a ref of the latest date parts so onChange handlers always have current values
   const birthMonthRef = useRef(birthMonth)
   const birthDayRef   = useRef(birthDay)
   const birthYearRef  = useRef(birthYear)
@@ -74,21 +72,12 @@ export default function Settings() {
   useEffect(() => { birthDayRef.current   = birthDay   }, [birthDay])
   useEffect(() => { birthYearRef.current  = birthYear  }, [birthYear])
 
-  // Hydrate from API
+  // Hydrate date/gender — also keep localStorage in sync for ThemeProvider
   useEffect(() => {
     if (!settings) return
 
-    // sync theme from API to localStorage
-    const apiTheme = settings.theme.toLowerCase() // "Dark" → "dark"
-    localStorage.setItem("theme", apiTheme)
-    if (apiTheme === "automatic") {
-      const prefersDark = window.matchMedia("(prefers-color-scheme: dark)").matches
-      document.documentElement.setAttribute("data-theme", prefersDark ? "dark" : "light")
-    } else {
-      document.documentElement.setAttribute("data-theme", apiTheme)
-    }
+    localStorage.setItem("theme", settings.theme.toLowerCase())
 
-    // date/gender hydration
     const { month, day, year } = parseDateOfBirth(settings.dateOfBirth)
     setBirthMonth(month)
     setBirthDay(day)
@@ -106,7 +95,6 @@ export default function Settings() {
     }
   }
 
-  // Only fires PATCH if all three date parts are filled
   const handleDateChange = (month: string, day: string, year: string) => {
     if (!month || !day || !year) return
     updateSettings({ dateOfBirth: buildDateOfBirth(month, day, year) })
@@ -133,14 +121,14 @@ export default function Settings() {
   }
 
   return (
-    <div className="bg-chinese-black max-w-3xl">
+    <div className="bg-chinese-black w-full max-w-3xl">
 
-    <ThemeSwitcher
-      saveStatus={saveStatus}
-      onThemeChange={(val) =>
-        updateSettings({ theme: (val.charAt(0).toUpperCase() + val.slice(1)) as Theme })
-      }
-    />
+      <ThemeSwitcher
+        saveStatus={saveStatus}
+        onThemeChange={(val) =>
+          updateSettings({ theme: (val.charAt(0).toUpperCase() + val.slice(1)) as Theme })
+        }
+      />
 
       {/* Password */}
       <div className="my-5 font-bold">
@@ -164,19 +152,18 @@ export default function Settings() {
 
       {/* Basic information */}
       <div className="mb-8 font-bold">
-        <div className="flex items-center justify-between mb-5">
-          <h1>Basic information</h1>
-        </div>
+        <h1 className="mb-5">Basic information</h1>
 
         {loading ? (
           <p className="text-white-smoke/40 text-sm">Loading...</p>
         ) : (
-          <div className="flex items-start gap-16">
+          <div className="flex flex-col sm:flex-row items-start gap-6 sm:gap-16">
+
             {/* Birth date */}
-            <div>
+            <div className="w-full sm:w-auto">
               <label className="text-sm text-white-smoke flex items-center gap-1.5 mb-2">
                 Birth date
-                <InfoPopover text="The date of birth you provided at sign-up." className="w-79" />
+                <InfoPopover text="The date of birth you provided at sign-up." className="w-64" />
               </label>
               <div className="flex items-center gap-2">
                 <Select
@@ -184,7 +171,7 @@ export default function Settings() {
                   onChange={handleMonthChange}
                   options={MONTH_OPTIONS}
                   placeholder="January"
-                  style={{ width: 130 }}
+                  style={{ width: 120 }}
                   className="notif-select"
                   classNames={{ popup: { root: "notif-dropdown-popup" } }}
                 />
@@ -193,7 +180,7 @@ export default function Settings() {
                   onChange={handleDayChange}
                   options={DAYS}
                   placeholder="1"
-                  style={{ width: 80 }}
+                  style={{ width: 68 }}
                   className="notif-select"
                   classNames={{ popup: { root: "notif-dropdown-popup" } }}
                 />
@@ -202,7 +189,7 @@ export default function Settings() {
                   onChange={handleYearChange}
                   options={YEARS}
                   placeholder="1988"
-                  style={{ width: 95 }}
+                  style={{ width: 88 }}
                   className="notif-select"
                   classNames={{ popup: { root: "notif-dropdown-popup" } }}
                 />
@@ -210,7 +197,7 @@ export default function Settings() {
             </div>
 
             {/* Gender */}
-            <div>
+            <div className="w-full sm:w-auto">
               <label className="text-sm text-white-smoke flex items-center gap-1 mb-2">
                 Gender
                 <span className="text-red-500 ml-0.5">*</span>
@@ -225,6 +212,7 @@ export default function Settings() {
                 classNames={{ popup: { root: "notif-dropdown-popup" } }}
               />
             </div>
+
           </div>
         )}
       </div>
