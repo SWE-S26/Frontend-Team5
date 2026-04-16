@@ -701,7 +701,7 @@ export default function UploadPage() {
   // ── Main Upload view ──
   return (
     <div className="flex min-h-dvh flex-col overflow-x-hidden bg-chinese-black text-white-smoke antialiased">
-      <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+      <div className="pointer-events-none fixed bottom-4 left-4 right-4 z-50 flex flex-col gap-2 sm:left-auto sm:right-4 sm:w-auto">
         {toasts.map((toast) => (
           <div
             key={toast.id}
@@ -740,26 +740,26 @@ export default function UploadPage() {
         {/* Usage bar */}
         <div className="rounded-md border border-[#27272d] bg-[#212121] px-4 py-3">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="flex min-w-0 items-center gap-2">
+            <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
               <div className="flex h-12 w-5 items-center justify-center text-[10px] text-[#dadadd]">
                 <CloudUploadOutlined style={{ fontSize: '24px' }} />
               </div>
               <span className="text-[13px] font-semibold text-[#f1f1f1]">{Math.round(usagePercent)}% of uploads used</span>
-              <div className="relative h-1 flex-1 rounded-full bg-[#3f4047] md:min-w-48">
+              <div className="relative h-1 w-full rounded-full bg-[#3f4047] sm:flex-1 md:min-w-48">
                 <div className="absolute left-0 top-0 h-1 rounded-full bg-white transition-all duration-500" style={{ width: `${usagePercent}%` }} />
               </div>
-              <span className="whitespace-nowrap text-[13px] font-semibold text-[#f1f1f1]">
+              <span className="text-[13px] font-semibold text-[#f1f1f1] sm:whitespace-nowrap">
                 {totalMinutesUsed.toFixed(1)} of {TOTAL_MINUTES_LIMIT} minutes
               </span>
             </div>
-            <button className="w-fit rounded-full border border-silver/30 bg-chinese-black px-5 py-1.5 text-[13px] font-semibold text-white-smoke transition-colors hover:opacity-90 cursor-pointer" type="button">
+            <button className="w-full rounded-full border border-silver/30 bg-chinese-black px-5 py-1.5 text-[13px] font-semibold text-white-smoke transition-colors hover:opacity-90 cursor-pointer sm:w-fit" type="button">
               Get unlimited uploads
             </button>
           </div>
         </div>
 
         <section className="mt-8">
-          <h1 className="text-[28px] pb-2 font-black tracking-[-0.03em] text-white-smoke">Upload your audio files.</h1>
+          <h1 className="pb-2 text-[24px] font-black tracking-[-0.03em] text-white-smoke sm:text-[28px]">Upload your audio files.</h1>
           <p className="mt-2 pb-2 text-[14px] font-semibold leading-relaxed text-white-smoke/90">
             For best quality, use WAV, FLAC, AIFF, or ALAC. The maximum file size is 4GB uncompressed.
             <button type="button" className="ml-1 border-b border-silver pb-px text-[14px] font-semibold text-white-smoke cursor-pointer">Learn more.</button>
@@ -842,7 +842,7 @@ export default function UploadPage() {
 
       </div>
 
-      <footer className="fixed inset-x-0 bottom-0 z-40 h-15 border-t border-silver/15 bg-chinese-black/90 text-center text-[12px] text-white-smoke">
+      <footer className="fixed inset-x-0 bottom-0 z-40 min-h-15 border-t border-silver/15 bg-chinese-black/90 py-2 text-center text-[12px] text-white-smoke">
         <div className="mx-auto flex h-full w-full max-w-6xl items-center px-4 sm:px-8 lg:px-14">
           <div className="flex w-full flex-wrap items-center justify-center gap-x-2 gap-y-2">
             {footerLinks.map((label, index) => (
