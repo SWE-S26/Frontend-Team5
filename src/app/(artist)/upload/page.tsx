@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import UploadIconBlack from "../../../../public/upload-icon/upload-black.svg";
+import UploadIconWhite from "../../../../public/upload-icon/upload-white.svg";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useCallback, useEffect } from "react";
 import {
@@ -22,7 +24,6 @@ import {
   estimateMinutes,
   formatBytes,
 } from "@/types/upload.types";
-import { CustomUploadIcon } from "./components/CustomUploadIcon";
 import { MicrophoneSection } from "./components/MicrophoneSection";
 import { TrackInfoForm } from "./components/TrackInfoForm";
 import { useAppSelector } from "@/store/hooks";
@@ -291,6 +292,13 @@ export default function UploadPage() {
     }
   }
 
+  const hasAtLeastOneSupportedAudioFile = (files: File[]) => {
+    return files.some((file) => {
+      const ext = getExtension(file.name);
+      return ALLOWED_EXTENSIONS.includes(ext) || file.type.startsWith("audio/");
+    });
+  };
+
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault(); e.stopPropagation(); setIsDragging(true);
   }, []);
@@ -300,10 +308,20 @@ export default function UploadPage() {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault(); e.stopPropagation(); setIsDragging(false);
     const files = Array.from(e.dataTransfer.files);
-    if (files.length) processFiles(files, true);
+    if (!files.length) return;
+    if (!hasAtLeastOneSupportedAudioFile(files)) {
+      addToast("error", "Drop audio files only.");
+      return;
+    }
+    processFiles(files, true);
   }, []);
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
+    if (files.length && !hasAtLeastOneSupportedAudioFile(files)) {
+      addToast("error", "Choose audio files only.");
+      e.target.value = "";
+      return;
+    }
     if (files.length) processFiles(files, true);
     e.target.value = "";
   };
@@ -703,7 +721,8 @@ export default function UploadPage() {
               className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full transition-opacity hover:opacity-90 cursor-pointer"
               aria-label="Go to home"
             >
-              <Image src="/app-logo/whitelogo.png" alt="BeatZa" width={52} height={52} className="object-contain" priority />
+              <Image src="/app-logo/whitelogo.png" alt="BeatZa" width={52} height={52} className="object-contain logo-dark" priority />
+              <Image src="/app-logo/blacklogo.png" alt="BeatZa" width={52} height={52} className="object-contain logo-light" priority />
             </button>
             <span className="text-[16px] font-black tracking-[-0.03em]">Upload</span>
           </div>
@@ -764,16 +783,31 @@ export default function UploadPage() {
             className={`mt-6 rounded-md border border-dashed px-5 py-16 transition-colors hover:border-white-smoke sm:px-12 sm:py-20 cursor-pointer
               ${isDragging ? "border-white-smoke bg-chinese-black" : "border-[#3f4047] bg-chinese-black"}`}
           >
-            <div className="mx-auto flex max-w-sm flex-col items-center text-center">
+            <div onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()} className="mx-auto flex max-w-sm flex-col items-center text-center">
               <div className="mb-6">
-                <CustomUploadIcon />
+                <Image
+                  src={UploadIconWhite}
+                  alt="Upload icon"
+                  className="logo-dark"
+                  width={74}
+                  height={74}
+                />
+                <Image
+                  src={UploadIconBlack}
+                  alt="Upload icon"
+                  className="logo-light"
+                  width={74}
+                  height={74}
+                />
               </div>
-              <p className="text-[16px] font-bold text-[#f7f7f7]">
-                {isDragging ? "Drop files here." : "Drag and drop audio files to get started."}
+              <p className="text-[16px] font-bold text-white-smoke">
+                {isDragging ? "Drop audio files here." : "Drag and drop audio files to get started."}
               </p>
               <label
-                htmlFor="main-upload-audio-input"
-                className="mt-6 rounded-full bg-white px-7 py-2 text-[14px] font-semibold text-[#090909] transition-opacity hover:opacity-90 cursor-pointer"
+                className="mt-6 rounded-full bg-chinese-black px-7 py-2 text-[14px] font-semibold text-white-smoke transition-opacity hover:opacity-90 cursor-pointer"
               >
                 Choose files
               </label>
@@ -808,7 +842,7 @@ export default function UploadPage() {
 
       </div>
 
-      <footer className="fixed inset-x-0 bottom-0 z-40 h-15 border-t border-silver/15 bg-chinese-black/90 text-center text-[12px] text-[#b8b8be]">
+      <footer className="fixed inset-x-0 bottom-0 z-40 h-15 border-t border-silver/15 bg-chinese-black/90 text-center text-[12px] text-white-smoke">
         <div className="mx-auto flex h-full w-full max-w-6xl items-center px-4 sm:px-8 lg:px-14">
           <div className="flex w-full flex-wrap items-center justify-center gap-x-2 gap-y-2">
             {footerLinks.map((label, index) => (
