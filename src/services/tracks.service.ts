@@ -1,5 +1,5 @@
 import api from "@/lib/api";
-import { GetTracksResponse } from "@/types/tracks.types";
+import { GetPostedTracksResponse, GetTracksResponse } from "@/types/tracks.types";
 
 import {
 	CreateTrackRequest,
@@ -41,4 +41,6 @@ export const tracksService = {
 		api.get<GetTracksResponse>(
 			`/api/public/tracks/v1/?page=${page}&limit=${limit}`,
 		),
+	getPostedTracks: (userId: string) =>
+		api.get<GetPostedTracksResponse>(`/api/public/tracks/v1/posted/${userId}`),
 };

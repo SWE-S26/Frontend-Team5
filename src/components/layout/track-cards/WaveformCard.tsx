@@ -6,7 +6,7 @@ import SausageWaveform from "@/components/ui/SausageWaveform";
 import Tooltip from "@/components/ui/Tooltip";
 import MoreDropdown from "@/components/ui/MoreDropdown";
 
-import { useState, useRef, useEffect } from "react";
+import { useState, useRef } from "react";
 import { Avatar } from "antd";
 
 import { motion, AnimatePresence } from "framer-motion";
@@ -121,7 +121,7 @@ export default function WaveformCard({
     <div className="flex items-stretch">
       {/* left side */}
       <div className="h-full overflow-hidden -m-1 -mb-1.75">
-        <Card type="static" />
+        <Card type="static" img={img} />
       </div>
 
       {/* right side */}
@@ -139,8 +139,8 @@ export default function WaveformCard({
             )}
           </div>
           <div>
-            <p className="text-sm font-bold text-silver ml-3">Kanye West</p>
-            <p className="text-sm font-bold text-white-smoke ml-3">I wonder</p>
+            <p className="text-sm font-bold text-silver ml-3">{artist}</p>
+            <p className="text-sm font-bold text-white-smoke ml-3">{title}</p>
           </div>
         </div>
 
