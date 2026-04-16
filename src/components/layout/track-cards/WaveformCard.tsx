@@ -12,6 +12,7 @@ import { Avatar } from "antd";
 import { motion, AnimatePresence } from "framer-motion";
 
 import { useAppSelector } from "@/store/hooks";
+import { useAudioProgress } from "@/hooks/useAudioProgress";
 
 import { UserOutlined } from "@ant-design/icons";
 import { IoIosMore, IoMdPlay, IoMdPause } from "react-icons/io";
@@ -21,10 +22,34 @@ import { TbCopy } from "react-icons/tb";
 import { ListStart } from "lucide-react";
 import { RiPlayListAddLine } from "react-icons/ri";
 import { BiStation } from "react-icons/bi";
+import { RootState } from "@/store/store";
+import { useDispatch, useSelector } from "react-redux";
+import {
+  pause,
+  play,
+  setTrack,
+  setTrackWithUrl,
+} from "@/store/slices/playerSlice";
 
-export default function WaveformCard() {
+// https://OmarGamalS.publit.io/file/POWER.mp3
+
+type CardProps = {
+  img?: string;
+  title?: string;
+  artist?: string;
+  trackId?: string;
+  trackUrl?: string;
+};
+
+export default function WaveformCard({
+  img,
+  title,
+  artist,
+  trackId = "69e0ddf66edb30422ccc729f",
+  trackUrl = "https://OmarGamalS.publit.io/file/POWER.mp3",
+}: CardProps) {
   const [isLiked, setIsLiked] = useState(false);
-  const [isPlaying, setIsPlaying] = useState(false);
+  // const [isPlaying, setIsPlaying] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [canComment, setCanComment] = useState(false);
 
@@ -32,6 +57,15 @@ export default function WaveformCard() {
   const commentButtonRef = useRef<HTMLButtonElement>(null);
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
+  const { progress, seek } = useAudioProgress();
+
+  const dispatch = useDispatch();
+
+  const { currentTrackId, isPlaying } = useSelector(
+    (state: RootState) => state.player,
+  );
+
+  const isThisCardPlaying = currentTrackId === trackId && isPlaying;
 
   const handleInputChange = () => {
     if (!commentBoxRef.current || !commentButtonRef.current) return;
@@ -39,6 +73,49 @@ export default function WaveformCard() {
     const comment = commentBoxRef.current.value.trim();
     setCanComment(comment.length > 0);
   };
+
+  function handlePlayClick(e: React.MouseEvent) {
+    e.stopPropagation();
+
+    if (!trackId) return;
+
+    if (isThisCardPlaying) {
+      dispatch(pause());
+      return;
+    }
+
+    if (trackUrl) {
+      dispatch(setTrackWithUrl({ id: trackId, url: trackUrl }));
+    } else {
+      dispatch(setTrack(trackId));
+    }
+
+    setTimeout(() => {
+      dispatch(play());
+    }, 100);
+  }
+
+  function handleWaveformPlay(seekPercentage?: number) {
+    // Start playback when interacting with waveform
+    if (!trackId) return;
+
+    // If already playing this track, don't restart it
+    if (isThisCardPlaying) return;
+
+    if (trackUrl) {
+      dispatch(setTrackWithUrl({ id: trackId, url: trackUrl }));
+    } else {
+      dispatch(setTrack(trackId));
+    }
+
+    setTimeout(() => {
+      // Seek to the clicked/dragged position if provided
+      if (seekPercentage !== undefined) {
+        seek(seekPercentage);
+      }
+      dispatch(play());
+    }, 100);
+  }
 
   return (
     <div className="flex items-stretch">
@@ -53,9 +130,9 @@ export default function WaveformCard() {
         <div className="flex items-center mb-4">
           <div
             className="w-10 h-10 bg-white-smoke rounded-full flex items-center justify-center cursor-pointer"
-            onClick={() => setIsPlaying(!isPlaying)}
+            onClick={handlePlayClick}
           >
-            {!isPlaying ? (
+            {!isThisCardPlaying ? (
               <IoMdPlay className="text-chinese-black text-[23px] ml-1" />
             ) : (
               <IoMdPause className="text-chinese-black text-[23px]" />
@@ -72,7 +149,13 @@ export default function WaveformCard() {
           className="w-full max-w-[632px] h-[60px] shrink-0 cursor-pointer"
           onClick={() => setShowComments(true)}
         >
-          <SausageWaveform samplesUrl="/waveform.json" />
+          <SausageWaveform
+            samplesUrl="/waveform.json"
+            externalProgress={progress}
+            onSeek={seek}
+            onPlay={handleWaveformPlay}
+            isPlaying={isThisCardPlaying}
+          />
         </div>
 
         {/* comment box */}

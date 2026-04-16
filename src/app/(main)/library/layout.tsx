@@ -6,8 +6,10 @@ export default function LibraryLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname()
 
   return (
-    <div>
-      <TabsNavbar pathname={pathname} className="pb-4 text-xl"
+    <div className="px-4 sm:px-0">
+      <TabsNavbar
+        pathname={pathname}
+        className="pb-4 text-sm sm:text-xl overflow-x-auto tabs-scrollable"
         tabs={[
           { href: "/library",           label: "Overview"  },
           { href: "/library/likes",     label: "Likes"     },
@@ -20,7 +22,6 @@ export default function LibraryLayout({ children }: { children: React.ReactNode 
       />
 
       {children}
-
     </div>
   )
 }
