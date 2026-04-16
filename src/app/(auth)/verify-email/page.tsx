@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { Suspense } from "react";
+import { Suspense, useEffect } from "react";
 import { useSearchParams } from "next/navigation";
 import { useVerifyEmail } from "@/hooks/useAuth";
 import Button from "@/components/ui/Button";
