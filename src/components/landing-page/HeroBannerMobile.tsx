@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Button from "@/components/ui/Button"
 import AuthModal from "@/components/auth/AuthModal"
 
@@ -31,6 +32,7 @@ const slides = [
 ]
 
 export default function HeroBannerMobile() {
+  const router = useRouter()
   const [current, setCurrent] = useState(0)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [authRedirect, setAuthRedirect] = useState("/home")
@@ -107,7 +109,13 @@ export default function HeroBannerMobile() {
                   ? "bg-white-smoke text-chinese-black"
                   : "text-white-smoke border border-white-smoke/60"
               }`}
-              onClick={() => openAuth(btn.label === "Upload" ? "/upload" : "/home")}
+              onClick={() => {
+                if (btn.label === "Go+") {
+                  router.push("/goplus")
+                  return
+                }
+                openAuth(btn.label === "Upload" ? "/upload" : "/home")
+              }}
             >
               {btn.label}
             </Button>

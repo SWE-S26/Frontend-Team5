@@ -44,11 +44,11 @@ export default function Dropdown({
       {isOpen && (
         <div
           data-testid={testId}
-          className={`flex flex-col absolute ${width} ${position} mt-5 py-2 bg-chinese-black border border-silver rounded-sm`}
+          className={`flex flex-col absolute ${width} ${position} mt-5 py-2 bg-chinese-black border border-silver/40 rounded-sm`}
         >
           {items.map((item, index) =>
             item.type === "separator" ? (
-              <hr key={index} className="border-silver my-1" />
+              <hr key={index} className="border-silver/40 my-1" />
             ) : (
               <button
                 key={index}

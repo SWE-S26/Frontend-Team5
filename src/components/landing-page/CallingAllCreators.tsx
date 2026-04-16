@@ -1,8 +1,18 @@
+"use client"
+import { useState } from "react"
 import Image from "next/image";
-import Link from "next/link";
 import Button from "@/components/ui/Button";
+import AuthModal from "@/components/auth/AuthModal";
 
 export default function CallingAllCreators() {
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authRedirect, setAuthRedirect] = useState("/home")
+
+  const openAuth = (redirectTo: string) => {
+    setAuthRedirect(redirectTo)
+    setIsAuthModalOpen(true)
+  }
+
   return (
     <section className="w-full bg-black">
       <div className="max-w-6xl mx-auto px-6 flex flex-col sm:flex-row items-center justify-between py-14 sm:h-87 gap-8 sm:gap-0">
@@ -17,11 +27,11 @@ export default function CallingAllCreators() {
             Get on Beatza to connect with fans, share your sounds, and grow your audience. What are you waiting for?
           </p>
 
-          <Link href="/sign-up" className="pt-4 sm:pt-8 mx-auto sm:mx-0 w-fit">
-            <Button className="bg-white text-black">
+          <div className="pt-4 sm:pt-8 mx-auto sm:mx-0 w-fit">
+            <Button className="bg-white text-black" onClick={() => openAuth("/upload")}>
               Find out more
             </Button>
-          </Link>
+          </div>
         </div>
 
         {/* Right: image — hidden on mobile */}
@@ -33,8 +43,9 @@ export default function CallingAllCreators() {
             className="object-contain object-right"
           />
         </div>
-
       </div>
+
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} redirectTo={authRedirect} />
     </section>
   );
 }

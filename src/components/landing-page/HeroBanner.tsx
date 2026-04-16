@@ -1,5 +1,6 @@
 "use client"
 import { useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import Link from "next/link"
 import Button from "@/components/ui/Button"
 import AuthModal from "@/components/auth/AuthModal";
@@ -27,11 +28,12 @@ const slides = [
     title: "Ascending Artist",
     heading: ["Where every music", "scene lives."],
     description: "Discover 400 million songs, remixes and DJ sets: every chart-topping track you can find elsewhere, and millions more you can't find anywhere else.",
-    buttons: [{ label: "Upload", href: "/upload" }, { label: "Explore Go+", href: "/go" }],
+    buttons: [{ label: "Upload", href: "/upload" }, { label: "Explore Go+", href: "/goplus" }],
   },
 ]
 
 export default function HeroBanner() {
+  const router = useRouter()
   const [current, setCurrent] = useState(0)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const [authRedirect, setAuthRedirect] = useState("/home")
@@ -83,7 +85,13 @@ export default function HeroBanner() {
                     <Button
                       key={j}
                       className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[13px] sm:text-[17px] cursor-pointer ${j === 0 ? "bg-white-smoke text-chinese-black" : "text-white-smoke hover:text-white-smoke"}`}
-                      onClick={() => openAuth(btn.label === "Upload" ? "/upload" : "/home")}
+                      onClick={() => {
+                        if (btn.label === "Explore Go+") {
+                          router.push("/goplus")
+                          return
+                        }
+                        openAuth(btn.label === "Upload" ? "/upload" : "/home")
+                      }}
                     >
                       {btn.label}
                     </Button>
