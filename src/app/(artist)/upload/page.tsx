@@ -749,7 +749,7 @@ export default function UploadPage() {
                 <div className="absolute left-0 top-0 h-1 rounded-full bg-white transition-all duration-500" style={{ width: `${usagePercent}%` }} />
               </div>
               <span className="text-[13px] font-semibold text-[#f1f1f1] sm:whitespace-nowrap">
-                {totalMinutesUsed.toFixed(1)} of {TOTAL_MINUTES_LIMIT} minutes
+                {Math.round(totalMinutesUsed)} of {TOTAL_MINUTES_LIMIT} minutes
               </span>
             </div>
             <button className="w-full rounded-full border border-silver/30 bg-chinese-black px-5 py-1.5 text-[13px] font-semibold text-white-smoke transition-colors hover:opacity-90 cursor-pointer sm:w-fit" type="button">
