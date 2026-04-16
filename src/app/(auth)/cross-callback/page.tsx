@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, Suspense } from "react";
+import { useMemo, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 
@@ -57,14 +57,6 @@ function CrossPlatformCallbackContent() {
       displayName,
     };
   }, [searchParams]);
-
-  useEffect(() => {
-    const previousOverflow = document.body.style.overflow;
-    document.body.style.overflow = "hidden";
-    return () => {
-      document.body.style.overflow = previousOverflow;
-    };
-  }, []);
 
   useEffect(() => {
     const postToReceivers = (payload: BridgePayload) => {
@@ -181,10 +173,10 @@ function CrossPlatformCallbackContent() {
 
 export default function CrossPlatformCallbackPage() {
   return (
-    <main className="flex h-dvh flex-col overflow-hidden bg-chinese-black text-white-smoke">
-      <header className="h-13 bg-chinese-black">
+    <main className="flex min-h-dvh flex-col bg-chinese-black text-white-smoke">
+      <header className="min-h-13 bg-chinese-black px-4 sm:px-0">
         <div className="mx-auto flex h-full w-full max-w-7xl items-center">
-          <div className="flex h-full w-60 items-center bg-chinese-black px-5">
+          <div className="flex h-full w-full max-w-60 items-center bg-chinese-black px-2 sm:px-5">
             <img
               src="/app-logo/beatza.png"
               alt="BeatZa logo"

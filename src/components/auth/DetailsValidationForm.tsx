@@ -10,8 +10,8 @@ export default function DetailsValidationForm({
   onSendAgain,
 }: DetailsValidationFormProps) {
   return (
-    <div data-testid="Details-Validation-Form" className="w-full text-white-smoke flex flex-col items-center text-center">
-      <h1 className="text-[28px] font-bold leading-tight mb-4">
+    <div data-testid="Details-Validation-Form" className="w-full text-white-smoke flex flex-col items-center text-center px-1 sm:px-0">
+      <h1 className="mb-4 text-[24px] font-bold leading-tight sm:text-[28px]">
         Check your inbox!
       </h1>
 
@@ -30,14 +30,14 @@ export default function DetailsValidationForm({
 
       {/* Paper plane illustration */}
       <div
-        className="mb-8 w-56 h-56 flex items-center justify-center relative overflow-hidden"
+        className="relative mb-8 flex h-40 w-40 items-center justify-center overflow-hidden sm:h-56 sm:w-56"
         style={{
           backgroundImage:
             "linear-gradient(color-mix(in srgb, var(--fg) 15%, transparent) 1px, transparent 1px), linear-gradient(90deg, color-mix(in srgb, var(--fg) 15%, transparent) 1px, transparent 1px)",
           backgroundSize: "10% 10%",
         }}
       >
-        <SiMinutemailer size={200} className="relative scale-x-[-1] text-white-smoke" />
+        <SiMinutemailer className="relative scale-x-[-1] text-[160px] text-white-smoke sm:text-[200px]" />
       </div>
 
       {/* Open Gmail button */}

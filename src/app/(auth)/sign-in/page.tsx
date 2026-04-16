@@ -46,8 +46,8 @@ function SignInContent() {
   }, [searchParams, router]);
 
   return (
-    <div>
-      <div className="flex mt-40 mx-auto max-w-110">
+    <div className="min-h-dvh px-4 pt-20 pb-8 sm:px-6 sm:pt-28">
+      <div className="mx-auto flex w-full max-w-110">
         <LoginForm />
       </div>
     </div>
@@ -56,7 +56,7 @@ function SignInContent() {
 
 export default function SignIn() {
   return (
-    <Suspense fallback={<div className="mt-40" />}>
+    <Suspense fallback={<div className="min-h-dvh px-4 pt-20 sm:px-6 sm:pt-28" />}>
       <SignInContent />
     </Suspense>
   );

@@ -50,15 +50,15 @@ export default function RegisterDetailsForm({
 
   return (
     <div data-testid="Register-Details-Form" className="w-full text-white-smoke transition-all duration-300">
-      <div className="relative flex items-center mb-6">
+      <div className="mb-6 flex items-center gap-2">
         <button data-testid="back-to-login-button-details"
           onClick={onBack}
-          className="mb-4 -ml-2 p-2 bg-[#303030] rounded-full transition-colors cursor-pointer"
+          className="shrink-0 rounded-full bg-[#303030] p-2 transition-colors cursor-pointer"
         >
           <IoChevronBack size={26} />
         </button>
 
-        <h1 className="text-[24px] ml-6 mt-3 font-semibold leading-tight mb-6 text-left">
+        <h1 className="text-[20px] font-semibold leading-tight text-left sm:text-[24px]">
           Tell us more about you
         </h1>
       </div>
@@ -98,7 +98,7 @@ export default function RegisterDetailsForm({
         {/* Date of Birth */}
         <div>
           <p className="text-sm font-bold text-white-smoke mb-2">Date of birth (required)</p>
-          <div className="grid grid-cols-3 gap-2">
+          <div className="grid grid-cols-1 gap-2 sm:grid-cols-3">
             {/* Month */}
             <div className="relative bg-chinese-black border border-white/10 rounded px-3 h-12 flex items-center">
               <select

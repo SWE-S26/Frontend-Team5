@@ -73,9 +73,9 @@ export default function QrLoginPage() {
       : "Waiting for scan approval...";
 
   return (
-    <main className="h-dvh overflow-hidden bg-chinese-black px-4 py-4">
+    <main className="min-h-dvh bg-chinese-black px-4 py-4 sm:px-6 sm:py-6">
       <div className="mx-auto flex h-full w-full max-w-xl items-center">
-        <section className="max-h-full w-full overflow-y-auto no-scrollbar rounded-2xl border border-white/10 bg-chinese-black p-6 text-white-smoke shadow-[0_12px_32px_rgba(0,0,0,0.35)] md:p-7">
+        <section className="max-h-full w-full overflow-y-auto no-scrollbar rounded-2xl border border-white/10 bg-chinese-black p-5 text-white-smoke shadow-[0_12px_32px_rgba(0,0,0,0.35)] sm:p-6 md:p-7">
           
           <button
             type="button"
@@ -85,7 +85,7 @@ export default function QrLoginPage() {
             <IoChevronBack size={24} />
           </button>
 
-          <h1 className="text-[32px] font-black tracking-tight">
+          <h1 className="text-[26px] font-black tracking-tight sm:text-[32px]">
             Sign in with QR code
           </h1>
 
