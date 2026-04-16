@@ -89,6 +89,7 @@ export default function MediaCardCarousel() {
                       title={track.basicInfo.title}
                       artist={track.basicInfo.mainArtists[0]}
                       trackId={track._id}
+                      trackUrl={track.audio.audioLink}
                     />
                   </div>
                 ))}
