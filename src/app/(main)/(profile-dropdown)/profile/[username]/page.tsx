@@ -132,7 +132,13 @@ const ProfilePage = ({ params }: Props) => {
     void getPostedTracks(profileUserId)
   }, [activeTab, profileUserId, getPostedTracks])
 
-  const profileTracks = (postedTracks ?? []).map((track) => ({
+  const profileTracks = [...(postedTracks ?? [])]
+    .sort((a, b) => {
+      const aTime = a.releaseDate ? new Date(a.releaseDate).getTime() : 0
+      const bTime = b.releaseDate ? new Date(b.releaseDate).getTime() : 0
+      return bTime - aTime
+    })
+    .map((track) => ({
     id: track._id,
     title: track.basicInfo.title,
     artist: track.basicInfo.mainArtists?.[0] || "Unknown Artist",

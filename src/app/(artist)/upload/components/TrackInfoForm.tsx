@@ -826,7 +826,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     <div className="min-h-screen bg-chinese-black text-white-smoke antialiased">
       {/* Header */}
       <div className="sticky top-0 z-50 bg-chinese-black">
-        <div className="mx-auto flex items-center justify-between px-6 py-3">
+        <div className="mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
           <input
             ref={replaceFileInputRef}
             type="file"
@@ -849,7 +849,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
 
           {/* Right: File info + Actions */}
           <div
-            className={`flex items-center gap-4 rounded-md border border-dashed px-3 py-2 transition-colors ${
+            className={`flex w-full flex-wrap items-center justify-end gap-3 rounded-md border border-dashed px-3 py-2 transition-colors md:w-auto md:max-w-[65%] ${
               isTrackDragActive ? "border-white-smoke bg-chinese-black" : "border-transparent"
             }`}
             onDragOver={(e) => {
@@ -865,18 +865,18 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
             onDrop={handleTrackDrop}
           >
             {showUploadProgress ? (
-              <div className="flex items-center gap-3 w-full justify-end">
-                <span className="text-[12px] text-white-smoke truncate max-w-50">{currentFileName}</span>
+              <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
+                <span className="truncate text-[12px] text-white-smoke">{currentFileName}</span>
                 <div className="w-24 h-1 bg-[#333] rounded-full overflow-hidden">
                   <div
-                    className={`h-full rounded-full transition-all duration-300 ${roundedUploadProgress > 50 ? "bg-[#1db954]" : "bg-chinese-black"}`}
+                    className={`h-full rounded-full transition-all duration-300 ${roundedUploadProgress > 50 ? "bg-[#1db954]" : "bg-white-smoke"}`}
                     style={{ width: `${roundedUploadProgress}%` }}
                   />
                 </div>
-                <span className="w-10 text-right text-[12px] font-semibold text-white-smoke">{roundedUploadProgress}%</span>
+                <span className="w-10 shrink-0 text-right text-[12px] font-semibold text-white-smoke">{roundedUploadProgress}%</span>
               </div>
             ) : (
-              <div className="flex items-center gap-2">
+              <div className="flex min-w-0 items-center gap-2">
                 {uploadedFileUrl && (
                   <button
                     onClick={togglePlayPause}
@@ -890,7 +890,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                     )}
                   </button>
                 )}
-                <span className="text-[12px] text-white-smoke truncate max-w-55">{currentFileName}</span>
+                <span className="truncate text-[12px] text-white-smoke">{currentFileName}</span>
               </div>
             )}
 
@@ -949,11 +949,11 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         </div>
       )}
 
-      <div className="mx-auto max-w-7xl px-5 py-8 pb-32">
-        <div className="grid grid-cols-12 gap-10">
+      <div className="mx-auto max-w-7xl px-4 py-8 pb-36 sm:px-5">
+        <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
           {/* Left - Artwork */}
-          <div className="col-span-4">
-            <div className="w-full max-w-90">
+          <div className="lg:col-span-4">
+            <div className="mx-auto w-full max-w-md lg:mx-0 lg:max-w-90">
               <input
                 ref={artworkInputRef}
                 type="file"
@@ -1083,7 +1083,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
           </div>
 
           {/* Right - Form */}
-          <div className="col-span-8 space-y-6">
+          <div className="space-y-6 lg:col-span-8">
             {submitError && (
               <div className="rounded-md border border-[#5a2d34] bg-chinese-black px-3 py-2 text-[12px] text-[#ff97a9]">
                 {submitError}
@@ -1353,7 +1353,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                   </button>
 
                   {releaseCalendarOpen && (
-                    <div className="absolute right-0 top-full z-40 mt-2 w-72 rounded-md border border-[#2f3035] bg-chinese-black p-3 shadow-xl">
+                    <div className="absolute left-0 top-full z-40 mt-2 w-[min(18rem,calc(100vw-2.5rem))] rounded-md border border-[#2f3035] bg-chinese-black p-3 shadow-xl sm:left-auto sm:right-0 sm:w-72">
                       <div className="mb-2 flex items-center justify-between">
                         <button
                           type="button"
@@ -1584,9 +1584,9 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
       </div>
 
       {/* Footer */}
-      <div className="fixed bottom-0 left-0 right-0 border-t border-silver/25 bg-chinese-black/90 px-6 py-5">
-        <div className="relative mx-auto flex w-full items-center justify-end">
-          <p className="pointer-events-none absolute left-1/2 -translate-x-1/2 text-center text-[11px] text-white-smoke">
+      <div className="fixed bottom-0 left-0 right-0 border-t border-silver/25 bg-chinese-black/90 px-4 py-4 sm:px-6 sm:py-5">
+        <div className="relative mx-auto flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
+          <p className="text-center text-[11px] text-white-smoke sm:pointer-events-none sm:absolute sm:left-1/2 sm:-translate-x-1/2">
             By uploading, you confirm that your sounds comply with our{" "}
             <button className="pointer-events-auto text-white-smoke underline cursor-pointer">Terms of Use</button>{" "}
             and you don't infringe anyone else's rights.
@@ -1594,7 +1594,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
           <button
             onClick={handleSave}
             disabled={isSubmitting}
-            className="rounded-full bg-[#1db954] px-12 py-2 text-[13px] font-bold text-chines-black hover:bg-[#1ed760] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+            className="w-full rounded-full bg-[#1db954] px-12 py-2 text-[13px] font-bold text-chines-black transition-colors hover:bg-[#1ed760] cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
           >
             {isSubmitting ? "Uploading..." : "Upload"}
           </button>
