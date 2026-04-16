@@ -18,6 +18,13 @@ export default function LandingPage() {
   const hasHydrated = useAppSelector((state) => state.auth.hasHydrated)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
 
+  const [authRedirect, setAuthRedirect] = useState("/home")
+  // helper to open auth modal with a specific redirect
+  const openAuth = (redirectTo: string) => {
+    setAuthRedirect(redirectTo)
+    setIsAuthModalOpen(true)
+  }
+
   useEffect(() => {
     if (!hasHydrated) return
     if (isAuthenticated) router.replace("/home")
@@ -39,7 +46,7 @@ export default function LandingPage() {
             <NavbarCenter />
           </div>
           <h1 className="font-bold hidden sm:block">or</h1>
-          <Button className="sm:w-auto px-3 py-1.5 text-[17px] cursor-pointer bg-white-smoke text-chinese-black">
+          <Button className="sm:w-auto px-3 py-1.5 text-[17px] cursor-pointer bg-white-smoke text-chinese-black" onClick={() => openAuth("/upload")}>
             Upload Your Own
           </Button>
         </div>
@@ -90,7 +97,7 @@ export default function LandingPage() {
         </div>
 
       </div>
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} redirectTo={authRedirect}/>
     </div>
   )
 }

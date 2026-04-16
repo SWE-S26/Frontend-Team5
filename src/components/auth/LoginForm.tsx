@@ -32,8 +32,10 @@ type Step =
 
 export default function LoginForm({
   onAuthSuccess,
+  redirectTo,
 }: {
   onAuthSuccess?: () => void;
+  redirectTo?: string;
 } = {}) {
   const [step, setStep] = useState<Step>("email");
   const [validationSource, setValidationSource] = useState<"signup" | "reset-password">("signup");
@@ -123,7 +125,7 @@ export default function LoginForm({
   useEffect(() => { loginLoadingRef.current = loginLoading; }, [loginLoading]);
 
   const navigateToPostAuth = useCallback((result?: any) => {
-    let target = "/home";
+    let target = redirectTo ?? "/home";
 
     if (typeof window !== "undefined") {
       const urlClient = new URLSearchParams(window.location.search).get("client")?.toLowerCase();
@@ -146,7 +148,7 @@ export default function LoginForm({
     startTransition(() => {
       router.replace(target);
     });
-  }, [router, startTransition]);
+  }, [router, startTransition, redirectTo]);
 
   const handleGoogleSignIn = useCallback(() => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";

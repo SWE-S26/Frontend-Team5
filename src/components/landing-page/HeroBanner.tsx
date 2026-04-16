@@ -34,6 +34,12 @@ const slides = [
 export default function HeroBanner() {
   const [current, setCurrent] = useState(0)
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authRedirect, setAuthRedirect] = useState("/home")
+
+  const openAuth = (redirectTo: string) => {
+    setAuthRedirect(redirectTo)
+    setIsAuthModalOpen(true)
+  }
 
   function goToSlide(index: number) {
     if (index === current) return
@@ -48,7 +54,7 @@ export default function HeroBanner() {
   }, [])
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden h-105 sm:h-111.5">
+    <div className="relative w-full rounded-2xl overflow-hidden h-[420px] sm:h-111.5">
 
       {/* sliding track */}
       <div
@@ -74,14 +80,13 @@ export default function HeroBanner() {
               <div className="flex items-center gap-4 sm:gap-6 mt-6 sm:mt-8">
                 <div className="flex gap-2 sm:gap-4">
                   {slide.buttons.map((btn, j) => (
-                    <Link key={j} href={btn.label === "Get Started" ? "#" : btn.href}>
-                      <Button
-                        className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[13px] sm:text-[17px] cursor-pointer ${j === 0 ? "bg-white-smoke text-chinese-black" : "text-white-smoke hover:text-white-smoke"}`}
-                        onClick={btn.label === "Get Started" ? () => setIsAuthModalOpen(true) : undefined}
-                      >
-                        {btn.label}
-                      </Button>
-                    </Link>
+                    <Button
+                      key={j}
+                      className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[13px] sm:text-[17px] cursor-pointer ${j === 0 ? "bg-white-smoke text-chinese-black" : "text-white-smoke hover:text-white-smoke"}`}
+                      onClick={() => openAuth(btn.label === "Upload" ? "/upload" : "/home")}
+                    >
+                      {btn.label}
+                    </Button>
                   ))}
                 </div>
 
@@ -105,14 +110,14 @@ export default function HeroBanner() {
           <Button
             data-testid="landing_sign_in"
             className="px-2.5 sm:px-4 py-1 sm:py-1.5 bg-white-smoke text-chinese-black text-[11px] sm:text-[13px] cursor-pointer"
-            onClick={() => setIsAuthModalOpen(true)}
+            onClick={() => openAuth("/home")}
           >
             Sign in
           </Button>
           <Button
             data-testid="landing_create_account"
             className="px-2 sm:px-3 py-1 sm:py-1.5 bg-chinese-black text-white-smoke text-[11px] sm:text-[13px] cursor-pointer"
-            onClick={() => setIsAuthModalOpen(true)}
+            onClick={() => openAuth("/home")}
           >
             Create account
           </Button>
@@ -136,7 +141,7 @@ export default function HeroBanner() {
         ))}
       </div>
 
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} redirectTo={authRedirect} />
     </div>
   )
 }
