@@ -1,6 +1,7 @@
 export interface AuthModalProps {
   isOpen: boolean;
   onClose: () => void;
+  redirectTo?: string;
 }
 
 export interface LoginFormProps {

@@ -6,9 +6,11 @@ export default function SettingsLayoutClient({ children }: { children: React.Rea
   const pathname = usePathname()
 
   return (
-    <div>
-      <h1 className="text-white-smoke font-bold text-2xl mb-6">Settings</h1>
-      <TabsNavbar pathname={pathname} className="pb-4 text-xl"
+    <div className="px-8 sm:px-0">
+      <h1 className="text-white-smoke font-bold text-xl sm:text-2xl mb-4 sm:mb-6">Settings</h1>
+      <TabsNavbar
+        pathname={pathname}
+        className="pb-4 text-sm sm:text-xl overflow-x-auto"
         tabs={[
           { href: "/settings",               label: "Account"       },
           { href: "/settings/content",       label: "Content"       },
