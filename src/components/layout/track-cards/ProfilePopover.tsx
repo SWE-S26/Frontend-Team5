@@ -1,11 +1,22 @@
 "use client";
 
 import { useState, useRef } from "react";
-import { createPortal } from "react-dom";
 import { Avatar } from "antd";
 import { FaUser } from "react-icons/fa6";
 import Button from "@/components/ui/Button";
 import { usePopover } from "./PopoverContext";
+import {
+  useFloating,
+  useHover,
+  useInteractions,
+  useDismiss,
+  FloatingPortal,
+  offset,
+  flip,
+  shift,
+  autoUpdate,
+  arrow,
+} from "@floating-ui/react";
 
 interface ProfilePopoverProps {
   id: string;
@@ -24,62 +35,65 @@ export default function ProfilePopover({
   profileImgLink,
   location,
 }: ProfilePopoverProps) {
-  const { openId, setOpenId, hideTimer } = usePopover();
-  const isVisible = openId === id;
-
-  const [coords, setCoords] = useState({ top: 0, left: 0 });
+  const { openId, setOpenId, scheduleClose, cancelClose } = usePopover();
+  const isOpen = openId === id;
   const [isFollowing, setIsFollowing] = useState(false);
+  const arrowRef = useRef(null);
 
-  const triggerRef = useRef<HTMLSpanElement>(null);
+  const { refs, floatingStyles, context, middlewareData } = useFloating({
+    open: isOpen,
+    onOpenChange: (open) => {
+      if (open) {
+        cancelClose();
+        setOpenId(id);
+      } else {
+        scheduleClose();
+      }
+    },
+    placement: "bottom",
+    whileElementsMounted: autoUpdate,
+    middleware: [offset(8), flip(), shift(), arrow({ element: arrowRef })],
+  });
 
-  function toggleFollow() {
-    setIsFollowing((prev) => !prev);
-  }
+  const hover = useHover(context, { delay: { open: 0, close: 0 } });
+  const dismiss = useDismiss(context);
+  const { getReferenceProps, getFloatingProps } = useInteractions([
+    hover,
+    dismiss,
+  ]);
 
-  function showPopover() {
-    if (hideTimer.current) clearTimeout(hideTimer.current);
-    if (!triggerRef.current) return;
-    const rect = triggerRef.current.getBoundingClientRect();
-    setCoords({
-      top: rect.bottom + window.scrollY + 8,
-      left: rect.left + window.scrollX + rect.width / 2,
-    });
-    setOpenId(id);
-  }
-
-  function hidePopover() {
-    hideTimer.current = setTimeout(() => setOpenId(null), 200);
-  }
-
-  function cancelHide() {
-    if (hideTimer.current) clearTimeout(hideTimer.current);
-  }
+  const arrowX = middlewareData.arrow?.x;
+  const arrowY = middlewareData.arrow?.y;
 
   return (
     <>
       <span
-        ref={triggerRef}
-        onMouseEnter={showPopover}
-        onMouseLeave={hidePopover}
+        ref={refs.setReference}
+        {...getReferenceProps()}
         className="inline-block"
       >
         {children}
       </span>
 
-      {isVisible &&
-        createPortal(
+      <FloatingPortal>
+        {isOpen && (
           <div
-            onMouseEnter={cancelHide}
-            onMouseLeave={hidePopover}
-            style={{
-              top: coords.top,
-              left: coords.left,
-              transform: "translateX(-50%)",
-            }}
-            className="fixed z-[9999] w-38 rounded border border-silver/50"
+            ref={refs.setFloating}
+            style={floatingStyles}
+            {...getFloatingProps()}
+            onMouseEnter={cancelClose}
+            onMouseLeave={scheduleClose}
+            className="z-[9999] w-38 rounded border border-silver/50"
           >
             {/* Arrow */}
-            <div className="absolute -top-[5px] left-1/2 -translate-x-1/2 w-3 h-3 bg-chinese-black border-l border-t border-silver/50 rotate-45" />
+            <div
+              ref={arrowRef}
+              style={{
+                left: arrowX != null ? `${arrowX}px` : "",
+                top: arrowY != null ? `${arrowY}px` : "",
+              }}
+              className="absolute -top-[5px] w-3 h-3 bg-chinese-black border-l border-t border-silver/50 rotate-45"
+            />
 
             {/* Content */}
             <div className="relative z-10 flex flex-col items-center p-4 bg-chinese-black rounded">
@@ -101,25 +115,20 @@ export default function ProfilePopover({
                   {location}
                 </p>
               )}
-              {isFollowing ? (
-                <Button
-                  className="mt-2 w-full bg-off-black text-white-smoke flex items-center justify-center text-center"
-                  onClick={toggleFollow}
-                >
-                  Following
-                </Button>
-              ) : (
-                <Button
-                  className="mt-2 w-full bg-white-smoke text-chinese-black flex items-center justify-center text-center"
-                  onClick={toggleFollow}
-                >
-                  Follow
-                </Button>
-              )}
+              <Button
+                className={`mt-2 w-full flex items-center justify-center text-center ${
+                  isFollowing
+                    ? "bg-off-black text-white-smoke"
+                    : "bg-white-smoke text-chinese-black"
+                }`}
+                onClick={() => setIsFollowing((prev) => !prev)}
+              >
+                {isFollowing ? "Following" : "Follow"}
+              </Button>
             </div>
-          </div>,
-          document.body,
+          </div>
         )}
+      </FloatingPortal>
     </>
   );
 }

@@ -203,6 +203,16 @@ export default function SausageWaveform({
 
         {/* Divider */}
         <div className="absolute bottom-[26px] left-0 w-full h-[1px] bg-chinese-black -translate-y-1/2 z-30 pointer-events-none" />
+
+        {/* Timestamps */}
+        <div className="absolute left-0 w-full flex justify-between text-[10px] z-40 bottom-[26px]">
+          <span className="bg-black px-[3px] flex items-center justify-center text-papaya">
+            0:00
+          </span>
+          <span className="bg-black px-[3px] flex items-center justify-center text-gray-500">
+            1:00
+          </span>
+        </div>
       </div>
     </div>
   );
