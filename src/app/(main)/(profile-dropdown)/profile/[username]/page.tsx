@@ -155,6 +155,8 @@ const ProfilePage = ({ params }: Props) => {
     trackUrl: track.audio?.audioLink || track.audioLink,
   }))
 
+  const trackCount = profileTracks.length
+
   return (
     <div>
       <ProfileHeader />
