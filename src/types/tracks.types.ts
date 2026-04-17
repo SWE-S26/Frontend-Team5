@@ -119,6 +119,11 @@ export interface PostedTrack {
 		tags?: string[];
 		isPrivate: boolean;
 	};
+	audio?: {
+		audioLink?: string;
+		id?: string;
+	};
+	audioLink?: string;
 	image?: {
 		imgLink?: string;
 		publicId?: string;

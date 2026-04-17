@@ -17,7 +17,8 @@ export default function All({ items }: Props) {
 
     <div className="flex flex-col gap-2">
     <div className="flex justify-center">
-        <img src="/app-logo/whitelogo.png" alt="App Logo" className="w-12 h-8 mt-8 opacity-50" />
+        <img src="/app-logo/whitelogo.png" alt="App Logo" className="w-12 logo-dark h-8 mt-8 opacity-50" />
+        <img src="/app-logo/blacklogo.png" alt="App Logo" className="w-12 logo-light h-8 mt-8 opacity-50" />
         
     </div>
     <p className="flex justify-center">More uploads means more listeners.</p>

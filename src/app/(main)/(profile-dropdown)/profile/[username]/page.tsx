@@ -103,7 +103,7 @@ const ProfilePage = ({ params }: Props) => {
   
   
   const role = useAppSelector((state) => state.profile.role)
-  const { getPostedTracks, tracks: postedTracks } = useGetPostedTracks()
+  const { getPostedTracks, tracks: postedTracks, loading: postedTracksLoading } = useGetPostedTracks()
 
   const artist = role === "Artist"
 
@@ -132,17 +132,27 @@ const ProfilePage = ({ params }: Props) => {
     void getPostedTracks(profileUserId)
   }, [activeTab, profileUserId, getPostedTracks])
 
+  const getTrackSortTime = (track: { releaseDate?: string; _id?: string }) => {
+    const releaseTime = track.releaseDate ? new Date(track.releaseDate).getTime() : NaN
+    if (Number.isFinite(releaseTime)) return releaseTime
+
+    // Fallback for MongoDB ObjectId-like ids (first 8 hex chars are seconds timestamp)
+    const objectIdPrefix = track._id?.slice(0, 8)
+    if (objectIdPrefix && /^[0-9a-fA-F]{8}$/.test(objectIdPrefix)) {
+      return parseInt(objectIdPrefix, 16) * 1000
+    }
+
+    return 0
+  }
+
   const profileTracks = [...(postedTracks ?? [])]
-    .sort((a, b) => {
-      const aTime = a.releaseDate ? new Date(a.releaseDate).getTime() : 0
-      const bTime = b.releaseDate ? new Date(b.releaseDate).getTime() : 0
-      return bTime - aTime
-    })
+    .sort((a, b) => getTrackSortTime(b) - getTrackSortTime(a))
     .map((track) => ({
-    id: track._id,
+    trackId: track._id,
     title: track.basicInfo.title,
     artist: track.basicInfo.mainArtists?.[0] || "Unknown Artist",
     img: track.image?.imgLink || "/Graduation.jpg",
+    trackUrl: track.audio?.audioLink || track.audioLink,
   }))
 
   return (
@@ -325,7 +335,11 @@ const ProfilePage = ({ params }: Props) => {
             )}
 
             {activeTab === "tracks" && (
-              profileTracks.length === 0 ? <EmptyTab /> : <Tracks items={profileTracks} />
+              postedTracksLoading || postedTracks === null
+                ? <Tracks items={[]} isLoading />
+                : profileTracks.length === 0
+                  ? <EmptyTab />
+                  : <Tracks items={profileTracks} />
             )}
 
             {activeTab === "albums" && (
