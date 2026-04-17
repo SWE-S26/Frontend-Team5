@@ -103,6 +103,7 @@ const ProfilePage = ({ params }: Props) => {
   
   
   const role = useAppSelector((state) => state.profile.role)
+  const trackCount = useAppSelector((state) => state.profile.trackCount)
   const { getPostedTracks, tracks: postedTracks } = useGetPostedTracks()
 
   const artist = role === "Artist"
@@ -162,6 +163,12 @@ const ProfilePage = ({ params }: Props) => {
         <div className="flex space-x-2">
           {!isLoading && (
             <>
+              {trackCount ? (
+                <Button data-testid="station-button" className="relative group font-bold bg-off-black justify-center cursor-pointer hover:text-silver">
+                  <IoRadio className="w-5 h-5" />
+                  <span className="ml-1 text-sm px-1 py-0.5">Station</span>
+                </Button>
+              ) : null}
               {isOwn ? (
                 <>
                   <Button data-testid="share-button"
@@ -186,12 +193,6 @@ const ProfilePage = ({ params }: Props) => {
                 
                 <>
                 
-                  {artist && (
-                    <Button data-testid="station-button" className="relative group font-bold  bg-off-black   justify-center cursor-pointer hover:text-silver ">
-                      <IoRadio className="w-5 h-5" />
-                      <span className="ml-1 text-sm   px-1 py-0.5">Station</span>
-                    </Button>
-                  )}
                    
                   <button data-testid="Follow-button"
                     onClick={() => {

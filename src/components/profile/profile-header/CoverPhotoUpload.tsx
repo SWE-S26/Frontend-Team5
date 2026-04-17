@@ -25,10 +25,16 @@ const CoverPhotoUpload = forwardRef<CoverUploadHandle, CoverProps>(
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0]
-      if (file) {
-        const previewUrl = URL.createObjectURL(file)
-        onImageChange(file, previewUrl)
+      if (!file) return
+
+      if (!file.type.startsWith("image/")) {
+        alert("Only image files are allowed.")
+        e.target.value = ""
+        return
       }
+
+      const previewUrl = URL.createObjectURL(file)
+      onImageChange(file, previewUrl)
     }
 
     const isOwn = useAppSelector((state) => state.profile.isOwnProfile)
