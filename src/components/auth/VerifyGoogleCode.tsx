@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter, useSearchParams } from "next/navigation";
-import { useRef, useState, Suspense } from "react";
+import { useEffect, useRef, useState, Suspense } from "react";
 import { useGoogleVerifyCode, useResendVerificationCode } from "@/hooks/useAuth";
 
 function VerifyGoogleCodeInner() {
@@ -13,6 +13,7 @@ function VerifyGoogleCodeInner() {
   const [digits, setDigits] = useState<string[]>(Array(6).fill(""));
   const [localError, setLocalError] = useState<string | null>(null);
   const [resendInfo, setResendInfo] = useState<string | null>(null);
+  const [resendCooldown, setResendCooldown] = useState(0);
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   const { verifyGoogleCode, loading, error } = useGoogleVerifyCode();
@@ -21,6 +22,16 @@ function VerifyGoogleCodeInner() {
   const code = digits.join("");
   const isCodeValid = code.trim().length === 6;
   const isDisabled = loading || !isCodeValid || !pendingToken;
+  const isResendDisabled = resendLoading || resendCooldown > 0;
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = window.setInterval(() => {
+      setResendCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [resendCooldown]);
 
   const handleDigitChange = (index: number, value: string) => {
     const nextDigit = value.replace(/\D/g, "").slice(-1);
@@ -105,6 +116,7 @@ function VerifyGoogleCodeInner() {
     const res = await resendVerificationCode(pendingToken);
 
     if (res) {
+      setResendCooldown(60);
       setResendInfo("Verification code resent. The original 5-minute expiry window is unchanged.");
     }
   };
@@ -164,10 +176,10 @@ function VerifyGoogleCodeInner() {
           <button
             type="button"
             onClick={handleResend}
-            disabled={resendLoading}
+            disabled={isResendDisabled}
             className="mt-3 block h-12 w-full rounded-md bg-[#2f3135] px-6 text-[20px] font-semibold text-white-smoke disabled:cursor-not-allowed disabled:opacity-70 enabled:cursor-pointer enabled:hover:bg-[#36383d]"
           >
-            {resendLoading ? "Resending..." : "Resend"}
+            {resendLoading ? "Resending..." : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend"}
           </button>
 
           <p className="mt-5 text-left text-[14px] text-[#a9aaad]">

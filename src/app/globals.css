@@ -30,6 +30,8 @@
   --progress-track-color: #4f4f4f;
   --volume1: #1a1a1a;
   --volume-bar: #3a3a3a;
+  --upload-schedular:#3a3a3a;
+  --upload-select:#4a4b4d;
 }
 
 [data-theme="light"] {
@@ -43,6 +45,8 @@
   --progress-track-color: #c7c7c7;
   --volume1: white;
   --volume-bar: #c7c7c7;
+  --upload-schedular: #aaaaac;
+  --upload-select:#909398;
 }
 
 /* @media is used for dark mode */
@@ -81,6 +85,8 @@
   --color-progress-track: var(--progress-track);
   --color-volume1: var(--volume1);
   --color-volume-bar: var(--volume-bar);
+  --color-upload-schedular: var(--upload-schedular);
+  --color-upload-select: var(--upload-select);
 
   --animate-fade-in: fadeIn 0.5s ease-in-out forwards;
 

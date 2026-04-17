@@ -5,6 +5,7 @@ import { useState } from "react";
 import { IoChevronBack } from "react-icons/io5";
 import { ForgotPasswordFormProps } from "@/types/auth.types";
 import { useForgetPassword } from "@/hooks/useAuth";
+import { useRouter } from "next/navigation";
 
 const emailSchema = z.string().email("Please enter a valid email address")
 
@@ -18,6 +19,7 @@ export default function ForgotPasswordForm({
   const { forgetPassword, loading, error } = useForgetPassword();
 
   const [emailError, setEmailError] = useState("")
+  const router = useRouter()
   
 
   const handleSendLink = async () => {
@@ -65,7 +67,7 @@ export default function ForgotPasswordForm({
         <p className="text-[14px] text-white-smoke leading-relaxed">
           If the email address is in our database, we will send you an email to
           reset your password. Need help?
-          <span className="text-[#044DD2] cursor-pointer ml-1">
+          <span onClick={() => router.push("/need-help")} className="text-[#044DD2] cursor-pointer ml-1">
             visit our Help Center.
           </span>
         </p>
