@@ -22,18 +22,15 @@ export default function TrackHeader({ trackId }: Props) {
     }
   const dispatch = useAppDispatch();
 
-  // ================= Redux =================
   const track = useAppSelector((state) => state.track);
 
-  // ================= State =================
   const [gradient, setGradient] = useState(
     "linear-gradient(to right, #4f46e5, #a855f7)"
   );
 
-  // ================= API =================
   const { getTrackById, loading, error } = useGetTrackById();
 
-  // ================= Fetch Track =================
+
   useEffect(() => {
     if (!trackId) return;
 
@@ -78,7 +75,6 @@ export default function TrackHeader({ trackId }: Props) {
     fetchTrack();
   }, [trackId, dispatch, getTrackById]);
 
-  // ================= Gradient Effect =================
   useEffect(() => {
     if (!track.imageLink) return;
 
@@ -116,7 +112,6 @@ export default function TrackHeader({ trackId }: Props) {
     );
   }
 
-  // ================= Error =================
   if (error || track.error || !track.trackId) {
     return (
       <div className="w-full h-[300px] flex items-center justify-center text-red-500">
@@ -129,10 +124,10 @@ export default function TrackHeader({ trackId }: Props) {
   ? formatDistanceToNow(new Date(track.releaseDate), { addSuffix: true })
   : ""
 
-  // ================= UI =================
+
   return (
     <div
-      className="w-[80%] mx-auto  h-100 p-13 flex gap-12 items-center shadow-lg"
+      className="w-[80%] mx-auto  h-100 p-13 flex gap-12  shadow-lg"
       style={{ background: gradient }}
     >
       {/* LEFT */}
