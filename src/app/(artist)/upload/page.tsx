@@ -1,6 +1,8 @@
 "use client";
 
 import Image from "next/image";
+import UploadIconBlack from "../../../../public/upload-icon/upload-black.svg";
+import UploadIconWhite from "../../../../public/upload-icon/upload-white.svg";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useCallback, useEffect } from "react";
 import {
@@ -22,7 +24,6 @@ import {
   estimateMinutes,
   formatBytes,
 } from "@/types/upload.types";
-import { CustomUploadIcon } from "./components/CustomUploadIcon";
 import { MicrophoneSection } from "./components/MicrophoneSection";
 import { TrackInfoForm } from "./components/TrackInfoForm";
 import { useAppSelector } from "@/store/hooks";
@@ -291,6 +292,13 @@ export default function UploadPage() {
     }
   }
 
+  const hasAtLeastOneSupportedAudioFile = (files: File[]) => {
+    return files.some((file) => {
+      const ext = getExtension(file.name);
+      return ALLOWED_EXTENSIONS.includes(ext) || file.type.startsWith("audio/");
+    });
+  };
+
   const handleDragOver = useCallback((e: React.DragEvent) => {
     e.preventDefault(); e.stopPropagation(); setIsDragging(true);
   }, []);
@@ -300,10 +308,20 @@ export default function UploadPage() {
   const handleDrop = useCallback((e: React.DragEvent) => {
     e.preventDefault(); e.stopPropagation(); setIsDragging(false);
     const files = Array.from(e.dataTransfer.files);
-    if (files.length) processFiles(files, true);
+    if (!files.length) return;
+    if (!hasAtLeastOneSupportedAudioFile(files)) {
+      addToast("error", "Drop audio files only.");
+      return;
+    }
+    processFiles(files, true);
   }, []);
   const handleFileSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const files = Array.from(e.target.files ?? []);
+    if (files.length && !hasAtLeastOneSupportedAudioFile(files)) {
+      addToast("error", "Choose audio files only.");
+      e.target.value = "";
+      return;
+    }
     if (files.length) processFiles(files, true);
     e.target.value = "";
   };
@@ -683,7 +701,7 @@ export default function UploadPage() {
   // ── Main Upload view ──
   return (
     <div className="flex min-h-dvh flex-col overflow-x-hidden bg-chinese-black text-white-smoke antialiased">
-      <div className="pointer-events-none fixed bottom-4 right-4 z-50 flex flex-col gap-2">
+      <div className="pointer-events-none fixed bottom-4 left-4 right-4 z-50 flex flex-col gap-2 sm:left-auto sm:right-4 sm:w-auto">
         {toasts.map((toast) => (
           <div
             key={toast.id}
@@ -703,7 +721,8 @@ export default function UploadPage() {
               className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full transition-opacity hover:opacity-90 cursor-pointer"
               aria-label="Go to home"
             >
-              <Image src="/app-logo/whitelogo.png" alt="BeatZa" width={52} height={52} className="object-contain" priority />
+              <Image src="/app-logo/whitelogo.png" alt="BeatZa" width={52} height={52} className="object-contain logo-dark" priority />
+              <Image src="/app-logo/blacklogo.png" alt="BeatZa" width={52} height={52} className="object-contain logo-light" priority />
             </button>
             <span className="text-[16px] font-black tracking-[-0.03em]">Upload</span>
           </div>
@@ -721,26 +740,26 @@ export default function UploadPage() {
         {/* Usage bar */}
         <div className="rounded-md border border-[#27272d] bg-[#212121] px-4 py-3">
           <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="flex min-w-0 items-center gap-2">
+            <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
               <div className="flex h-12 w-5 items-center justify-center text-[10px] text-[#dadadd]">
                 <CloudUploadOutlined style={{ fontSize: '24px' }} />
               </div>
               <span className="text-[13px] font-semibold text-[#f1f1f1]">{Math.round(usagePercent)}% of uploads used</span>
-              <div className="relative h-1 flex-1 rounded-full bg-[#3f4047] md:min-w-48">
+              <div className="relative h-1 w-full rounded-full bg-[#3f4047] sm:flex-1 md:min-w-48">
                 <div className="absolute left-0 top-0 h-1 rounded-full bg-white transition-all duration-500" style={{ width: `${usagePercent}%` }} />
               </div>
-              <span className="whitespace-nowrap text-[13px] font-semibold text-[#f1f1f1]">
-                {totalMinutesUsed.toFixed(1)} of {TOTAL_MINUTES_LIMIT} minutes
+              <span className="text-[13px] font-semibold text-[#f1f1f1] sm:whitespace-nowrap">
+                {Math.round(totalMinutesUsed)} of {TOTAL_MINUTES_LIMIT} minutes
               </span>
             </div>
-            <button className="w-fit rounded-full border border-silver/30 bg-chinese-black px-5 py-1.5 text-[13px] font-semibold text-white-smoke transition-colors hover:opacity-90 cursor-pointer" type="button">
+            <button className="w-full rounded-full border border-silver/30 bg-chinese-black px-5 py-1.5 text-[13px] font-semibold text-white-smoke transition-colors hover:opacity-90 cursor-pointer sm:w-fit" type="button">
               Get unlimited uploads
             </button>
           </div>
         </div>
 
         <section className="mt-8">
-          <h1 className="text-[28px] pb-2 font-black tracking-[-0.03em] text-white-smoke">Upload your audio files.</h1>
+          <h1 className="pb-2 text-[24px] font-black tracking-[-0.03em] text-white-smoke sm:text-[28px]">Upload your audio files.</h1>
           <p className="mt-2 pb-2 text-[14px] font-semibold leading-relaxed text-white-smoke/90">
             For best quality, use WAV, FLAC, AIFF, or ALAC. The maximum file size is 4GB uncompressed.
             <button type="button" className="ml-1 border-b border-silver pb-px text-[14px] font-semibold text-white-smoke cursor-pointer">Learn more.</button>
@@ -764,16 +783,31 @@ export default function UploadPage() {
             className={`mt-6 rounded-md border border-dashed px-5 py-16 transition-colors hover:border-white-smoke sm:px-12 sm:py-20 cursor-pointer
               ${isDragging ? "border-white-smoke bg-chinese-black" : "border-[#3f4047] bg-chinese-black"}`}
           >
-            <div className="mx-auto flex max-w-sm flex-col items-center text-center">
+            <div onDragOver={handleDragOver}
+                onDragLeave={handleDragLeave}
+                onDrop={handleDrop}
+                onClick={() => fileInputRef.current?.click()} className="mx-auto flex max-w-sm flex-col items-center text-center">
               <div className="mb-6">
-                <CustomUploadIcon />
+                <Image
+                  src={UploadIconWhite}
+                  alt="Upload icon"
+                  className="logo-dark"
+                  width={74}
+                  height={74}
+                />
+                <Image
+                  src={UploadIconBlack}
+                  alt="Upload icon"
+                  className="logo-light"
+                  width={74}
+                  height={74}
+                />
               </div>
-              <p className="text-[16px] font-bold text-[#f7f7f7]">
-                {isDragging ? "Drop files here." : "Drag and drop audio files to get started."}
+              <p className="text-[16px] font-bold text-white-smoke">
+                {isDragging ? "Drop audio files here." : "Drag and drop audio files to get started."}
               </p>
               <label
-                htmlFor="main-upload-audio-input"
-                className="mt-6 rounded-full bg-white px-7 py-2 text-[14px] font-semibold text-[#090909] transition-opacity hover:opacity-90 cursor-pointer"
+                className="mt-6 rounded-full bg-chinese-black px-7 py-2 text-[14px] font-semibold text-white-smoke transition-opacity hover:opacity-90 cursor-pointer"
               >
                 Choose files
               </label>
@@ -808,7 +842,7 @@ export default function UploadPage() {
 
       </div>
 
-      <footer className="fixed inset-x-0 bottom-0 z-40 h-15 border-t border-silver/15 bg-chinese-black/90 text-center text-[12px] text-[#b8b8be]">
+      <footer className="fixed inset-x-0 bottom-0 z-40 min-h-15 border-t border-silver/15 bg-chinese-black/90 py-2 text-center text-[12px] text-white-smoke">
         <div className="mx-auto flex h-full w-full max-w-6xl items-center px-4 sm:px-8 lg:px-14">
           <div className="flex w-full flex-wrap items-center justify-center gap-x-2 gap-y-2">
             {footerLinks.map((label, index) => (

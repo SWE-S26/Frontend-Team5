@@ -36,6 +36,7 @@ import SpamPopUp from "@/components/messages/conversation/SpamPopUp"
 import Button from "@/components/ui/Button"
 import { useBlockUser, useUnblockUser } from "@/hooks/useSocial"
 import { setProfile } from "@/store/slices/profileSlice"
+import { useGetPostedTracks } from "@/hooks/useTracks"
 
 interface Props {
   params: { username: string }
@@ -60,12 +61,6 @@ const mockAll = [
 const mockPopular = [
   { id: "1", title: "Popular One",   artist: "Artist A", img: "/Graduation.jpg" },
   { id: "2", title: "Popular Two",   artist: "Artist B", img: "/Graduation.jpg" },
-]
-
-const mockTracks = [
-  { id: "1", title: "My Track One",   artist: "Artist A", img: "/Graduation.jpg" },
-  { id: "2", title: "My Track Two",   artist: "Artist B", img: "/Graduation.jpg" },
-  { id: "3", title: "My Track Three", artist: "Artist C", img: "/Graduation.jpg" },
 ]
 
 const mockAlbums = [
@@ -109,6 +104,7 @@ const ProfilePage = ({ params }: Props) => {
   
   const role = useAppSelector((state) => state.profile.role)
   const trackCount = useAppSelector((state) => state.profile.trackCount)
+  const { getPostedTracks, tracks: postedTracks } = useGetPostedTracks()
 
   const artist = role === "Artist"
 
@@ -131,6 +127,24 @@ const ProfilePage = ({ params }: Props) => {
   document.addEventListener("mousedown", handleClick)
   return () => document.removeEventListener("mousedown", handleClick)
 }, [openMoreMenu])
+
+  useEffect(() => {
+    if (activeTab !== "tracks" || !profileUserId) return
+    void getPostedTracks(profileUserId)
+  }, [activeTab, profileUserId, getPostedTracks])
+
+  const profileTracks = [...(postedTracks ?? [])]
+    .sort((a, b) => {
+      const aTime = a.releaseDate ? new Date(a.releaseDate).getTime() : 0
+      const bTime = b.releaseDate ? new Date(b.releaseDate).getTime() : 0
+      return bTime - aTime
+    })
+    .map((track) => ({
+    id: track._id,
+    title: track.basicInfo.title,
+    artist: track.basicInfo.mainArtists?.[0] || "Unknown Artist",
+    img: track.image?.imgLink || "/Graduation.jpg",
+  }))
 
   return (
     <div>
@@ -312,7 +326,7 @@ const ProfilePage = ({ params }: Props) => {
             )}
 
             {activeTab === "tracks" && (
-              mockTracks.length === 0 ? <EmptyTab /> : <Tracks items={mockTracks} />
+              profileTracks.length === 0 ? <EmptyTab /> : <Tracks items={profileTracks} />
             )}
 
             {activeTab === "albums" && (

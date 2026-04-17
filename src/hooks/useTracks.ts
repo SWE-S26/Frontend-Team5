@@ -3,6 +3,7 @@ import { tracksService } from "@/services/tracks.service";
 import { useCallback, useState } from "react";
 import { CreateTrackRequest } from "@/types/tracks.types";
 import {
+  GetPostedTracksResponse,
   GetTracksErrorResponse,
   GetTracksResponse,
 } from "@/types/tracks.types";
@@ -87,5 +88,47 @@ export function useGetTracks() {
     validationErrors,
     tracks,
     paginationInfo,
+  };
+}
+
+export function useGetPostedTracks() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<
+    GetTracksErrorResponse["errors"] | null
+  >(null);
+  const [tracks, setTracks] = useState<GetPostedTracksResponse["data"] | null>(
+    null,
+  );
+
+  const getPostedTracks = useCallback(async (userId: string) => {
+    if (!userId) return;
+    setLoading(true);
+    setError(null);
+    setValidationErrors(null);
+    setTracks(null);
+    try {
+      const res = await tracksService.getPostedTracks(userId);
+      setTracks(res.data.data);
+      return res.data;
+    } catch (err) {
+      if (axios.isAxiosError<GetTracksErrorResponse>(err)) {
+        const data = err.response?.data;
+        setError(data?.message || "Something went wrong");
+        if (data?.errors) setValidationErrors(data.errors);
+      } else {
+        setError("Something went wrong");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return {
+    getPostedTracks,
+    loading,
+    error,
+    validationErrors,
+    tracks,
   };
 }

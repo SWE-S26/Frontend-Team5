@@ -5,7 +5,7 @@ import { IoClose } from "react-icons/io5";
 import LoginForm from "./LoginForm";
 import { AuthModalProps } from "@/types/auth.types";
 
-export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
+export default function AuthModal({ isOpen, onClose, redirectTo }: AuthModalProps) {
   const [shouldRender, setShouldRender] = useState(false);
   const [animate, setAnimate] = useState(false);
 
@@ -46,7 +46,7 @@ export default function AuthModal({ isOpen, onClose }: AuthModalProps) {
           animate ? "translate-y-0" : "-translate-y-[150vh]"
         }`}
       >
-        <LoginForm onAuthSuccess={onClose} />
+        <LoginForm onAuthSuccess={onClose} redirectTo={redirectTo}/>
       </div>
     </div>
   );

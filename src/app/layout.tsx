@@ -6,6 +6,7 @@ import AuthGoogle from "@/components/auth/AuthGoogle";
 import ReduxProvider from "@/components/ReduxProvider";
 import AntProviders from "@/components/AntProviders";
 import "./globals.css";
+import AudioBridge from "@/components/AudioBridge";
 
 const inter = Inter({
   variable: "--font-sans",
@@ -33,6 +34,7 @@ export default function RootLayout({
             <MockProvider>
               <ThemeProvider>
                 <AuthGoogle />
+                <AudioBridge />
                 {children}
               </ThemeProvider>
             </MockProvider>

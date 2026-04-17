@@ -9,7 +9,7 @@ export default function Tracks({ items }: Props) {
          <>
          <div className="flex flex-col gap-12">
            {items.map((item) => (
-             <Card key={item.id} />
+             <Card key={item.id} title={item.title} artist={item.artist} img={item.img} />
            ))}
          </div>
          

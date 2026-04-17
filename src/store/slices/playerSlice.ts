@@ -1,66 +1,120 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-interface Track {
+export type Track = {
   id: string;
-  title: string;
-  artist: string;
-  img: string;
-  audioUrl: string;
-}
+  url: string;
+  title?: string;
+  artist?: string;
+  img?: string;
+};
 
-interface PlayerState {
-  currentTrack: Track | null;
+type PlayerState = {
+  tracks: Track[];
+  currentTrackId: string | null;
+  currentTrackUrl: string | null;
   isPlaying: boolean;
   volume: number;
-  progress: number;
-  duration: number;
-}
+  shuffle: boolean;
+  loop: "none" | "one" | "all";
+};
 
 const initialState: PlayerState = {
-  currentTrack: null,
+  tracks: [],
+  currentTrackId: null,
+  currentTrackUrl: null,
   isPlaying: false,
   volume: 1,
-  progress: 0,
-  duration: 0,
+  shuffle: false,
+  loop: "none",
 };
 
 const playerSlice = createSlice({
   name: "player",
   initialState,
   reducers: {
-    setTrack: (state, action: PayloadAction<Track>) => {
-      state.currentTrack = action.payload;
-      state.progress = 0;
-      state.duration = 0;
+    setTracks(state, action: PayloadAction<Track[]>) {
+      state.tracks = action.payload;
+    },
+
+    setTrack(state, action: PayloadAction<string>) {
+      state.currentTrackId = action.payload;
+    },
+
+    setTrackWithUrl(state, action: PayloadAction<{ id: string; url: string }>) {
+      state.currentTrackId = action.payload.id;
+      state.currentTrackUrl = action.payload.url;
+    },
+
+    play(state) {
       state.isPlaying = true;
     },
-    togglePlay: (state) => {
+
+    pause(state) {
+      state.isPlaying = false;
+    },
+
+    togglePlay(state) {
       state.isPlaying = !state.isPlaying;
     },
-    setIsPlaying: (state, action: PayloadAction<boolean>) => {
-      state.isPlaying = action.payload;
+
+    next(state) {
+      if (!state.tracks.length) return;
+
+      const currentIndex = state.tracks.findIndex(
+        (t) => t.id === state.currentTrackId,
+      );
+
+      if (state.shuffle) {
+        state.currentTrackId =
+          state.tracks[Math.floor(Math.random() * state.tracks.length)].id;
+        return;
+      }
+
+      const nextIndex = (currentIndex + 1) % state.tracks.length;
+      state.currentTrackId = state.tracks[nextIndex].id;
     },
-    setProgress: (state, action: PayloadAction<number>) => {
-      state.progress = action.payload;
+
+    prev(state) {
+      if (!state.tracks.length) return;
+
+      const currentIndex = state.tracks.findIndex(
+        (t) => t.id === state.currentTrackId,
+      );
+
+      const prevIndex =
+        (currentIndex - 1 + state.tracks.length) % state.tracks.length;
+
+      state.currentTrackId = state.tracks[prevIndex].id;
     },
-    setDuration: (state, action: PayloadAction<number>) => {
-      state.duration = action.payload;
-    },
-    setVolume: (state, action: PayloadAction<number>) => {
+
+    setVolume(state, action: PayloadAction<number>) {
       state.volume = action.payload;
     },
-    clearPlayer: () => initialState,
+
+    toggleShuffle(state) {
+      state.shuffle = !state.shuffle;
+    },
+
+    cycleLoop(state) {
+      if (state.loop === "none") state.loop = "all";
+      else if (state.loop === "all") state.loop = "one";
+      else state.loop = "none";
+    },
   },
 });
 
 export const {
+  setTracks,
   setTrack,
+  setTrackWithUrl,
+  play,
+  pause,
   togglePlay,
-  setIsPlaying,
-  setProgress,
-  setDuration,
+  next,
+  prev,
   setVolume,
-  clearPlayer,
+  toggleShuffle,
+  cycleLoop,
 } = playerSlice.actions;
 
 export default playerSlice.reducer;
