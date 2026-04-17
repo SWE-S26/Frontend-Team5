@@ -218,3 +218,11 @@ export interface LoginWithQRcodeResponse {
 export interface DeleteAccountResponse {
   message: string;
 }
+
+/* (15) "/api/auth/v1/google/resend-code" */
+export interface ResendVerificationCodeRequest {
+  pendingToken: string;
+}
+export interface ResendVerificationCodeResponse {
+  message: string;
+}

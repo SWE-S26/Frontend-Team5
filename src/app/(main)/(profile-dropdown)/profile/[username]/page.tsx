@@ -100,6 +100,7 @@ const ProfilePage = ({ params }: Props) => {
   const isLoading = useAppSelector((state) => state.profile.isLoading)
   const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
   const displayName = useAppSelector((state) => state.profile.displayName)
+  const profileTrackCount = useAppSelector((state) => state.profile.trackCount)
   
   
   const role = useAppSelector((state) => state.profile.role)
@@ -128,9 +129,9 @@ const ProfilePage = ({ params }: Props) => {
 }, [openMoreMenu])
 
   useEffect(() => {
-    if (activeTab !== "tracks" || !profileUserId) return
+    if (activeTab !== "tracks" || !profileUserId || isLoading || profileTrackCount <= 0) return
     void getPostedTracks(profileUserId)
-  }, [activeTab, profileUserId, getPostedTracks])
+  }, [activeTab, profileUserId, getPostedTracks, isLoading, profileTrackCount])
 
   const getTrackSortTime = (track: { releaseDate?: string; _id?: string }) => {
     const releaseTime = track.releaseDate ? new Date(track.releaseDate).getTime() : NaN
@@ -156,6 +157,8 @@ const ProfilePage = ({ params }: Props) => {
   }))
 
   const trackCount = profileTracks.length
+  const hasKnownNoTracks = !isLoading && profileTrackCount <= 0
+  const shouldShowTracksSkeleton = postedTracksLoading && profileTrackCount > 0
 
   return (
     <div>
@@ -337,9 +340,11 @@ const ProfilePage = ({ params }: Props) => {
             )}
 
             {activeTab === "tracks" && (
-              postedTracksLoading || postedTracks === null
-                ? <Tracks items={[]} isLoading />
-                : profileTracks.length === 0
+              hasKnownNoTracks
+                ? <EmptyTab />
+                : shouldShowTracksSkeleton || postedTracks === null
+                  ? <Tracks items={[]} isLoading />
+                  : profileTracks.length === 0
                   ? <EmptyTab />
                   : <Tracks items={profileTracks} />
             )}
