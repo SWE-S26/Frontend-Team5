@@ -139,3 +139,41 @@ export interface GetPostedTracksResponse {
 	message: string;
 	data: PostedTrack[];
 }
+
+
+
+export interface Track {
+  _id: string;
+
+  basicInfo: {
+    title: string;
+    permalink: string;
+    mainArtists: string[];
+    genre?: string;
+    tags?: string[];
+    description?: string;
+    isPrivate: boolean;
+  };
+
+  audio: {
+    audioLink: string;
+    id: string;
+  };
+
+  image: {
+    imgLink: string;
+    publicId: string;
+  };
+
+  numLikes: number;
+  numPlays: number;
+  numReposts: number;
+  numComments: number;
+
+  releaseDate: string;
+}
+
+export interface GetTrackByIdResponse {
+  message: string;
+  data: Track;
+}
