@@ -17,6 +17,11 @@ import { setProfileImgLink, setBannerImgLink } from "@/store/slices/authSlice"
 import { setProfile, clearProfile } from "@/store/slices/profileSlice"
 
 export default function ProfileHeader() {
+
+  const isPickingFile = useRef(false)
+  const DEFAULT_COVER = "https://res.cloudinary.com/dr1sqiouu/image/upload/v1776357570/profile/file_ud25rn.png"
+
+
   const dispatch   = useAppDispatch()
   const params     = useParams()
   const rawUserId  = params.username as string
@@ -139,7 +144,11 @@ const handleDeleteAvatar = async () => {
 
   // sync local image state from profileSlice
   useEffect(() => {
-    if (bannerImgLink) setCoverImage(bannerImgLink)
+    if (bannerImgLink && bannerImgLink !== DEFAULT_COVER) {
+      setCoverImage(bannerImgLink)
+    } else {
+      setCoverImage(null)
+    }
   }, [bannerImgLink])
 
   useEffect(() => {
@@ -267,12 +276,13 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
 </div>
 
      <div
-  className="absolute left-10 top-1/2 -translate-y-1/2 group/avatar"
-  ref={avatarMenuRef}
-  onClick={() => {
-    if (avatarImage) setAvatarViewOpen(true)
-  }}
->
+      className="absolute left-10 top-1/2 -translate-y-1/2 group/avatar"
+      ref={avatarMenuRef}
+      onClick={(e) => {
+        const clickedButton = (e.target as HTMLElement).closest("button")
+        if (avatarImage && !clickedButton && !isPickingFile.current) setAvatarViewOpen(true)
+      }}
+    >
   <AvatarUpload
     ref={avatarRef}
     avatarImage={avatarImage}
@@ -299,9 +309,12 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
       
 
       <button data-testid="Replace image-button-menuAvatar"
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation()
           setShowAvatarMenu(false)
+          isPickingFile.current = true
           avatarRef.current?.openFilePicker()
+          setTimeout(() => { isPickingFile.current = false }, 500)
         }}
         className="w-full text-left px-4 py-3 text-sm font-semibold text-white hover:bg-white/5 transition-colors border-b border-white/5"
       >
@@ -310,7 +323,10 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
 
       {avatarImage && (
         <button data-testid="Delete image-button-menuAvatar"
-          onClick={handleDeleteAvatar}
+          onClick={(e) => {
+            e.stopPropagation()
+            handleDeleteAvatar()
+          }}
           className="w-full text-left px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
         >
           Delete image
