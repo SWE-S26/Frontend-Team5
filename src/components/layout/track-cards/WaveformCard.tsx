@@ -45,8 +45,8 @@ export default function WaveformCard({
   img,
   title,
   artist,
-  trackId = "69e0ddf66edb30422ccc729f",
-  trackUrl = "https://OmarGamalS.publit.io/file/POWER.mp3",
+  trackId,
+  trackUrl,
 }: CardProps) {
   const [isLiked, setIsLiked] = useState(false);
   // const [isPlaying, setIsPlaying] = useState(false);
@@ -122,7 +122,6 @@ export default function WaveformCard({
       {/* left side */}
       <div className="h-full overflow-hidden -m-1 -mb-1.75">
         <Card type="static" img={img} />
-        <Card type="static" img={img} />
       </div>
 
       {/* right side */}
@@ -142,14 +141,12 @@ export default function WaveformCard({
           <div>
             <p className="text-sm font-bold text-silver ml-3">{artist}</p>
             <p className="text-sm font-bold text-white-smoke ml-3">{title}</p>
-            <p className="text-sm font-bold text-silver ml-3">{artist}</p>
-            <p className="text-sm font-bold text-white-smoke ml-3">{title}</p>
           </div>
         </div>
 
         {/* waveform */}
         <div
-          className="w-full max-w-[632px] h-[60px] shrink-0 cursor-pointer"
+          className="w-full max-w-158 h-15 shrink-0 cursor-pointer"
           onClick={() => setShowComments(true)}
         >
           <SausageWaveform
@@ -186,7 +183,7 @@ export default function WaveformCard({
                 ref={commentBoxRef}
                 onInput={handleInputChange}
                 placeholder="Write a comment"
-                className="ml-2 flex-1 bg-off-black rounded px-4 py-2 text-sm text-white-smoke caret-brilliant-orange outline outline-1 outline-transparent focus:outline-white-smoke/50 transition-[outline-color] duration-200 ease-in-out"
+                className="ml-2 flex-1 bg-off-black rounded px-4 py-2 text-sm text-white-smoke caret-brilliant-orange outline outline-transparent focus:outline-white-smoke/50 transition-[outline-color] duration-200 ease-in-out"
               />
               <Button
                 ref={commentButtonRef}
