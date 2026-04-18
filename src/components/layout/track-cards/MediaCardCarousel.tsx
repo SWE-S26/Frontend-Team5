@@ -86,7 +86,11 @@ export default function MediaCardCarousel() {
                     <Card
                       img={track.image.imgLink || undefined}
                       title={track.basicInfo.title}
-                      artist={track.basicInfo.mainArtists[0]}
+                      artist={
+                        track.basicInfo.mainArtists?.length
+                          ? track.basicInfo.mainArtists.join(", ")
+                          : "Unknown Artist"
+                      }
                       trackId={track._id}
                       trackUrl={track.audio.audioLink}
                       duration={track.durationInSeconds}
