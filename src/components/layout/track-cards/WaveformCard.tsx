@@ -9,10 +9,11 @@ import MoreDropdown from "@/components/ui/MoreDropdown";
 import { useState, useRef } from "react";
 import { Avatar } from "antd";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, Transition } from "framer-motion";
 
 import { useAppSelector } from "@/store/hooks";
 import { useAudioProgress } from "@/hooks/useAudioProgress";
+import { useStatelessComments } from "@/hooks/useComments";
 
 import { UserOutlined } from "@ant-design/icons";
 import { IoIosMore, IoMdPlay, IoMdPause } from "react-icons/io";
@@ -37,6 +38,8 @@ type CardProps = {
   allTracks?: Track[];
 };
 
+const FLASH_DURATION = 3000;
+
 export default function WaveformCard({
   img,
   title,
@@ -47,40 +50,91 @@ export default function WaveformCard({
   allTracks,
 }: CardProps) {
   const [isLiked, setIsLiked] = useState(false);
-  const [showComments, setShowComments] = useState(false);
+  const [showCommentBox, setShowCommentBox] = useState(false);
+  const [inputFocused, setInputFocused] = useState(false);
   const [canComment, setCanComment] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [commentTimestamp, setCommentTimestamp] = useState(0);
+  // The submitted comment text shown as a flash bubble for 2s, null = no flash
+  const [flashComment, setFlashComment] = useState<string | null>(null);
+  const [reloadTrigger, setReloadTrigger] = useState(0);
 
   const commentBoxRef = useRef<HTMLInputElement>(null);
-  const commentButtonRef = useRef<HTMLButtonElement>(null);
+  const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
   const { progress, currentTime, seekToPercentage } = useAudioProgress();
 
   const dispatch = useDispatch();
-
   const { currentTrackId, isPlaying } = useSelector(
     (state: RootState) => state.player,
   );
-
   const isThisCardPlaying = currentTrackId === trackId && isPlaying;
 
-  const handleInputChange = () => {
-    if (!commentBoxRef.current || !commentButtonRef.current) return;
+  const { submitComment } = useStatelessComments();
 
-    const comment = commentBoxRef.current.value.trim();
-    setCanComment(comment.length > 0);
+  const handleInputChange = () => {
+    if (!commentBoxRef.current) return;
+    setCanComment(commentBoxRef.current.value.trim().length > 0);
+  };
+
+  const handleInputFocus = () => {
+    setCommentTimestamp(currentTime);
+    setInputFocused(true);
+  };
+
+  const handleInputBlur = () => {
+    setInputFocused(false);
+  };
+
+  const handleOpenCommentBox = () => {
+    setShowCommentBox(true);
+  };
+
+  const handleSubmitComment = async () => {
+    if (!trackId || !commentBoxRef.current) return;
+    const content = commentBoxRef.current.value.trim();
+    if (!content) return;
+
+    setIsSubmitting(true);
+    try {
+      await submitComment(trackId, {
+        content,
+        timestamp: Math.floor(commentTimestamp),
+      });
+
+      commentBoxRef.current.value = "";
+      setCanComment(false);
+      commentBoxRef.current.blur();
+
+      if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
+      setFlashComment(content);
+      // Reload comments 200ms before flash ends so real avatar is ready when flash disappears
+      setTimeout(() => setReloadTrigger((n) => n + 1), FLASH_DURATION - 1500);
+      flashTimerRef.current = setTimeout(
+        () => setFlashComment(null),
+        FLASH_DURATION,
+      );
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Enter" && canComment && !isSubmitting) handleSubmitComment();
+    if (e.key === "Escape") {
+      setShowCommentBox(false);
+      setInputFocused(false);
+    }
   };
 
   function handlePlayClick(e: React.MouseEvent) {
     e.stopPropagation();
-
     if (!trackId || !trackUrl) return;
-
     if (isThisCardPlaying) {
       dispatch(pause());
       return;
     }
-
     dispatch(
       playAudio({
         tracks: allTracks?.length
@@ -89,16 +143,11 @@ export default function WaveformCard({
         startId: trackId,
       }),
     );
-
-    setTimeout(() => {
-      dispatch(play());
-    }, 0);
+    setTimeout(() => dispatch(play()), 0);
   }
+
   function handleWaveformPlay(seekPercentage?: number) {
-    if (!trackId || !trackUrl) return;
-
-    if (isThisCardPlaying) return;
-
+    if (!trackId || !trackUrl || isThisCardPlaying) return;
     dispatch(
       playAudio({
         tracks: allTracks?.length
@@ -107,25 +156,21 @@ export default function WaveformCard({
         startId: trackId,
       }),
     );
-
     setTimeout(() => {
-      if (seekPercentage !== undefined) {
-        seekToPercentage(seekPercentage);
-      }
+      if (seekPercentage !== undefined) seekToPercentage(seekPercentage);
       dispatch(play());
     }, 100);
   }
 
+  const transitionConfig: Transition = { duration: 0.25, ease: "easeOut" };
+
   return (
     <div className="flex items-stretch">
-      {/* left side */}
       <div className="h-full overflow-hidden -m-1 -mb-1.75">
         <Card type="static" img={img} />
       </div>
 
-      {/* right side */}
       <div className="flex flex-col flex-1 ml-6">
-        {/* top */}
         <div className="flex items-center mb-4">
           <div
             className="w-10 h-10 bg-white-smoke rounded-full flex items-center justify-center cursor-pointer"
@@ -143,123 +188,138 @@ export default function WaveformCard({
           </div>
         </div>
 
-        {/* waveform */}
         <div
           className="w-full max-w-158 h-15 shrink-0 cursor-pointer"
-          onClick={() => setShowComments(true)}
+          onClick={handleOpenCommentBox}
         >
           <SausageWaveform
+            trackId={trackId}
             samplesUrl="/waveform.json"
             externalProgress={progress}
             onSeek={seekToPercentage}
             onPlay={handleWaveformPlay}
+            onAvatarHover={handleOpenCommentBox}
+            onTimestampChange={setCommentTimestamp}
             isPlaying={isThisCardPlaying}
             currentTime={currentTime}
             duration={duration}
+            isCommenting={inputFocused}
+            commentTimestamp={commentTimestamp}
+            profileAvatarUrl={profileImgLink ?? undefined}
+            flashComment={flashComment}
+            reloadTrigger={reloadTrigger}
           />
         </div>
 
-        {/* comment box */}
-        <AnimatePresence>
-          {showComments && (
-            <motion.div
-              initial={{ y: -20, opacity: 0 }}
-              animate={{ y: 0, opacity: 1 }}
-              exit={{ y: -20, opacity: 0 }}
-              transition={{ duration: 0.25, ease: "easeOut" }}
-              className="flex items-center mt-4 mb-4"
-            >
-              <Avatar
-                size="large"
-                icon={
-                  profileImgLink ? (
-                    <img src={profileImgLink} alt="Profile" />
-                  ) : (
-                    <UserOutlined />
-                  )
-                }
-              />
-              <input
-                type="text"
-                ref={commentBoxRef}
-                onInput={handleInputChange}
-                placeholder="Write a comment"
-                className="ml-2 flex-1 bg-off-black rounded px-4 py-2 text-sm text-white-smoke caret-brilliant-orange outline outline-transparent focus:outline-white-smoke/50 transition-[outline-color] duration-200 ease-in-out"
-              />
-              <Button
-                ref={commentButtonRef}
-                disabled={!canComment}
-                className="ml-2 bg-off-black text-chinese-black font-bold py-2 px-4 rounded hover:bg-opacity-80"
-              >
-                <HiOutlinePaperAirplane className="text-[20px] text-white-smoke rotate-45" />
-              </Button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* buttons */}
+        {/* Comment box + buttons wrapped together so layout animates as one unit */}
         <motion.div
           layout
-          transition={{ layout: { duration: 0.3, ease: "easeInOut" } }}
-          className="flex items-center mt-auto"
+          transition={{ layout: transitionConfig }}
+          className="flex flex-col mt-auto"
         >
-          <Tooltip label="Like">
-            <Button
-              onClick={() => setIsLiked(!isLiked)}
-              className="bg-off-black mr-4"
-              icon={<HiHeart className="text-[16px]" />}
-            >
-              177
-            </Button>
-          </Tooltip>
+          <AnimatePresence>
+            {showCommentBox && (
+              <motion.div
+                initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
+                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                transition={transitionConfig}
+                className="flex items-center overflow-hidden mt-7"
+              >
+                <Avatar
+                  size="large"
+                  icon={
+                    profileImgLink ? (
+                      <img src={profileImgLink} alt="Profile" />
+                    ) : (
+                      <UserOutlined />
+                    )
+                  }
+                />
+                <input
+                  type="text"
+                  ref={commentBoxRef}
+                  onInput={handleInputChange}
+                  onFocus={handleInputFocus}
+                  onBlur={handleInputBlur}
+                  onKeyDown={handleKeyDown}
+                  placeholder="Write a comment"
+                  className="ml-2 flex-1 bg-off-black rounded px-4 py-2 text-sm text-white-smoke caret-brilliant-orange outline outline-transparent focus:outline-white-smoke/50 transition-[outline-color] duration-200 ease-in-out"
+                />
+                <Button
+                  disabled={!canComment || isSubmitting}
+                  onClick={handleSubmitComment}
+                  className="ml-2 bg-off-black text-chinese-black font-bold py-2 px-4 rounded hover:bg-opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
+                >
+                  <HiOutlinePaperAirplane
+                    className={`text-[20px] text-white-smoke rotate-45 transition-opacity ${isSubmitting ? "opacity-40" : "opacity-100"}`}
+                  />
+                </Button>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
-          <Tooltip label="Repost">
-            <Button
-              className="bg-off-black mr-4"
-              icon={<LuRepeat2 className="text-[16px]" />}
-            >
-              177
-            </Button>
-          </Tooltip>
-
-          <Tooltip label="Share">
-            <Button
-              className="bg-off-black mr-4"
-              icon={<LuShare className="text-xl" />}
-            />
-          </Tooltip>
-
-          <Tooltip label="Copy Link">
-            <Button
-              className="bg-off-black mr-4"
-              icon={<TbCopy className="text-xl" />}
-            />
-          </Tooltip>
-
-          <MoreDropdown
-            trigger={
+          <div className="flex items-center">
+            <Tooltip label="Like">
               <Button
-                className="bg-off-black"
-                icon={<IoIosMore className="text-xl" />}
+                onClick={() => setIsLiked(!isLiked)}
+                className="bg-off-black mr-4"
+                icon={<HiHeart className="text-[16px]" />}
+              >
+                177
+              </Button>
+            </Tooltip>
+            <Tooltip label="Repost">
+              <Button
+                className="bg-off-black mr-4"
+                icon={<LuRepeat2 className="text-[16px]" />}
+              >
+                177
+              </Button>
+            </Tooltip>
+            <Tooltip label="Share">
+              <Button
+                className="bg-off-black mr-4"
+                icon={<LuShare className="text-xl" />}
               />
-            }
-            tooltipLabel="More"
-            items={[
-              {
-                label: "Add to Next up",
-                icon: <ListStart size={19} className="scale-x-[-1]" />,
-              },
-              {
-                label: "Add to Playlist",
-                icon: (
-                  <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
-                ),
-              },
-              { label: "Station", icon: <BiStation className="text-lg" /> },
-            ]}
-          />
+            </Tooltip>
+            <Tooltip label="Copy Link">
+              <Button
+                className="bg-off-black mr-4"
+                icon={<TbCopy className="text-xl" />}
+              />
+            </Tooltip>
+            <MoreDropdown
+              trigger={
+                <Button
+                  className="bg-off-black"
+                  icon={<IoIosMore className="text-xl" />}
+                />
+              }
+              tooltipLabel="More"
+              items={[
+                {
+                  label: "Add to Next up",
+                  icon: <ListStart size={19} className="scale-x-[-1]" />,
+                },
+                {
+                  label: "Add to Playlist",
+                  icon: (
+                    <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
+                  ),
+                },
+                { label: "Station", icon: <BiStation className="text-lg" /> },
+              ]}
+            />
+          </div>
         </motion.div>
       </div>
     </div>
   );
+}
+
+function formatTime(seconds: number): string {
+  const m = Math.floor(seconds / 60);
+  const s = Math.floor(seconds % 60);
+  return `${m}:${s.toString().padStart(2, "0")}`;
 }

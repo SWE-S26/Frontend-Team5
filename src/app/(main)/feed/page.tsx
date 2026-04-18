@@ -15,7 +15,7 @@ export default function Feed() {
   const { getTracks, loading, error, tracks } = useGetTracks();
 
   useEffect(() => {
-    getTracks(1, 20);
+    getTracks(1, 100);
   }, [getTracks]);
 
   const reduxTracks: Track[] = useMemo(
