@@ -568,9 +568,9 @@ export default function LoginForm({
           <p className="text-[13px] text-gray-400 mb-6 leading-relaxed">
             By clicking on any of the "Continue" buttons below, you agree to
             BeatZa's
-            <span className="text-[#699FFF] cursor-pointer ml-1">Terms of Use</span>{" "}
+            <span className="text-[#699FFF] cursor-pointer ml-1" onClick={() => router.push("/legal")}>Terms of Use</span>{" "}
             and
-            <span className="text-[#699FFF] cursor-pointer ml-1">Privacy Policy</span>.
+            <span className="text-[#699FFF] cursor-pointer ml-1" onClick={() => router.push("/privacy-policy")}>Privacy Policy</span>.
           </p>
           <div className="space-y-2 mb-8">
             <button
