@@ -27,6 +27,7 @@ import {
 import { MicrophoneSection } from "./components/MicrophoneSection";
 import { TrackInfoForm } from "./components/TrackInfoForm";
 import { useAppSelector } from "@/store/hooks";
+import { consumePendingUploadAudioFile } from "@/lib/pendingUploadAudio";
 
 function encodeAudioBufferToWav(buffer: AudioBuffer): Blob {
   const numChannels = buffer.numberOfChannels;
@@ -291,6 +292,12 @@ export default function UploadPage() {
       startFormUploadProgress();
     }
   }
+
+  useEffect(() => {
+    const pending = consumePendingUploadAudioFile();
+    if (!pending) return;
+    processFiles([pending], true, true);
+  }, []);
 
   const hasAtLeastOneSupportedAudioFile = (files: File[]) => {
     return files.some((file) => {

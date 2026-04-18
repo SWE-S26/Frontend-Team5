@@ -32,6 +32,12 @@
   --volume-bar: #3a3a3a;
   --upload-schedular:#3a3a3a;
   --upload-select:#4a4b4d;
+  --waveform-base: #f5f5f5;
+  --waveform-left-mask: rgba(88, 88, 88, 0.62);
+  --waveform-left-wave: #5d5d5d;
+  --waveform-window-fill: rgba(47, 191, 98, 0.20);
+  --waveform-window-fill-zero: rgba(88, 88, 88, 0.32);
+  --waveform-playback-mask: rgba(74, 74, 74, 0.62);
 }
 
 [data-theme="light"] {
@@ -47,6 +53,12 @@
   --volume-bar: #c7c7c7;
   --upload-schedular: #aaaaac;
   --upload-select:#909398;
+  --waveform-base: #161616;
+  --waveform-left-mask: rgba(150, 150, 150, 0.42);
+  --waveform-left-wave: #9a9a9a;
+  --waveform-window-fill: rgba(29, 185, 84, 0.22);
+  --waveform-window-fill-zero: rgba(140, 140, 140, 0.28);
+  --waveform-playback-mask: rgba(125, 125, 125, 0.52);
 }
 
 /* @media is used for dark mode */

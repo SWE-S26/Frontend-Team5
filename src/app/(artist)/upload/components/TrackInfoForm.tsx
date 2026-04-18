@@ -184,9 +184,17 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   const audioRef = useRef<HTMLAudioElement | null>(null);
   const clipAudioRef = useRef<HTMLAudioElement | null>(null);
   const clipTrackRef = useRef<HTMLDivElement | null>(null);
+  const clipSelectionRef = useRef<HTMLDivElement | null>(null);
+  const clipLeftShadeRef = useRef<HTMLDivElement | null>(null);
+  const clipLeftShadeWaveRef = useRef<HTMLDivElement | null>(null);
+  const clipRightShadeRef = useRef<HTMLDivElement | null>(null);
+  const clipActivePointerIdRef = useRef<number | null>(null);
   const clipDragOffsetRef = useRef(0);
+  const clipTrackMetricsRef = useRef<{ left: number; width: number } | null>(null);
+  const clipWasPlayingOnDragStartRef = useRef(false);
   const clipDragRafRef = useRef<number | null>(null);
   const clipPendingRangeRef = useRef<{ start: number; end: number } | null>(null);
+  const clipVisualRangeRef = useRef<{ start: number; end: number } | null>(null);
   const replaceFileInputRef = useRef<HTMLInputElement | null>(null);
   const artworkInputRef = useRef<HTMLInputElement | null>(null);
   const releaseCalendarRef = useRef<HTMLDivElement | null>(null);
@@ -220,6 +228,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   const [isClipPlaying, setIsClipPlaying] = useState(false);
   const [clipPlaybackSeconds, setClipPlaybackSeconds] = useState(0);
   const [isDraggingClip, setIsDraggingClip] = useState(false);
+  const [clipDragDisplayRange, setClipDragDisplayRange] = useState<{ start: number; end: number } | null>(null);
   const [isArtworkDragActive, setIsArtworkDragActive] = useState(false);
   const [isTrackDragActive, setIsTrackDragActive] = useState(false);
 
@@ -879,13 +888,20 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   const rightShadePercent = Math.max(0, 100 - (clipLeftPercent + clipWidthPercent));
   const clipPlaybackPercentInWindow = clamp(((clipPlaybackSeconds - safeClipStart) / clipDuration) * 100, 0, 100);
   const clipPlaybackOverlayPercent = isClipPlaying ? clipPlaybackPercentInWindow : 0;
+  const liveClipStart = isDraggingClip ? (clipDragDisplayRange?.start ?? safeClipStart) : safeClipStart;
+  const isClipWindowAtZeroStart = liveClipStart < 0.5;
+  const showClipResetButton = liveClipStart > 0.001;
 
-  const waveformDisplaySamples = Array.from(
-    { length: 220 },
-    (_, idx) => 48 + Math.sin(idx / 7) * 12 + Math.cos(idx / 15) * 7,
+  const waveformDisplaySamples = useMemo(
+    () =>
+      Array.from(
+        { length: 220 },
+        (_, idx) => 48 + Math.sin(idx / 7) * 12 + Math.cos(idx / 15) * 7,
+      ),
+    [],
   );
 
-  const waveformMax = Math.max(...waveformDisplaySamples, 1);
+  const waveformMax = useMemo(() => Math.max(...waveformDisplaySamples, 1), [waveformDisplaySamples]);
 
   const baseWaveformBars = useMemo(
     () =>
@@ -894,23 +910,23 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         return (
           <span
             key={`wave-${idx}`}
-            className="block flex-1 rounded-[1px] bg-white-smoke"
-            style={{ height: `${Math.round(14 + normalized * 72)}px` }}
+            className="block flex-1 rounded-[1px]"
+            style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-base)" }}
           />
         );
       }),
     [waveformDisplaySamples, waveformMax],
   );
 
-  const darkWaveformBars = useMemo(
+  const leftMaskedWaveformBars = useMemo(
     () =>
       waveformDisplaySamples.map((sample, idx) => {
         const normalized = Math.max(0.12, sample / waveformMax);
         return (
           <span
-            key={`wave-dark-${idx}`}
-            className="block flex-1 rounded-[1px] bg-[#525252]"
-            style={{ height: `${Math.round(14 + normalized * 72)}px` }}
+            key={`wave-left-mask-${idx}`}
+            className="block flex-1 rounded-[1px]"
+            style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-left-wave)" }}
           />
         );
       }),
@@ -918,10 +934,63 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   );
 
   const xToSeconds = (clientX: number) => {
+    const metrics = clipTrackMetricsRef.current;
+    if (metrics && metrics.width > 0) {
+      const ratio = clamp((clientX - metrics.left) / metrics.width, 0, 1);
+      return ratio * timelineMax;
+    }
+
     const rect = clipTrackRef.current?.getBoundingClientRect();
     if (!rect || rect.width === 0) return safeClipStart;
     const ratio = clamp((clientX - rect.left) / rect.width, 0, 1);
     return ratio * timelineMax;
+  };
+
+  const updateClipTrackMetrics = () => {
+    const rect = clipTrackRef.current?.getBoundingClientRect();
+    if (!rect || rect.width <= 0) {
+      clipTrackMetricsRef.current = null;
+      return null;
+    }
+    const metrics = { left: rect.left, width: rect.width };
+    clipTrackMetricsRef.current = metrics;
+    return metrics;
+  };
+
+  const applyClipVisualRange = (start: number, end: number) => {
+    const duration = Math.max(0.001, end - start);
+    const metrics = clipTrackMetricsRef.current;
+    const leftPercent = Math.min(100, (start / timelineMax) * 100);
+    const widthPercent = Math.max(5, Math.min(100 - leftPercent, (duration / timelineMax) * 100));
+
+    if (clipSelectionRef.current) {
+      if (metrics && metrics.width > 0) {
+        const leftPx = (leftPercent / 100) * metrics.width;
+        const widthPx = (widthPercent / 100) * metrics.width;
+        clipSelectionRef.current.style.left = "0px";
+        clipSelectionRef.current.style.width = `${widthPx}px`;
+        clipSelectionRef.current.style.transform = `translate3d(${leftPx}px, 0, 0)`;
+      } else {
+        clipSelectionRef.current.style.transform = "translate3d(0px, 0, 0)";
+        clipSelectionRef.current.style.left = `${leftPercent}%`;
+        clipSelectionRef.current.style.width = `${widthPercent}%`;
+      }
+    }
+    if (clipLeftShadeRef.current) {
+      if (metrics && metrics.width > 0) {
+        const leftPx = (leftPercent / 100) * metrics.width;
+        clipLeftShadeRef.current.style.width = `${leftPx}px`;
+      } else {
+        clipLeftShadeRef.current.style.width = `${leftPercent}%`;
+      }
+    }
+    if (clipLeftShadeWaveRef.current) {
+      if (metrics && metrics.width > 0) {
+        clipLeftShadeWaveRef.current.style.width = `${metrics.width}px`;
+      } else {
+        clipLeftShadeWaveRef.current.style.width = "100%";
+      }
+    }
   };
 
   const setDraggedClipRange = (nextStart: number, nextEnd: number, options?: { syncDraft?: boolean }) => {
@@ -991,8 +1060,21 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
 
   const handleClipDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
     if (!canSetAudioPreview) return;
+
+    const target = event.target as HTMLElement | null;
+    if (target?.closest('[data-clip-control="true"]')) {
+      return;
+    }
+
     event.preventDefault();
+    event.stopPropagation();
+    event.currentTarget.setPointerCapture(event.pointerId);
+    clipActivePointerIdRef.current = event.pointerId;
+    clipWasPlayingOnDragStartRef.current = isClipPlaying;
+    const rect = clipTrackRef.current?.getBoundingClientRect();
+    clipTrackMetricsRef.current = rect && rect.width > 0 ? { left: rect.left, width: rect.width } : null;
     clipDragOffsetRef.current = xToSeconds(event.clientX) - safeClipStart;
+    setClipDragDisplayRange({ start: safeClipStart, end: safeClipEnd });
     setIsDraggingClip(true);
   };
 
@@ -1028,6 +1110,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     if (!isDraggingClip || !canSetAudioPreview) return;
 
     const onPointerMove = (event: PointerEvent) => {
+      event.preventDefault();
       const rangeStart = xToSeconds(event.clientX) - clipDragOffsetRef.current;
       const boundedStart = clamp(rangeStart, 0, Math.max(0, timelineMax - clipDuration));
       const boundedEnd = boundedStart + clipDuration;
@@ -1039,11 +1122,19 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         const pending = clipPendingRangeRef.current;
         clipDragRafRef.current = null;
         if (!pending) return;
+        applyClipVisualRange(pending.start, pending.end);
+        clipVisualRangeRef.current = pending;
 
-        setDraggedClipRange(pending.start, pending.end, { syncDraft: false });
-        if (isClipPlaying && clipAudioRef.current) {
-          clipAudioRef.current.currentTime = pending.start;
-        }
+        setClipDragDisplayRange((prev) => {
+          if (
+            prev &&
+            Math.floor(prev.start) === Math.floor(pending.start) &&
+            Math.floor(prev.end) === Math.floor(pending.end)
+          ) {
+            return prev;
+          }
+          return { start: pending.start, end: pending.end };
+        });
       });
     };
 
@@ -1053,31 +1144,87 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         clipDragRafRef.current = null;
       }
 
+      if (clipSelectionRef.current && clipActivePointerIdRef.current !== null) {
+        if (clipSelectionRef.current.hasPointerCapture(clipActivePointerIdRef.current)) {
+          clipSelectionRef.current.releasePointerCapture(clipActivePointerIdRef.current);
+        }
+      }
+      clipActivePointerIdRef.current = null;
+      clipTrackMetricsRef.current = null;
+
       const pending = clipPendingRangeRef.current;
       if (pending) {
         setDraggedClipRange(pending.start, pending.end);
+        if (clipAudioRef.current) {
+          clipAudioRef.current.currentTime = pending.start;
+        }
+        if (clipWasPlayingOnDragStartRef.current) {
+          void playClipFrom(pending.start);
+        }
       } else {
         setAudioClipStartDraft(formatTimeLabel(safeClipStart));
         setAudioClipEndDraft(formatTimeLabel(safeClipEnd));
       }
 
       clipPendingRangeRef.current = null;
+      clipVisualRangeRef.current = null;
+      clipWasPlayingOnDragStartRef.current = false;
+      setClipDragDisplayRange(null);
       setIsDraggingClip(false);
     };
 
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
+    window.addEventListener("pointercancel", onPointerUp);
 
     return () => {
       if (clipDragRafRef.current !== null) {
         window.cancelAnimationFrame(clipDragRafRef.current);
         clipDragRafRef.current = null;
       }
+      clipActivePointerIdRef.current = null;
+      clipTrackMetricsRef.current = null;
       clipPendingRangeRef.current = null;
+      clipVisualRangeRef.current = null;
+      clipWasPlayingOnDragStartRef.current = false;
+      setClipDragDisplayRange(null);
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
+      window.removeEventListener("pointercancel", onPointerUp);
     };
-  }, [isDraggingClip, timelineMax, clipDuration, canSetAudioPreview, isClipPlaying, safeClipStart, safeClipEnd]);
+  }, [isDraggingClip, timelineMax, clipDuration, canSetAudioPreview, safeClipStart, safeClipEnd]);
+
+  useEffect(() => {
+    if (isDraggingClip) return;
+    updateClipTrackMetrics();
+    applyClipVisualRange(safeClipStart, safeClipEnd);
+  }, [isDraggingClip, safeClipStart, safeClipEnd, timelineMax]);
+
+  useEffect(() => {
+    if (!clipTrackRef.current) return;
+
+    const syncVisuals = () => {
+      if (isDraggingClip) return;
+      updateClipTrackMetrics();
+      applyClipVisualRange(safeClipStart, safeClipEnd);
+    };
+
+    syncVisuals();
+
+    const observer = new ResizeObserver(() => {
+      syncVisuals();
+    });
+    observer.observe(clipTrackRef.current);
+
+    window.addEventListener("resize", syncVisuals);
+    window.addEventListener("orientationchange", syncVisuals);
+
+    return () => {
+      observer.disconnect();
+      window.removeEventListener("resize", syncVisuals);
+      window.removeEventListener("orientationchange", syncVisuals);
+    };
+  }, [isDraggingClip, safeClipStart, safeClipEnd, timelineMax]);
 
   useEffect(() => {
     if (!uploadedFileUrl) {
@@ -1214,7 +1361,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
 
       {/* Quit Modal */}
       {showQuitModal && (
-        <div className="fixed inset-0 z-60 flex items-center justify-center bg-login px-4">
+        <div className="fixed inset-0 z-200 flex items-center justify-center bg-login px-4">
           <div className="relative w-full max-w-105 rounded-lg bg-chinese-black border border-[#2b2c31] p-6 shadow-2xl">
             <button
               type="button"
@@ -2103,7 +2250,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
               >
                 <div className="py-4">
                   <div className="relative overflow-hidden bg-chinese-black">
-                    <div className="relative h-24 px-2 pt-4 sm:h-30 sm:pt-6">
+                    <div className="relative h-28 px-1.5 pt-3 sm:h-30 sm:px-2 sm:pt-6">
                       <div className="pointer-events-none absolute inset-0 opacity-85">
                         <div className="flex h-full w-full items-center gap-px px-1">
                           {baseWaveformBars}
@@ -2121,28 +2268,41 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                       ) : (
                         <>
                           <div
-                            className="pointer-events-none absolute inset-y-0 left-0 bg-chinese-black/45"
+                            ref={clipLeftShadeRef}
+                            className="pointer-events-none absolute inset-y-0 left-1 overflow-hidden"
                             style={{ width: `${clipLeftPercent}%` }}
-                          />
+                          >
+                            <div ref={clipLeftShadeWaveRef} className="flex h-full items-center gap-px px-1">
+                              {leftMaskedWaveformBars}
+                            </div>
+                          </div>
                           <div
-                            className="pointer-events-none absolute inset-y-0 right-0 bg-chinese-black/45"
+                            ref={clipRightShadeRef}
+                            className="pointer-events-none absolute inset-y-0 right-0"
                             style={{ width: `${rightShadePercent}%` }}
                           />
 
                           <div ref={clipTrackRef} className="absolute inset-y-0 left-1 right-1">
                             <div
-                              className={`absolute inset-y-0 z-30 cursor-grab overflow-hidden rounded-sm border border-white bg-transparent isolate ${isDraggingClip ? "cursor-grabbing" : ""}`}
-                              style={{ left: `${clipLeftPercent}%`, width: `${clipWidthPercent}%` }}
+                              ref={clipSelectionRef}
+                              className={`absolute inset-y-0 z-30 cursor-grab overflow-hidden rounded-sm border border-white bg-transparent isolate will-change-transform ${isDraggingClip ? "cursor-grabbing" : ""}`}
+                              style={{ left: `${clipLeftPercent}%`, width: `${clipWidthPercent}%`, touchAction: "none", transform: "translate3d(0px, 0, 0)" }}
                               onPointerDown={handleClipDragStart}
                             >
-                              <div className="pointer-events-none absolute inset-px z-0 rounded-sm bg-[#2fbf62]/18" />
                               <div
-                                className="pointer-events-none absolute bottom-px left-px top-px z-10 overflow-hidden rounded-l-sm bg-[#4f4f4f]/62"
-                                style={{ width: `${clipPlaybackOverlayPercent}%` }}
-                              >
+                                className="pointer-events-none absolute inset-px z-0 rounded-sm"
+                                style={{ backgroundColor: isClipWindowAtZeroStart ? "var(--waveform-window-fill-zero)" : "var(--waveform-window-fill)" }}
+                              />
+                              <div className="pointer-events-none absolute inset-px z-5 overflow-hidden rounded-sm">
                                 <div className="flex h-full w-full items-center gap-px px-1">
-                                  {darkWaveformBars}
+                                  {baseWaveformBars}
                                 </div>
+                              </div>
+                              <div
+                                className="pointer-events-none absolute bottom-px left-px top-px z-10 overflow-hidden rounded-l-sm"
+                                style={{ backgroundColor: "var(--waveform-playback-mask)", width: `${clipPlaybackOverlayPercent}%` }}
+                              >
+                                <div className="h-full w-full" />
                               </div>
                               <button
                                 type="button"
@@ -2150,7 +2310,8 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                                   e.stopPropagation();
                                   void handleClipPlayPause();
                                 }}
-                                className="absolute left-1/2 top-1/2 z-20 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white-smoke text-chinese-black shadow-lg cursor-pointer sm:h-10 sm:w-10"
+                                data-clip-control="true"
+                                className="absolute left-1/2 top-1/2 z-20 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white-smoke text-chinese-black shadow-lg cursor-pointer sm:h-10 sm:w-10"
                                 aria-label={isClipPlaying ? "Pause clip preview" : "Play clip preview"}
                               >
                                 {isClipPlaying ? <PauseCircleOutlined className="text-[16px] sm:text-[20px]" /> : <PlayCircleOutlined className="text-[16px] sm:text-[20px]" />}
@@ -2166,7 +2327,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                     <div className="flex items-end justify-between border-t border-[#2a2a2a] px-2 pb-2 pt-2 sm:px-4 sm:pb-3">
                       <div className="flex min-w-14 flex-col gap-1 sm:min-w-16 sm:gap-1.5">
                         <input
-                          value={isDraggingClip ? formatTimeLabel(safeClipStart) : audioClipStartDraft}
+                          value={isDraggingClip ? formatTimeLabel(clipDragDisplayRange?.start ?? safeClipStart) : audioClipStartDraft}
                           onChange={(e) => setAudioClipStartDraft(e.target.value)}
                           onBlur={() => void applyTypedClipTime("start")}
                           onKeyDown={(e) => {
@@ -2181,18 +2342,21 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                         <span className="h-px w-10 bg-[#4a4a4a] sm:w-12" />
                       </div>
                       <div className="flex flex-col items-center justify-end gap-1 sm:gap-1.5">
-                        <button
-                          type="button"
-                          onClick={handleClipReset}
-                          className="rounded border border-white-smoke/30 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white-smoke hover:border-white-smoke hover:bg-white-smoke/10 cursor-pointer"
-                        >
-                          Reset
-                        </button>
-                        <span className="h-px w-10 bg-[#4a4a4a] sm:w-12" />
+                        {showClipResetButton ? (
+                          <button
+                            type="button"
+                            onClick={handleClipReset}
+                            className="rounded border border-white-smoke/30 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white-smoke hover:border-white-smoke hover:bg-white-smoke/10 cursor-pointer"
+                          >
+                            Reset
+                          </button>
+                        ) : (
+                          <div className="h-5.75" />
+                        )}
                       </div>
                       <div className="flex min-w-14 flex-col items-end gap-1 sm:min-w-16 sm:gap-1.5">
                         <input
-                          value={isDraggingClip ? formatTimeLabel(safeClipEnd) : audioClipEndDraft}
+                          value={isDraggingClip ? formatTimeLabel(clipDragDisplayRange?.end ?? safeClipEnd) : audioClipEndDraft}
                           onChange={(e) => setAudioClipEndDraft(e.target.value)}
                           onBlur={() => void applyTypedClipTime("end")}
                           onKeyDown={(e) => {
@@ -2268,7 +2432,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
       </div>
 
       {/* Footer */}
-      <div className="fixed bottom-0 left-0 right-0 border-t border-silver/25 bg-chinese-black/90 px-4 py-4 sm:px-6 sm:py-5">
+      <div className="fixed z-100 bottom-0 left-0 right-0 border-t border-silver/25 bg-chinese-black/90 px-4 py-4 sm:px-6 sm:py-5">
         <div className="relative mx-auto flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
           <p className="text-center text-[11px] text-white-smoke sm:pointer-events-none sm:absolute sm:left-1/2 sm:-translate-x-1/2">
             By uploading, you confirm that your sounds comply with our{" "}
