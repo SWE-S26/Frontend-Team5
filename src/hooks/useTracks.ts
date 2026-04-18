@@ -7,6 +7,8 @@ import {
   GetTracksErrorResponse,
   GetTracksResponse,
 } from "@/types/tracks.types";
+import { GetTrackByIdResponse } from "@/types/tracks.types";
+
 
 export function useCreateTrack() {
   const [loading, setLoading] = useState(false);
@@ -130,5 +132,42 @@ export function useGetPostedTracks() {
     error,
     validationErrors,
     tracks,
+  };
+}
+
+export function useGetTrackById() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [track, setTrack] = useState<GetTrackByIdResponse["data"] | null>(null);
+
+  const getTrackById = useCallback(async (id: string) => {
+    if (!id) return;
+
+    setLoading(true);
+    setError(null);
+    setTrack(null);
+
+    try {
+      const res = await tracksService.getTrackById(id);
+      setTrack(res.data.data);
+      return res.data;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const message =
+          err.response?.data?.message || "Failed to fetch track";
+        setError(message);
+      } else {
+        setError("Something went wrong");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return {
+    getTrackById,
+    loading,
+    error,
+    track,
   };
 }

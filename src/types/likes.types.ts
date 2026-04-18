@@ -9,3 +9,17 @@ export interface LikeTrackResponse {
 export interface LikeTrackErrorResponse {
   message: string;
 }
+
+export interface LikeUser {
+  userId:         string
+  displayName:    string
+  avatarUrl:      string
+  followersCount: number
+}
+
+export interface TrackLikesResponse {
+  total:  number
+  offset: number
+  limit:  number
+  users:  LikeUser[]
+}

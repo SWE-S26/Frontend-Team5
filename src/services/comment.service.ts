@@ -1,0 +1,50 @@
+import api from "@/lib/api"
+import { TrackComment, CommentsResponse, RepliesResponse, PostCommentPayload, LikeCommentResponse } from "@/types/comments.types"
+
+export const fetchTrackComments = async (
+  trackId: string,
+  offset = 1,
+  limit  = 20
+): Promise<CommentsResponse> => {
+  const res = await api.get(
+    `/api/public/engagement/tracks/v1/${trackId}/comments`,
+    { params: { offset, limit } }
+  )
+  return res.data
+}
+
+export const fetchCommentReplies = async (
+  commentId: string,
+  offset = 1,
+  limit  = 20
+): Promise<RepliesResponse> => {
+  const res = await api.get(
+    `/api/public/engagement/comments/v1/${commentId}/replies`,
+    { params: { offset, limit } }
+  )
+  return res.data
+}
+
+export const postComment = async (
+  trackId: string,
+  payload: PostCommentPayload
+): Promise<TrackComment> => {
+  const res = await api.post(
+    `/api/engagement/tracks/v1/${trackId}/comments`,
+    payload
+  )
+  return res.data
+}
+
+export const likeComment = async (
+  commentId: string
+): Promise<LikeCommentResponse> => {
+  const res = await api.post(
+    `/api/engagement/comments/v1/${commentId}/like`
+  )
+  return res.data
+}
+
+export const deleteComment = async (commentId: string): Promise<void> => {
+  await api.delete(`/api/engagement/comments/v1/${commentId}`)
+}

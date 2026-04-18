@@ -4,6 +4,7 @@ import { GetPostedTracksResponse, GetTracksResponse } from "@/types/tracks.types
 import {
 	CreateTrackRequest,
 	CreateTrackResponse,
+	GetTrackByIdResponse
 } from "@/types/tracks.types";
 
 export const tracksService = {
@@ -43,4 +44,6 @@ export const tracksService = {
 		),
 	getPostedTracks: (userId: string) =>
 		api.get<GetPostedTracksResponse>(`/api/public/tracks/v1/posted/${userId}`),
+	getTrackById: (id: string) =>
+  	api.get<GetTrackByIdResponse>(`/api/public/tracks/v1/${id}`),
 };
