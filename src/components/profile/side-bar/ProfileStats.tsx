@@ -27,7 +27,7 @@ export default function ProfileStats() {
             </div>
             </Link>
 
-            <Link href={`/profile/${username}/tracks`} className="flex flex-col gap-3 group/tracks cursor-pointer">
+            <Link href={`/profile/${username}?tab=tracks`} className="flex flex-col gap-3 group/tracks cursor-pointer">
             <p className="text-sm text-silver font-bold">Tracks</p>
             <div className="relative">
                 <span className="text-2xl text-white-smoke font-bold group-hover/tracks:text-silver">{trackCount}</span>
