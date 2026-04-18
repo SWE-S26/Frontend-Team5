@@ -8,12 +8,14 @@ export default function SausageWaveform({
   onSeek,
   onPlay,
   isPlaying = false,
+  currentTime = 0,
 }: {
   samplesUrl: string;
   externalProgress?: number;
   onSeek?: (percentage: number) => void;
   onPlay?: (seekPercentage?: number) => void;
   isPlaying?: boolean;
+  currentTime: number;
 }) {
   const scwRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -25,8 +27,6 @@ export default function SausageWaveform({
   const [fgBottom, setFgBottom] = useState<string | null>(null);
 
   const [isHovering, setIsHovering] = useState(false);
-
-  const [playbackStarted, setPlaybackStarted] = useState(false);
 
   // Click-preview state: flat top follows mouse, playback unaffected
   const [isPreviewing, setIsPreviewing] = useState(false);
@@ -95,6 +95,13 @@ export default function SausageWaveform({
       0,
       Math.min(100, ((e.clientX - rect.left) / rect.width) * 100),
     );
+  };
+
+  const formatTime = (time: number) => {
+    const minutes = Math.floor(time / 60);
+    const seconds = Math.floor(time % 60);
+
+    return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
   // Detect when mousedown becomes an actual drag
@@ -282,11 +289,11 @@ export default function SausageWaveform({
         <div className="absolute bottom-[26px] left-0 w-full h-[1px] bg-chinese-black -translate-y-1/2 z-30 pointer-events-none" />
 
         {/* Timestamps — z-40 */}
-        <div className="absolute left-0 w-full flex justify-between text-[10px] z-40 bottom-[26px]">
+        <div className="absolute left-0 w-full flex justify-between text-[10px] z-40 bottom-[27px]">
           <span className="bg-black px-[3px] flex items-center justify-center text-papaya">
-            0:00
+            {formatTime(currentTime)}
           </span>
-          <span className="bg-black px-[3px] flex items-center justify-center text-gray-500">
+          <span className="bg-black px-[3px] flex items-center justify-center text-white/50">
             1:00
           </span>
         </div>

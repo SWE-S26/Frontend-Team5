@@ -4,10 +4,19 @@ import { RootState } from "@/store/store";
 import { playerEngine } from "@/lib/playerEngine";
 
 export function useAudioProgress() {
-  const { isPlaying } = useSelector((state: RootState) => state.player);
+  const { isPlaying, currentTrackDuration } = useSelector(
+    (state: RootState) => state.player,
+  );
   const [currentTime, setCurrentTime] = useState(0);
-  const [duration, setDuration] = useState(0);
+  const [duration, setDuration] = useState(currentTrackDuration);
   const animationFrameRef = useRef<number | null>(null);
+
+  // Initialize duration from Redux when track changes
+  useEffect(() => {
+    if (currentTrackDuration > 0) {
+      setDuration(currentTrackDuration);
+    }
+  }, [currentTrackDuration]);
 
   // Update progress smoothly on every frame while playing
   useEffect(() => {
@@ -46,9 +55,10 @@ export function useAudioProgress() {
     };
   }, [isPlaying, duration]);
 
-  // Seek to a percentage of the track
-  const seek = useCallback((percentage: number) => {
-    playerEngine.seek(percentage);
+  // PUBLIC API: Seek to a percentage of the track (0-100)
+  // This is the only way to seek - it keeps UI state in sync
+  const seekToPercentage = useCallback((percentage: number) => {
+    playerEngine._seekPercentage(percentage);
     const newTime = (percentage / 100) * playerEngine.getDuration();
     setCurrentTime(newTime);
   }, []);
@@ -59,6 +69,6 @@ export function useAudioProgress() {
     currentTime,
     duration,
     progress,
-    seek,
+    seekToPercentage,
   };
 }

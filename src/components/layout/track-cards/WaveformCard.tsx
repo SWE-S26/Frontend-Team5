@@ -22,16 +22,10 @@ import { TbCopy } from "react-icons/tb";
 import { ListStart } from "lucide-react";
 import { RiPlayListAddLine } from "react-icons/ri";
 import { BiStation } from "react-icons/bi";
+
 import { RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  pause,
-  play,
-  setTrack,
-  setTrackWithUrl,
-} from "@/store/slices/playerSlice";
-
-// https://OmarGamalS.publit.io/file/POWER.mp3
+import { pause, play, playAudio } from "@/store/slices/playerSlice";
 
 type CardProps = {
   img?: string;
@@ -39,6 +33,7 @@ type CardProps = {
   artist?: string;
   trackId?: string;
   trackUrl?: string;
+  duration?: number;
 };
 
 export default function WaveformCard({
@@ -49,7 +44,6 @@ export default function WaveformCard({
   trackUrl,
 }: CardProps) {
   const [isLiked, setIsLiked] = useState(false);
-  // const [isPlaying, setIsPlaying] = useState(false);
   const [showComments, setShowComments] = useState(false);
   const [canComment, setCanComment] = useState(false);
 
@@ -57,7 +51,7 @@ export default function WaveformCard({
   const commentButtonRef = useRef<HTMLButtonElement>(null);
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
-  const { progress, seek } = useAudioProgress();
+  const { progress, currentTime, seekToPercentage } = useAudioProgress();
 
   const dispatch = useDispatch();
 
@@ -77,41 +71,38 @@ export default function WaveformCard({
   function handlePlayClick(e: React.MouseEvent) {
     e.stopPropagation();
 
-    if (!trackId) return;
+    if (!trackId || !trackUrl) return;
 
     if (isThisCardPlaying) {
       dispatch(pause());
       return;
     }
 
-    if (trackUrl) {
-      dispatch(setTrackWithUrl({ id: trackId, url: trackUrl }));
-    } else {
-      dispatch(setTrack(trackId));
-    }
+    dispatch(
+      playAudio({
+        tracks: [{ id: trackId, url: trackUrl, title, artist, img }],
+        startId: trackId,
+      }),
+    );
 
     setTimeout(() => {
       dispatch(play());
-    }, 100);
+    }, 0);
   }
-
   function handleWaveformPlay(seekPercentage?: number) {
-    // Start playback when interacting with waveform
-    if (!trackId) return;
+    if (!trackId || !trackUrl) return;
 
-    // If already playing this track, don't restart it
     if (isThisCardPlaying) return;
 
-    if (trackUrl) {
-      dispatch(setTrackWithUrl({ id: trackId, url: trackUrl }));
-    } else {
-      dispatch(setTrack(trackId));
-    }
+    dispatch(
+      playAudio({
+        tracks: [{ id: trackId, url: trackUrl, title, artist, img }],
+      }),
+    );
 
     setTimeout(() => {
-      // Seek to the clicked/dragged position if provided
       if (seekPercentage !== undefined) {
-        seek(seekPercentage);
+        seekToPercentage(seekPercentage);
       }
       dispatch(play());
     }, 100);
@@ -152,9 +143,10 @@ export default function WaveformCard({
           <SausageWaveform
             samplesUrl="/waveform.json"
             externalProgress={progress}
-            onSeek={seek}
+            onSeek={seekToPercentage}
             onPlay={handleWaveformPlay}
             isPlaying={isThisCardPlaying}
+            currentTime={currentTime}
           />
         </div>
 

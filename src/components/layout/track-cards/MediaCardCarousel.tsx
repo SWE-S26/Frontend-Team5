@@ -53,7 +53,6 @@ export default function MediaCardCarousel() {
 
   return (
     <div className="sm:w-1/5 md:w-full max-w-6xl py-8">
-      {" "}
       {/* OM - removed this from className (mx-auto px-4) for alignment purposes, re-add them to see yourself */}
       {/* Title */}
       <h2 className="text-[22px] font-bold pb-4 text-white-smoke">
@@ -79,7 +78,7 @@ export default function MediaCardCarousel() {
             {loading
               ? skeletonCards.map((_, index) => (
                   <div key={index} className="flex-none">
-                    <Card />{" "}
+                    <Card />
                   </div>
                 ))
               : tracks?.map((track) => (
@@ -90,6 +89,7 @@ export default function MediaCardCarousel() {
                       artist={track.basicInfo.mainArtists[0]}
                       trackId={track._id}
                       trackUrl={track.audio.audioLink}
+                      duration={track.durationInSeconds}
                     />
                   </div>
                 ))}

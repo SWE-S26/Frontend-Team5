@@ -9,13 +9,8 @@ import { ListStart } from "lucide-react";
 import MoreDropdown from "./MoreDropdown";
 
 import { useSelector, useDispatch } from "react-redux";
-import { RootState } from "@/store/store";
-import {
-  setTrack,
-  setTrackWithUrl,
-  play,
-  pause,
-} from "@/store/slices/playerSlice";
+import { RootState, store } from "@/store/store";
+import { play, pause, playAudio, playNext } from "@/store/slices/playerSlice";
 
 import { useLikeTrack } from "@/hooks/useLikes";
 
@@ -25,6 +20,7 @@ type CardProps = {
   artist?: string;
   trackId?: string;
   trackUrl?: string;
+  duration?: number;
   type?: "interactive" | "static";
 };
 
@@ -34,6 +30,7 @@ export default function Card({
   artist,
   trackId,
   trackUrl,
+  duration,
   type = "interactive",
 }: CardProps) {
   const { likeTrack, liked, loading } = useLikeTrack();
@@ -50,18 +47,19 @@ export default function Card({
   function handlePlayClick(e: React.MouseEvent) {
     e.stopPropagation();
 
-    if (!trackId) return;
+    if (!trackId || !trackUrl) return;
 
     if (isThisCardPlaying) {
       dispatch(pause());
       return;
     }
 
-    if (trackUrl) {
-      dispatch(setTrackWithUrl({ id: trackId, url: trackUrl }));
-    } else {
-      dispatch(setTrack(trackId));
-    }
+    dispatch(
+      playAudio({
+        tracks: [{ id: trackId, url: trackUrl, title, artist, img, duration }],
+        startId: trackId,
+      }),
+    );
 
     setTimeout(() => {
       dispatch(play());
@@ -71,6 +69,23 @@ export default function Card({
   function handleLikeClick(e: React.MouseEvent) {
     e.stopPropagation();
     setIsLiked((l) => !l);
+  }
+
+  function handlePlayNextClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!trackId || !trackUrl) return;
+
+    dispatch(
+      playNext({
+        id: trackId,
+        url: trackUrl,
+        title,
+        artist,
+        img,
+      }),
+    );
+
+    console.log(store.getState().player.tracks);
   }
 
   return (
@@ -141,7 +156,7 @@ export default function Card({
                   {
                     label: "Add to Next up",
                     icon: <ListStart size={19} className="scale-x-[-1]" />,
-                    onClick: () => console.log("next up"),
+                    onClick: (e) => handlePlayNextClick(e),
                   },
                   {
                     label: "Add to Playlist",

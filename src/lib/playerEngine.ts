@@ -2,10 +2,13 @@ import { Howl } from "howler";
 
 let sound: Howl | null = null;
 let pendingSeek: number | null = null;
+let loopMode: "none" | "one" | "all" = "none";
 
 export const playerEngine = {
   load(src: string, onEnd?: () => void) {
     if (sound) {
+      sound.off(); // remove all event listeners first
+      sound.stop();
       sound.unload();
       sound = null;
     }
@@ -14,7 +17,6 @@ export const playerEngine = {
       src: [src],
       html5: true,
       onload: () => {
-        // Audio is now fully loaded, apply any pending seek
         if (pendingSeek !== null) {
           const duration = sound!.duration();
           if (duration > 0) {
@@ -24,9 +26,18 @@ export const playerEngine = {
         }
       },
       onend: () => {
-        onEnd?.();
+        if (loopMode === "one") {
+          sound!.seek(0);
+          sound!.play();
+        } else if (loopMode === "all") {
+          onEnd?.();
+        }
       },
     });
+  },
+
+  setLoop(mode: "none" | "one" | "all") {
+    loopMode = mode;
   },
 
   play() {
@@ -37,11 +48,9 @@ export const playerEngine = {
     sound?.pause();
   },
 
-  stop() {
-    sound?.stop();
-  },
-
-  seek(pct: number) {
+  // INTERNAL: Seek to a percentage of the track (0-100)
+  // Use useAudioProgress.seekToPercentage() instead - it manages state correctly
+  _seekPercentage(pct: number) {
     if (!sound) return;
 
     // Store the seek request to apply after audio loads
@@ -60,11 +69,13 @@ export const playerEngine = {
     sound?.volume(v);
   },
 
+  // Get current playback position in seconds
   getCurrentTime(): number {
     if (!sound) return 0;
     return sound.seek() as number;
   },
 
+  // Get total duration in seconds
   getDuration(): number {
     if (!sound) return 0;
     return sound.duration();
@@ -74,3 +85,16 @@ export const playerEngine = {
     return sound !== null;
   },
 };
+
+/**
+ * PUBLIC API for audio control:
+ * - playerEngine.load(src)        : Load audio source
+ * - playerEngine.play()           : Start playback
+ * - playerEngine.pause()          : Pause playback
+ * - playerEngine.setVolume(0-1)   : Set volume level
+ * - playerEngine.getCurrentTime() : Get current position (seconds)
+ * - playerEngine.getDuration()    : Get total duration (seconds)
+ *
+ * For seeking: Use useAudioProgress.seekToPercentage() instead
+ * This ensures React state stays synchronized with audio position
+ */

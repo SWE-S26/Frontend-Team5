@@ -21,7 +21,7 @@ export interface DropdownItem {
   type?: "separator";
   label?: string;
   icon?: React.ReactNode;
-  onClick?: () => void;
+  onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
 }
 
@@ -134,7 +134,7 @@ export default function MoreDropdown({
                 disabled={item.disabled}
                 onClick={(e) => {
                   e.stopPropagation();
-                  item.onClick?.();
+                  item.onClick?.(e);
                   setIsOpen(false);
                 }}
                 className={`flex items-center gap-3 pl-3 pr-6 py-1.5 text-left transition-colors ${
