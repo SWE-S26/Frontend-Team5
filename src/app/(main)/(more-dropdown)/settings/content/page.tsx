@@ -94,7 +94,6 @@ export default function Content() {
   const [includeInRss,       setIncludeInRss]       = useState(false)
   const [creativeCommons,    setCreativeCommons]    = useState(false)
 
-  // Snapshot for cancel rollback
   const [savedEmailDisplay,       setSavedEmailDisplay]       = useState("none")
   const [savedCustomFeedTitle,    setSavedCustomFeedTitle]    = useState("")
   const [savedCategory,           setSavedCategory]           = useState("")
@@ -105,20 +104,19 @@ export default function Content() {
   const [savedIncludeInRss,       setSavedIncludeInRss]       = useState(false)
   const [savedCreativeCommons,    setSavedCreativeCommons]    = useState(false)
 
-  // Hydrate from API
   useEffect(() => {
     if (!settings) return
 
-    const rss            = settings.rssFeedLink            ?? ""
-    const email          = settings.rssEmailDisplayed      ?? "none"
-    const feedTitle      = settings.customFieldTitle       ?? ""
-    const cat            = settings.category               ?? ""
-    const stats          = settings.statsServiceUrlPrefix  ?? ""
-    const author         = settings.customAuthorName       ?? ""
-    const redirect       = settings.subscriberRedirect     ?? ""
-    const explicit       = settings.containsExplicitContent ?? false
-    const inRss          = settings.includeInRssFeed       ?? false
-    const cc             = settings.creativeCommonsLicense ?? false
+    const rss      = settings.rssFeedLink            ?? ""
+    const email    = settings.rssEmailDisplayed      ?? "none"
+    const feedTitle = settings.customFieldTitle      ?? ""
+    const cat      = settings.category               ?? ""
+    const stats    = settings.statsServiceUrlPrefix  ?? ""
+    const author   = settings.customAuthorName       ?? ""
+    const redirect = settings.subscriberRedirect     ?? ""
+    const explicit = settings.containsExplicitContent ?? false
+    const inRss    = settings.includeInRssFeed       ?? false
+    const cc       = settings.creativeCommonsLicense ?? false
 
     setRssFeed(rss)
     setEmailDisplay(email)
@@ -165,15 +163,15 @@ export default function Content() {
 
   const handleSave = () => {
     updateSettings({
-      rssEmailDisplayed:      emailDisplay,
-      customFieldTitle:       customFeedTitle,
+      rssEmailDisplayed:       emailDisplay,
+      customFieldTitle:        customFeedTitle,
       category,
-      statsServiceUrlPrefix:  statsPrefix,
+      statsServiceUrlPrefix:   statsPrefix,
       customAuthorName,
       subscriberRedirect,
       containsExplicitContent: explicitContent,
-      includeInRssFeed:       includeInRss,
-      creativeCommonsLicense: creativeCommons,
+      includeInRssFeed:        includeInRss,
+      creativeCommonsLicense:  creativeCommons,
     })
 
     setSavedEmailDisplay(emailDisplay)
@@ -204,7 +202,7 @@ export default function Content() {
   }
 
   return (
-    <div className="max-w-3xl text-white-smoke font-bold space-y-8 mb-10">
+    <div className="w-full max-w-3xl text-white-smoke font-bold space-y-8 mb-10">
 
       {/* RSS feed */}
       <div>
@@ -239,10 +237,10 @@ export default function Content() {
           </span>
         </div>
 
-        <div className="grid grid-cols-3 gap-6 mb-5">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-6 mb-5">
 
           {/* Row 1 */}
-          <div className="col-span-2">
+          <div className="sm:col-span-2">
             <label className="text-sm mb-2 block">RSS feed</label>
             <TextInput value={rssFeed} readOnly />
           </div>

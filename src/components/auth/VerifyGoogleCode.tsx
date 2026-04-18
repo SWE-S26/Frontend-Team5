@@ -2,7 +2,7 @@
 
 import { useRouter, useSearchParams } from "next/navigation";
 import { useRef, useState, Suspense } from "react";
-import { useGoogleVerifyCode } from "@/hooks/useAuth";
+import { useGoogleVerifyCode, useResendVerificationCode } from "@/hooks/useAuth";
 
 function VerifyGoogleCodeInner() {
   const router = useRouter();
@@ -12,9 +12,11 @@ function VerifyGoogleCodeInner() {
 
   const [digits, setDigits] = useState<string[]>(Array(6).fill(""));
   const [localError, setLocalError] = useState<string | null>(null);
+  const [resendInfo, setResendInfo] = useState<string | null>(null);
   const inputRefs = useRef<Array<HTMLInputElement | null>>([]);
 
   const { verifyGoogleCode, loading, error } = useGoogleVerifyCode();
+  const { resendVerificationCode, loading: resendLoading } = useResendVerificationCode();
 
   const code = digits.join("");
   const isCodeValid = code.trim().length === 6;
@@ -92,29 +94,34 @@ function VerifyGoogleCodeInner() {
     }
   };
 
+  const handleResend = async () => {
+    if (!pendingToken) {
+      setLocalError("Missing verification token. Please start sign-in again.");
+      return;
+    }
+
+    setLocalError(null);
+    setResendInfo(null);
+    const res = await resendVerificationCode(pendingToken);
+
+    if (res) {
+      setResendInfo("Verification code resent. The original 5-minute expiry window is unchanged.");
+    }
+  };
+
   return (
-    <main data-testid="Verify-Google-Code" className="relative min-h-dvh bg-chinese-black">
-      <div className="mx-auto flex min-h-dvh w-full items-center justify-center px-4 py-8">
-        <section className="w-full max-w-md rounded-sm border border-white/10 bg-chinese-black px-8 py-10 text-white-smoke shadow-[0_30px_90px_rgba(0,0,0,0.45)]">
-          <h1 className="text-center text-xl font-bold leading-snug tracking-tight">
-            <span className="block">An account exists</span>
-            <span className="block">with this email address!</span>
+    <main data-testid="Verify-Google-Code" className="min-h-dvh bg-chinese-black px-3 py-6 sm:px-6 sm:py-10">
+      <div className="mx-auto flex min-h-[calc(100dvh-3rem)] w-full max-w-105 items-center justify-center">
+        <section className="w-full rounded-md border border-white/30 bg-chinese-black px-6 py-8 text-white-smoke shadow-[0_18px_60px_rgba(0,0,0,0.45)] sm:px-7 sm:py-9">
+          <h1 className="text-center text-[48px] font-bold tracking-[-0.03em] text-[#e7e7e7] leading-none sm:text-[32px]">
+            Welcome back!
           </h1>
 
-          <p className="mx-auto mt-4 text-center text-sm leading-snug text-white-smoke/90">
-            We can connect your Google credentials to this account so you can use
-            it to log in next time.
+          <p className="mx-auto mt-8 max-w-110 text-center text-[14px] leading-tight text-[#f0f0f0] sm:text-[14px]">
+            We found an account for <span className="font-semibold">{email}</span>. Enter the code sent to your email to link your Google login and continue.
           </p>
 
-          <p className="mx-auto mt-4 text-center text-sm leading-snug text-white-smoke/95">
-            To continue, enter the code we have sent to this email as verification.
-          </p>
-
-          <p className="mt-5 text-center text-base font-semibold leading-tight text-white-smoke">
-            {email}
-          </p>
-
-          <div className="mt-6 flex items-center justify-center gap-2 sm:gap-3">
+          <div className="mt-8 flex items-center justify-between gap-2.5 sm:gap-2">
             {digits.map((digit, index) => (
               <input
                 data-testid="Verify-Code-input"
@@ -130,37 +137,48 @@ function VerifyGoogleCodeInner() {
                 onChange={(event) => handleDigitChange(index, event.target.value)}
                 onKeyDown={(event) => handleKeyDown(index, event)}
                 onPaste={index === 0 ? handlePaste : undefined}
-                className="h-14 w-10 rounded-md border border-[#d7d7d7] bg-[#e9e9e9] text-center text-xl font-semibold text-[#101010] outline-none transition focus:border-white focus:shadow-[0_0_0_2px_rgba(255,255,255,0.15)] sm:h-16 sm:w-11 sm:text-2xl"
+                className="h-16 w-13 rounded-md border border-transparent bg-[#303030] text-center text-[28px] font-semibold text-[#f4f4f4] outline-none transition focus:border-[#dedede] focus:bg-[#2f3135]"
                 aria-label={`Verification digit ${index + 1}`}
               />
             ))}
           </div>
 
-          {(localError || error) && (
-            <p className="mx-auto mt-3 text-center text-sm text-red-400">
-              {localError || error}
-            </p>
-          )}
+          <div className="mt-5 min-h-6">
+            {(localError || error) && (
+              <p className="text-center text-[14px] text-[#ff7f9b]">{localError || error}</p>
+            )}
+            {!localError && !error && resendInfo && (
+              <p className="text-center text-[14px] text-[#9ed7a6]">{resendInfo}</p>
+            )}
+          </div>
 
           <button
             type="button"
             onClick={handleVerify}
             disabled={isDisabled}
-            className="mx-auto mt-6 block h-10 w-full max-w-xs rounded-md bg-white-smoke px-6 text-base font-semibold text-chinese-black disabled:cursor-not-allowed disabled:opacity-70 enabled:cursor-pointer enabled:hover:bg-[#ededed]"
+            className="mt-7 block h-12 w-full rounded-md bg-white-smoke px-6 text-[20px] font-semibold text-chinese-black disabled:cursor-not-allowed disabled:opacity-70 enabled:cursor-pointer enabled:hover:bg-[#f2f2f2]"
           >
             {loading ? "Verifying..." : "Continue"}
           </button>
 
           <button
             type="button"
-            onClick={() => setLocalError(null)}
-            className="mx-auto mt-3 block text-center text-sm text-[#4285f4] hover:text-[#6ea3ff] cursor-pointer"
+            onClick={handleResend}
+            disabled={resendLoading}
+            className="mt-3 block h-12 w-full rounded-md bg-[#2f3135] px-6 text-[20px] font-semibold text-white-smoke disabled:cursor-not-allowed disabled:opacity-70 enabled:cursor-pointer enabled:hover:bg-[#36383d]"
           >
-            Send again
+            {resendLoading ? "Resending..." : "Resend"}
           </button>
 
-          <p className="mx-auto mt-5 text-center text-sm leading-snug text-white-smoke/90">
-            Otherwise, you can go back and choose another authentication method.
+          <p className="mt-5 text-left text-[14px] text-[#a9aaad]">
+            Not you?{" "}
+            <button
+              type="button"
+              onClick={() => router.push("/sign-in")}
+              className="font-semibold text-[#5e98ff] hover:text-[#7aacff] cursor-pointer"
+            >
+              Back to login
+            </button>
           </p>
         </section>
       </div>

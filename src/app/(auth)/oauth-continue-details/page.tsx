@@ -41,10 +41,10 @@ function OAuthContinueDetailsForm() {
   };
 
   return (
-    <main className="min-h-dvh bg-chinese-black px-4 py-8">
-      <div className="mx-auto mt-12 w-full max-w-xl">
+    <main className="min-h-dvh bg-chinese-black px-4 py-8 sm:px-6">
+      <div className="mx-auto mt-6 w-full max-w-xl sm:mt-12">
         {!incompleteToken ? (
-          <section className="rounded-sm border border-white/10 bg-chinese-black px-8 py-10 text-white-smoke">
+          <section className="rounded-sm border border-white/10 bg-chinese-black px-5 py-8 text-white-smoke sm:px-8 sm:py-10">
             <h1 className="text-xl font-bold">Unable to continue Google sign-in</h1>
             <p className="mt-3 text-sm text-white-smoke/90">
               Missing or expired continuation token. Please start Google sign-in again.
@@ -58,7 +58,7 @@ function OAuthContinueDetailsForm() {
             </button>
           </section>
         ) : (
-          <section className="rounded-sm border border-white/10 bg-chinese-black px-8 py-10">
+          <section className="rounded-sm border border-white/10 bg-chinese-black px-5 py-8 sm:px-8 sm:py-10">
             <RegisterDetailsForm
               email={email}
               requireDisplayName={true}
@@ -76,7 +76,7 @@ function OAuthContinueDetailsForm() {
 
 export default function OAuthContinueDetailsPage() {
   return (
-    <Suspense fallback={<div>Loading...</div>}>
+    <Suspense fallback={<div className="min-h-dvh bg-chinese-black" />}>
       <OAuthContinueDetailsForm />
     </Suspense>
   );

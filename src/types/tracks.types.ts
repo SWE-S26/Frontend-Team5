@@ -109,3 +109,34 @@ export interface GetTracksErrorResponse {
     message: string;
   }[];
 }
+
+export interface PostedTrack {
+	_id: string;
+	basicInfo: {
+		title: string;
+		permalink: string;
+		mainArtists: string[];
+		genre?: string;
+		tags?: string[];
+		isPrivate: boolean;
+	};
+	audio?: {
+		audioLink?: string;
+		id?: string;
+	};
+	audioLink?: string;
+	image?: {
+		imgLink?: string;
+		publicId?: string;
+	};
+	numLikes?: number;
+	numPlays?: number;
+	numReposts?: number;
+	numComments?: number;
+	releaseDate?: string;
+}
+
+export interface GetPostedTracksResponse {
+	message: string;
+	data: PostedTrack[];
+}

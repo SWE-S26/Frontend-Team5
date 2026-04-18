@@ -134,6 +134,10 @@ body {
   opacity: 0.7 !important;
 }
 
+/*  ---------- TabsNavBar Hide Scroll Bar while keeping scroll ability ---------- */
+.tabs-scrollable::-webkit-scrollbar { display: none; }
+.tabs-scrollable { -ms-overflow-style: none; scrollbar-width: none; }
+
 /*  ---------- Settings (Account Tab - Notification Tab) ---------- */
 .notif-select, .notif-select *, .notif-select .ant-select-selector,
 .notif-select .ant-select-selection-item, .notif-select .ant-select-selection-placeholder,

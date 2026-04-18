@@ -33,21 +33,21 @@ export default function ForgotPasswordForm({
 
   return (
     <div data-testid="Forget-Password-Form" className="w-full text-white-smoke animate-in fade-in duration-300">
-      <div className="relative flex items-center mb-8">
+      <div className="mb-6 flex items-center gap-2 sm:mb-8">
         <button
           data-testid="back-to-login-forgot"
           onClick={onBack}
-          className="mb-4 -ml-2 p-2 bg-back rounded-full transition-colors cursor-pointer"
+          className="shrink-0 rounded-full bg-back p-2 transition-colors cursor-pointer"
         >
           <IoChevronBack size={26} />
         </button>
-        <h1 className="text-[20px] font-semibold leading-tight ml-20 mt-5 mb-8 text-center">
+        <h1 className="text-[18px] font-semibold leading-tight sm:text-[20px] pl-16">
           Reset password
         </h1>
       </div>
 
       <div className="space-y-6">
-        <div className="relative bg-chinese-black border border-white/10 rounded p-3 h-18 flex flex-col justify-center">
+        <div className="relative bg-chinese-black border border-white/10 rounded p-3 h-16 sm:h-18 flex flex-col justify-center">
           <label className={`absolute left-3 transition-all duration-200 text-gray-400 font-bold tracking-wider pointer-events-none ${isEmailActive ? "text-[10px] top-2" : "text-[14px] top-1/2 -translate-y-1/2"}`}>
             Your email address
           </label>

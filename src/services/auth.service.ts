@@ -13,7 +13,9 @@ import {
   ResendVerificationEmailRequest, ResendVerificationEmailResponse,
   GenerateQRcodeResponse, LoginWithQRcodeRequest, LoginWithQRcodeResponse,
   RefreshTokenResponse,
-  DeleteAccountResponse 
+  DeleteAccountResponse,
+  ResendVerificationCodeRequest,
+  ResendVerificationCodeResponse
 } from "@/types/auth.types";
 
 export const authService = {
@@ -80,4 +82,8 @@ export const authService = {
   /* (15) */
   forgotPasswordLoggedIn: () =>
   api.get("/api/auth/v1/forgot-password/logged-in"),
+
+  /* (16) */
+  resendVerificationCode: (data: ResendVerificationCodeRequest) =>
+    api.post<ResendVerificationCodeResponse>("/api/auth/v1/google/resend-code", data),
 };

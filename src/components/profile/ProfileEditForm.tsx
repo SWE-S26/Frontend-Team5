@@ -71,6 +71,7 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
   const [formCity,        setFormCity]         = useState("")
   const [formCountry,     setFormCountry]      = useState("")
   const [formBio,         setFormBio]          = useState("")
+  const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null)
 
   const [rawImageUrl,   setRawImageUrl]   = useState<string | null>(null)
 const [rawFile,       setRawFile]       = useState<File | null>(null)
@@ -144,16 +145,13 @@ const fileInputRef = useRef<HTMLInputElement>(null)
   return { file, dataUrl }
 }
 
-
-
-  const handleAvatarChange = async (file: File, previewUrl: string) => {
+ 
+  const handleAvatarChange = useCallback(async (file: File, previewUrl: string) => {
     setAvatarImage(previewUrl)
+    setPendingAvatarFile(file)   // ← store file, don't upload yet
     setIsDirty(true)
-    const updated = await updateProfileImages({ profileImg: file })
-    if (updated?.profileImgLink) {
-      setAvatarImage(updated.profileImgLink)
-    }
-  }
+  }, [])
+
 
   
 
@@ -177,10 +175,11 @@ const handleReplace = useCallback(async () => {
   if (!croppedArea || !rawFile || !rawImageUrl) return
   const { file, dataUrl } = await getCroppedImage(rawImageUrl, croppedArea, rawFile.name)
   await handleAvatarChange(file, dataUrl)
+  setIsDirty(true)
   setIsCropping(false)
   setRawImageUrl(null)
   setRawFile(null)
-}, [croppedArea, rawFile, rawImageUrl])
+}, [croppedArea, rawFile, rawImageUrl, handleAvatarChange])
 
 const handleCancelCrop = () => {
   setIsCropping(false)
@@ -210,6 +209,7 @@ const handleCancelCrop = () => {
     )
     setFormSupportLink(reduxSupportLinkRef.current || null)
     setLinkErrors({})
+    setPendingAvatarFile(null)
 
     setIsDirty(false)
   }, [isOpen])
@@ -283,57 +283,60 @@ const handleCancelCrop = () => {
     setFormSupportLink(reduxSupportLinkRef.current || null)
     setDisplayNameError(false)
     setProfileLinkError(false)
+    setPendingAvatarFile(null)
     setLinkErrors({})
     onClose()
   }
 
-  const handleSave = async () => {
-  let hasError = false;
+const handleSave = async () => {
+  let hasError = false
 
-  if (!formDisplayName.trim()) {
-    setDisplayNameError(true);
-    hasError = true;
-  }
-  if (!formProfileLink.trim()) {
-    setProfileLinkError(true);
-    hasError = true;
-  }
+  if (!formDisplayName.trim()) { setDisplayNameError(true); hasError = true }
+  if (!formProfileLink.trim()) { setProfileLinkError(true); hasError = true }
+  if (hasError) return
 
-  if (hasError) return;
-
-  // Format links
   const formattedLinks = formLinks
     .filter((l) => l.link.trim())
     .map(({ linkId, name, link }) => {
-      let finalLink = link.trim();
+      let finalLink = link.trim()
       if (finalLink.includes("@") && !finalLink.startsWith("http")) {
-        finalLink = `mailto:${finalLink}`;
+        finalLink = `mailto:${finalLink}`
       } else if (!finalLink.startsWith("http")) {
-        finalLink = `https://${finalLink}`;
+        finalLink = `https://${finalLink}`
       }
-      return { linkId, name, link: finalLink };
-    })  
-    .filter((l: { linkId: string; name: string; link: string }, index: number, self: { linkId: string; name: string; link: string }[]) =>
-    index === self.findIndex((x: { link: string }) => x.link === l.link)
-);
-  
+      return { linkId, name, link: finalLink }
+    })
+    .filter((l, index, self) => index === self.findIndex((x) => x.link === l.link))
 
-  // Required fields + optional fields (null if empty)
   const updateData: any = {
-    displayName:  formDisplayName,
-    profileLink:  formProfileLink,
-    firstName:    formFirstName.trim() || null,
-    lastName:     formLastName.trim()  || null,
-    city:         formCity.trim()      || null,
-    country:      formCountry.trim()   || null,
-    bio:          formBio.trim()       || null,
-    links:        formattedLinks,
-    bannerLinks:  formattedLinks,
-    supportLink:  formSupportLink?.trim() || null,
-  };
+    displayName: formDisplayName,
+    profileLink: formProfileLink,
+    firstName:   formFirstName.trim()  || null,
+    lastName:    formLastName.trim()   || null,
+    city:        formCity.trim()       || null,
+    country:     formCountry.trim()    || null,
+    bio:         formBio.trim()        || null,
+    links:       formattedLinks,
+    bannerLinks: formattedLinks,
+    supportLink: formSupportLink?.trim() || null,
+  }
 
   try {
-    const res = await updateProfile(updateData);
+    // 1. Upload avatar if one is pending — do this BEFORE updateProfile
+    //    so finalAvatarUrl holds the real Cloudinary URL, not a blob URL
+    let finalAvatarUrl = profileImgLinkRef.current ?? null
+
+    if (pendingAvatarFile) {
+      const updated = await updateProfileImages({ profileImg: pendingAvatarFile })
+      if (updated?.profileImgLink) {
+        finalAvatarUrl = updated.profileImgLink
+        setAvatarImage(finalAvatarUrl)
+      }
+      setPendingAvatarFile(null)
+    }
+
+    // 2. Save text fields
+    const res = await updateProfile(updateData)
     if (res) {
       dispatch(setProfile({
         displayName:    res.displayName,
@@ -344,16 +347,16 @@ const handleCancelCrop = () => {
         country:        res.country,
         bio:            res.bio,
         bannerLinks:    res.bannerLinks?.length ? res.bannerLinks : [],
-        profileImgLink: res.profileImgLink,
+        profileImgLink: finalAvatarUrl,  // always the real URL, never a blob
         links:          res.links,
         supportLink:    res.supportLink,
-      }));
-      onClose();
+      }))
+      onClose()
     }
   } catch (err) {
-    console.error("Failed to save profile:", err);
+    console.error("Failed to save profile:", err)
   }
-};
+}
 
   return (
     <AnimatePresence>
@@ -449,7 +452,10 @@ const handleCancelCrop = () => {
     type="file"
     accept="image/*"
     className="hidden"
-    onChange={handleFileChange}
+    onChange={(e) => {
+      handleFileChange(e)
+      setIsDirty(true)
+    }}
   />
 </div>
 
@@ -460,6 +466,7 @@ const handleCancelCrop = () => {
                     Display name <span className="text-red-500">*</span>
                   </p>
                   <input data-testid="DisplayName-input"
+                    maxLength={40}
                     value={formDisplayName || ""}
                     onChange={(e) => {
                       setFormDisplayName(e.target.value)
@@ -510,6 +517,7 @@ const handleCancelCrop = () => {
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">First name</p>
                     <input data-testid="FirstName-input"
+                      maxLength={40}
                       value={formFirstName || ""}
                       onChange={(e) => {
                         setFormFirstName(e.target.value)
@@ -522,6 +530,7 @@ const handleCancelCrop = () => {
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">Last name</p>
                     <input data-testid="LastName-input"
+                      maxLength={40}
                       value={formLastName || ""}
                       onChange={(e) => {
                         setFormLastName(e.target.value)
@@ -537,6 +546,7 @@ const handleCancelCrop = () => {
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">City</p>
                     <input data-testid="City-input"
+                      maxLength={40}
                       value={formCity || ""}
                       onChange={(e) => {
                         setFormCity(e.target.value)
@@ -549,6 +559,7 @@ const handleCancelCrop = () => {
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">Country</p>
                     <input data-testid="Country-input"
+                      maxLength={40}
                       value={formCountry || ""}
                       onChange={(e) => {
                         setFormCountry(e.target.value)
@@ -616,6 +627,7 @@ const handleCancelCrop = () => {
                     </div>
 
                     <input data-testid="LinkName-input"
+                      maxLength={40}
                       value={l.name || ""}
                       onChange={(e) => {
                         handleLinkChange(l.linkId, "name", e.target.value)

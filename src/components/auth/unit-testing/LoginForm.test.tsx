@@ -307,6 +307,28 @@ describe("Password Visibility Toggle", () => {
 // 5. Login (Existing User)
 // ════════════════════════════════════════════════════════════════════════════
 describe("Login — Existing User", () => {
+  const solveCaptcha = async () => {
+    const answerNode = await screen.findByTestId("client-captcha-code");
+    const answer = answerNode.textContent?.trim() || "";
+    if (!answer) throw new Error("Captcha code is empty in test mode.");
+    await userEvent.clear(screen.getByTestId("client-captcha-input"));
+    await userEvent.type(screen.getByTestId("client-captcha-input"), answer);
+  };
+
+  test("does not call login when captcha is not completed", async () => {
+    mockFindEmail.mockResolvedValueOnce({ data: { exists: true } });
+
+    renderForm();
+    await userEvent.type(screen.getByTestId("email-input"), "test@test.com");
+    await userEvent.click(screen.getByTestId("continue-button-login"));
+    await waitFor(() => screen.getByTestId("password-input"));
+
+    await userEvent.type(screen.getByTestId("password-input"), "pass1234");
+    await userEvent.click(screen.getByTestId("continue-button-login"));
+
+    expect(mockLogin).not.toHaveBeenCalled();
+  });
+
   test("calls login with correct email and password", async () => {
     mockFindEmail.mockResolvedValueOnce({ data: { exists: true } });
     mockLogin.mockResolvedValueOnce({ message: "Authenticated successfully" });
@@ -317,6 +339,7 @@ describe("Login — Existing User", () => {
     await waitFor(() => screen.getByTestId("password-input"));
 
     await userEvent.type(screen.getByTestId("password-input"), "pass1234");
+    await solveCaptcha();
     await userEvent.click(screen.getByTestId("continue-button-login"));
 
     await waitFor(() => {
@@ -335,6 +358,7 @@ describe("Login — Existing User", () => {
     await waitFor(() => screen.getByTestId("password-input"));
 
     await userEvent.type(screen.getByTestId("password-input"), "pass1234");
+    await solveCaptcha();
     await userEvent.click(screen.getByTestId("continue-button-login"));
 
     await waitFor(() => expect(onAuthSuccess).toHaveBeenCalled());
@@ -350,6 +374,7 @@ describe("Login — Existing User", () => {
     await waitFor(() => screen.getByTestId("password-input"));
 
     await userEvent.type(screen.getByTestId("password-input"), "pass1234");
+    await solveCaptcha();
     await userEvent.click(screen.getByTestId("continue-button-login"));
 
     await waitFor(() => {

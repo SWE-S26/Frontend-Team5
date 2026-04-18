@@ -36,6 +36,7 @@ import SpamPopUp from "@/components/messages/conversation/SpamPopUp"
 import Button from "@/components/ui/Button"
 import { useBlockUser, useUnblockUser } from "@/hooks/useSocial"
 import { setProfile } from "@/store/slices/profileSlice"
+import { useGetPostedTracks } from "@/hooks/useTracks"
 
 interface Props {
   params: { username: string }
@@ -60,12 +61,6 @@ const mockAll = [
 const mockPopular = [
   { id: "1", title: "Popular One",   artist: "Artist A", img: "/Graduation.jpg" },
   { id: "2", title: "Popular Two",   artist: "Artist B", img: "/Graduation.jpg" },
-]
-
-const mockTracks = [
-  { id: "1", title: "My Track One",   artist: "Artist A", img: "/Graduation.jpg" },
-  { id: "2", title: "My Track Two",   artist: "Artist B", img: "/Graduation.jpg" },
-  { id: "3", title: "My Track Three", artist: "Artist C", img: "/Graduation.jpg" },
 ]
 
 const mockAlbums = [
@@ -105,9 +100,11 @@ const ProfilePage = ({ params }: Props) => {
   const isLoading = useAppSelector((state) => state.profile.isLoading)
   const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
   const displayName = useAppSelector((state) => state.profile.displayName)
+  const profileTrackCount = useAppSelector((state) => state.profile.trackCount)
   
   
   const role = useAppSelector((state) => state.profile.role)
+  const { getPostedTracks, tracks: postedTracks, loading: postedTracksLoading } = useGetPostedTracks()
 
   const artist = role === "Artist"
 
@@ -131,6 +128,38 @@ const ProfilePage = ({ params }: Props) => {
   return () => document.removeEventListener("mousedown", handleClick)
 }, [openMoreMenu])
 
+  useEffect(() => {
+    if (activeTab !== "tracks" || !profileUserId || isLoading || profileTrackCount <= 0) return
+    void getPostedTracks(profileUserId)
+  }, [activeTab, profileUserId, getPostedTracks, isLoading, profileTrackCount])
+
+  const getTrackSortTime = (track: { releaseDate?: string; _id?: string }) => {
+    const releaseTime = track.releaseDate ? new Date(track.releaseDate).getTime() : NaN
+    if (Number.isFinite(releaseTime)) return releaseTime
+
+    // Fallback for MongoDB ObjectId-like ids (first 8 hex chars are seconds timestamp)
+    const objectIdPrefix = track._id?.slice(0, 8)
+    if (objectIdPrefix && /^[0-9a-fA-F]{8}$/.test(objectIdPrefix)) {
+      return parseInt(objectIdPrefix, 16) * 1000
+    }
+
+    return 0
+  }
+
+  const profileTracks = [...(postedTracks ?? [])]
+    .sort((a, b) => getTrackSortTime(b) - getTrackSortTime(a))
+    .map((track) => ({
+    trackId: track._id,
+    title: track.basicInfo.title,
+    artist: track.basicInfo.mainArtists?.[0] || "Unknown Artist",
+    img: track.image?.imgLink || "/Graduation.jpg",
+    trackUrl: track.audio?.audioLink || track.audioLink,
+  }))
+
+  const trackCount = profileTracks.length
+  const hasKnownNoTracks = !isLoading && profileTrackCount <= 0
+  const shouldShowTracksSkeleton = postedTracksLoading && profileTrackCount > 0
+
   return (
     <div>
       <ProfileHeader />
@@ -148,6 +177,12 @@ const ProfilePage = ({ params }: Props) => {
         <div className="flex space-x-2">
           {!isLoading && (
             <>
+              {trackCount ? (
+                <Button data-testid="station-button" className="relative group font-bold bg-off-black justify-center cursor-pointer hover:text-silver">
+                  <IoRadio className="w-5 h-5" />
+                  <span className="ml-1 text-sm px-1 py-0.5">Station</span>
+                </Button>
+              ) : null}
               {isOwn ? (
                 <>
                   <Button data-testid="share-button"
@@ -172,12 +207,6 @@ const ProfilePage = ({ params }: Props) => {
                 
                 <>
                 
-                  {artist && (
-                    <Button data-testid="station-button" className="relative group font-bold  bg-off-black   justify-center cursor-pointer hover:text-silver ">
-                      <IoRadio className="w-5 h-5" />
-                      <span className="ml-1 text-sm   px-1 py-0.5">Station</span>
-                    </Button>
-                  )}
                    
                   <button data-testid="Follow-button"
                     onClick={() => {
@@ -311,7 +340,13 @@ const ProfilePage = ({ params }: Props) => {
             )}
 
             {activeTab === "tracks" && (
-              mockTracks.length === 0 ? <EmptyTab /> : <Tracks items={mockTracks} />
+              hasKnownNoTracks
+                ? <EmptyTab />
+                : shouldShowTracksSkeleton || postedTracks === null
+                  ? <Tracks items={[]} isLoading />
+                  : profileTracks.length === 0
+                  ? <EmptyTab />
+                  : <Tracks items={profileTracks} />
             )}
 
             {activeTab === "albums" && (

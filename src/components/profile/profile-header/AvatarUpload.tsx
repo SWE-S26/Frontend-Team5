@@ -30,6 +30,13 @@ const AvatarUpload = forwardRef<AvatarUploadHandle, AvatarProps>(
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
       const file = e.target.files?.[0];
       if (!file) return;
+
+      if (!file.type.startsWith("image/")) {
+        alert("Only image files are allowed.");
+        e.target.value = "";
+        return;
+      }
+
       e.target.value = "";
       const previewUrl = URL.createObjectURL(file);
       onImageChange(file, previewUrl);
