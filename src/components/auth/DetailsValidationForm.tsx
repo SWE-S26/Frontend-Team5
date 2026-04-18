@@ -1,14 +1,35 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { FcGoogle } from "react-icons/fc";
 import { SiMinutemailer } from "react-icons/si";
 import { DetailsValidationFormProps } from "@/types/auth.types";
+import { useRouter } from "next/navigation";
 
 export default function DetailsValidationForm({
   email,
   onBackToLogin,
   onSendAgain,
 }: DetailsValidationFormProps) {
+  const [resendCooldown, setResendCooldown] = useState(0);
+  
+  const router = useRouter();
+
+  useEffect(() => {
+    if (resendCooldown <= 0) return;
+    const timer = window.setInterval(() => {
+      setResendCooldown((prev) => (prev > 0 ? prev - 1 : 0));
+    }, 1000);
+
+    return () => window.clearInterval(timer);
+  }, [resendCooldown]);
+
+  const handleSendAgain = async () => {
+    if (!onSendAgain || resendCooldown > 0) return;
+    const result = await onSendAgain();
+    if (result) setResendCooldown(60);
+  };
+
   return (
     <div data-testid="Details-Validation-Form" className="w-full text-white-smoke flex flex-col items-center text-center px-1 sm:px-0">
       <h1 className="mb-4 text-[24px] font-bold leading-tight sm:text-[28px]">
@@ -21,10 +42,11 @@ export default function DetailsValidationForm({
       <p className="text-sm text-gray-400 mb-6">
         No email in your inbox or spam folder?{" "}
         <button data-testid="send-again-button"
-          onClick={onSendAgain}
-          className="text-[#699FFF] hover:underline cursor-pointer font-medium"
+          onClick={handleSendAgain}
+          disabled={resendCooldown > 0}
+          className="text-[#699FFF] hover:underline cursor-pointer font-medium disabled:cursor-not-allowed disabled:opacity-60"
         >
-          Send again
+          {resendCooldown > 0 ? `Send again in ${resendCooldown}s` : "Send again"}
         </button>
       </p>
 
@@ -62,7 +84,7 @@ export default function DetailsValidationForm({
       </p>
       <p className="text-sm text-gray-400 mt-1">
         If you still need help, visit our{" "}
-        <span className="text-[#699FFF] hover:underline cursor-pointer font-medium">
+        <span onClick={() => router.push("/need-help")} className="text-[#699FFF] hover:underline cursor-pointer font-medium">
           Help Center.
         </span>
       </p>

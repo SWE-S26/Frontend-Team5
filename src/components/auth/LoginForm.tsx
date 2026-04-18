@@ -415,11 +415,10 @@ export default function LoginForm({
         onBackToLogin={handleBackToLogin}
         onSendAgain={() => {
           if (validationSource === "reset-password") {
-            forgetPassword(email);
-            return;
+            return forgetPassword(email);
           }
 
-          resendVerificationEmail(email);
+          return resendVerificationEmail(email);
         }}
       />
     );
@@ -827,7 +826,7 @@ export default function LoginForm({
       )}
 
       {!isPasswordStep && (
-        <button data-testid="need-help-button" className="mt-6 text-sm cursor-pointer text-[#699FFF] hover:underline font-medium">
+        <button onClick={() => router.push("/need-help")} data-testid="need-help-button" className="mt-6 text-sm cursor-pointer text-[#699FFF] hover:underline font-medium">
           Need help?
         </button>
       )}

@@ -2,7 +2,21 @@
 
 import Image from "next/image";
 import { useRouter } from "next/navigation";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
+import { AnimatePresence, motion } from "framer-motion";
+import {
+  useFloating,
+  useHover,
+  useInteractions,
+  FloatingPortal,
+  offset,
+  flip,
+  shift,
+  autoUpdate,
+  arrow,
+  FloatingArrow,
+  type Placement,
+} from "@floating-ui/react";
 import { useCreateTrack } from "@/hooks/useTracks";
 import type { CreateTrackRequest } from "@/types/tracks.types";
 import { MAX_FILE_SIZE_BYTES, formatBytes } from "@/types/upload.types";
@@ -13,20 +27,59 @@ import {
   DownOutlined,
   UpOutlined,
   PictureOutlined,
-  GlobalOutlined,
   UserAddOutlined,
   CalendarOutlined,
   InfoCircleOutlined,
-  LockOutlined,
   PlayCircleOutlined,
   PauseCircleOutlined,
 } from "@ant-design/icons";
+import { Switch } from "antd";
+import { Check, Circle } from "lucide-react";
 import { IoToggleOutline } from "react-icons/io5";
+import { FiLock } from "react-icons/fi";
+import { CiGlobe } from "react-icons/ci";
 import { RxSpeakerLoud } from "react-icons/rx";
 import { BsCcCircle } from "react-icons/bs";
 import { FaRegClock } from "react-icons/fa";
 import { RiDeleteBinLine } from "react-icons/ri";
 import { GrEdit } from "react-icons/gr";
+import { IoMdCalendar } from "react-icons/io";
+import { BsExplicitFill } from "react-icons/bs";
+import { CiCircleQuestion } from "react-icons/ci";
+import { RiLockFill } from "react-icons/ri";
+
+const AUDIO_PREVIEW_SECONDS = 20;
+
+const TOOLTIP_TEXT = {
+  trackTitle: {
+    title: "Track title",
+    description: "Clear track titles help your fans know exactly what they're listening to.",
+  },
+  mainArtists: {
+    title: "Main Artist(s)",
+    description: "Put your name and any featured artists you want to give primary credit to here. These names will be displayed underneath your track title.",
+  },
+  tags: {
+    title: "Tags",
+    description: "Tags help identify what kind of sound your track is, whether it is spoken voice, hip-hop, etc. Tags make it easier for listeners to find your track on BeatZa.",
+  },
+  proFollowerExclusive: {
+    title: "Follower exclusive",
+    description: "Sign up for Artist Pro to unlock follower-only listening.",
+  },
+  proScheduleRelease: {
+    title: "Schedule",
+    description: "Artist Pro subscribers can schedule when their tracks go live.",
+  },
+  proSwitch: {
+    title: "Engagement settings",
+    description: "Sign up for Artist Pro to unlock these advanced settings",
+  },
+  proGeoblocking: {
+    title: "Geoblocking",
+    description: "Get a Artist Pro subscription to customize what countries you want your track to be available in.",
+  },
+};
 
 interface TrackInfoFormProps {
   isUploading: boolean;
@@ -89,20 +142,41 @@ interface TrackInfoFormProps {
   setGeoblockingOption: (v: string) => void;
   licenseType: "all-rights" | "creative-commons";
   setLicenseType: (v: "all-rights" | "creative-commons") => void;
+  isArtistPro?: boolean;
   onReplaceTrackFile: (file: File) => void;
 }
 
-function Toggle({ on, onToggle }: { on: boolean; onToggle: () => void }) {
+function PrettyCheckbox({ checked, onChange }: { checked: boolean; onChange: (next: boolean) => void }) {
   return (
     <button
-      onClick={onToggle}
-      className={`relative shrink-0 h-6.5 w-11.5 rounded-full transition-colors duration-200 ${on ? "bg-[#1db954]" : "bg-[#333]"}`}
+      type="button"
+      role="checkbox"
+      aria-checked={checked}
+      onClick={() => onChange(!checked)}
+      className={`mt-0.5 flex h-4.5 w-4.5 items-center justify-center rounded border transition-colors cursor-pointer ${checked ? "border-white-smoke bg-white-smoke" : "border-[#7a7a7a] bg-transparent"}`}
     >
-      <div
-        className={`absolute top-0.75 h-5 w-5 rounded-full bg-white shadow transition-transform duration-200 ${on ? "translate-x-5.75" : "translate-x-0.75"}`}
-      />
+      {checked && <Check className="h-3.5 w-3.5 text-chinese-black" strokeWidth={3} />}
     </button>
   );
+}
+
+function PrettyRadio({ checked, onSelect }: { checked: boolean; onSelect: () => void }) {
+  return (
+    <button
+      type="button"
+      role="radio"
+      aria-checked={checked}
+      onClick={onSelect}
+      className="mt-0.5 flex h-4.5 w-4.5 items-center justify-center cursor-pointer"
+    >
+      <Circle className={`h-4.5 w-4.5 ${checked ? "text-white-smoke" : "text-[#7a7a7a]"}`} strokeWidth={2.2} />
+      {checked && <span className="absolute h-2 w-2 rounded-full bg-white-smoke" />}
+    </button>
+  );
+}
+
+function clamp(value: number, min: number, max: number) {
+  return Math.min(max, Math.max(min, value));
 }
 
 export function TrackInfoForm(props: TrackInfoFormProps) {
@@ -111,6 +185,8 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   const clipAudioRef = useRef<HTMLAudioElement | null>(null);
   const clipTrackRef = useRef<HTMLDivElement | null>(null);
   const clipDragOffsetRef = useRef(0);
+  const clipDragRafRef = useRef<number | null>(null);
+  const clipPendingRangeRef = useRef<{ start: number; end: number } | null>(null);
   const replaceFileInputRef = useRef<HTMLInputElement | null>(null);
   const artworkInputRef = useRef<HTMLInputElement | null>(null);
   const releaseCalendarRef = useRef<HTMLDivElement | null>(null);
@@ -122,6 +198,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [submitted, setSubmitted] = useState(false);
   const [showQuitModal, setShowQuitModal] = useState(false);
+  const [showProFeatureModal, setShowProFeatureModal] = useState(false);
   const [submitError, setSubmitError] = useState<string | null>(null);
   const { createTrack, error: createTrackError } = useCreateTrack();
   const [artworkUrl, setArtworkUrl] = useState<string | null>(null);
@@ -132,12 +209,16 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   const [privacyMenuOpen, setPrivacyMenuOpen] = useState(false);
   const [visibilityOption, setVisibilityOption] = useState<"public" | "private" | "followerExclusive">("public");
   const [genreMenuOpen, setGenreMenuOpen] = useState(false);
+  const [genreSearch, setGenreSearch] = useState("");
   const [releaseCalendarOpen, setReleaseCalendarOpen] = useState(false);
   const [releaseCalendarMonth, setReleaseCalendarMonth] = useState(() => new Date());
   const [audioClipStartInput, setAudioClipStartInput] = useState("0");
   const [audioClipEndInput, setAudioClipEndInput] = useState("20");
+  const [audioClipStartDraft, setAudioClipStartDraft] = useState("0:00");
+  const [audioClipEndDraft, setAudioClipEndDraft] = useState("0:20");
   const [audioDurationSeconds, setAudioDurationSeconds] = useState(0);
   const [isClipPlaying, setIsClipPlaying] = useState(false);
+  const [clipPlaybackSeconds, setClipPlaybackSeconds] = useState(0);
   const [isDraggingClip, setIsDraggingClip] = useState(false);
   const [isArtworkDragActive, setIsArtworkDragActive] = useState(false);
   const [isTrackDragActive, setIsTrackDragActive] = useState(false);
@@ -198,6 +279,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     setGeoblockingOption,
     licenseType,
     setLicenseType,
+    isArtistPro = false,
     onReplaceTrackFile,
   } = props;
 
@@ -331,11 +413,11 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     const dy = e.clientY - artworkPanStartRef.current.clientY;
     const width = Math.max(1, frame.clientWidth);
     const height = Math.max(1, frame.clientHeight);
-    const movementScale = 1.2;
+    const movementScale = 1;
 
     setArtworkPosition({
       x: clampArtworkPosition(artworkPanStartRef.current.startX + (dx / width) * movementScale),
-      y: clampArtworkPosition(artworkPanStartRef.current.startY - (dy / height) * movementScale),
+      y: clampArtworkPosition(artworkPanStartRef.current.startY + (dy / height) * movementScale),
     });
   };
 
@@ -398,7 +480,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
       const cropSize = Math.max(1, Math.round(shortestSide / boundedZoom));
       const maxOffsetX = Math.max(0, (imageWidth - cropSize) / 2);
       const maxOffsetY = Math.max(0, (imageHeight - cropSize) / 2);
-      const centerX = imageWidth / 2 + clampArtworkPosition(position.x) * maxOffsetX;
+      const centerX = imageWidth / 2 - clampArtworkPosition(position.x) * maxOffsetX;
       const centerY = imageHeight / 2 - clampArtworkPosition(position.y) * maxOffsetY;
       const sourceX = Math.max(0, Math.min(imageWidth - cropSize, Math.floor(centerX - cropSize / 2)));
       const sourceY = Math.max(0, Math.min(imageHeight - cropSize, Math.floor(centerY - cropSize / 2)));
@@ -446,6 +528,30 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     "Dance & EDM",
     "Dancehall",
     "Deep House",
+    "Disco",
+    "Drum & Bass",
+    "Dubstep",
+    "Electronic",
+    "Folk & Singer-Songwriter",
+    "Hip-hop & Rap",
+    "House",
+    "Indie",
+    "Jazz & Blues",
+    "Latin",
+    "Metal",
+    "Piano",
+    "Pop",
+    "R&B & Soul",
+    "Reggae",
+    "Reggaeton",
+    "Rock",
+    "Soundtrack",
+    "Speech",
+    "Techno",
+    "Trance",
+    "Trap",
+    "Triphop",
+    "World",
   ];
   const audioGenres = [
     "Audiobooks",
@@ -454,13 +560,47 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     "Entertainment",
     "Learning",
     "News & Politics",
+    "Religion & Spirituality",
+    "Science",
+    "Sports",
+    "Storytelling",
+    "Technology",
   ];
+
+  const normalizedGenreSearch = genreSearch.trim().toLowerCase();
+  const filteredMusicGenres = musicGenres.filter((item) => item.toLowerCase().includes(normalizedGenreSearch));
+  const filteredAudioGenres = audioGenres.filter((item) => item.toLowerCase().includes(normalizedGenreSearch));
+  const shouldShowAddCustomGenre =
+    normalizedGenreSearch.length > 0 && filteredMusicGenres.length === 0 && filteredAudioGenres.length === 0;
+
+  const commitGenreSearch = () => {
+    const nextGenre = genreSearch.trim();
+    if (nextGenre !== genre) {
+      setGenre(nextGenre);
+    }
+  };
 
   const formatTimeLabel = (seconds: number) => {
     const safe = Number.isFinite(seconds) ? Math.max(0, Math.floor(seconds)) : 0;
     const m = Math.floor(safe / 60);
     const s = `${safe % 60}`.padStart(2, "0");
     return `${m}:${s}`;
+  };
+
+  const parseTimeInputToSeconds = (value: string): number | null => {
+    const trimmed = value.trim();
+    if (!trimmed) return null;
+    if (trimmed.includes(":")) {
+      const [minPart, secPart] = trimmed.split(":");
+      const mins = Number(minPart);
+      const secs = Number(secPart);
+      if (!Number.isFinite(mins) || !Number.isFinite(secs)) return null;
+      if (mins < 0 || secs < 0 || secs >= 60) return null;
+      return mins * 60 + secs;
+    }
+    const asNumber = Number(trimmed);
+    if (!Number.isFinite(asNumber) || asNumber < 0) return null;
+    return asNumber;
   };
 
   const parseIsoDate = (value: string): Date | null => {
@@ -533,8 +673,9 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     const normalizedIsrc = parsedIsrc
       ? parsedIsrc.replace(/[^a-zA-Z0-9]/g, "").toUpperCase()
       : undefined;
-    const parsedAudioClipStart = toOptionalTrimmed(audioClipStartInput);
-    const parsedAudioClipEnd = toOptionalTrimmed(audioClipEndInput);
+    const canAttachAudioClip = audioDurationSeconds > AUDIO_PREVIEW_SECONDS;
+    const parsedAudioClipStart = canAttachAudioClip ? toOptionalTrimmed(audioClipStartInput) : undefined;
+    const parsedAudioClipEnd = canAttachAudioClip ? toOptionalTrimmed(audioClipEndInput) : undefined;
     const audioClipStartValue = parsedAudioClipStart !== undefined ? Number(parsedAudioClipStart) : undefined;
     const audioClipEndValue = parsedAudioClipEnd !== undefined ? Number(parsedAudioClipEnd) : undefined;
     const parsedTitle = trackTitle.trim();
@@ -571,13 +712,14 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         "An ISRC (International Standard Recording Code) is a unique identifier that is assigned to a track. Use the same ISRC for a given track wherever you distribute it."
       );
     }
-    if (audioClipStartValue !== undefined && (!Number.isFinite(audioClipStartValue) || audioClipStartValue < 0)) {
+    if (canAttachAudioClip && audioClipStartValue !== undefined && (!Number.isFinite(audioClipStartValue) || audioClipStartValue < 0)) {
       throw new Error("Audio clip start must be a valid non-negative number.");
     }
-    if (audioClipEndValue !== undefined && (!Number.isFinite(audioClipEndValue) || audioClipEndValue <= 0)) {
+    if (canAttachAudioClip && audioClipEndValue !== undefined && (!Number.isFinite(audioClipEndValue) || audioClipEndValue <= 0)) {
       throw new Error("Audio clip end must be a valid number greater than 0.");
     }
     if (
+      canAttachAudioClip &&
       audioClipStartValue !== undefined &&
       audioClipEndValue !== undefined &&
       audioClipEndValue <= audioClipStartValue
@@ -623,8 +765,8 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         ISRC: normalizedIsrc,
         explicitContent,
         pLine: toOptionalTrimmed(pline),
-        audioClipStart: audioClipStartValue,
-        audioClipEnd: audioClipEndValue,
+        audioClipStart: canAttachAudioClip ? audioClipStartValue : undefined,
+        audioClipEnd: canAttachAudioClip ? audioClipEndValue : undefined,
       },
     };
   };
@@ -673,6 +815,8 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   // Shared input/label styles matching SoundCloud's underline-only fields
   const fieldCls = "w-full bg-transparent border-0 border-b border-[#333] text-[13px] text-white-smoke placeholder-[#555] focus:outline-none focus:border-[#666] pb-2 pt-1 transition-colors";
   const labelCls = "mb-1.5 block text-[13px] font-semibold text-white-smoke";
+  const AdvfieldCls = "w-full bg-transparent border border-white-smoke text-[13px] text-white-smoke pl-4 placeholder-[#555] focus:outline-none focus:border-[#666] pb-2 pt-1 transition-colors";
+
 
   useEffect(() => {
     return () => {
@@ -687,7 +831,12 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   }, [createTrackError]);
 
   useEffect(() => {
-    setVisibilityOption(isPublic ? "public" : "private");
+    setVisibilityOption((prev) => {
+      if (!isPublic && prev === "followerExclusive") {
+        return prev;
+      }
+      return isPublic ? "public" : "private";
+    });
   }, [isPublic]);
 
   useEffect(() => {
@@ -700,7 +849,9 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         setPrivacyMenuOpen(false);
       }
       if (genreMenuRef.current && !genreMenuRef.current.contains(event.target as Node)) {
+        commitGenreSearch();
         setGenreMenuOpen(false);
+        setGenreSearch("");
       }
       if (releaseCalendarRef.current && !releaseCalendarRef.current.contains(event.target as Node)) {
         setReleaseCalendarOpen(false);
@@ -711,17 +862,60 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     return () => document.removeEventListener("mousedown", onClickOutside);
   }, []);
 
+  const canSetAudioPreview = audioDurationSeconds > AUDIO_PREVIEW_SECONDS;
+  const timelineMax = audioDurationSeconds > 0 ? audioDurationSeconds : AUDIO_PREVIEW_SECONDS;
+  const selectionDuration = canSetAudioPreview
+    ? AUDIO_PREVIEW_SECONDS
+    : Math.max(1, Math.min(AUDIO_PREVIEW_SECONDS, timelineMax));
   const clipStartSeconds = Number(audioClipStartInput);
-  const clipEndSeconds = Number(audioClipEndInput);
-  const safeClipStart = Number.isFinite(clipStartSeconds) ? Math.max(0, clipStartSeconds) : 0;
-  const safeClipEnd = Number.isFinite(clipEndSeconds) ? Math.max(safeClipStart + 1, clipEndSeconds) : safeClipStart + 20;
+  const rawClipStart = Number.isFinite(clipStartSeconds) ? Math.max(0, clipStartSeconds) : 0;
+  const safeClipStart = canSetAudioPreview
+    ? clamp(rawClipStart, 0, Math.max(0, timelineMax - selectionDuration))
+    : 0;
+  const safeClipEnd = canSetAudioPreview ? safeClipStart + selectionDuration : selectionDuration;
   const clipDuration = Math.max(1, safeClipEnd - safeClipStart);
-  const timelineMax = audioDurationSeconds > 0 ? Math.ceil(audioDurationSeconds) : Math.max(40, safeClipEnd + 20);
   const clipLeftPercent = Math.min(100, (safeClipStart / timelineMax) * 100);
   const clipWidthPercent = Math.max(5, Math.min(100 - clipLeftPercent, (clipDuration / timelineMax) * 100));
   const rightShadePercent = Math.max(0, 100 - (clipLeftPercent + clipWidthPercent));
+  const clipPlaybackPercentInWindow = clamp(((clipPlaybackSeconds - safeClipStart) / clipDuration) * 100, 0, 100);
+  const clipPlaybackOverlayPercent = isClipPlaying ? clipPlaybackPercentInWindow : 0;
 
-  const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
+  const waveformDisplaySamples = Array.from(
+    { length: 220 },
+    (_, idx) => 48 + Math.sin(idx / 7) * 12 + Math.cos(idx / 15) * 7,
+  );
+
+  const waveformMax = Math.max(...waveformDisplaySamples, 1);
+
+  const baseWaveformBars = useMemo(
+    () =>
+      waveformDisplaySamples.map((sample, idx) => {
+        const normalized = Math.max(0.12, sample / waveformMax);
+        return (
+          <span
+            key={`wave-${idx}`}
+            className="block flex-1 rounded-[1px] bg-white-smoke"
+            style={{ height: `${Math.round(14 + normalized * 72)}px` }}
+          />
+        );
+      }),
+    [waveformDisplaySamples, waveformMax],
+  );
+
+  const darkWaveformBars = useMemo(
+    () =>
+      waveformDisplaySamples.map((sample, idx) => {
+        const normalized = Math.max(0.12, sample / waveformMax);
+        return (
+          <span
+            key={`wave-dark-${idx}`}
+            className="block flex-1 rounded-[1px] bg-[#525252]"
+            style={{ height: `${Math.round(14 + normalized * 72)}px` }}
+          />
+        );
+      }),
+    [waveformDisplaySamples, waveformMax],
+  );
 
   const xToSeconds = (clientX: number) => {
     const rect = clipTrackRef.current?.getBoundingClientRect();
@@ -730,28 +924,23 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     return ratio * timelineMax;
   };
 
-  const setDraggedClipRange = (nextStart: number, nextEnd: number) => {
-    setAudioClipStartInput(String(Math.round(nextStart)));
-    setAudioClipEndInput(String(Math.round(nextEnd)));
-  };
+  const setDraggedClipRange = (nextStart: number, nextEnd: number, options?: { syncDraft?: boolean }) => {
+    const preciseStart = Number(nextStart.toFixed(3));
+    const preciseEnd = Number(nextEnd.toFixed(3));
+    setAudioClipStartInput(String(preciseStart));
+    setAudioClipEndInput(String(preciseEnd));
 
-  const handleClipDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
-    event.preventDefault();
-    clipDragOffsetRef.current = xToSeconds(event.clientX) - safeClipStart;
-    setIsDraggingClip(true);
-  };
-
-  const handleClipPlayPause = async () => {
-    const clipAudio = clipAudioRef.current;
-    if (!clipAudio || !uploadedFileUrl) return;
-
-    if (isClipPlaying) {
-      clipAudio.pause();
-      setIsClipPlaying(false);
-      return;
+    if (options?.syncDraft !== false) {
+      setAudioClipStartDraft(formatTimeLabel(preciseStart));
+      setAudioClipEndDraft(formatTimeLabel(preciseEnd));
     }
+  };
 
-    clipAudio.currentTime = safeClipStart;
+  const playClipFrom = async (startSeconds: number) => {
+    const clipAudio = clipAudioRef.current;
+    if (!clipAudio || !uploadedFileUrl || !canSetAudioPreview) return;
+    clipAudio.currentTime = startSeconds;
+    setClipPlaybackSeconds(startSeconds);
     try {
       await clipAudio.play();
       setIsClipPlaying(true);
@@ -760,40 +949,144 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     }
   };
 
+  const handleClipReset = () => {
+    const clipAudio = clipAudioRef.current;
+    if (!clipAudio || !canSetAudioPreview) return;
+
+    const resetStart = 0;
+    const resetEnd = Math.min(AUDIO_PREVIEW_SECONDS, timelineMax);
+
+    setDraggedClipRange(resetStart, resetEnd);
+    clipAudio.pause();
+    clipAudio.currentTime = resetStart;
+    setClipPlaybackSeconds(resetStart);
+    setIsClipPlaying(false);
+  };
+
+  const applyTypedClipTime = async (target: "start" | "end") => {
+    if (!canSetAudioPreview) return;
+    const parsed = parseTimeInputToSeconds(target === "start" ? audioClipStartDraft : audioClipEndDraft);
+    if (parsed === null) {
+      setAudioClipStartDraft(formatTimeLabel(safeClipStart));
+      setAudioClipEndDraft(formatTimeLabel(safeClipEnd));
+      return;
+    }
+
+    const maxStart = Math.max(0, timelineMax - AUDIO_PREVIEW_SECONDS);
+    const nextStart =
+      target === "start"
+        ? clamp(parsed, 0, maxStart)
+        : clamp(parsed - AUDIO_PREVIEW_SECONDS, 0, maxStart);
+    const nextEnd = nextStart + AUDIO_PREVIEW_SECONDS;
+
+    if (Math.round(nextStart) === Math.round(safeClipStart) && Math.round(nextEnd) === Math.round(safeClipEnd)) {
+      setAudioClipStartDraft(formatTimeLabel(safeClipStart));
+      setAudioClipEndDraft(formatTimeLabel(safeClipEnd));
+      return;
+    }
+
+    setDraggedClipRange(nextStart, nextEnd);
+    await playClipFrom(nextStart);
+  };
+
+  const handleClipDragStart = (event: React.PointerEvent<HTMLDivElement>) => {
+    if (!canSetAudioPreview) return;
+    event.preventDefault();
+    clipDragOffsetRef.current = xToSeconds(event.clientX) - safeClipStart;
+    setIsDraggingClip(true);
+  };
+
+  const handleClipPlayPause = async () => {
+    const clipAudio = clipAudioRef.current;
+    if (!clipAudio || !uploadedFileUrl || !canSetAudioPreview) return;
+
+    if (isClipPlaying) {
+      clipAudio.pause();
+      setClipPlaybackSeconds(clipAudio.currentTime);
+      setIsClipPlaying(false);
+      return;
+    }
+
+    const resumeTime = clipAudio.currentTime;
+    const shouldResume = resumeTime > safeClipStart && resumeTime < safeClipEnd;
+    await playClipFrom(shouldResume ? resumeTime : safeClipStart);
+  };
+
   const handleClipTimeUpdate = () => {
     const clipAudio = clipAudioRef.current;
     if (!clipAudio) return;
+    setClipPlaybackSeconds(clipAudio.currentTime);
     if (clipAudio.currentTime >= safeClipEnd) {
       clipAudio.pause();
       clipAudio.currentTime = safeClipStart;
+      setClipPlaybackSeconds(safeClipStart);
       setIsClipPlaying(false);
     }
   };
 
   useEffect(() => {
-    if (!isDraggingClip) return;
+    if (!isDraggingClip || !canSetAudioPreview) return;
 
     const onPointerMove = (event: PointerEvent) => {
       const rangeStart = xToSeconds(event.clientX) - clipDragOffsetRef.current;
       const boundedStart = clamp(rangeStart, 0, Math.max(0, timelineMax - clipDuration));
       const boundedEnd = boundedStart + clipDuration;
-      setDraggedClipRange(boundedStart, boundedEnd);
+
+      clipPendingRangeRef.current = { start: boundedStart, end: boundedEnd };
+      if (clipDragRafRef.current !== null) return;
+
+      clipDragRafRef.current = window.requestAnimationFrame(() => {
+        const pending = clipPendingRangeRef.current;
+        clipDragRafRef.current = null;
+        if (!pending) return;
+
+        setDraggedClipRange(pending.start, pending.end, { syncDraft: false });
+        if (isClipPlaying && clipAudioRef.current) {
+          clipAudioRef.current.currentTime = pending.start;
+        }
+      });
     };
 
-    const onPointerUp = () => setIsDraggingClip(false);
+    const onPointerUp = () => {
+      if (clipDragRafRef.current !== null) {
+        window.cancelAnimationFrame(clipDragRafRef.current);
+        clipDragRafRef.current = null;
+      }
+
+      const pending = clipPendingRangeRef.current;
+      if (pending) {
+        setDraggedClipRange(pending.start, pending.end);
+      } else {
+        setAudioClipStartDraft(formatTimeLabel(safeClipStart));
+        setAudioClipEndDraft(formatTimeLabel(safeClipEnd));
+      }
+
+      clipPendingRangeRef.current = null;
+      setIsDraggingClip(false);
+    };
 
     window.addEventListener("pointermove", onPointerMove);
     window.addEventListener("pointerup", onPointerUp);
 
     return () => {
+      if (clipDragRafRef.current !== null) {
+        window.cancelAnimationFrame(clipDragRafRef.current);
+        clipDragRafRef.current = null;
+      }
+      clipPendingRangeRef.current = null;
       window.removeEventListener("pointermove", onPointerMove);
       window.removeEventListener("pointerup", onPointerUp);
     };
-  }, [isDraggingClip, timelineMax, clipDuration]);
+  }, [isDraggingClip, timelineMax, clipDuration, canSetAudioPreview, isClipPlaying, safeClipStart, safeClipEnd]);
 
   useEffect(() => {
     if (!uploadedFileUrl) {
       setAudioDurationSeconds(0);
+      setAudioClipStartInput("0");
+      setAudioClipEndInput(String(AUDIO_PREVIEW_SECONDS));
+      setAudioClipStartDraft("0:00");
+      setAudioClipEndDraft("0:20");
+      setClipPlaybackSeconds(0);
       setIsClipPlaying(false);
       return;
     }
@@ -802,6 +1095,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
       clipAudio.pause();
       clipAudio.currentTime = 0;
     }
+    setClipPlaybackSeconds(0);
     setIsClipPlaying(false);
   }, [uploadedFileUrl]);
 
@@ -814,10 +1108,15 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     const duration = clipAudio.duration;
     setAudioDurationSeconds(duration);
 
-    const boundedStart = clamp(safeClipStart, 0, Math.max(0, duration - 1));
-    const boundedEnd = clamp(safeClipEnd, boundedStart + 1, Math.max(boundedStart + 1, duration));
+    if (duration <= AUDIO_PREVIEW_SECONDS) {
+      setDraggedClipRange(0, duration);
+      return;
+    }
 
-    if (boundedStart !== safeClipStart || boundedEnd !== safeClipEnd) {
+    const boundedStart = clamp(safeClipStart, 0, Math.max(0, duration - AUDIO_PREVIEW_SECONDS));
+    const boundedEnd = boundedStart + AUDIO_PREVIEW_SECONDS;
+
+    if (boundedStart !== safeClipStart || boundedEnd !== safeClipEnd || clipDuration !== AUDIO_PREVIEW_SECONDS) {
       setDraggedClipRange(boundedStart, boundedEnd);
     }
   };
@@ -949,6 +1248,43 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         </div>
       )}
 
+      {showProFeatureModal && (
+        <div className="fixed inset-0 z-60 flex items-center justify-center bg-login px-4">
+          <div className="relative w-full max-w-105 rounded-lg bg-chinese-black border border-[#2b2c31] p-6 shadow-2xl">
+            <button
+              type="button"
+              onClick={() => setShowProFeatureModal(false)}
+              className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#2b2c31] text-[#ccc] transition-colors hover:bg-[#38383d] cursor-pointer"
+              aria-label="Close pro feature modal"
+            >
+              <CloseOutlined className="text-[14px]" />
+            </button>
+
+            <h2 className="pr-10 text-[16px] font-bold text-white-smoke">Artist Pro feature</h2>
+            <p className="mt-3 text-[13px] text-[#888]">
+              Follower Exclusive is available for Artist Pro accounts. Upgrade to unlock this option.
+            </p>
+
+            <div className="mt-6 flex items-center justify-end gap-3">
+              <button
+                type="button"
+                onClick={() => setShowProFeatureModal(false)}
+                className="px-4 py-2 text-[13px] font-semibold text-white-smoke rounded transition-colors hover:bg-[#2b2c31] cursor-pointer"
+              >
+                Maybe later
+              </button>
+              <button
+                type="button"
+                onClick={() => router.push("/artistpro")}
+                className="rounded-full bg-[#f5a623] px-5 py-2 text-[13px] font-semibold text-chinese-black transition-colors hover:bg-[#ffc55a] cursor-pointer"
+              >
+                Upgrade to Pro
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       <div className="mx-auto max-w-7xl px-4 py-8 pb-36 sm:px-5">
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
           {/* Left - Artwork */}
@@ -997,8 +1333,8 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                     fill
                     className="object-cover"
                     style={{
-                      transform: `scale(${artworkZoom})`,
-                      objectPosition: `${50 + artworkPosition.x * 50}% ${50 - artworkPosition.y * 50}%`,
+                      transform: `translate(${artworkPosition.x * (artworkZoom - 1) * 50}%, ${artworkPosition.y * (artworkZoom - 1) * 50}%) scale(${artworkZoom})`,
+                      objectPosition: "50% 50%",
                     }}
                     draggable={false}
                     onDragStart={(e) => e.preventDefault()}
@@ -1006,8 +1342,8 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                   />
                 ) : (
                   <button type="button" onClick={handleArtworkPick} className="flex h-full w-full flex-col items-center justify-center gap-3 p-6 cursor-pointer">
-                    <PictureOutlined className="text-[36px] text-white-smoke transition-colors group-hover:text-black/60" />
-                    <span className="text-[12px] font-semibold text-white-smoke transition-colors group-hover:text-black/60">Add new artwork</span>
+                    <PictureOutlined className="text-[100px] text-white-smoke transition-colors" />
+                    <span className="text-[15px] font-semibold text-white-smoke transition-colors">Add new artwork</span>
                   </button>
                 )}
 
@@ -1093,7 +1429,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
             {/* Track Title */}
             <div>
               <label className={labelCls}>
-                Track title <InfoCircleOutlined className="text-[10px] ml-0.5 normal-case" />
+                Track title <InfoTooltip text={TOOLTIP_TEXT.trackTitle} />
               </label>
               <input
                 type="text"
@@ -1115,7 +1451,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
             {/* Artist */}
             <div>
               <label className={labelCls}>
-                Main Artist(s) <InfoCircleOutlined className="text-[10px] ml-0.5 normal-case" />
+                Main Artist(s) <InfoTooltip text={TOOLTIP_TEXT.mainArtists} />
               </label>
               <input
                 type="text"
@@ -1131,57 +1467,115 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
             <div>
               <label className={labelCls}>Genre</label>
               <div className="relative" ref={genreMenuRef}>
-                <button
-                  type="button"
-                  onClick={() => setGenreMenuOpen((prev) => !prev)}
-                  className="flex w-full items-center justify-between border-b border-[#333] pb-2 pt-1 text-left"
-                >
-                  <span className={`text-[13px] ${genre ? "text-white-smoke" : "text-[#555]"}`}>
-                    {genre || "Add or search for genre"}
-                  </span>
+                <div className="flex w-full items-center justify-between border-b border-[#333] pb-2 pt-1 text-left">
+                  <input
+                    type="text"
+                    value={genreMenuOpen ? genreSearch : genre}
+                    onFocus={() => {
+                      setGenreSearch(genre);
+                      setGenreMenuOpen(true);
+                    }}
+                    onChange={(e) => {
+                      setGenreSearch(e.target.value);
+                      if (!genreMenuOpen) setGenreMenuOpen(true);
+                    }}
+                    onBlur={() => {
+                      commitGenreSearch();
+                    }}
+                    onKeyDown={(e) => {
+                      if (e.key === "Enter" && shouldShowAddCustomGenre) {
+                        e.preventDefault();
+                        setGenre(genreSearch.trim());
+                        setGenreSearch("");
+                        setGenreMenuOpen(false);
+                      }
+                    }}
+                    placeholder="Add or search for genre"
+                    className="w-full bg-transparent text-[13px] text-white-smoke placeholder-[#555] focus:outline-none"
+                  />
                   <span className="flex items-center gap-3 text-white-smoke">
                     {genre && (
                       <CloseOutlined
-                        onClick={(e) => {
-                          e.stopPropagation();
+                        onClick={() => {
                           setGenre("");
+                          setGenreSearch("");
                         }}
-                        className="text-[12px]"
+                        className="cursor-pointer text-[12px]"
                       />
                     )}
-                    {genreMenuOpen ? <UpOutlined className="text-[11px]" /> : <DownOutlined className="text-[11px]" />}
+                    <button
+                      type="button"
+                      onClick={() => {
+                        if (!genreMenuOpen) {
+                          setGenreSearch(genre);
+                        } else {
+                          commitGenreSearch();
+                          setGenreSearch("");
+                        }
+                        setGenreMenuOpen((prev) => !prev);
+                      }}
+                      className="cursor-pointer"
+                      aria-label={genreMenuOpen ? "Close genre menu" : "Open genre menu"}
+                    >
+                      {genreMenuOpen ? <UpOutlined className="text-[11px]" /> : <DownOutlined className="text-[11px]" />}
+                    </button>
                   </span>
-                </button>
+                </div>
                 {genreMenuOpen && (
                   <div className="absolute left-0 right-0 top-full z-30 mt-2 max-h-70 overflow-y-auto rounded border border-[#2f3035] bg-chinese-black shadow-xl">
-                    <p className="px-4 py-2 text-[13px] text-white-smoke]">All music genres</p>
-                    {musicGenres.map((item) => (
+                    {filteredMusicGenres.length > 0 && (
+                      <>
+                        <p className="px-4 py-2 text-[13px] text-white-smoke">All music genres</p>
+                        {filteredMusicGenres.map((item) => (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => {
+                              setGenre(item);
+                              setGenreSearch("");
+                              setGenreMenuOpen(false);
+                            }}
+                            className="block w-full px-4 py-2 text-left text-[13px] bg-[#1e1e1e] text-white-smoke hover:bg-[#3a3b3f]"
+                          >
+                            {item}
+                          </button>
+                        ))}
+                      </>
+                    )}
+
+                    {filteredAudioGenres.length > 0 && (
+                      <>
+                        <p className="border-t border-[#2a2b30] px-4 py-2 text-[13px] text-white-smoke">All audio genres</p>
+                        {filteredAudioGenres.map((item) => (
+                          <button
+                            key={item}
+                            type="button"
+                            onClick={() => {
+                              setGenre(item);
+                              setGenreSearch("");
+                              setGenreMenuOpen(false);
+                            }}
+                            className="block w-full px-4 py-2 text-left text-[13px] bg-[#1e1e1e] text-white-smoke hover:bg-[#3a3b3f]"
+                          >
+                            {item}
+                          </button>
+                        ))}
+                      </>
+                    )}
+
+                    {shouldShowAddCustomGenre && (
                       <button
-                        key={item}
                         type="button"
                         onClick={() => {
-                          setGenre(item);
+                          setGenre(genreSearch.trim());
+                          setGenreSearch("");
                           setGenreMenuOpen(false);
                         }}
-                        className="block w-full px-4 py-2 text-left text-[13px] text-white-smoke hover:bg-[#3a3b3f]"
+                        className="block w-full border-t border-[#2a2b30] px-4 py-3 text-left text-[13px] font-semibold text-white-smoke hover:bg-[#3a3b3f]"
                       >
-                        {item}
+                        Add "{genreSearch.trim()}"
                       </button>
-                    ))}
-                    <p className="border-t border-[#2a2b30] px-4 py-2 text-[13px] text-white-smoke">All audio genres</p>
-                    {audioGenres.map((item) => (
-                      <button
-                        key={item}
-                        type="button"
-                        onClick={() => {
-                          setGenre(item);
-                          setGenreMenuOpen(false);
-                        }}
-                        className="block w-full px-4 py-2 text-left text-[13px] text-white-smoke hover:bg-[#3a3b3f]"
-                      >
-                        {item}
-                      </button>
-                    ))}
+                    )}
                   </div>
                 )}
               </div>
@@ -1190,7 +1584,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
             {/* Tags */}
             <div>
               <label className={labelCls}>
-                Tags <InfoCircleOutlined className="text-[10px] ml-0.5 normal-case" />
+                Tags <InfoTooltip text={TOOLTIP_TEXT.tags} />
               </label>
               <input
                 type="text"
@@ -1208,94 +1602,164 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                 value={description}
                 onChange={(e) => setDescription(e.target.value)}
                 placeholder="Tracks with descriptions tend to get more plays and engagements."
-                rows={3}
+                rows={1}
                 className={`${fieldCls} resize-none`}
               />
             </div>
 
             {/* Privacy */}
-            <div className="rounded border border-[#2a2a2a] bg-chinese-black p-4" ref={privacyMenuRef}>
-              <div className="grid grid-cols-[2rem_1fr_auto] items-start gap-x-3">
-                <div className="flex h-8 w-8 items-center justify-center rounded-full bg-chinese-black">
-                  {visibilityOption === "public" ? (
-                    <GlobalOutlined className="text-[14px] text-[#1db954]" />
-                  ) : visibilityOption === "private" ? (
-                    <LockOutlined className="text-[14px] text-white-smoke" />
-                  ) : (
-                    <UserAddOutlined className="text-[14px] text-white-smoke" />
-                  )}
-                </div>
-                <div>
-                  <p className="text-[13px] font-semibold text-white-smoke">
-                    {visibilityOption === "public" ? "Public" : visibilityOption === "private" ? "Private" : "Follower Exclusive"}
-                  </p>
-                  <p className="text-[11px] text-white-smoke">
-                    {visibilityOption === "public"
-                      ? "Anyone can access and listen to this track."
-                      : visibilityOption === "private"
-                        ? "Track is not discoverable. Only people with private link can view and listen."
-                        : "Only those who follow you can access."}
-                  </p>
-                </div>
-                <button type="button" onClick={() => setPrivacyMenuOpen((prev) => !prev)} className="pt-1 text-text-white-smoke">
-                  {privacyMenuOpen ? <UpOutlined /> : <DownOutlined />}
-                </button>
-              </div>
-
-              {privacyMenuOpen && (
-                <div className="mt-3 overflow-hidden rounded">
-                  {[
-                    {
-                      value: "public" as const,
-                      title: "Public",
-                      desc: "Anyone can access and listen to this track.",
-                      icon: <GlobalOutlined className="text-[14px] text-[#1db954]" />,
-                    },
-                    {
-                      value: "private" as const,
-                      title: "Private",
-                      desc: "Track is not discoverable. Only people with private link can view and listen.",
-                      icon: <LockOutlined className="text-[14px] text-white-smoke" />,
-                    },
-                    {
-                      value: "followerExclusive" as const,
-                      title: "Follower Exclusive",
-                      desc: "Only those who follow you can access.",
-                      icon: <UserAddOutlined className="text-[14px] text-white-smoke" />,
-                    },
-                  ].map((item) => (
-                    <button
-                      key={item.value}
-                      type="button"
-                      onClick={() => {
-                        setVisibilityOption(item.value);
-                        setPrivacyMenuOpen(false);
-                      }}
-                      className={`grid w-full grid-cols-[2rem_1fr] items-start gap-x-3 px-3 py-3 text-left ${visibilityOption === item.value ? "bg-[#4a4b4d]" : "bg-chinese-black hover:bg-[#35363a]"}`}
-                    >
-                      <span className="flex h-8 w-8 items-center justify-center rounded-full bg-chinese-black">{item.icon}</span>
-                      <span>
-                        <p className="text-[13px] font-semibold text-white-smoke">{item.title}</p>
-                        <p className="text-[11px] text-white-smoke">{item.desc}</p>
-                      </span>
-                    </button>
-                  ))}
-                </div>
-              )}
-
-              <div className="mt-3 border-t border-[#2a2a2a] pt-3">
-                <div className="grid grid-cols-[2rem_1fr_auto] items-start gap-x-3">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center rounded-full bg-chinese-black">
-                    <FaRegClock className="text-[12px] text-white-smoke" />
+            <div className="relative rounded border border-[#2a2a2a] bg-chinese-black p-4" ref={privacyMenuRef}>
+              <div className="relative">
+                <button
+                  type="button"
+                  onClick={() => setPrivacyMenuOpen((prev) => !prev)}
+                  className="grid w-full cursor-pointer grid-cols-[2rem_1fr_auto] items-start gap-x-3 text-left"
+                  aria-expanded={privacyMenuOpen}
+                  aria-label="Toggle privacy options"
+                >
+                  <div className="flex h-8 w-8 items-center justify-center">
+                    {visibilityOption === "public" ? (
+                      <CiGlobe className="text-[24px] text-[#1db954]" />
+                    ) : visibilityOption === "private" ? (
+                      <FiLock className="text-[20px] text-white-smoke" />
+                    ) : (
+                      <UserAddOutlined className="text-[20px] text-white-smoke" />
+                    )}
                   </div>
                   <div>
-                    <p className="text-[12px] font-semibold text-white-smoke">
-                      Schedule public release <span className="text-[#f5a623]">ARTIST PRO</span>
+                    <p className="text-[13px] font-semibold text-white-smoke">
+                      {visibilityOption === "public" ? "Public" : visibilityOption === "private" ? "Private" : "Follower Exclusive"}
                     </p>
-                    <p className="text-[11px] text-[#666]">Track will be made public at specific date and time.</p>
+                    <p className="text-[11px] text-white-smoke">
+                      {visibilityOption === "public"
+                        ? "Anyone can access and listen to this track."
+                        : visibilityOption === "private"
+                          ? "Track is not discoverable. Only people with private link can view and listen."
+                          : "Only those who follow you can access."}
+                    </p>
                   </div>
-                  <Toggle on={scheduleRelease} onToggle={() => setScheduleRelease(!scheduleRelease)} />
+                  <span className="pt-1 text-white-smoke">
+                    {privacyMenuOpen ? <UpOutlined /> : <DownOutlined />}
+                  </span>
+                </button>
+
+                <div
+                  className={`absolute -left-4 -right-4 top-full z-20 mt-2 overflow-hidden rounded border border-[#2a2a2a] bg-chinese-black shadow-xl transition-all duration-200 ${
+                    privacyMenuOpen
+                      ? "pointer-events-auto translate-y-0 opacity-100"
+                      : "pointer-events-none -translate-y-1 opacity-0"
+                  }`}
+                >
+                  <div className="max-h-72 overflow-y-auto">
+                    {[
+                      {
+                        value: "public" as const,
+                        title: "Public",
+                        desc: "Anyone can access and listen to this track.",
+                        icon: <CiGlobe className={`text-[24px] ${visibilityOption === "public" ? "text-[#1db954]" : "text-white-smoke"}`} />,
+                      },
+                      {
+                        value: "private" as const,
+                        title: "Private",
+                        desc: "Track is not discoverable. Only people with private link can view and listen.",
+                        icon: <FiLock className="text-[20px] text-white-smoke" />,
+                      },
+                      {
+                        value: "followerExclusive" as const,
+                        title: "Follower Exclusive",
+                        desc: "Only those who follow you can access.",
+                        icon: <UserAddOutlined className="text-[20px] text-white-smoke" />,
+                        isProOnly: true,
+                      },
+                    ].map((item) => (
+                      item.value === "followerExclusive" && !isArtistPro ? (
+                        <ProLockTooltip key={item.value} text={TOOLTIP_TEXT.proFollowerExclusive}>
+                          <button
+                            type="button"
+                            onClick={() => {
+                              setShowProFeatureModal(true);
+                            }}
+                            className={`grid w-full cursor-not-allowed grid-cols-[2rem_1fr] items-start gap-x-3 px-3 py-3 text-left ${visibilityOption === item.value ? "bg-upload-select" : "bg-chinese-black hover:bg-upload-schedular"}`}
+                          >
+                            <span className="flex h-8 w-8 items-center justify-center">{item.icon}</span>
+                            <span>
+                              <p className="flex items-center gap-2 text-[13px] font-semibold text-white-smoke">
+                                {item.title}
+                                <span className="rounded border border-[#f5a623] px-1.5 py-px text-[9px] font-bold uppercase tracking-wide text-[#f5a623]">PRO</span>
+                              </p>
+                              <p className="text-[11px] text-white-smoke">{item.desc}</p>
+                            </span>
+                          </button>
+                        </ProLockTooltip>
+                      ) : (
+                        <button
+                          key={item.value}
+                          type="button"
+                          onClick={() => {
+                            setVisibilityOption(item.value);
+                            setPrivacyMenuOpen(false);
+                          }}
+                          className={`grid w-full cursor-pointer grid-cols-[2rem_1fr] items-start gap-x-3 px-3 py-3 text-left ${visibilityOption === item.value ? "bg-upload-select" : "bg-chinese-black hover:bg-upload-schedular"}`}
+                        >
+                          <span className="flex h-8 w-8 items-center justify-center">{item.icon}</span>
+                          <span>
+                            <p className="flex items-center gap-2 text-[13px] font-semibold text-white-smoke">
+                              {item.title}
+                              {item.value === "followerExclusive" && (
+                                <span className="rounded border border-[#f5a623] px-1.5 py-px text-[9px] font-bold uppercase tracking-wide text-[#f5a623]">PRO</span>
+                              )}
+                            </p>
+                            <p className="text-[11px] text-white-smoke">{item.desc}</p>
+                          </span>
+                        </button>
+                      )
+                    ))}
+                  </div>
                 </div>
+              </div>
+
+              <div className="mt-3 border-t border-[#2a2a2a] pt-3">
+                {isArtistPro ? (
+                  <div className="grid grid-cols-[2rem_1fr_auto] items-start gap-x-3">
+                    <div className="flex h-8 w-8 shrink-0 items-center justify-center">
+                      <FaRegClock className="text-[20px] text-white-smoke" />
+                    </div>
+                    <div>
+                      <p className="flex items-center gap-1 text-[12px] font-semibold text-white-smoke">
+                        Schedule public release <span className="text-[#f5a623]">ARTIST PRO</span>
+                      </p>
+                      <p className="text-[11px] text-[#666]">Track will be made public at specific date and time.</p>
+                    </div>
+                    <Switch
+                      checked={scheduleRelease}
+                      onChange={setScheduleRelease}
+                      disabled={!isArtistPro}
+                      className="shrink-0 [&:not(.ant-switch-checked)]:bg-[#666666]! [&.ant-switch-checked]:bg-[#1db954]!"
+                    />
+                  </div>
+                ) : (
+                  <ProLockTooltip text={TOOLTIP_TEXT.proScheduleRelease} referenceClassName="w-full" placement="bottom">
+                    <div className="grid grid-cols-[2rem_1fr_auto] items-start gap-x-3 opacity-60">
+                      <div className="flex h-8 w-8 shrink-0 items-center justify-center">
+                        <FaRegClock className="text-[20px] text-white-smoke" />
+                      </div>
+                      <div>
+                        <p className="flex items-center gap-1 text-[12px] font-semibold text-white-smoke">
+                          Schedule public release <span className="text-[#f5a623]">ARTIST PRO</span>
+                        </p>
+                        <p className="text-[11px] text-[#666]">Track will be made public at specific date and time.</p>
+                      </div>
+                      <span className="inline-flex">
+                        <Switch
+                          checked={scheduleRelease}
+                          onChange={setScheduleRelease}
+                          disabled={!isArtistPro}
+                          className="shrink-0 [&:not(.ant-switch-checked)]:bg-[#666666]! [&.ant-switch-checked]:bg-[#1db954]!"
+                        />
+                      </span>
+                    </div>
+                  </ProLockTooltip>
+                )}
               </div>
             </div>
 
@@ -1313,47 +1777,59 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
             </div>
             {expandedSections.advancedDetails ? <UpOutlined className="text-[11px] text-white-smoke" /> : <DownOutlined className="text-[11px] text-white-smoke" />}
           </button>
-          {expandedSections.advancedDetails && (
-            <div className="space-y-5 py-4 border-b border-[#222]">
+          <AnimatePresence initial={false}>
+            {expandedSections.advancedDetails && (
+              <motion.div
+                key="advanced-details"
+                initial={{ height: 0, opacity: 0, y: -6 }}
+                animate={{ height: "auto", opacity: 1, y: 0 }}
+                exit={{ height: 0, opacity: 0, y: -6 }}
+                transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden border-b border-[#222]"
+              >
+                <div className="space-y-5 py-4">
               {[
-                { label: "Buy link", value: buyLink, setter: setBuyLink, placeholder: "https://your-store.com/track" },
-                { label: "Record label", value: recordLabel, setter: setRecordLabel, placeholder: "Label name" },
-                { label: "Publisher", value: publisher, setter: setPublisher, placeholder: "Publisher name" },
-                { label: "ISRC", value: isrc, setter: setIsrc, placeholder: "e.g. USRC12345678" },
-              ].map(({ label, value, setter, placeholder }) => (
+                { label: "Buy link", value: buyLink, setter: setBuyLink, placeholder: "Add a link to let your fans purchase the track from another site", info: "" },
+                { label: "Record label", value: recordLabel, setter: setRecordLabel, placeholder: "If your track is released under a specific record label, you can add that here.", info: "" },
+              ].map(({ label, value, setter, placeholder, info }) => (
                 <div key={label}>
                   <label className={labelCls}>{label}</label>
+                  <small className="flex pb-2 text-[12px] text-white/55">{info}</small>
                   <input
                     type="text"
                     value={value}
                     onChange={(e) => setter(e.target.value)}
                     placeholder={placeholder}
-                    className={fieldCls}
+                    className={AdvfieldCls}
                   />
                 </div>
               ))}
               <div>
                 <label className={labelCls}>Release date</label>
+                <small className="flex pb-2 text-[12px] text-white/55">If your track has a specific release date, you can add that here.</small>
                 <div className="relative" ref={releaseCalendarRef}>
-                  <input
-                    type="text"
-                    value={formatDisplayDate(releaseDate)}
-                    readOnly
-                    onClick={openReleaseCalendar}
-                    placeholder="MM/DD/YYYY"
-                    className={`${fieldCls} pr-9`}
-                  />
-                  <button
-                    type="button"
-                    onClick={() => setReleaseCalendarOpen((prev) => !prev)}
-                    className="absolute right-1 top-1/2 -translate-y-1/2 rounded p-1 text-white-smoke/85 hover:text-white-smoke cursor-pointer"
-                    aria-label="Open release date calendar"
-                  >
-                    <CalendarOutlined className="text-[13px]" />
-                  </button>
+                  <div className="relative max-w-45">
+                    <input
+                      type="text"
+                      value={formatDisplayDate(releaseDate)}
+                      readOnly
+                      onClick={openReleaseCalendar}
+                      placeholder="MM/DD/YYYY"
+                      className={`${AdvfieldCls} pr-9 w-full cursor-pointer`}
+                    />
+
+                    <button
+                      type="button"
+                      onClick={() => setReleaseCalendarOpen((prev) => !prev)}
+                      className="absolute right-2 top-1/2 -translate-y-1/2 text-white-smoke/85 hover:text-white-smoke cursor-pointer"
+                      aria-label="Open release date calendar"
+                    >
+                      <IoMdCalendar className="text-[22px]" />
+                    </button>
+                  </div>
 
                   {releaseCalendarOpen && (
-                    <div className="absolute left-0 top-full z-40 mt-2 w-[min(18rem,calc(100vw-2.5rem))] rounded-md border border-[#2f3035] bg-chinese-black p-3 shadow-xl sm:left-auto sm:right-0 sm:w-72">
+                    <div className="absolute left-0 top-full z-40 mt-2 w-[min(18rem,calc(100vw-2.5rem))] rounded-md border border-[#2f3035] bg-chinese-black p-3 shadow-xl sm:left-0 sm:right-auto sm:w-72">
                       <div className="mb-2 flex items-center justify-between">
                         <button
                           type="button"
@@ -1412,48 +1888,74 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                   )}
                 </div>
               </div>
+              {[
+                { label: "Publisher", value: publisher, setter: setPublisher, placeholder: "", info: "If you have a publisher, you can add that here. A music publisher is a person or organization that helps songwriters promote and monetize their songs and ensure that they are properly compensated when their songs are used." },
+                { label: "ISRC", value: isrc, setter: setIsrc, placeholder: "", info: "An ISRC (International Standard Recording Code) is a unique identifier that is assigned to a track. Use the same ISRC for a given track wherever you distribute it. If you work with a record label or distributor, ask them if they already have ISRCs for your tracks." },
+              ].map(({ label, value, setter, placeholder, info }) => (
+                <div key={label}>
+                  <label className={labelCls}>{label}</label>
+                  <small className="flex pb-2 text-[12px] text-white/55">{info}</small>
+                  <input
+                    type="text"
+                    value={value}
+                    onChange={(e) => setter(e.target.value)}
+                    placeholder={placeholder}
+                    className={AdvfieldCls}
+                  />
+                </div>
+              ))}
               <div>
                 <label className={labelCls}>Contains explicit content</label>
-                <label className="flex items-center gap-2 cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={explicitContent}
-                    onChange={(e) => setExplicitContent(e.target.checked)}
-                    className="h-3.5 w-3.5 rounded border-[#444] bg-chinses-black accent-[#1db954]"
-                  />
+                <small className="flex pb-2 text-[12px] text-white/55">Please check this if your track contains explicit content. The badge will be displayed next to your track title.</small>
+                <label className="flex items-center gap-2">
+                  <PrettyCheckbox checked={explicitContent} onChange={setExplicitContent} />
                   <span className="text-[12px] text-white-smoke">Explicit content</span>
+                  <BsExplicitFill className="logo-dark" />
+                  <BsExplicitFill className="invert logo-light" />
                 </label>
               </div>
               <div>
                 <label className={labelCls}>P line</label>
+                <small className="text-[12px] flex pb-2 text-white/55">P line notice identify the owner of the rights in the original sound recording (the masters) at the time the CD/carrier/file is manufactured.</small>
                 <input
                   type="text"
                   value={pline}
                   onChange={(e) => setPline(e.target.value)}
-                  placeholder="℗ 2026 Your Name"
-                  className={fieldCls}
+                  placeholder=""
+                  className={AdvfieldCls}
                 />
               </div>
-            </div>
-          )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Permissions */}
           <button onClick={() => toggleSection("permissions")} className="flex w-full items-center justify-between py-4 text-left border-b border-[#222] cursor-pointer">
             <div className="flex items-start gap-3">
               <span className="mt-1 pb-2 flex h-5 w-5 shrink-0 items-center justify-center text-white-smoke">
-                <IoToggleOutline className="text-[17px]" />
+                <IoToggleOutline className="mt-0.5 text-[22px]" />
               </span>
               <div>
-                <p className="text-[13px] font-semibold text-white-smoke">Permissions</p>
-                <p className="text-[11px] text-white-smoke mt-0.5">Control the visibility of engagements on your track, direct downloads, and more.</p>
+                <p className="text-[17px] font-semibold text-white-smoke">Permissions</p>
+                <p className="text-[15px] text-white-smoke mt-0.5">Control the visibility of engagements on your track, direct downloads, and more.</p>
               </div>
             </div>
             {expandedSections.permissions ? <UpOutlined className="text-[11px] text-white-smoke" /> : <DownOutlined className="text-[11px] text-white-smoke" />}
           </button>
-          {expandedSections.permissions && (
-            <div className="space-y-4 py-4 border-b border-[#222]">
+          <AnimatePresence initial={false}>
+            {expandedSections.permissions && (
+              <motion.div
+                key="permissions"
+                initial={{ height: 0, opacity: 0, y: -6 }}
+                animate={{ height: "auto", opacity: 1, y: 0 }}
+                exit={{ height: 0, opacity: 0, y: -6 }}
+                transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden border-b border-[#222]"
+              >
+                <div className="space-y-4 py-4 pl-14 pr-2">
               <div className="space-y-4 pb-4 border-b border-[#1e1e1e]">
-                <p className="text-[11px] font-bold text-white-smoke uppercase tracking-wide">Access settings</p>
+                <p className="text-[16px] font-bold text-white-smoke uppercase tracking-wide">Access settings</p>
                 {[
                   { label: "Enable direct downloads", desc: "Allow listeners to download the original audio file.", val: enableDownloads, set: setEnableDownloads },
                   { label: "Offline listening", desc: "Allows this track to be played on devices without an internet connection.", val: offlineListening, set: setOfflineListening },
@@ -1461,96 +1963,280 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                   { label: "Display embed code", desc: "Choose whether you want this track's embedded player code to be displayed publicly.", val: displayEmbedCode, set: setDisplayEmbedCode },
                   { label: "Enable app playback", desc: "Choose whether you want this track to be playable outside the app.", val: enableAppPlayback, set: setEnableAppPlayback },
                 ].map(({ label, desc, val, set }) => (
-                  <div key={label} className="flex items-center justify-between gap-4">
+                  <div key={label} className="flex items-center justify-between gap-4 border-b border-[#2a2a2a] pb-4 last:border-b-0 last:pb-0">
                     <div>
-                      <p className="text-[12px] font-semibold text-white-smoke">{label}</p>
-                      <p className="text-[11px] text-white-smoke">{desc}</p>
+                      <p className="text-[15px] font-semibold text-white-smoke">{label}</p>
+                      <p className="text-[13px] text-white/55">{desc}</p>
                     </div>
-                    <Toggle on={val} onToggle={() => set(!val)} />
+                    <Switch checked={val} onChange={set} className="shrink-0 [&:not(.ant-switch-checked)]:bg-[#666666]! [&.ant-switch-checked]:bg-[#1db954]!" />
                   </div>
                 ))}
               </div>
               <div className="space-y-4 pb-4 border-b border-[#1e1e1e]">
-                <p className="text-[11px] font-bold text-white-smoke uppercase tracking-wide">Engagement privacy</p>
+                <p className="text-[16px] font-bold text-white-smoke uppercase tracking-wide">Engagement privacy</p>
                 {[
                   { label: "Allow people to comment on your track", val: allowComments, set: setAllowComments },
                   { label: "Show track comments to public", val: showTrackComments, set: setShowTrackComments },
                   { label: "Show track insights to public", val: showTrackInsights, set: setShowTrackInsights },
                 ].map(({ label, val, set }) => (
-                  <div key={label} className="flex items-center justify-between gap-4">
-                    <div className="flex items-center gap-1.5">
-                      <LockOutlined className="text-[11px] text-white-smoke" />
-                      <p className="text-[12px] font-semibold text-white-smoke">{label}</p>
+                  isArtistPro ? (
+                    <div key={label} className="flex items-center justify-between gap-4 border-b border-[#2a2a2a] pb-4 last:border-b-0 last:pb-0">
+                      <p className="text-[15px] font-semibold text-white-smoke">{label}</p>
+
+                      <div className="flex items-center gap-2">
+                        <RiLockFill className="text-[20px] text-white-smoke" />
+                        <Switch
+                          checked={val}
+                          onChange={set}
+                          disabled={!isArtistPro}
+                          className="shrink-0 [&:not(.ant-switch-checked)]:bg-[#666666]! [&.ant-switch-checked]:bg-[#1db954]!"
+                        />
+                      </div>
                     </div>
-                    <Toggle on={val} onToggle={() => set(!val)} />
-                  </div>
+                  ) : (
+                    <div key={label} className="flex items-center justify-between gap-4 border-b border-[#2a2a2a] pb-4 opacity-70 last:border-b-0 last:pb-0">
+                      <p className="text-[15px] font-semibold text-white-smoke">{label}</p>
+
+                      <div className="flex items-center gap-2">
+                        <RiLockFill className="text-[20px] text-white-smoke" />
+                        <ProLockTooltip text={TOOLTIP_TEXT.proSwitch} referenceClassName="inline-flex h-fit w-fit" placement="bottom-end">
+                          <span className="inline-flex">
+                            <Switch
+                              checked={val}
+                              onChange={set}
+                              disabled={!isArtistPro}
+                              className="shrink-0 [&:not(.ant-switch-checked)]:bg-[#666666]! [&.ant-switch-checked]:bg-[#1db954]!"
+                            />
+                          </span>
+                        </ProLockTooltip>
+                      </div>
+                    </div>
+                  )
                 ))}
               </div>
-              <div>
-                <div className="flex items-center gap-1.5 mb-1">
-                  <LockOutlined className="text-[11px] text-white-smoke" />
-                  <p className="text-[11px] font-bold text-white-smoke uppercase tracking-wide">Geoblocking</p>
+              {isArtistPro ? (
+                <div>
+                  <div className="ml-14">
+                    <div className="flex items-center gap-1.5 mb-1">
+                      <RiLockFill className="mb-1 text-[20px] text-white-smoke" />
+                      <p className="flex items-center gap-1 text-[17px] font-bold text-white-smoke tracking-wide">
+                        Geoblocking
+                      </p>
+                    </div>
+                    <p className="mb-3 text-[14px] text-white-smoke">Customize what countries your track will be available in.</p>
+                  </div>
+                  <div role="radiogroup" className="space-y-2">
+                    {["worldwide", "exclusive", "blocked"].map((opt) => (
+                      <label key={opt} className="flex cursor-pointer items-center gap-2">
+                        <PrettyRadio
+                          checked={geoblockingOption === opt}
+                          onSelect={() => {
+                            if (!isArtistPro) return;
+                            setGeoblockingOption(opt);
+                          }}
+                        />
+                        <span className="text-[15px] text-white-smoke">
+                          {opt === "worldwide" ? "Worldwide" : opt === "exclusive" ? "Exclusive regions" : "Blocked regions"}
+                        </span>
+                      </label>
+                    ))}
+                  </div>
                 </div>
-                <p className="mb-3 text-[11px] text-white-smoke">Customize what countries your track will be available in.</p>
-                <div className="space-y-2">
-                  {["worldwide", "exclusive", "blocked"].map((opt) => (
-                    <label key={opt} className="flex items-center gap-2 cursor-pointer">
-                      <input
-                        type="radio"
-                        name="geoblocking"
-                        value={opt}
-                        checked={geoblockingOption === opt}
-                        onChange={(e) => setGeoblockingOption(e.target.value)}
-                        className="h-3.5 w-3.5 accent-[#1db954]"
-                      />
-                      <span className="text-[12px] text-white-smoke">
-                        {opt === "worldwide" ? "Worldwide" : opt === "exclusive" ? "Exclusive regions" : "Blocked regions"}
-                      </span>
-                    </label>
-                  ))}
+              ) : (
+                <ProLockTooltip text={TOOLTIP_TEXT.proGeoblocking}>
+                  <div className="opacity-55">
+                    <div className="ml-14">
+                      <div className="flex items-center gap-1.5 mb-1">
+                        <RiLockFill className="mb-1 text-[20px] text-white-smoke" />
+                        <p className="flex items-center gap-1 text-[17px] font-bold text-white-smoke tracking-wide">
+                          Geoblocking
+                        </p>
+                      </div>
+                      <p className="mb-3 text-[14px] text-white-smoke">Customize what countries your track will be available in.</p>
+                    </div>
+                    <div role="radiogroup" className="space-y-2">
+                      {["worldwide", "exclusive", "blocked"].map((opt) => (
+                        <label key={opt} className="flex cursor-not-allowed items-center gap-2 opacity-60">
+                          <PrettyRadio
+                            checked={geoblockingOption === opt}
+                            onSelect={() => {
+                              if (!isArtistPro) return;
+                              setGeoblockingOption(opt);
+                            }}
+                          />
+                          <span className="text-[15px] text-white-smoke">
+                            {opt === "worldwide" ? "Worldwide" : opt === "exclusive" ? "Exclusive regions" : "Blocked regions"}
+                          </span>
+                        </label>
+                      ))}
+                    </div>
+                  </div>
+                </ProLockTooltip>
+              )}
                 </div>
-              </div>
-            </div>
-          )}
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Audio Clip */}
           <button onClick={() => toggleSection("audioClip")} className="flex w-full items-center justify-between py-4 text-left border-b border-[#222] cursor-pointer">
             <div className="flex items-start gap-3">
               <span className="mt-1 pb-2 flex h-5 w-5 shrink-0 items-center justify-center text-white-smoke">
-                <RxSpeakerLoud className="text-[17px]" />
+                <RxSpeakerLoud className="mt-1 text-[20px]" />
               </span>
               <div>
-                <p className="text-[13px] font-semibold text-white-smoke">Audio clip</p>
-                <p className="text-[11px] text-white-smoke mt-0.5">Pick the 20 second clip you'd like to use as your track preview. This will live on your feed and socials.</p>
+                <p className="text-[17px] font-semibold text-white-smoke">Audio clip</p>
+                <p className="text-[14px] text-white-smoke mt-0.5">Pick the 20 second clip you'd like to use as your track preview. This will live on your feed and socials.</p>
               </div>
             </div>
-            {expandedSections.audioClip ? <UpOutlined className="text-[11px] text-white-smoke" /> : <DownOutlined className="text-[11px] text-white-smoke" />}
+            {expandedSections.audioClip ? <UpOutlined className="text-[13px] text-white-smoke" /> : <DownOutlined className="text-[13px] text-white-smoke" />}
           </button>
-          {expandedSections.audioClip && (
-            <div className="py-4 border-b border-[#222]">
-              <div className="h-20 rounded bg-chinese-black flex items-center justify-center">
-                <p className="text-[12px] text-white-smoke text-center px-4">
-                  Can't set audio preview — this track is shorter than the preview time.
-                </p>
-              </div>
-            </div>
-          )}
+          <AnimatePresence initial={false}>
+            {expandedSections.audioClip && (
+              <motion.div
+                key="audio-clip"
+                initial={{ height: 0, opacity: 0, y: -6 }}
+                animate={{ height: "auto", opacity: 1, y: 0 }}
+                exit={{ height: 0, opacity: 0, y: -6 }}
+                transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden border-b border-[#222]"
+              >
+                <div className="py-4">
+                  <div className="relative overflow-hidden bg-chinese-black">
+                    <div className="relative h-24 px-2 pt-4 sm:h-30 sm:pt-6">
+                      <div className="pointer-events-none absolute inset-0 opacity-85">
+                        <div className="flex h-full w-full items-center gap-px px-1">
+                          {baseWaveformBars}
+                        </div>
+                      </div>
+                      <div className="pointer-events-none absolute bottom-0 left-1 right-1 top-1/2 bg-chinese-black/38" />
+                      <div className="pointer-events-none absolute left-1 right-1 top-1/2 z-10 h-0.5 -translate-y-1/2 bg-chinese-black/80 shadow-[0_0_6px_rgba(0,0,0,0.35)]" />
+
+                      {!canSetAudioPreview ? (
+                        <div className="absolute inset-0 flex items-center justify-center bg-chinese-black/55">
+                          <p className="px-4 text-center text-[14px] font-semibold leading-tight text-white/85 sm:text-[22px]">
+                            Can&apos;t set audio preview, because this track is shorter than preview time.
+                          </p>
+                        </div>
+                      ) : (
+                        <>
+                          <div
+                            className="pointer-events-none absolute inset-y-0 left-0 bg-chinese-black/45"
+                            style={{ width: `${clipLeftPercent}%` }}
+                          />
+                          <div
+                            className="pointer-events-none absolute inset-y-0 right-0 bg-chinese-black/45"
+                            style={{ width: `${rightShadePercent}%` }}
+                          />
+
+                          <div ref={clipTrackRef} className="absolute inset-y-0 left-1 right-1">
+                            <div
+                              className={`absolute inset-y-0 z-30 cursor-grab overflow-hidden rounded-sm border border-white bg-transparent isolate ${isDraggingClip ? "cursor-grabbing" : ""}`}
+                              style={{ left: `${clipLeftPercent}%`, width: `${clipWidthPercent}%` }}
+                              onPointerDown={handleClipDragStart}
+                            >
+                              <div className="pointer-events-none absolute inset-px z-0 rounded-sm bg-[#2fbf62]/18" />
+                              <div
+                                className="pointer-events-none absolute bottom-px left-px top-px z-10 overflow-hidden rounded-l-sm bg-[#4f4f4f]/62"
+                                style={{ width: `${clipPlaybackOverlayPercent}%` }}
+                              >
+                                <div className="flex h-full w-full items-center gap-px px-1">
+                                  {darkWaveformBars}
+                                </div>
+                              </div>
+                              <button
+                                type="button"
+                                onClick={(e) => {
+                                  e.stopPropagation();
+                                  void handleClipPlayPause();
+                                }}
+                                className="absolute left-1/2 top-1/2 z-20 flex h-8 w-8 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white-smoke text-chinese-black shadow-lg cursor-pointer sm:h-10 sm:w-10"
+                                aria-label={isClipPlaying ? "Pause clip preview" : "Play clip preview"}
+                              >
+                                {isClipPlaying ? <PauseCircleOutlined className="text-[16px] sm:text-[20px]" /> : <PlayCircleOutlined className="text-[16px] sm:text-[20px]" />}
+                              </button>
+                              <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 h-2 bg-white-smoke sm:h-3" />
+                              <div className="pointer-events-none absolute inset-0 z-30 rounded-sm border border-white-smoke" />
+                            </div>
+                          </div>
+                        </>
+                      )}
+                    </div>
+
+                    <div className="flex items-end justify-between border-t border-[#2a2a2a] px-2 pb-2 pt-2 sm:px-4 sm:pb-3">
+                      <div className="flex min-w-14 flex-col gap-1 sm:min-w-16 sm:gap-1.5">
+                        <input
+                          value={isDraggingClip ? formatTimeLabel(safeClipStart) : audioClipStartDraft}
+                          onChange={(e) => setAudioClipStartDraft(e.target.value)}
+                          onBlur={() => void applyTypedClipTime("start")}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              void applyTypedClipTime("start");
+                            }
+                          }}
+                          className="w-14 bg-transparent text-[16px] font-semibold leading-none text-white-smoke outline-none sm:w-18 sm:text-[22px]"
+                          aria-label="Audio clip start time"
+                        />
+                        <span className="h-px w-10 bg-[#4a4a4a] sm:w-12" />
+                      </div>
+                      <div className="flex flex-col items-center justify-end gap-1 sm:gap-1.5">
+                        <button
+                          type="button"
+                          onClick={handleClipReset}
+                          className="rounded border border-white-smoke/30 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white-smoke hover:border-white-smoke hover:bg-white-smoke/10 cursor-pointer"
+                        >
+                          Reset
+                        </button>
+                        <span className="h-px w-10 bg-[#4a4a4a] sm:w-12" />
+                      </div>
+                      <div className="flex min-w-14 flex-col items-end gap-1 sm:min-w-16 sm:gap-1.5">
+                        <input
+                          value={isDraggingClip ? formatTimeLabel(safeClipEnd) : audioClipEndDraft}
+                          onChange={(e) => setAudioClipEndDraft(e.target.value)}
+                          onBlur={() => void applyTypedClipTime("end")}
+                          onKeyDown={(e) => {
+                            if (e.key === "Enter") {
+                              e.preventDefault();
+                              void applyTypedClipTime("end");
+                            }
+                          }}
+                          className="w-14 bg-transparent text-right text-[16px] font-semibold leading-none text-white-smoke outline-none sm:w-18 sm:text-[22px]"
+                          aria-label="Audio clip end time"
+                        />
+                        <span className="h-px w-10 bg-[#4a4a4a] sm:w-12" />
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
 
           {/* Licensing */}
           <button onClick={() => toggleSection("licensing")} className="flex w-full items-center justify-between py-4 text-left border-b border-[#222] cursor-pointer">
             <div className="flex items-start gap-3">
               <span className="mt-1 pb-2 flex h-5 w-5 shrink-0 items-center justify-center text-white-smoke">
-                <BsCcCircle className="text-[17px]" />
+                <BsCcCircle className="mt-1 text-[20px]" />
               </span>
               <div>
-                <p className="text-[13px] font-semibold text-white-smoke">Licensing</p>
-                <p className="text-[11px] text-white-smoke mt-0.5">Enable Creative Commons licenses options.</p>
+                <p className="text-[17px] font-semibold text-white-smoke">Licensing</p>
+                <p className="text-[14px] text-white-smoke mt-0.5">Enable Creative Commons licenses options.</p>
               </div>
             </div>
             {expandedSections.licensing ? <UpOutlined className="text-[11px] text-white-smoke" /> : <DownOutlined className="text-[11px] text-white-smoke" />}
           </button>
-          {expandedSections.licensing && (
-            <div className="py-4 space-y-4 border-b border-[#222]">
+          <AnimatePresence initial={false}>
+            {expandedSections.licensing && (
+              <motion.div
+                key="licensing"
+                initial={{ height: 0, opacity: 0, y: -6 }}
+                animate={{ height: "auto", opacity: 1, y: 0 }}
+                exit={{ height: 0, opacity: 0, y: -6 }}
+                transition={{ duration: 0.24, ease: [0.22, 1, 0.36, 1] }}
+                className="overflow-hidden border-b border-[#222]"
+              >
+                <div className="py-4 space-y-4 pl-14 pr-2">
               {[
                 {
                   value: "all-rights",
@@ -1564,22 +2250,20 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                 },
               ].map(({ value, title, desc }) => (
                 <label key={value} className="flex cursor-pointer items-start gap-3">
-                  <input
-                    type="radio"
-                    name="license"
-                    value={value}
+                  <PrettyRadio
                     checked={licenseType === value}
-                    onChange={(e) => setLicenseType(e.target.value as "all-rights" | "creative-commons")}
-                    className="mt-0.5 h-3.5 w-3.5 accent-[#1db954]"
+                    onSelect={() => setLicenseType(value as "all-rights" | "creative-commons")}
                   />
                   <div>
-                    <p className="text-[12px] font-semibold text-white-smoke">{title}</p>
-                    <p className="mt-0.5 text-[11px] text-white-smoke">{desc}</p>
+                    <p className="text-[14px] font-semibold text-white-smoke">{title}</p>
+                    <p className="mt-0.5 text-[13px] text-white-smoke">{desc}</p>
                   </div>
                 </label>
               ))}
-            </div>
-          )}
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
         </div>
       </div>
 
@@ -1613,5 +2297,125 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         />
       )}
     </div>
+  );
+}
+
+function ProLockTooltip({
+  text,
+  children,
+  referenceClassName = "w-full",
+  placement = "bottom",
+}: {
+  text: { title: string; description: string };
+  children: ReactNode;
+  referenceClassName?: string;
+  placement?: Placement;
+}) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const arrowRef = useRef<SVGSVGElement | null>(null);
+
+  const { refs, floatingStyles, context } = useFloating({
+    open,
+    onOpenChange: setOpen,
+    placement,
+    whileElementsMounted: autoUpdate,
+    middleware: [offset(10), flip(), shift({ padding: 8 }), arrow({ element: arrowRef })],
+  });
+
+  const hover = useHover(context, {
+    move: false,
+    delay: { open: 80, close: 70 },
+  });
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
+
+  return (
+    <>
+      <div ref={refs.setReference} {...getReferenceProps()} className={referenceClassName}>
+        {children}
+      </div>
+
+      <FloatingPortal>
+        {open && (
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            {...getFloatingProps()}
+            className="z-80 w-64 max-w-[calc(100vw-1.5rem)] rounded-md border border-[#2f3035] bg-chinese-black px-4 py-4 text-white-smoke shadow-xl"
+          >
+            <p className="text-[24px] font-semibold leading-none tracking-tight text-white-smoke">{text.title}</p>
+            <p className="mt-2 text-[11px] leading-5 text-white-smoke">{text.description}</p>
+            <button
+              type="button"
+              onClick={() => router.push("/artistpro")}
+              className="mt-4 rounded-full bg-white-smoke px-4 py-2 text-[12px] font-bold text-chinese-black transition-colors hover:bg-white-smoke cursor-pointer"
+            >
+              Unlock with Artist Pro
+            </button>
+            <FloatingArrow
+              ref={arrowRef}
+              context={context}
+              className="fill-[#111216]"
+              stroke="#2f3035"
+              strokeWidth={1}
+            />
+          </div>
+        )}
+      </FloatingPortal>
+    </>
+  );
+}
+
+function InfoTooltip({ text }: { text: { title: string; description: string } }) {
+  const [open, setOpen] = useState(false);
+  const arrowRef = useRef<SVGSVGElement | null>(null);
+
+  const { refs, floatingStyles, context } = useFloating({
+    open,
+    onOpenChange: setOpen,
+    placement: "bottom",
+    whileElementsMounted: autoUpdate,
+    middleware: [offset(10), flip(), shift({ padding: 8 }), arrow({ element: arrowRef })],
+  });
+
+  const hover = useHover(context, {
+    move: false,
+    delay: { open: 100, close: 80 },
+  });
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
+
+  return (
+    <>
+      <span
+        ref={refs.setReference}
+        {...getReferenceProps()}
+        className="ml-1 inline-flex cursor-help align-middle text-white/70 hover:text-white-smoke"
+      >
+        <CiCircleQuestion className="text-white-smoke text-[14px]" />
+      </span>
+
+      <FloatingPortal>
+        {open && (
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            {...getFloatingProps()}
+            className="z-80 w-64 max-w-[calc(100vw-1.5rem)] rounded-md border border-[#2f3035] bg-chinese-black px-4 py-4 text-white-smoke shadow-xl"
+          >
+            <p className="text-[16px] text-white-smoke font-semibold leading-none tracking-tight">{text.title}</p>
+            <p className="mt-2 text-[11px] leading-5 text-white-smoke">{text.description}</p>
+            <FloatingArrow
+              ref={arrowRef}
+              context={context}
+              className="fill-[#111216]"
+              stroke="#2f3035"
+              strokeWidth={1}
+            />
+          </div>
+        )}
+      </FloatingPortal>
+    </>
   );
 }

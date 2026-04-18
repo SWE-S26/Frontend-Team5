@@ -38,7 +38,7 @@ export interface RegisterDetailsFormProps {
 export interface DetailsValidationFormProps {
   email: string;
   onBackToLogin: () => void;
-  onSendAgain?: () => void;
+  onSendAgain?: () => Promise<unknown> | unknown;
 }
 export interface RefreshTokenResponse {
   message: string
