@@ -1,5 +1,6 @@
 "use client";
 import { useState, useRef, useEffect } from "react";
+import Link from "next/link";
 
 export interface DropdownItem {
   type?: "separator";
@@ -7,6 +8,7 @@ export interface DropdownItem {
   icon?: React.ReactNode;
   onClick?: () => void;
   disabled?: boolean;
+  href?: string;
 }
 
 interface DropdownProps {
@@ -37,6 +39,9 @@ export default function Dropdown({
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  const itemClass =
+    "flex items-center text-sm gap-3 text-white-smoke hover:text-silver font-bold px-4 py-2 text-left transition-all duration-300 cursor-pointer w-full";
+
   return (
     <div className="relative" ref={ref}>
       <div onClick={() => setIsOpen(!isOpen)}>{trigger}</div>
@@ -47,23 +52,33 @@ export default function Dropdown({
           className={`flex flex-col absolute ${width} ${position} mt-5 py-2 bg-chinese-black border border-silver/40 rounded-sm`}
         >
           {items.map((item, index) =>
-            item.type === "separator" ? (
-              <hr key={index} className="border-silver/40 my-1" />
-            ) : (
-              <button
-                key={index}
-                disabled={item.disabled}
-                onClick={() => {
-                  item.onClick?.();
-                  setIsOpen(false);
-                }}
-                className="flex items-center text-sm gap-3 text-white-smoke hover:text-silver font-bold px-4 py-2 text-left transition-all duration-300 cursor-pointer"
-              >
-                {item.icon && <span className="text-md">{item.icon}</span>}
-                {item.label}
-              </button>
-            ),
-          )}
+          item.type === "separator" ? (
+            <hr key={index} className="border-silver/40 my-1" />
+          ) : item.href ? (
+            <Link
+              key={index}
+              href={item.href}
+              onClick={() => setIsOpen(false)}
+              className={itemClass}
+            >
+              {item.icon && <span className="text-md">{item.icon}</span>}
+              {item.label}
+            </Link>
+          ) : (
+            <button
+              key={index}
+              disabled={item.disabled}
+              onClick={() => {
+                item.onClick?.();
+                setIsOpen(false);
+              }}
+              className={itemClass}
+            >
+              {item.icon && <span className="text-md">{item.icon}</span>}
+              {item.label}
+            </button>
+          ),
+        )}
         </div>
       )}
     </div>
