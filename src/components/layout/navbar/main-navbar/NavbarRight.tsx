@@ -65,22 +65,22 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   const profileTarget = userId ? `/profile/${userId}` : "/home"
 
   const profileItems: DropdownItem[] = useMemo(() => [
-    { label: "Profile",        icon: <FaUser />,                 onClick: () => router.push(profileTarget), disabled: !userId },
-    { label: "Likes",          icon: <FaHeart />,                onClick: () => router.push("/library/likes")     },
-    { label: "Playlists",      icon: <BiSolidCopy />,            onClick: () => router.push("/library/playlists") },
-    { label: "Stations",       icon: <HiMiniSignal />,           onClick: () => router.push("/library/stations")  },
-    { label: "Following",      icon: <FaUserCheck />,            onClick: () => router.push("/library/following") },
-    { label: "Who to follow",  icon: <FaUserPlus />,             onClick: () => console.log("done")               },
-    { label: "Try Artist Pro", icon: <FaStar />,                 onClick: () => router.push("/artistpro")         },
-    { label: "Tracks",         icon: <PiWaveformBold />,         onClick: () => router.push("/artists")           },
-    { label: "Insights",       icon: <ImStatsBars />,            onClick: () => console.log("done")               },
-    { label: "Distribute",     icon: <BsArrowsExpandVertical />, onClick: () => router.push("/artistpro")         },
-  ], [router, profileTarget, userId])
+    { label: "Profile",        icon: <FaUser />,                 href: profileTarget,       disabled: !userId },
+    { label: "Likes",          icon: <FaHeart />,                href: "/library/likes"                       },
+    { label: "Playlists",      icon: <BiSolidCopy />,            href: "/library/playlists"                   },
+    { label: "Stations",       icon: <HiMiniSignal />,           href: "/library/stations"                    },
+    { label: "Following",      icon: <FaUserCheck />,            href: "/library/following"                   },
+    { label: "Who to follow",  icon: <FaUserPlus />,             onClick: () => console.log("done")           },
+    { label: "Try Artist Pro", icon: <FaStar />,                 href: "/artistpro"                           },
+    { label: "Tracks",         icon: <PiWaveformBold />,         href: "/artists"                             },
+    { label: "Insights",       icon: <ImStatsBars />,            onClick: () => console.log("done")           },
+    { label: "Distribute",     icon: <BsArrowsExpandVertical />, href: "/artistpro"                           },
+  ], [profileTarget, userId])
 
   const moreItems: DropdownItem[] = useMemo(() => [
     { label: "About us",           onClick: () => console.log("done")      },
-    { label: "Legal",              onClick: () => router.push("/legal")     },
-    { label: "Copyright",          onClick: () => router.push("/copyright") },
+    { label: "Legal",              href: "/legal"                          },
+    { label: "Copyright",          href: "/copyright"                      },
     { type: "separator" },
     { label: "Mobile apps",        onClick: () => console.log("done")      },
     { label: "Artist Membership",  onClick: () => console.log("done")      },
@@ -89,12 +89,12 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
     { label: "Developers",         onClick: () => console.log("done")      },
     { label: "SoundCloud Store",   onClick: () => console.log("done")      },
     { type: "separator" },
-    { label: "Support",            onClick: () => console.log("done")      },
+    { label: "Support",            href: "/need-help"                      },
     { label: "Keyboard shortcuts", onClick: () => setIsShortcutsOpen(true) },
     { type: "separator" },
     ...(isLoggedIn ? [
       { label: "Subscription", onClick: () => console.log("done")          },
-      { label: "Settings",     onClick: () => router.push("/settings")     },
+      { label: "Settings",     href: "/settings"                           },
       { label: "Sign out",     onClick: () => logout(), disabled: loading  },
     ] : [
       { label: "Pro Plans",    onClick: () => console.log("done")          },
