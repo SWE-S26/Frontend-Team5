@@ -1,28 +1,37 @@
 "use client";
 
+import Link from "next/link";
+
 const sidebarSections = [
   {
     title: "Legal",
     links: [
-      "Terms Of Use",
-      "Privacy Policy",
-      "Cookie Policy",
-      "Cookie Manager",
-      "Community Guidelines",
-      "Moderation and Enforcement Policies",
-      "Law Enforcement Guidelines",
-      "Transparency Reports",
-      "Report Illegal Content",
-      "Accessibility Statement",
+      { label: "Terms Of Use", href: "/legal" },
+      { label: "Privacy Policy", href: "/privacy-policy" },
+      { label: "Cookie Policy", href: "#" },
+      { label: "Cookie Manager", href: "#" },
+      { label: "Community Guidelines", href: "#" },
+      { label: "Moderation and Enforcement Policies", href: "#" },
+      { label: "Law Enforcement Guidelines", href: "#" },
+      { label: "Transparency Reports", href: "#" },
+      { label: "Report Illegal Content", href: "#" },
+      { label: "Accessibility Statement", href: "#" },
     ],
   },
   {
     title: "Copyright",
-    links: ["Learn About Copyright", "Report Copyright Infringement"],
+    links: [
+      { label: "Learn About Copyright", href: "#" },
+      { label: "Report Copyright Infringement", href: "#" },
+    ],
   },
   {
     title: "About",
-    links: ["About BeatZa", "Company Information", "Press Information"],
+    links: [
+      { label: "About BeatZa", href: "#" },
+      { label: "Company Information", href: "#" },
+      { label: "Press Information", href: "#" },
+    ],
   },
 ];
 
@@ -38,10 +47,13 @@ export default function LegalSidebar() {
 
             <ul className="space-y-2">
               {section.links.map((link, index) => (
-                <li key={`${link}-${index}`}>
-                  <a className="text-[13px] cursor-pointer hover:underline text-[#044DD2]">
-                    {link}
-                  </a>
+                <li key={`${link.label}-${index}`}>
+                  <Link
+                    href={link.href}
+                    className="text-[13px] cursor-pointer hover:underline text-[#044DD2]"
+                  >
+                    {link.label}
+                  </Link>
                 </li>
               ))}
             </ul>
