@@ -151,7 +151,9 @@ const ProfilePage = ({ params }: Props) => {
     .map((track) => ({
     trackId: track._id,
     title: track.basicInfo.title,
-    artist: track.basicInfo.mainArtists?.[0] || "Unknown Artist",
+    artist: track.basicInfo.mainArtists?.length
+      ? track.basicInfo.mainArtists.join(", ")
+      : "Unknown Artist",
     img: track.image?.imgLink || "/Graduation.jpg",
     trackUrl: track.audio?.audioLink || track.audioLink,
   }))
