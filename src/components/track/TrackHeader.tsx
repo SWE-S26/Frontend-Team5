@@ -16,6 +16,9 @@ interface Props {
 
 export default function TrackHeader({ trackId }: Props) {
 
+
+  const profileImgLink = useAppSelector((state) => state.profile.profileImgLink)
+
     const [isPlaying, setIsPlaying] = useState(false)
     const togglePlay = () => {
         setIsPlaying((prev) => !prev)

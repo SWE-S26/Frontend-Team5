@@ -4,6 +4,8 @@ import profileReducer from "./slices/profileSlice";
 import messagesReducer from "./slices/messagesSlice";
 import playerReducer from "./slices/playerSlice";
 import trackReducer from "./slices/trackSlice";
+import commentReducer from "@/store/slices/commentSlice"
+import likesReducer from "@/store/slices/likeSlice"
 
 // the root store — combines all slices into one object
 // shape will be: { auth: {...}, profile: {...}, messages: {...}, player: {...} }
@@ -14,6 +16,8 @@ export const store = configureStore({
     messages: messagesReducer,
     player: playerReducer,
     track: trackReducer,
+    comments: commentReducer,
+    likes: likesReducer,
   },
 });
 
