@@ -29,7 +29,7 @@ export const playerEngine = {
         if (loopMode === "one") {
           sound!.seek(0);
           sound!.play();
-        } else if (loopMode === "all") {
+        } else {
           onEnd?.();
         }
       },
