@@ -65,7 +65,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   const profileTarget = userId ? `/profile/${userId}` : "/home"
 
   const profileItems: DropdownItem[] = useMemo(() => [
-    { label: "Profile",        icon: <FaUser />,                 href: profileTarget,        disabled: !userId },
+    { label: "Profile",        icon: <FaUser />,                 href: profileTarget,       disabled: !userId },
     { label: "Likes",          icon: <FaHeart />,                href: "/library/likes"                       },
     { label: "Playlists",      icon: <BiSolidCopy />,            href: "/library/playlists"                   },
     { label: "Stations",       icon: <HiMiniSignal />,           href: "/library/stations"                    },
@@ -79,8 +79,8 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
 
   const moreItems: DropdownItem[] = useMemo(() => [
     { label: "About us",           onClick: () => console.log("done")      },
-    { label: "Legal",              href: "/legal"                           },
-    { label: "Copyright",          href: "/copyright"                       },
+    { label: "Legal",              href: "/legal"                          },
+    { label: "Copyright",          href: "/copyright"                      },
     { type: "separator" },
     { label: "Mobile apps",        onClick: () => console.log("done")      },
     { label: "Artist Membership",  onClick: () => console.log("done")      },
@@ -89,7 +89,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
     { label: "Developers",         onClick: () => console.log("done")      },
     { label: "SoundCloud Store",   onClick: () => console.log("done")      },
     { type: "separator" },
-    { label: "Support",            onClick: () => console.log("done")      },
+    { label: "Support",            href: "/need-help"                      },
     { label: "Keyboard shortcuts", onClick: () => setIsShortcutsOpen(true) },
     { type: "separator" },
     ...(isLoggedIn ? [

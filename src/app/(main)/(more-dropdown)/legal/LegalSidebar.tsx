@@ -21,8 +21,8 @@ const sidebarSections = [
   {
     title: "Copyright",
     links: [
-      { label: "Learn About Copyright", href: "#" },
-      { label: "Report Copyright Infringement", href: "#" },
+      { label: "Learn About Copyright", href: "/copyright" },
+      { label: "Report Copyright Infringement", href: "/copyright/report" },
     ],
   },
   {
