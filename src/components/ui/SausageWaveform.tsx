@@ -9,6 +9,7 @@ export default function SausageWaveform({
   onPlay,
   isPlaying = false,
   currentTime = 0,
+  duration = 0,
 }: {
   samplesUrl: string;
   externalProgress?: number;
@@ -16,6 +17,7 @@ export default function SausageWaveform({
   onPlay?: (seekPercentage?: number) => void;
   isPlaying?: boolean;
   currentTime: number;
+  duration?: number;
 }) {
   const scwRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -37,7 +39,7 @@ export default function SausageWaveform({
   const [dragPct, setDragPct] = useState<number | null>(null);
   const dragEndedRef = useRef(false);
 
-  const progress = externalProgress ?? 0;
+  const progress = isPlaying ? (externalProgress ?? 0) : 0;
 
   useEffect(() => {
     import("@/lib/waveform").then((mod) => {
@@ -290,11 +292,17 @@ export default function SausageWaveform({
 
         {/* Timestamps — z-40 */}
         <div className="absolute left-0 w-full flex justify-between text-[10px] z-40 bottom-[27px]">
-          <span className="bg-black px-[3px] flex items-center justify-center text-papaya">
-            {formatTime(currentTime)}
-          </span>
+          {isPlaying ? (
+            <span className="bg-black px-[3px] flex items-center justify-center text-papaya">
+              {formatTime(currentTime)}
+            </span>
+          ) : (
+            <span className="bg-black px-[3px] flex items-center justify-center text-papaya opacity-0">
+              0:00
+            </span>
+          )}
           <span className="bg-black px-[3px] flex items-center justify-center text-white/50">
-            1:00
+            {formatTime(duration)}
           </span>
         </div>
       </div>

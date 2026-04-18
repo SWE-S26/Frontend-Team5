@@ -25,7 +25,7 @@ import { BiStation } from "react-icons/bi";
 
 import { RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
-import { pause, play, playAudio } from "@/store/slices/playerSlice";
+import { pause, play, playAudio, Track } from "@/store/slices/playerSlice";
 
 type CardProps = {
   img?: string;
@@ -34,6 +34,7 @@ type CardProps = {
   trackId?: string;
   trackUrl?: string;
   duration?: number;
+  allTracks?: Track[];
 };
 
 export default function WaveformCard({
@@ -42,6 +43,8 @@ export default function WaveformCard({
   artist,
   trackId,
   trackUrl,
+  duration,
+  allTracks,
 }: CardProps) {
   const [isLiked, setIsLiked] = useState(false);
   const [showComments, setShowComments] = useState(false);
@@ -80,7 +83,9 @@ export default function WaveformCard({
 
     dispatch(
       playAudio({
-        tracks: [{ id: trackId, url: trackUrl, title, artist, img }],
+        tracks: allTracks?.length
+          ? allTracks
+          : [{ id: trackId, url: trackUrl ?? "", title, artist, img }],
         startId: trackId,
       }),
     );
@@ -96,7 +101,10 @@ export default function WaveformCard({
 
     dispatch(
       playAudio({
-        tracks: [{ id: trackId, url: trackUrl, title, artist, img }],
+        tracks: allTracks?.length
+          ? allTracks
+          : [{ id: trackId, url: trackUrl ?? "", title, artist, img }],
+        startId: trackId,
       }),
     );
 
@@ -147,6 +155,7 @@ export default function WaveformCard({
             onPlay={handleWaveformPlay}
             isPlaying={isThisCardPlaying}
             currentTime={currentTime}
+            duration={duration}
           />
         </div>
 
