@@ -79,10 +79,10 @@ export default function Legal() {
   );
 
   return (
-    <div className="flex justify-between bg-chinese-black text-white-smoke font-sans">
+    <div className="flex justify-between bg-chinese-black text-white-smoke font-sans px-4 sm:px-0">
 
         {/* MAIN CONTENT */}
-        <div className="w-[68%] min-w-xl">
+        <div className="w-full md:w-[68%]">
           <main className="flex-1 max-w-3xl text-[14px] leading-relaxed text-white-smoke">
             <h1 className="text-3xl font-bold text-white-smoke mb-6">
               BeatZa Terms of Use
@@ -602,7 +602,7 @@ export default function Legal() {
         </div>
 
         {/* SIDEBAR */}
-        <div className="w-[27.75%]">
+        <div className="hidden md:block md:w-[27.75%]">
           <LegalSidebar />
         </div>
       </div>
