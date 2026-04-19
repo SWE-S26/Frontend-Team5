@@ -47,6 +47,8 @@ import { IoMdCalendar } from "react-icons/io";
 import { BsExplicitFill } from "react-icons/bs";
 import { CiCircleQuestion } from "react-icons/ci";
 import { RiLockFill } from "react-icons/ri";
+import { FaPlay } from "react-icons/fa";
+import { FaPause } from "react-icons/fa6";
 
 const AUDIO_PREVIEW_SECONDS = 20;
 
@@ -887,7 +889,8 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   const clipWidthPercent = Math.max(5, Math.min(100 - clipLeftPercent, (clipDuration / timelineMax) * 100));
   const rightShadePercent = Math.max(0, 100 - (clipLeftPercent + clipWidthPercent));
   const clipPlaybackPercentInWindow = clamp(((clipPlaybackSeconds - safeClipStart) / clipDuration) * 100, 0, 100);
-  const clipPlaybackOverlayPercent = isClipPlaying ? clipPlaybackPercentInWindow : 0;
+  //const clipPlaybackOverlayPercent = isClipPlaying ? clipPlaybackPercentInWindow : 0;
+  const clipPlaybackOverlayPercent = clipPlaybackPercentInWindow;
   const liveClipStart = isDraggingClip ? (clipDragDisplayRange?.start ?? safeClipStart) : safeClipStart;
   const isClipWindowAtZeroStart = liveClipStart < 0.5;
   const showClipResetButton = liveClipStart > 0.001;
@@ -910,7 +913,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         return (
           <span
             key={`wave-${idx}`}
-            className="block flex-1 rounded-[1px]"
+            className="block w-full"
             style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-base)" }}
           />
         );
@@ -925,7 +928,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         return (
           <span
             key={`wave-left-mask-${idx}`}
-            className="block flex-1 rounded-[1px]"
+            className="block w-full"
             style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-left-wave)" }}
           />
         );
@@ -1099,10 +1102,10 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     if (!clipAudio) return;
     setClipPlaybackSeconds(clipAudio.currentTime);
     if (clipAudio.currentTime >= safeClipEnd) {
-      clipAudio.pause();
+      //clipAudio.pause();
       clipAudio.currentTime = safeClipStart;
       setClipPlaybackSeconds(safeClipStart);
-      setIsClipPlaying(false);
+      //setIsClipPlaying(false);
     }
   };
 
@@ -2289,20 +2292,19 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                               style={{ left: `${clipLeftPercent}%`, width: `${clipWidthPercent}%`, touchAction: "none", transform: "translate3d(0px, 0, 0)" }}
                               onPointerDown={handleClipDragStart}
                             >
-                              <div
-                                className="pointer-events-none absolute inset-px z-0 rounded-sm"
-                                style={{ backgroundColor: isClipWindowAtZeroStart ? "var(--waveform-window-fill-zero)" : "var(--waveform-window-fill)" }}
-                              />
+                              <div className="pointer-events-none absolute inset-px z-0 rounded-sm" 
+                                  style={{ backgroundColor: isClipWindowAtZeroStart ? "var(--waveform-window-fill-zero)" : "var(--waveform-window-fill)" }} />
                               <div className="pointer-events-none absolute inset-px z-5 overflow-hidden rounded-sm">
-                                <div className="flex h-full w-full items-center gap-px px-1">
+                                <div className="flex h-full w-full items-center gap-px px-1 relative">
                                   {baseWaveformBars}
+                                  <div
+                                    className="pointer-events-none absolute bottom-0 left-0 top-0 z-10 overflow-hidden rounded-l-sm"
+                                    style={{ 
+                                      backgroundColor: "var(--waveform-playback-mask)", 
+                                      width: `${clipPlaybackOverlayPercent}%` 
+                                    }}
+                                  />
                                 </div>
-                              </div>
-                              <div
-                                className="pointer-events-none absolute bottom-px left-px top-px z-10 overflow-hidden rounded-l-sm"
-                                style={{ backgroundColor: "var(--waveform-playback-mask)", width: `${clipPlaybackOverlayPercent}%` }}
-                              >
-                                <div className="h-full w-full" />
                               </div>
                               <button
                                 type="button"
@@ -2314,7 +2316,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                                 className="absolute left-1/2 top-1/2 z-20 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white-smoke text-chinese-black shadow-lg cursor-pointer sm:h-10 sm:w-10"
                                 aria-label={isClipPlaying ? "Pause clip preview" : "Play clip preview"}
                               >
-                                {isClipPlaying ? <PauseCircleOutlined className="text-[16px] sm:text-[20px]" /> : <PlayCircleOutlined className="text-[16px] sm:text-[20px]" />}
+                                {isClipPlaying ? <FaPause className="text-[16px] sm:text-[20px]" /> : <FaPlay className="text-[16px] sm:text-[20px]" />}
                               </button>
                               <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 h-2 bg-white-smoke sm:h-3" />
                               <div className="pointer-events-none absolute inset-0 z-30 rounded-sm border border-white-smoke" />
@@ -2457,7 +2459,13 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
           src={uploadedFileUrl ?? undefined}
           onLoadedMetadata={handleClipMetadataLoaded}
           onTimeUpdate={handleClipTimeUpdate}
-          onEnded={() => setIsClipPlaying(false)}
+          onEnded={() => {
+            const clipAudio = clipAudioRef.current;
+            if (clipAudio) {
+              clipAudio.currentTime = safeClipStart;
+              clipAudio.play();
+            }}
+          }
         />
       )}
     </div>
