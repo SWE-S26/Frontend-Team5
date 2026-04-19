@@ -47,6 +47,8 @@ import { IoMdCalendar } from "react-icons/io";
 import { BsExplicitFill } from "react-icons/bs";
 import { CiCircleQuestion } from "react-icons/ci";
 import { RiLockFill } from "react-icons/ri";
+import { FaPause } from "react-icons/fa";
+import { FaPlay } from "react-icons/fa6";
 
 const AUDIO_PREVIEW_SECONDS = 20;
 
@@ -887,7 +889,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   const clipWidthPercent = Math.max(5, Math.min(100 - clipLeftPercent, (clipDuration / timelineMax) * 100));
   const rightShadePercent = Math.max(0, 100 - (clipLeftPercent + clipWidthPercent));
   const clipPlaybackPercentInWindow = clamp(((clipPlaybackSeconds - safeClipStart) / clipDuration) * 100, 0, 100);
-  const clipPlaybackOverlayPercent = isClipPlaying ? clipPlaybackPercentInWindow : 0;
+  const clipPlaybackOverlayPercent = clipPlaybackPercentInWindow;
   const liveClipStart = isDraggingClip ? (clipDragDisplayRange?.start ?? safeClipStart) : safeClipStart;
   const isClipWindowAtZeroStart = liveClipStart < 0.5;
   const showClipResetButton = liveClipStart > 0.001;
@@ -2314,7 +2316,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
                                 className="absolute left-1/2 top-1/2 z-20 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white-smoke text-chinese-black shadow-lg cursor-pointer sm:h-10 sm:w-10"
                                 aria-label={isClipPlaying ? "Pause clip preview" : "Play clip preview"}
                               >
-                                {isClipPlaying ? <PauseCircleOutlined className="text-[16px] sm:text-[20px]" /> : <PlayCircleOutlined className="text-[16px] sm:text-[20px]" />}
+                                {isClipPlaying ? <FaPause className="text-[16px] sm:text-[20px]" /> : <FaPlay className="text-[16px] sm:text-[20px]" />}
                               </button>
                               <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 h-2 bg-white-smoke sm:h-3" />
                               <div className="pointer-events-none absolute inset-0 z-30 rounded-sm border border-white-smoke" />
