@@ -80,7 +80,7 @@ export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
     <header className="fixed inset-x-0 top-0 z-200 flex h-13 items-center bg-[#111]">
 
       {/* Right actions */}
-      <div className={`flex flex-1 pt-5 pb-2 items-center justify-end ${isMobile ? "gap-1.5 px-2.5" : "gap-2 px-4"}`}>
+      <div className={`flex flex-1 pt-5 pb-3 items-center justify-end ${isMobile ? "gap-1.5 px-2.5" : "gap-2 px-4"}`}>
         {/* Search */}
         <button
           type="button"
