@@ -9,10 +9,10 @@ export default function ReportCopyright() {
 
   return (
     <div className="min-h-screen bg-chinese-black text-white-smoke font-sans">
-      <div className="max-w-7xl mx-auto pr-8 py-2 flex gap-28">
+      <div className="max-w-7xl mx-auto pr-8 py-2 flex gap-28 px-4 sm:px-0">
 
         {/* MAIN CONTENT */}
-        <main className="flex-1 max-w-3xl text-[14px] leading-relaxed text-white-smoke">
+        <main className="flex-1 w-full max-w-3xl text-[14px] leading-relaxed text-white-smoke">
           <h1 className="text-3xl font-bold text-white-smoke mb-4">
             Report Copyright Infringement
           </h1>
@@ -255,7 +255,7 @@ export default function ReportCopyright() {
         </main>
 
         {/* RIGHT COLUMN */}
-        <div className="w-64 shrink-0">
+        <div className="hidden md:block w-64 shrink-0">
           {/* Learn More Card */}
           <div className="bg-off-black w-80 p-5 mb-8">
             <h3 className="text-white-smoke font-bold text-base mb-3">

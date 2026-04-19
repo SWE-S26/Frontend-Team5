@@ -29,11 +29,11 @@ export default function Copyright() {
   const router = useRouter();
 
   return (
-    <div className="flex justify-between mx-auto bg-chinese-black text-white-smoke">
+    <div className="flex justify-between mx-auto bg-chinese-black text-white-smoke px-4 sm:px-0">
 
 
         {/* MAIN CONTENT */}
-        <div className="w-[68%] min-w-xl">
+        <div className="w-full md:w-[68%]">
           <main className="flex-1 max-w-3xl text-sm leading-relaxed text-white-smoke">
             <h1 className="text-3xl font-bold text-white-smoke mb-4">
               Learn about Copyright
@@ -185,7 +185,7 @@ export default function Copyright() {
         </div>
 
         {/* RIGHT COLUMN */}
-        <div className="w-[27.75%] shrink-0">
+        <div className="hidden md:block md:w-[27.75%] shrink-0">
 
           {/* Report Card */}
           <div className="bg-off-black w-full p-5 mb-8">

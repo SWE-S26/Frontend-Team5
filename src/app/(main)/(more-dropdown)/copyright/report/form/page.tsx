@@ -161,10 +161,10 @@ export default function ReportCopyrightForm() {
 
   return (
     <div className="min-h-screen bg-chinese-black text-white-smoke font-sans">
-      <div className="max-w-7xl mx-auto pr-8 py-2 flex gap-28">
+      <div className="max-w-7xl mx-auto pr-8 py-2 flex gap-28 px-4 sm:px-0">
 
         {/* MAIN CONTENT */}
-        <main className="flex-1 max-w-3xl text-[14px] leading-relaxed text-white-smoke">
+        <main className="flex-1 w-full max-w-3xl text-[14px] leading-relaxed text-white-smoke">
           <h1 className="text-2xl font-bold text-white-smoke mb-2">
             Report copyright infringement
           </h1>
@@ -429,7 +429,7 @@ export default function ReportCopyrightForm() {
         </main>
 
         {/* RIGHT COLUMN */}
-        <div className="w-64 shrink-0">
+        <div className="hidden md:block w-64 shrink-0">
           <div className="bg-off-black w-80 p-5 mb-8">
             <h3 className="text-white-smoke font-bold text-base mb-3">
               Learn About Copyright
