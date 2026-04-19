@@ -2,7 +2,7 @@ import { useEffect } from "react";
 import { useRouter, usePathname } from "next/navigation";
 import { useAppSelector } from "@/store/hooks";
 
-const EXECLUDED_ROUTES = ["/home", "/feed", "/library", "/privacy","/legal", "/privacy-policy", "/copyright", "/goplus"];
+const EXECLUDED_ROUTES = ["/home", "/feed", "/library", "/privacy","/legal", "/privacy-policy", "/copyright", "/goplus", "/cross-callback"];
 
 export function useRequireAuth() {
   const router = useRouter();
