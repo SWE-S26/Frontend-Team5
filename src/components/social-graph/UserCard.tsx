@@ -29,7 +29,7 @@ const UserCard = ({ user }: UserCardProps) => {
           <span className="text-xs text-silver">{user.followersCount} followers</span>
         </div>
         <div className="invisible group-hover/usercard:visible">
-          <FollowButton userId={user.userId} initialIsFollowing={false} data-testid="UserCard-FollowButton" />
+          <FollowButton userId={user.userId} initialIsFollowing={user.isFollowed ?? false} data-testid="UserCard-FollowButton" />
         </div>
       </div>
     </div>

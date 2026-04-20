@@ -13,6 +13,7 @@
         profileImgLink: "https://picsum.photos/seed/karólg/200",
         trackCount:     109,
         followersCount: 395000,
+        isFollowed:     false,
     },
     {
         userId:         "mock-user-002",
@@ -20,6 +21,7 @@
         profileImgLink: "https://picsum.photos/seed/trippie/200",
         trackCount:     531,
         followersCount: 2160000,
+        isFollowed:     true,
     },
     {
         userId:         "mock-user-003",
@@ -27,6 +29,7 @@
         profileImgLink: "https://picsum.photos/seed/doja/200",
         trackCount:     164,
         followersCount: 2030000,
+        isFollowed:     false,
     },
     {
         userId:         "mock-user-004",
@@ -34,6 +37,7 @@
         profileImgLink: "https://picsum.photos/seed/badbunny/200",
         trackCount:     200,
         followersCount: 3040000,
+        isFollowed:     true,
     },
     {
         userId:         "mock-user-005",
@@ -41,6 +45,7 @@
         profileImgLink: "https://picsum.photos/seed/drake/200",
         trackCount:     320,
         followersCount: 5000000,
+        isFollowed:     false,
     },
     {
         userId:         "mock-user-006",
@@ -48,6 +53,7 @@
         profileImgLink: "https://picsum.photos/seed/taylorswift/200",
         trackCount:     280,
         followersCount: 8000000,
+        isFollowed:     true,
     },
     {
         userId:         "mock-user-007",
@@ -55,6 +61,7 @@
         profileImgLink: "https://picsum.photos/seed/weeknd/200",
         trackCount:     150,
         followersCount: 6500000,
+        isFollowed:     false,
     },
     ]
 
@@ -113,7 +120,10 @@
         )
         }
 
-        return HttpResponse.json(MOCK_USERS.slice(0, 4), { status: 200 })
+        return HttpResponse.json(
+            MOCK_USERS.slice(0, 4).map(u => ({ ...u, isFollowed: true })),
+            { status: 200 },
+        )
     }),
 
     // (3) GET /api/social/v1/suggested
@@ -127,7 +137,10 @@
         // If we've run out of users, loop back from start (simulates endless suggestions)
         const result = sliced.length > 0 ? sliced : MOCK_USERS.slice(0, limit)
 
-        return HttpResponse.json(result, { status: 200 })
+        return HttpResponse.json(
+            result.map(u => ({ ...u, isFollowed: false })),
+            { status: 200 },
+        )
     }),
 
     // (4) GET /api/social/v1/blocked

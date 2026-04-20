@@ -9,6 +9,7 @@ export interface SocialUser {
   profileImgLink: string | null
   trackCount:     number
   followersCount: number
+  isFollowed?:     boolean
 }
 
 // ─────────────────────────────────────────────────────────────────────────────

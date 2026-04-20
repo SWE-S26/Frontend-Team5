@@ -36,9 +36,11 @@ const Following = () => {
   return (
     <div className='mb-8'>
       <div className='flex justify-between mb-2 mt-5 cursor-pointer'>
-        <p className='font-bold text-sm text-white-smoke hover:text-silver'>
+        <Link
+          href={`/profile/${username}/following`} 
+          className='font-bold text-sm text-white-smoke hover:text-silver'>
           {followedCount} Following
-        </p>
+        </Link>
         <Link
           href={`/profile/${username}/following`}
           className='text-sm text-silver hover:underline'

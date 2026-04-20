@@ -9,6 +9,7 @@ import ListLatestComments from "./ListLatestComments"
 import BioSection from "./BioSection"
 import SocialLinks from "./SocialLinks"
 import SupportLink from "./SupportLink"
+import FollowersList from "./FollowersList"
 
 
 
@@ -27,8 +28,9 @@ const displayName  = useSelector((state: RootState) => state.profile.displayName
             <div className="w-full"><BioSection bio={bio} /></div>
             <div className="w-full"><SocialLinks links={links} /></div>
             <div><OnTourSection /></div>
-            <div><Following /></div>
-            <div><ListLatestComments /></div>
+            <div className="w-full"><FollowersList /></div>
+            <div className="w-full"><Following /></div>
+            <div className="w-full"><ListLatestComments /></div>
         </div>
         
     </div>
