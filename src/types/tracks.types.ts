@@ -178,3 +178,23 @@ export interface GetTrackByIdResponse {
   message: string;
   data: Track;
 }
+
+export interface UpdateTrackRequest {
+  id: string;
+  image?: File;
+  basicInfo: CreateTrackBasicInfo;
+  permissions?: CreateTrackPermissions;
+  license?: CreateTrackLicense;
+  advanced?: CreateTrackAdvanced;
+}
+
+export interface UpdateTrackResponse {
+  message: string;
+  errors?: CreateTrackValidationError[];
+  data?: string;
+}
+
+export interface incrementPlayCountResponse {
+  message: string;
+  errors?: CreateTrackValidationError[];
+}

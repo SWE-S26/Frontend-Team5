@@ -6,6 +6,7 @@ import {
   GetPostedTracksResponse,
   GetTracksErrorResponse,
   GetTracksResponse,
+  UpdateTrackRequest,
 } from "@/types/tracks.types";
 import { GetTrackByIdResponse } from "@/types/tracks.types";
 
@@ -170,4 +171,67 @@ export function useGetTrackById() {
     error,
     track,
   };
+}
+
+export function useUpdateTrack() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+
+  const updateTrack = useCallback(
+    async (
+      data: UpdateTrackRequest
+    ) => {
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+      try {
+        const res = await tracksService.UpdateTrack(data);
+        setSuccess(true);
+        return res.data;
+      } catch (err: any) {
+        const status = err.response?.status;
+        const message =
+          status === 413
+            ? "Update failed"
+            : err.response?.data?.message || "Something went wrong";
+        setError(message);
+        setSuccess(false);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  return { updateTrack, loading, error, success };
+}
+
+export function useIncrementPlayCount() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+
+  const incrementPlayCount = useCallback(
+    async (id: string) => {
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+      try {
+        const res = await tracksService.incrementPlayCount(id);
+        setSuccess(true);
+        return res.data;
+      } catch (err: any) {
+        setError(err.response?.data?.message || "Failed to increment play count");
+        setSuccess(false);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  return { incrementPlayCount, loading, error, success };
 }
