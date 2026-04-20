@@ -1101,10 +1101,11 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     if (!clipAudio) return;
     setClipPlaybackSeconds(clipAudio.currentTime);
     if (clipAudio.currentTime >= safeClipEnd) {
-      clipAudio.pause();
+      // Loop the clip: jump to start and continue playing
       clipAudio.currentTime = safeClipStart;
       setClipPlaybackSeconds(safeClipStart);
-      setIsClipPlaying(false);
+      clipAudio.play();
+      setIsClipPlaying(true);
     }
   };
 
