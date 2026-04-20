@@ -40,7 +40,6 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   // only pulling the two fields this component actually needs
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
   const userId = useAppSelector((state) => state.auth.userId)
-  const displayName = useAppSelector((state) => state.auth.displayName)
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false)
