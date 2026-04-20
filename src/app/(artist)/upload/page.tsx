@@ -814,7 +814,7 @@ export default function UploadPage() {
                 {isDragging ? "Drop audio files here." : "Drag and drop audio files to get started."}
               </p>
               <label
-                className="mt-6 rounded-full bg-chinese-black px-7 py-2 text-[14px] font-semibold text-white-smoke transition-opacity hover:opacity-90 cursor-pointer"
+                className="mt-6 rounded-full bg-white-smoke px-7 py-2 text-[14px] border font-bold text-chinese-black transition-opacity hover:opacity-90 cursor-pointer"
               >
                 Choose files
               </label>
