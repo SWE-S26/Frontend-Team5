@@ -23,8 +23,8 @@
 
     /* (3) GET /api/social/v1/suggested
         offset + limit drive the refresh button — just change the params */
-    getSuggestedUsers: (params?: SuggestedParams) =>
-        api.get<GetSuggestedUsersResponse>("/api/social/v1/suggested", { params }),
+    getSuggestedUsers: () =>
+        api.get<GetSuggestedUsersResponse>("/api/social/v1/suggested"),
 
     /* (4) GET /api/social/v1/blocked */
     getBlockedUsers: () =>
