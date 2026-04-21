@@ -6,7 +6,7 @@ import SausageWaveform from "@/components/ui/SausageWaveform";
 import Tooltip from "@/components/ui/Tooltip";
 import MoreDropdown from "@/components/ui/MoreDropdown";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Avatar } from "antd";
 
 import { motion, AnimatePresence, Transition } from "framer-motion";
@@ -55,7 +55,6 @@ export default function WaveformCard({
   const [canComment, setCanComment] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [commentTimestamp, setCommentTimestamp] = useState(0);
-  // The submitted comment text shown as a flash bubble for 2s, null = no flash
   const [flashComment, setFlashComment] = useState<string | null>(null);
   const [reloadTrigger, setReloadTrigger] = useState(0);
 
@@ -70,6 +69,13 @@ export default function WaveformCard({
     (state: RootState) => state.player,
   );
   const isThisCardPlaying = currentTrackId === trackId && isPlaying;
+
+  // Open comment box when this song starts playing, in addition to all
+  // other conditions (waveform click, avatar hover) that already call
+  // handleOpenCommentBox directly.
+  useEffect(() => {
+    if (isThisCardPlaying) setShowCommentBox(true);
+  }, [isThisCardPlaying]);
 
   const { submitComment } = useStatelessComments();
 
@@ -109,7 +115,6 @@ export default function WaveformCard({
 
       if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
       setFlashComment(content);
-      // Reload comments 200ms before flash ends so real avatar is ready when flash disappears
       setTimeout(() => setReloadTrigger((n) => n + 1), FLASH_DURATION - 1500);
       flashTimerRef.current = setTimeout(
         () => setFlashComment(null),
@@ -211,7 +216,6 @@ export default function WaveformCard({
           />
         </div>
 
-        {/* Comment box + buttons wrapped together so layout animates as one unit */}
         <motion.div
           layout
           transition={{ layout: transitionConfig }}
@@ -316,10 +320,4 @@ export default function WaveformCard({
       </div>
     </div>
   );
-}
-
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
 }
