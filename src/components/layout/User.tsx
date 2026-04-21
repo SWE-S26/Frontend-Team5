@@ -37,7 +37,7 @@
             </div>
             <FollowButton 
                 userId={user.userId} 
-                initialIsFollowing={true}
+                initialIsFollowing={user.isFollowed ?? false}
                 onUnfollow={() => onUnfollow?.(user.userId)}
                 />
         </div>

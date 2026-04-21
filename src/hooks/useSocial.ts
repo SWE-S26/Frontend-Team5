@@ -136,11 +136,11 @@
     const [error,          setError]          = useState<string | null>(null)
     const [suggestedUsers, setSuggestedUsers] = useState<GetSuggestedUsersResponse | null>(null)
 
-    const getSuggestedUsers = useCallback(async (params?: SuggestedParams) => {
+    const getSuggestedUsers = useCallback(async () => {
         setLoading(true)
         setError(null)
         try {
-        const res = await socialService.getSuggestedUsers(params)
+        const res = await socialService.getSuggestedUsers()
         setSuggestedUsers(res.data)
         return res.data
         } catch (err: any) {
@@ -149,10 +149,13 @@
         } finally {
         setLoading(false)
         }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [])
 
     return { getSuggestedUsers, loading, error, suggestedUsers }
     }
+
+  
 
     // ─────────────────────────────────────────────────────────────────────────────
     // (6) Get blocked users
