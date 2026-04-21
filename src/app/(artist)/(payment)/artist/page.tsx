@@ -6,9 +6,9 @@ import Image from "next/image"
 
 import { useAppSelector } from "@/store/hooks"
 import { useLogout } from "@/hooks/useAuth"
-import { HeroSection } from '@/components/payment/artist/HeroSection'
-import { AvailablePlans } from '@/components/payment/artist/AvailablePlans'
-import { CompareFeatures } from '@/components/payment/artist/CompareFeatures'
+import { HeroSection } from '@/components/payment/HeroSection'
+import { AvailablePlans } from '@/components/payment/AvailablePlans'
+import { CompareFeatures } from '@/components/payment/CompareFeatures'
 
 import { IoIosArrowDown } from "react-icons/io";
 

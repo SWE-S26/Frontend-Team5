@@ -143,7 +143,7 @@ export default function Content() {
   const isDirty = useMemo(
     () =>
       emailDisplay       !== savedEmailDisplay       ||
-      customFeedTitle    !== savedCustomFeedTitle     ||
+      customFeedTitle    !== savedCustomFeedTitle    ||
       category           !== savedCategory           ||
       statsPrefix        !== savedStatsPrefix        ||
       customAuthorName   !== savedCustomAuthorName   ||

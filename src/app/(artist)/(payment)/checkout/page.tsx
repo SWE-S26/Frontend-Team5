@@ -10,6 +10,8 @@ import { useLogout } from '@/hooks/useAuth'
 import CB from '@/components/settings/CB'
 import { IoIosArrowDown } from 'react-icons/io'
 import { FaLock } from 'react-icons/fa'
+import FloatingInput from '@/components/payment/FloatingInput'
+import { COUNTRIES } from '@/components/payment/countries'
 
 const PRICING_CONFIG = {
     monthlyPrice: 149.99,
@@ -106,7 +108,7 @@ export default function CheckoutPage() {
                     <div className="grid grid-cols-1 md:grid-cols-5 gap-12">
 
                         {/* Left Column */}
-                        <div className="md:col-span-3 space-y-10">
+                        <div className="md:col-span-2 space-y-10">
 
                             {/* 1. Billing Cycle */}
                             <div>
@@ -176,48 +178,53 @@ export default function CheckoutPage() {
                                 </div>
 
                                 <div className="space-y-3">
-                                    <input type="text" placeholder="First name" className="w-full bg-gray-100 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none" />
-                                    <input type="text" placeholder="Surname" className="w-full bg-gray-100 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none" />
+                                    <FloatingInput placeholder="First name" />
+                                    <FloatingInput placeholder="Surname" />
 
                                     <div className="relative">
-                                        <input type="text" placeholder="Card number" className="w-full bg-gray-100 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none pr-12" />
+                                        <FloatingInput placeholder="Card number" format="Enter a card number." />
                                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400">💳</span>
                                     </div>
 
                                     <div className="grid grid-cols-3 gap-3">
-                                        <input type="text" placeholder="Expiration month" className="bg-gray-100 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none" />
-                                        <input type="text" placeholder="Expiration year" className="bg-gray-100 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none" />
+                                        <FloatingInput placeholder="Expiration month" format="MM" />
+                                        <FloatingInput placeholder="Expiration year" format="YY" />
                                         <div className="relative">
-                                            <input type="text" placeholder="CVV" className="w-full bg-gray-100 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none pr-10" />
+                                            <FloatingInput placeholder="CVV" />
                                             <span className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400">🔒</span>
                                         </div>
                                     </div>
 
                                     <div className="relative">
                                         <select className="w-full bg-gray-100 rounded-lg px-4 pt-5 pb-2 text-sm text-gray-700 outline-none appearance-none">
-                                            <option value="EG">Egypt</option>
-                                            <option value="US">United States</option>
-                                            <option value="GB">United Kingdom</option>
+                                            {COUNTRIES.map((country) => (
+                                            <option key={country.value} value={country.value}>{country.label}</option>
+                                            ))}
                                         </select>
                                         <p className="absolute left-4 top-1.5 text-[10px] text-gray-400">Billing Country</p>
                                         <span className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 pointer-events-none">▾</span>
                                     </div>
 
-                                    <input type="text" placeholder="Postcode (optional)" className="w-full bg-gray-100 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none" />
+                                    <FloatingInput placeholder="Postcode (optional)" />
 
                                     {/* Billing address checkbox */}
                                     <div className="flex items-center gap-2 pt-1">
-                                        <CB checked={showBillingAddress} onChange={setShowBillingAddress} />
+                                        <CB
+                                            checked={showBillingAddress}
+                                            onChange={setShowBillingAddress}
+                                            uncheckedClassName="border-gray-400"
+                                            checkStroke="black"
+                                        />
                                         <span className="text-sm font-medium text-black">Add billing address (visible on invoice)</span>
                                     </div>
 
                                     {/* Billing address fields */}
                                     {showBillingAddress && (
                                         <div className="space-y-3">
-                                            <input type="text" placeholder="Full name (optional)" className="w-full bg-gray-100 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none" />
-                                            <input type="text" placeholder="Company (optional)" className="w-full bg-gray-100 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none" />
-                                            <input type="text" placeholder="Street Address (optional)" className="w-full bg-gray-100 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none" />
-                                            <input type="text" placeholder="City (optional)" className="w-full bg-gray-100 rounded-lg px-4 py-3 text-sm text-gray-700 outline-none" />
+                                            <FloatingInput placeholder="Full name (optional)" />
+                                            <FloatingInput placeholder="Company (optional)" />
+                                            <FloatingInput placeholder="Street Address (optional)" />
+                                            <FloatingInput placeholder="City (optional)" />
                                         </div>
                                     )}
                                 </div>
@@ -243,12 +250,11 @@ export default function CheckoutPage() {
 
                             {showCoupon && (
                                 <div className="flex gap-2 mb-6">
-                                    <input
-                                        type="text"
+                                    <FloatingInput
+                                        placeholder="Enter coupon code"
                                         value={couponCode}
                                         onChange={(e) => setCouponCode(e.target.value)}
-                                        placeholder="Enter coupon code"
-                                        className="flex-1 bg-gray-100 rounded-lg px-4 py-2 text-sm text-gray-700 outline-none"
+                                        className="flex-1"
                                     />
                                     <button className="bg-black text-white px-5 py-2 rounded-full font-semibold text-sm hover:bg-gray-800">
                                         Apply
