@@ -37,8 +37,8 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
 
   return (
     <>
-      <div className="fixed inset-0 z-[100] bg-black/40" onClick={onClose} />
-      <div className="fixed right-0 top-0 z-[110] flex h-full w-full max-w-[600px] flex-col bg-[#111] shadow-2xl">
+      <div className="fixed inset-0 z-100 bg-black/40" onClick={onClose} />
+      <div className="fixed right-0 top-0 z-110 flex h-full w-full max-w-150 flex-col bg-[#111] shadow-2xl">
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#2a2a2a] px-5 py-3.5">
@@ -56,7 +56,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
             <button
               type="button"
               onClick={() => artworkInputRef.current?.click()}
-              className="flex h-[220px] w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-[#333] bg-[#181818] hover:border-[#555] transition-colors cursor-pointer overflow-hidden"
+              className="flex h-55 w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-[#333] bg-[#181818] hover:border-[#555] transition-colors cursor-pointer overflow-hidden"
             >
               {artworkSrc ? (
                 <img src={artworkSrc} alt="New artwork" className="h-full w-full object-cover" />

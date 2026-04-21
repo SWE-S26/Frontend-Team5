@@ -1,8 +1,8 @@
 export function AddToPlaylistPanel({ onClose }: { onClose: () => void }) {
   return (
     <>
-      <div className="fixed inset-0 z-[100] bg-black/40" onClick={onClose} />
-      <div className="fixed right-0 top-0 z-[110] flex h-full w-full max-w-[600px] flex-col bg-[#111] shadow-2xl">
+      <div className="fixed inset-0 z-100 bg-black/40" onClick={onClose} />
+      <div className="fixed right-0 top-0 z-110 flex h-full w-full max-w-150 flex-col bg-[#111] shadow-2xl">
         <div className="flex items-center gap-3 border-b border-[#2a2a2a] px-6 py-4">
           <button type="button" onClick={onClose} className="text-[#888] hover:text-white transition-colors text-[18px] leading-none">✕</button>
           <h2 className="text-[16px] font-bold text-white">Add to playlist</h2>

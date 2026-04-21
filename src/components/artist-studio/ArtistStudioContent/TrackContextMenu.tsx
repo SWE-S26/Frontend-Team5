@@ -46,7 +46,7 @@ export function TrackContextMenu({
   return (
     <div
       ref={ref}
-      className="fixed z-[150] w-52 rounded-xl border border-[#2a2a2a] bg-[#161616] py-1.5 shadow-2xl"
+      className="fixed z-150 w-52 rounded-xl border border-[#2a2a2a] bg-[#161616] py-1.5 shadow-2xl"
       style={{ top: adjustedY, left: adjustedX }}
     >
       {menuItems.map(({ icon: Icon, label, action, danger }) => (
