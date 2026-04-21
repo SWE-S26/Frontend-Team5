@@ -1,6 +1,6 @@
 export function AmplifyModal({ onClose, onUnlock }: { onClose: () => void; onUnlock: () => void }) {
   return (
-    <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/70" onClick={onClose}>
+    <div className="fixed inset-0 z-200 flex items-center justify-center bg-black/70" onClick={onClose}>
       <div
         className="relative mx-4 w-full max-w-2xl rounded-2xl bg-[#111] p-8 shadow-2xl"
         onClick={(e) => e.stopPropagation()}

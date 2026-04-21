@@ -50,8 +50,8 @@ export function EditTrackPanel({ track, onClose }: { track: ArtistTrackRow; onCl
 
   return (
     <>
-      <div className="fixed inset-0 z-[100] bg-black/40" onClick={onClose} />
-      <div className="fixed right-0 top-0 z-[110] flex h-full w-full max-w-[600px] flex-col bg-[#111] shadow-2xl">
+      <div className="fixed inset-0 z-100 bg-black/40" onClick={onClose} />
+      <div className="fixed right-0 top-0 z-110 flex h-full w-full max-w-150 flex-col bg-[#111] shadow-2xl">
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#2a2a2a] px-5 py-3.5">
@@ -82,11 +82,11 @@ export function EditTrackPanel({ track, onClose }: { track: ArtistTrackRow; onCl
             <div className="space-y-5">
               {/* Artwork */}
               <div className="flex flex-col items-center gap-3">
-                <div className="relative w-full max-w-[280px]">
+                <div className="relative w-full max-w-70">
                   <img
                     src={artworkSrc || "/test.jpg"}
                     alt="Track artwork"
-                    className="h-[280px] w-full rounded object-cover"
+                    className="h-70 w-full rounded object-cover"
                     onError={(e) => { e.currentTarget.src = "/test.jpg"; }}
                   />
                   <div className="absolute right-2 top-2 flex flex-col gap-1.5">
@@ -107,7 +107,7 @@ export function EditTrackPanel({ track, onClose }: { track: ArtistTrackRow; onCl
                   </div>
                 </div>
                 {/* Zoom slider */}
-                <div className="flex w-full max-w-[280px] items-center gap-2 text-[#888]">
+                <div className="flex w-full max-w-70 items-center gap-2 text-[#888]">
                   <span className="text-[13px]">−</span>
                   <input
                     type="range"
