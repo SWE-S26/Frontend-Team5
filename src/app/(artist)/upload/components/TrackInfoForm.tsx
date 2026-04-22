@@ -181,6 +181,127 @@ function clamp(value: number, min: number, max: number) {
   return Math.min(max, Math.max(min, value));
 }
 
+
+function ProLockTooltip({
+  text,
+  children,
+  referenceClassName = "w-full",
+  placement = "bottom",
+}: {
+  text: { title: string; description: string };
+  children: ReactNode;
+  referenceClassName?: string;
+  placement?: Placement;
+}) {
+  const router = useRouter();
+  const [open, setOpen] = useState(false);
+  const arrowRef = useRef<SVGSVGElement | null>(null);
+
+  const { refs, floatingStyles, context } = useFloating({
+    open,
+    onOpenChange: setOpen,
+    placement,
+    whileElementsMounted: autoUpdate,
+    middleware: [offset(10), flip(), shift({ padding: 8 }), arrow({ element: arrowRef })],
+  });
+
+  const hover = useHover(context, {
+    move: false,
+    delay: { open: 80, close: 70 },
+  });
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
+
+  return (
+    <>
+      <div ref={refs.setReference} {...getReferenceProps()} className={referenceClassName}>
+        {children}
+      </div>
+
+      <FloatingPortal>
+        {open && (
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            {...getFloatingProps()}
+            className="z-80 w-64 max-w-[calc(100vw-1.5rem)] rounded-md border border-[#2f3035] bg-chinese-black px-4 py-4 text-white-smoke shadow-xl"
+          >
+            <p className="text-[24px] font-semibold leading-none tracking-tight text-white-smoke">{text.title}</p>
+            <p className="mt-2 text-[11px] leading-5 text-white-smoke">{text.description}</p>
+            <button
+              type="button"
+              onClick={() => router.push("/artistpro")}
+              className="mt-4 rounded-full bg-white-smoke px-4 py-2 text-[12px] font-bold text-chinese-black transition-colors hover:bg-white-smoke cursor-pointer"
+            >
+              Unlock with Artist Pro
+            </button>
+            <FloatingArrow
+              ref={arrowRef}
+              context={context}
+              className="fill-[#111216]"
+              stroke="#2f3035"
+              strokeWidth={1}
+            />
+          </div>
+        )}
+      </FloatingPortal>
+    </>
+  );
+}
+
+function InfoTooltip({ text }: { text: { title: string; description: string } }) {
+  const [open, setOpen] = useState(false);
+  const arrowRef = useRef<SVGSVGElement | null>(null);
+
+  const { refs, floatingStyles, context } = useFloating({
+    open,
+    onOpenChange: setOpen,
+    placement: "bottom",
+    whileElementsMounted: autoUpdate,
+    middleware: [offset(10), flip(), shift({ padding: 8 }), arrow({ element: arrowRef })],
+  });
+
+  const hover = useHover(context, {
+    move: false,
+    delay: { open: 100, close: 80 },
+  });
+
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
+
+  return (
+    <>
+      <span
+        ref={refs.setReference}
+        {...getReferenceProps()}
+        className="ml-1 inline-flex cursor-help align-middle text-white/70 hover:text-white-smoke"
+      >
+        <CiCircleQuestion className="text-white-smoke text-[14px]" />
+      </span>
+
+      <FloatingPortal>
+        {open && (
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            {...getFloatingProps()}
+            className="z-80 w-64 max-w-[calc(100vw-1.5rem)] rounded-md border border-[#2f3035] bg-chinese-black px-4 py-4 text-white-smoke shadow-xl"
+          >
+            <p className="text-[16px] text-white-smoke font-semibold leading-none tracking-tight">{text.title}</p>
+            <p className="mt-2 text-[11px] leading-5 text-white-smoke">{text.description}</p>
+            <FloatingArrow
+              ref={arrowRef}
+              context={context}
+              className="fill-[#111216]"
+              stroke="#2f3035"
+              strokeWidth={1}
+            />
+          </div>
+        )}
+      </FloatingPortal>
+    </>
+  );
+}
+
 export function TrackInfoForm(props: TrackInfoFormProps) {
   const router = useRouter();
   const audioRef = useRef<HTMLAudioElement | null>(null);
@@ -2464,125 +2585,5 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         />
       )}
     </div>
-  );
-}
-
-function ProLockTooltip({
-  text,
-  children,
-  referenceClassName = "w-full",
-  placement = "bottom",
-}: {
-  text: { title: string; description: string };
-  children: ReactNode;
-  referenceClassName?: string;
-  placement?: Placement;
-}) {
-  const router = useRouter();
-  const [open, setOpen] = useState(false);
-  const arrowRef = useRef<SVGSVGElement | null>(null);
-
-  const { refs, floatingStyles, context } = useFloating({
-    open,
-    onOpenChange: setOpen,
-    placement,
-    whileElementsMounted: autoUpdate,
-    middleware: [offset(10), flip(), shift({ padding: 8 }), arrow({ element: arrowRef })],
-  });
-
-  const hover = useHover(context, {
-    move: false,
-    delay: { open: 80, close: 70 },
-  });
-
-  const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
-
-  return (
-    <>
-      <div ref={refs.setReference} {...getReferenceProps()} className={referenceClassName}>
-        {children}
-      </div>
-
-      <FloatingPortal>
-        {open && (
-          <div
-            ref={refs.setFloating}
-            style={floatingStyles}
-            {...getFloatingProps()}
-            className="z-80 w-64 max-w-[calc(100vw-1.5rem)] rounded-md border border-[#2f3035] bg-chinese-black px-4 py-4 text-white-smoke shadow-xl"
-          >
-            <p className="text-[24px] font-semibold leading-none tracking-tight text-white-smoke">{text.title}</p>
-            <p className="mt-2 text-[11px] leading-5 text-white-smoke">{text.description}</p>
-            <button
-              type="button"
-              onClick={() => router.push("/artistpro")}
-              className="mt-4 rounded-full bg-white-smoke px-4 py-2 text-[12px] font-bold text-chinese-black transition-colors hover:bg-white-smoke cursor-pointer"
-            >
-              Unlock with Artist Pro
-            </button>
-            <FloatingArrow
-              ref={arrowRef}
-              context={context}
-              className="fill-[#111216]"
-              stroke="#2f3035"
-              strokeWidth={1}
-            />
-          </div>
-        )}
-      </FloatingPortal>
-    </>
-  );
-}
-
-function InfoTooltip({ text }: { text: { title: string; description: string } }) {
-  const [open, setOpen] = useState(false);
-  const arrowRef = useRef<SVGSVGElement | null>(null);
-
-  const { refs, floatingStyles, context } = useFloating({
-    open,
-    onOpenChange: setOpen,
-    placement: "bottom",
-    whileElementsMounted: autoUpdate,
-    middleware: [offset(10), flip(), shift({ padding: 8 }), arrow({ element: arrowRef })],
-  });
-
-  const hover = useHover(context, {
-    move: false,
-    delay: { open: 100, close: 80 },
-  });
-
-  const { getReferenceProps, getFloatingProps } = useInteractions([hover]);
-
-  return (
-    <>
-      <span
-        ref={refs.setReference}
-        {...getReferenceProps()}
-        className="ml-1 inline-flex cursor-help align-middle text-white/70 hover:text-white-smoke"
-      >
-        <CiCircleQuestion className="text-white-smoke text-[14px]" />
-      </span>
-
-      <FloatingPortal>
-        {open && (
-          <div
-            ref={refs.setFloating}
-            style={floatingStyles}
-            {...getFloatingProps()}
-            className="z-80 w-64 max-w-[calc(100vw-1.5rem)] rounded-md border border-[#2f3035] bg-chinese-black px-4 py-4 text-white-smoke shadow-xl"
-          >
-            <p className="text-[16px] text-white-smoke font-semibold leading-none tracking-tight">{text.title}</p>
-            <p className="mt-2 text-[11px] leading-5 text-white-smoke">{text.description}</p>
-            <FloatingArrow
-              ref={arrowRef}
-              context={context}
-              className="fill-[#111216]"
-              stroke="#2f3035"
-              strokeWidth={1}
-            />
-          </div>
-        )}
-      </FloatingPortal>
-    </>
   );
 }
