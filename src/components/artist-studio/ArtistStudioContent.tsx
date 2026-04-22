@@ -5,7 +5,7 @@ import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 
 import { useGetPostedTracks } from "@/hooks/useTracks";
-import { TOTAL_MINUTES_LIMIT } from "@/types/upload.types";
+import { TOTAL_TRACK_LIMIT } from "@/types/upload.types";
 
 import { ArtistStudioHeader } from "./ArtistStudioContent/ArtistStudioHeader";
 import { TracksTab } from "./ArtistStudioContent/TracksTab";
@@ -140,7 +140,7 @@ function UploadQuotaBanner({ usagePercent, minutesUsed }: { usagePercent: number
               style={{ width: `${usagePercent}%` }}
             />
           </div>
-          <span className="text-[15px] text-[#d0d0d0]">{Math.round(minutesUsed)} of {TOTAL_MINUTES_LIMIT} minutes</span>
+          <span className="text-[15px] text-[#d0d0d0]">{Math.round(minutesUsed)} of {TOTAL_TRACK_LIMIT} minutes</span>
         </div>
         <button type="button" className="rounded-full border border-[#444] bg-[#0e0e10] px-5 py-1.5 text-[14px] font-bold text-white hover:border-[#666] transition-colors">
           Get unlimited uploads
@@ -162,7 +162,7 @@ export default function ArtistStudioContent({ activeTab, onChangeTab }: ArtistSt
   }, []);
 
   const totalMinutesUsed = 0;
-  const usagePercent = Math.min(100, (totalMinutesUsed / TOTAL_MINUTES_LIMIT) * 100);
+  const usagePercent = Math.min(100, (totalMinutesUsed / TOTAL_TRACK_LIMIT) * 100);
 
   const stats = useMemo(() => {
     const tracks = postedTracks ?? [];
