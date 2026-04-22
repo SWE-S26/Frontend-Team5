@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import { useStatelessComments } from "@/hooks/useComments";
 import { TrackComment } from "@/types/comments.types";
 
@@ -83,7 +83,7 @@ function CommentAvatar({
     >
       {/* Bubble — always in DOM, fades in/out, anchored to fixed container */}
       <div
-        className="absolute top-full mt-1 pointer-events-none flex items-baseline gap-1.5 bg-off-black text-white text-[11px] rounded px-2 py-1.5 shadow-lg overflow-hidden transition-opacity duration-150"
+        className="absolute top-full mt-1 pointer-events-none flex items-baseline gap-1.5 bg-off-black text-white-smoke text-[11px] rounded px-2 py-1.5 shadow-lg overflow-hidden transition-opacity duration-150"
         style={{
           maxWidth: 220,
           opacity: expanded ? 1 : 0,
@@ -95,11 +95,15 @@ function CommentAvatar({
             <span className="font-semibold truncate shrink-0 max-w-[80px]">
               {comment.displayName}
             </span>
-            <span className="text-white/60 truncate">{comment.content}</span>
+            <span className="text-white-smoke/60 truncate">
+              {comment.content}
+            </span>
           </>
         ) : (
           <>
-            <span className="text-white/60 truncate">{comment.content}</span>
+            <span className="text-white-smoke/60 truncate">
+              {comment.content}
+            </span>
             <span className="font-semibold truncate shrink-0 max-w-[80px]">
               {comment.displayName}
             </span>
@@ -174,7 +178,7 @@ function PendingAvatar({
       onMouseDown={handleMouseDown}
     >
       <div
-        className="absolute top-full mt-1 bg-off-black text-white text-[11px] rounded px-2 py-1.5 flex items-baseline gap-1.5 shadow-lg whitespace-nowrap pointer-events-none transition-opacity duration-200"
+        className="absolute top-full mt-1 bg-off-black text-white-smoke text-[11px] rounded px-2 py-1.5 flex items-baseline gap-1.5 shadow-lg whitespace-nowrap pointer-events-none transition-opacity duration-200"
         style={{
           maxWidth: 220,
           opacity: visible ? 1 : 0,
@@ -183,7 +187,7 @@ function PendingAvatar({
             : { right: "calc(-50% + 10px)" }),
         }}
       >
-        <span className="text-white/60 truncate">{flashText ?? ""}</span>
+        <span className="text-white-smoke/60 truncate">{flashText ?? ""}</span>
       </div>
       <img
         src={avatarUrl}
@@ -237,6 +241,14 @@ export default function SausageWaveform({
   const [fgTopFlat, setFgTopFlat] = useState<string | null>(null);
   const [fgBottom, setFgBottom] = useState<string | null>(null);
   const [isReady, setIsReady] = useState(false);
+
+  const [theme] = useState<"light" | "dark">(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("theme");
+      if (saved === "light" || saved === "dark") return saved;
+    }
+    return "dark";
+  });
   const loadedCountRef = useRef(0);
 
   const [isHovering, setIsHovering] = useState(false);
@@ -297,16 +309,19 @@ export default function SausageWaveform({
       bar_width: 8,
       bar_gap: 0.3,
     };
+
+    const bgTopColor = theme === "dark" ? "#ffffff" : "#121212";
+    const bgBottomColor = theme === "dark" ? "#e5e5e5" : "#b2b2b2";
     const layers: [string, (png: string) => void][] = [
       [
-        "#ffffff",
+        bgTopColor,
         (png) => {
           setBgTop(png);
           markLoaded();
         },
       ],
       [
-        "#e5e5e5",
+        bgBottomColor,
         (png) => {
           setBgBottom(png);
           markLoaded();
