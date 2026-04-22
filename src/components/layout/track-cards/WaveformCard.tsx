@@ -7,7 +7,6 @@ import Tooltip from "@/components/ui/Tooltip";
 import MoreDropdown from "@/components/ui/MoreDropdown";
 
 import { useState, useRef, useEffect } from "react";
-import { useState, useRef, useEffect } from "react";
 import { Avatar } from "antd";
 
 import { motion, AnimatePresence, Transition } from "framer-motion";
