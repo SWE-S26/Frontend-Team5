@@ -10,6 +10,7 @@ import { TbRepeat } from "react-icons/tb";
 import { FaRegClock } from "react-icons/fa";
 import { BsLightningChargeFill } from "react-icons/bs";
 import { Checkbox, type ArtistTrackRow } from "../ArtistStudioContent";
+import { MdOutlineDownloadForOffline } from "react-icons/md";
 
 
 export function TrackRow({
@@ -124,7 +125,7 @@ export function TrackRow({
         <span className="inline-flex items-center gap-1"><IoHeartOutline />   {track.likes    > 0 ? track.likes    : "-"}</span>
         <span className="inline-flex items-center gap-1"><FiMessageSquare /> {track.comments > 0 ? track.comments : "-"}</span>
         <span className="inline-flex items-center gap-1"><TbRepeat />        {track.reposts  > 0 ? track.reposts  : "-"}</span>
-        <span className="inline-flex items-center gap-1"><FaRegClock />      -</span>
+        <span className="inline-flex items-center gap-1"><MdOutlineDownloadForOffline />      -</span>
       </div>
 
       <div className="text-right text-[13px] font-semibold text-[#aaa]">{track.plays}</div>

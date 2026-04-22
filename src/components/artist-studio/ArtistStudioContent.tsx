@@ -140,7 +140,7 @@ function UploadQuotaBanner({ usagePercent, minutesUsed }: { usagePercent: number
               style={{ width: `${usagePercent}%` }}
             />
           </div>
-          <span className="text-[15px] text-[#d0d0d0]">{Math.round(minutesUsed)} of {TOTAL_TRACK_LIMIT} minutes</span>
+          <span className="text-[15px] text-[#d0d0d0]">{Math.round(minutesUsed)} of {TOTAL_TRACK_LIMIT} tracks</span>
         </div>
         <button type="button" className="rounded-full border border-[#444] bg-[#0e0e10] px-5 py-1.5 text-[14px] font-bold text-white hover:border-[#666] transition-colors">
           Get unlimited uploads
