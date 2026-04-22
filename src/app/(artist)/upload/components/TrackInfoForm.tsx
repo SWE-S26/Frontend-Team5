@@ -5,7 +5,6 @@
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useMemo, useRef, useState, type ReactNode } from "react";
-import { AnimatePresence, motion } from "framer-motion";
 import {
   useFloating,
   useHover,
@@ -23,32 +22,20 @@ import { useCreateTrack } from "@/hooks/useTracks";
 import type { CreateTrackRequest } from "@/types/tracks.types";
 import { MAX_FILE_SIZE_BYTES, formatBytes } from "@/types/upload.types";
 import {
-  CloseOutlined,
-  PlusOutlined,
-  MinusOutlined,
-  DownOutlined,
-  UpOutlined,
-  PictureOutlined,
-  UserAddOutlined,
-  PlayCircleOutlined,
-  PauseCircleOutlined,
-} from "@ant-design/icons";
+  Header,
+} from "./TrackInfoForm/Header";
+import { QuitModal } from "./TrackInfoForm/QuitModal";
+import { ProFeatureModal } from "./TrackInfoForm/ProFeatureModal";
+import { ArtworkPanel } from "./TrackInfoForm/ArtworkPanel";
+import { BasicInfoForm } from "./TrackInfoForm/BasicInfoForm";
+import { AdvancedDetailsSection } from "./TrackInfoForm/AdvancedDetailsSection";
+import { PermissionsSection } from "./TrackInfoForm/PermissionsSection";
+import { AudioClipSection } from "./TrackInfoForm/AudioClipSection";
+import { LicensingSection } from "./TrackInfoForm/LicensingSection";
+import { Footer } from "./TrackInfoForm/Footer";
 import { Switch } from "antd";
 import { Check, Circle } from "lucide-react";
-import { IoToggleOutline } from "react-icons/io5";
-import { FiLock } from "react-icons/fi";
-import { CiGlobe } from "react-icons/ci";
-import { RxSpeakerLoud } from "react-icons/rx";
-import { BsCcCircle } from "react-icons/bs";
-import { FaRegClock } from "react-icons/fa";
-import { RiDeleteBinLine } from "react-icons/ri";
-import { GrEdit } from "react-icons/gr";
-import { IoMdCalendar } from "react-icons/io";
-import { BsExplicitFill } from "react-icons/bs";
 import { CiCircleQuestion } from "react-icons/ci";
-import { RiLockFill } from "react-icons/ri";
-import { FaPause } from "react-icons/fa";
-import { FaPlay } from "react-icons/fa6";
 
 // Constants
 
@@ -187,8 +174,6 @@ export interface TrackInfoFormProps {
   isArtistPro?: boolean;
   onReplaceTrackFile: (file: File) => void;
 }
-
-// Pure Utility Functions
 
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
@@ -1210,1175 +1195,209 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     setIsClipPlaying(false);
   }, [uploadedFileUrl]);
 
-  // ── Render Sections ───────────────────────────────────────────────────────
-  // Named render functions keep the JSX return readable and allow each section
-  // to be reasoned about independently. They close over component state so
-  // they need no extra prop-passing.
-
-  function renderHeader() {
-    return (
-      <div className="sticky top-0 z-50 bg-chinese-black">
-        <div className="mx-auto flex flex-wrap items-center justify-between gap-3 px-4 py-3 sm:px-6">
-          <input
-            ref={replaceFileInputRef}
-            type="file"
-            accept="audio/*,.wav,.flac,.aiff,.aif,.alac,.m4a,.mp3"
-            className="hidden"
-            onChange={handleReplaceTrackChange}
-          />
-
-          {/* Left: Logo + Title */}
-          <div className="flex items-center gap-3">
-            <button
-              onClick={() => router.push("/home")}
-              className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-[#1b1c20] cursor-pointer"
-            >
-              <Image src="/app-logo/whitelogo.png" alt="BeatZa" width={52} height={52} className="object-contain logo-dark" priority />
-              <Image src="/app-logo/blacklogo.png"  alt="BeatZa" width={52} height={52} className="object-contain logo-light" priority />
-            </button>
-            <span className="text-[16px] font-semibold text-white-smoke">Track Info</span>
-          </div>
-
-          {/* Right: File info + Actions */}
-          <div
-            className={`flex w-full flex-wrap items-center justify-end gap-3 rounded-md border border-dashed px-3 py-2 transition-colors md:w-auto md:max-w-[65%] ${
-              isTrackDragActive ? "border-white-smoke bg-chinese-black" : "border-transparent"
-            }`}
-            onDragOver={(e) => { e.preventDefault(); if (!isTrackDragActive) setIsTrackDragActive(true); }}
-            onDragLeave={(e) => { const rel = e.relatedTarget as Node | null; if (!rel || !e.currentTarget.contains(rel)) setIsTrackDragActive(false); }}
-            onDrop={handleTrackDrop}
-          >
-            {showUploadProgress ? (
-              <div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
-                <span className="truncate text-[12px] text-white-smoke">{currentFileName}</span>
-                <div className="w-24 h-1 bg-[#333] rounded-full overflow-hidden">
-                  <div
-                    className={`h-full rounded-full transition-all duration-300 ${roundedUploadProgress > 50 ? "bg-[#1db954]" : "bg-white-smoke"}`}
-                    style={{ width: `${roundedUploadProgress}%` }}
-                  />
-                </div>
-                <span className="w-10 shrink-0 text-right text-[12px] font-semibold text-white-smoke">
-                  {roundedUploadProgress}%
-                </span>
-              </div>
-            ) : (
-              <div className="flex min-w-0 items-center gap-2">
-                {uploadedFileUrl && (
-                  <button
-                    onClick={togglePlayPause}
-                    className="flex h-7 w-7 items-center justify-center text-white-smoke hover:text-[#f2f2f2] transition-colors cursor-pointer"
-                    aria-label={isPlaying ? "Pause" : "Play"}
-                  >
-                    {isPlaying ? <PauseCircleOutlined className="text-[16px]" /> : <PlayCircleOutlined className="text-[16px]" />}
-                  </button>
-                )}
-                <span className="truncate text-[12px] text-white-smoke">{currentFileName}</span>
-              </div>
-            )}
-
-            {isTrackDragActive && (
-              <span className="text-[11px] font-semibold text-white/85">Drop audio file to upload</span>
-            )}
-            {showReplaceTrack && (
-              <button onClick={handleReplaceTrack} className="text-[12px] font-semibold text-white-smoke hover:underline cursor-pointer">
-                Replace track
-              </button>
-            )}
-            <button
-              onClick={() => setShowQuitModal(true)}
-              className="flex h-9 w-9 items-center justify-center rounded-full bg-[#222] text-[#ccc] transition-colors hover:bg-[#333] cursor-pointer"
-            >
-              <CloseOutlined className="text-[14px]" />
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  function renderQuitModal() {
-    if (!showQuitModal) return null;
-    return (
-      <div className="fixed inset-0 z-200 flex items-center justify-center bg-login px-4">
-        <div className="relative w-full max-w-105 rounded-lg bg-chinese-black border border-[#2b2c31] p-6 shadow-2xl">
-          <button
-            type="button"
-            onClick={() => setShowQuitModal(false)}
-            className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#2b2c31] text-[#ccc] transition-colors hover:bg-[#38383d] cursor-pointer"
-            aria-label="Cancel quit"
-          >
-            <CloseOutlined className="text-[14px]" />
-          </button>
-          <h2 className="text-[16px] font-bold text-white-smoke pr-10">Are you sure you want to quit?</h2>
-          <p className="mt-3 text-[13px] text-[#888]">Your changes will not be saved.</p>
-          <div className="mt-6 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setShowQuitModal(false)}
-              className="px-4 py-2 text-[13px] font-semibold text-white-smoke rounded transition-colors hover:bg-[#2b2c31] cursor-pointer"
-            >
-              Back to upload
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/artists")}
-              className="rounded-full bg-[#f25870] px-5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#ff6b81] cursor-pointer"
-            >
-              Quit upload
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  function renderProFeatureModal() {
-    if (!showProFeatureModal) return null;
-    return (
-      <div className="fixed inset-0 z-60 flex items-center justify-center bg-login px-4">
-        <div className="relative w-full max-w-105 rounded-lg bg-chinese-black border border-[#2b2c31] p-6 shadow-2xl">
-          <button
-            type="button"
-            onClick={() => setShowProFeatureModal(false)}
-            className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#2b2c31] text-[#ccc] transition-colors hover:bg-[#38383d] cursor-pointer"
-            aria-label="Close pro feature modal"
-          >
-            <CloseOutlined className="text-[14px]" />
-          </button>
-          <h2 className="pr-10 text-[16px] font-bold text-white-smoke">Artist Pro feature</h2>
-          <p className="mt-3 text-[13px] text-[#888]">
-            Follower Exclusive is available for Artist Pro accounts. Upgrade to unlock this option.
-          </p>
-          <div className="mt-6 flex items-center justify-end gap-3">
-            <button
-              type="button"
-              onClick={() => setShowProFeatureModal(false)}
-              className="px-4 py-2 text-[13px] font-semibold text-white-smoke rounded transition-colors hover:bg-[#2b2c31] cursor-pointer"
-            >
-              Maybe later
-            </button>
-            <button
-              type="button"
-              onClick={() => router.push("/artistpro")}
-              className="rounded-full bg-[#f5a623] px-5 py-2 text-[13px] font-semibold text-chinese-black transition-colors hover:bg-[#ffc55a] cursor-pointer"
-            >
-              Upgrade to Pro
-            </button>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  function renderArtworkPanel() {
-    return (
-      <div className="lg:col-span-4">
-        <div className="mx-auto w-full max-w-md lg:mx-0 lg:max-w-90">
-          <input ref={artworkInputRef} type="file" accept="image/*" className="hidden" onChange={handleArtworkChange} />
-
-          {/* Artwork frame */}
-          <div
-            ref={artworkFrameRef}
-            className={`group relative aspect-square w-full overflow-hidden rounded border bg-chinese-black transition-colors ${
-              artworkUrl
-                ? "border-transparent"
-                : isArtworkDragActive
-                  ? "border-dashed border-white-smoke"
-                  : "border-dashed border-[#444] hover:border-white-smoke"
-            } ${artworkUrl ? (isPanningArtwork ? "cursor-grabbing" : "cursor-grab") : ""}`}
-            style={{ touchAction: artworkUrl ? "none" : "auto", userSelect: "none" }}
-            onPointerDown={handleArtworkPointerDown}
-            onPointerMove={handleArtworkPointerMove}
-            onPointerUp={handleArtworkPointerUp}
-            onPointerCancel={handleArtworkPointerUp}
-            onDragOver={(e) => {
-              const isFileDrag = Array.from(e.dataTransfer.types || []).includes("Files");
-              if (!isFileDrag) return;
-              e.preventDefault();
-              if (!isArtworkDragActive) setIsArtworkDragActive(true);
-            }}
-            onDragLeave={(e) => {
-              const rel = e.relatedTarget as Node | null;
-              if (!rel || !e.currentTarget.contains(rel)) setIsArtworkDragActive(false);
-            }}
-            onDrop={handleArtworkDrop}
-          >
-            {artworkUrl ? (
-              <Image
-                src={artworkUrl}
-                alt="Artwork"
-                fill
-                className="object-cover"
-                style={{
-                  transform: `translate(${artworkPosition.x * (artworkZoom - 1) * 50}%, ${artworkPosition.y * (artworkZoom - 1) * 50}%) scale(${artworkZoom})`,
-                  objectPosition: "50% 50%",
-                }}
-                draggable={false}
-                onDragStart={(e) => e.preventDefault()}
-                unoptimized
-              />
-            ) : (
-              <button type="button" onClick={handleArtworkPick} className="flex h-full w-full flex-col items-center justify-center gap-3 p-6 cursor-pointer">
-                <PictureOutlined className="text-[100px] text-white-smoke transition-colors" />
-                <span className="text-[15px] font-semibold text-white-smoke transition-colors">Add new artwork</span>
-              </button>
-            )}
-
-            {isArtworkDragActive && (
-              <div className="pointer-events-none absolute inset-0 z-30 flex items-center justify-center bg-black/45">
-                <span className="rounded-full border border-white/55 px-4 py-2 text-[12px] font-semibold text-white-smoke">
-                  Drop image here
-                </span>
-              </div>
-            )}
-
-            {artworkUrl && (
-              <div
-                className="absolute bottom-3 right-3 flex flex-col gap-2"
-                data-artwork-control="true"
-                onPointerDown={(e) => e.stopPropagation()}
-              >
-                <button
-                  type="button"
-                  title="Replace Image"
-                  onClick={handleArtworkPick}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-chinese-black text-white-smoke transition-colors hover:bg-[#2a2b31] cursor-pointer"
-                  aria-label="Replace artwork"
-                >
-                  <GrEdit className="text-[18px]" />
-                </button>
-                <button
-                  type="button"
-                  title="Remove Image"
-                  onClick={handleDeleteArtwork}
-                  className="flex h-10 w-10 items-center justify-center rounded-full bg-chinese-black text-white-smoke transition-colors hover:bg-[#2a2b31] cursor-pointer"
-                  aria-label="Delete artwork"
-                >
-                  <RiDeleteBinLine className="text-[18px]" />
-                </button>
-              </div>
-            )}
-          </div>
-
-          {/* Zoom controls */}
-          {artworkUrl && (
-            <div className="mt-3 flex items-center gap-3 rounded-md bg-chinese-black px-3 py-2" data-artwork-control="true">
-              <button
-                type="button"
-                onClick={() => setArtworkZoom((z) => Math.max(1, Number((z - 0.1).toFixed(2))))}
-                className="text-white-smoke/90 hover:text-white"
-                aria-label="Zoom out"
-              >
-                <MinusOutlined />
-              </button>
-              <input
-                type="range"
-                min={1} max={3} step={0.01}
-                value={artworkZoom}
-                onChange={(e) => setArtworkZoom(Number(e.target.value))}
-                className="w-full accent-white-smoke"
-                aria-label="Artwork zoom"
-              />
-              <button
-                type="button"
-                onClick={() => setArtworkZoom((z) => Math.min(3, Number((z + 0.1).toFixed(2))))}
-                className="text-white-smoke/90 hover:text-white"
-                aria-label="Zoom in"
-              >
-                <PlusOutlined />
-              </button>
-            </div>
-          )}
-        </div>
-      </div>
-    );
-  }
-
-  function renderBasicInfoForm() {
-    return (
-      <div className="space-y-6 lg:col-span-8">
-        {submitError && (
-          <div className="rounded-md border border-[#5a2d34] bg-chinese-black px-3 py-2 text-[12px] text-[#ff97a9]">
-            {submitError}
-          </div>
-        )}
-
-        {/* Track Title */}
-        <div>
-          <label className={LABEL_CLS}>Track title <InfoTooltip text={TOOLTIP_TEXT.trackTitle} /></label>
-          <input
-            type="text"
-            value={trackTitle}
-            onChange={(e) => setTrackTitle(e.target.value)}
-            placeholder="Enter track title"
-            className={FIELD_CLS}
-          />
-        </div>
-
-        {/* Track Link */}
-        <div>
-          <label className={LABEL_CLS}>Track link</label>
-          <div className="border-b border-[#333] pb-2 pt-1 text-[13px] text-white-smoke truncate">
-            https://beatza.me/{slug || "your-track"}/
-          </div>
-        </div>
-
-        {/* Main Artist(s) */}
-        <div>
-          <label className={LABEL_CLS}>Main Artist(s) <InfoTooltip text={TOOLTIP_TEXT.mainArtists} /></label>
-          <input
-            type="text"
-            value={artistName}
-            onChange={(e) => setArtistName(e.target.value)}
-            placeholder="Your artist name"
-            className={FIELD_CLS}
-          />
-          <p className="mt-1.5 text-[11px] text-white-smoke">Tip: Use commas to add multiple artist names.</p>
-        </div>
-
-        {/* Genre */}
-        <div>
-          <label className={LABEL_CLS}>Genre</label>
-          <div className="relative" ref={genreMenuRef}>
-            <div className="flex w-full items-center justify-between border-b border-[#333] pb-2 pt-1 text-left">
-              <input
-                type="text"
-                value={genreMenuOpen ? genreSearch : genre}
-                onFocus={() => { setGenreSearch(genre); setGenreMenuOpen(true); }}
-                onChange={(e) => { setGenreSearch(e.target.value); if (!genreMenuOpen) setGenreMenuOpen(true); }}
-                onBlur={() => { commitGenreSearch(); }}
-                onKeyDown={(e) => {
-                  if (e.key === "Enter" && shouldShowAddCustomGenre) {
-                    e.preventDefault();
-                    setGenre(genreSearch.trim());
-                    setGenreSearch("");
-                    setGenreMenuOpen(false);
-                  }
-                }}
-                placeholder="Add or search for genre"
-                className="w-full bg-transparent text-[13px] text-white-smoke placeholder-[#555] focus:outline-none"
-              />
-              <span className="flex items-center gap-3 text-white-smoke">
-                {genre && (
-                  <CloseOutlined
-                    onClick={() => { setGenre(""); setGenreSearch(""); }}
-                    className="cursor-pointer text-[12px]"
-                  />
-                )}
-                <button
-                  type="button"
-                  onClick={() => {
-                    if (!genreMenuOpen) { setGenreSearch(genre); } else { commitGenreSearch(); setGenreSearch(""); }
-                    setGenreMenuOpen((prev) => !prev);
-                  }}
-                  className="cursor-pointer"
-                  aria-label={genreMenuOpen ? "Close genre menu" : "Open genre menu"}
-                >
-                  {genreMenuOpen ? <UpOutlined className="text-[11px]" /> : <DownOutlined className="text-[11px]" />}
-                </button>
-              </span>
-            </div>
-
-            {genreMenuOpen && (
-              <div className="absolute left-0 right-0 top-full z-30 mt-2 max-h-70 overflow-y-auto rounded border border-[#2f3035] bg-chinese-black shadow-xl">
-                {filteredMusicGenres.length > 0 && (
-                  <>
-                    <p className="px-4 py-2 text-[13px] text-white-smoke">All music genres</p>
-                    {filteredMusicGenres.map((item) => (
-                      <button
-                        key={item}
-                        type="button"
-                        onClick={() => { setGenre(item); setGenreSearch(""); setGenreMenuOpen(false); }}
-                        className="block w-full px-4 py-2 text-left text-[13px] bg-[#1e1e1e] text-white-smoke hover:bg-[#3a3b3f]"
-                      >
-                        {item}
-                      </button>
-                    ))}
-                  </>
-                )}
-                {filteredAudioGenres.length > 0 && (
-                  <>
-                    <p className="border-t border-[#2a2b30] px-4 py-2 text-[13px] text-white-smoke">All audio genres</p>
-                    {filteredAudioGenres.map((item) => (
-                      <button
-                        key={item}
-                        type="button"
-                        onClick={() => { setGenre(item); setGenreSearch(""); setGenreMenuOpen(false); }}
-                        className="block w-full px-4 py-2 text-left text-[13px] bg-[#1e1e1e] text-white-smoke hover:bg-[#3a3b3f]"
-                      >
-                        {item}
-                      </button>
-                    ))}
-                  </>
-                )}
-                {shouldShowAddCustomGenre && (
-                  <button
-                    type="button"
-                    onClick={() => { setGenre(genreSearch.trim()); setGenreSearch(""); setGenreMenuOpen(false); }}
-                    className="block w-full border-t border-[#2a2b30] px-4 py-3 text-left text-[13px] font-semibold text-white-smoke hover:bg-[#3a3b3f]"
-                  >
-                    Add &quot;{genreSearch.trim()}&quot;
-                  </button>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-
-        {/* Tags */}
-        <div>
-          <label className={LABEL_CLS}>Tags <InfoTooltip text={TOOLTIP_TEXT.tags} /></label>
-          <input
-            type="text"
-            value={tags}
-            onChange={(e) => setTags(e.target.value)}
-            placeholder="Add styles, moods, tempo"
-            className={FIELD_CLS}
-          />
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className={LABEL_CLS}>Description</label>
-          <textarea
-            value={description}
-            onChange={(e) => setDescription(e.target.value)}
-            placeholder="Tracks with descriptions tend to get more plays and engagements."
-            rows={1}
-            className={`${FIELD_CLS} resize-none`}
-          />
-        </div>
-
-        {/* Privacy */}
-        <div className="relative rounded border border-[#2a2a2a] bg-chinese-black p-4" ref={privacyMenuRef}>
-          <div className="relative">
-            <button
-              type="button"
-              onClick={() => setPrivacyMenuOpen((prev) => !prev)}
-              className="grid w-full cursor-pointer grid-cols-[2rem_1fr_auto] items-start gap-x-3 text-left"
-              aria-expanded={privacyMenuOpen}
-              aria-label="Toggle privacy options"
-            >
-              <div className="flex h-8 w-8 items-center justify-center">
-                {visibilityOption === "public"  ? <CiGlobe       className="text-[24px] text-[#1db954]"   /> :
-                 visibilityOption === "private" ? <FiLock        className="text-[20px] text-white-smoke" /> :
-                                                  <UserAddOutlined className="text-[20px] text-white-smoke" />}
-              </div>
-              <div>
-                <p className="text-[13px] font-semibold text-white-smoke">
-                  {visibilityOption === "public" ? "Public" : visibilityOption === "private" ? "Private" : "Follower Exclusive"}
-                </p>
-                <p className="text-[11px] text-white-smoke">
-                  {visibilityOption === "public"
-                    ? "Anyone can access and listen to this track."
-                    : visibilityOption === "private"
-                      ? "Track is not discoverable. Only people with private link can view and listen."
-                      : "Only those who follow you can access."}
-                </p>
-              </div>
-              <span className="pt-1 text-white-smoke">
-                {privacyMenuOpen ? <UpOutlined /> : <DownOutlined />}
-              </span>
-            </button>
-
-            {/* Privacy dropdown */}
-            <div
-              className={`absolute -left-4 -right-4 top-full z-20 mt-2 overflow-hidden rounded border border-[#2a2a2a] bg-chinese-black shadow-xl transition-all duration-200 ${
-                privacyMenuOpen
-                  ? "pointer-events-auto translate-y-0 opacity-100"
-                  : "pointer-events-none -translate-y-1 opacity-0"
-              }`}
-            >
-              <div className="max-h-72 overflow-y-auto">
-                {[
-                  {
-                    value: "public" as const,
-                    title: "Public",
-                    desc:  "Anyone can access and listen to this track.",
-                    icon:  <CiGlobe className={`text-[24px] ${visibilityOption === "public" ? "text-[#1db954]" : "text-white-smoke"}`} />,
-                  },
-                  {
-                    value: "private" as const,
-                    title: "Private",
-                    desc:  "Track is not discoverable. Only people with private link can view and listen.",
-                    icon:  <FiLock className="text-[20px] text-white-smoke" />,
-                  },
-                  {
-                    value: "followerExclusive" as const,
-                    title: "Follower Exclusive",
-                    desc:  "Only those who follow you can access.",
-                    icon:  <UserAddOutlined className="text-[20px] text-white-smoke" />,
-                    isProOnly: true,
-                  },
-                ].map((item) =>
-                  item.value === "followerExclusive" && !isArtistPro ? (
-                    <ProLockTooltip key={item.value} text={TOOLTIP_TEXT.proFollowerExclusive}>
-                      <button
-                        type="button"
-                        onClick={() => setShowProFeatureModal(true)}
-                        className={`grid w-full cursor-not-allowed grid-cols-[2rem_1fr] items-start gap-x-3 px-3 py-3 text-left ${
-                          visibilityOption === item.value ? "bg-upload-select" : "bg-chinese-black hover:bg-upload-schedular"
-                        }`}
-                      >
-                        <span className="flex h-8 w-8 items-center justify-center">{item.icon}</span>
-                        <span>
-                          <p className="flex items-center gap-2 text-[13px] font-semibold text-white-smoke">
-                            {item.title}
-                            <span className="rounded border border-[#f5a623] px-1.5 py-px text-[9px] font-bold uppercase tracking-wide text-[#f5a623]">PRO</span>
-                          </p>
-                          <p className="text-[11px] text-white-smoke">{item.desc}</p>
-                        </span>
-                      </button>
-                    </ProLockTooltip>
-                  ) : (
-                    <button
-                      key={item.value}
-                      type="button"
-                      onClick={() => { setVisibilityOption(item.value); setPrivacyMenuOpen(false); }}
-                      className={`grid w-full cursor-pointer grid-cols-[2rem_1fr] items-start gap-x-3 px-3 py-3 text-left ${
-                        visibilityOption === item.value ? "bg-upload-select" : "bg-chinese-black hover:bg-upload-schedular"
-                      }`}
-                    >
-                      <span className="flex h-8 w-8 items-center justify-center">{item.icon}</span>
-                      <span>
-                        <p className="flex items-center gap-2 text-[13px] font-semibold text-white-smoke">
-                          {item.title}
-                          {item.value === "followerExclusive" && (
-                            <span className="rounded border border-[#f5a623] px-1.5 py-px text-[9px] font-bold uppercase tracking-wide text-[#f5a623]">PRO</span>
-                          )}
-                        </p>
-                        <p className="text-[11px] text-white-smoke">{item.desc}</p>
-                      </span>
-                    </button>
-                  )
-                )}
-              </div>
-            </div>
-          </div>
-
-          {/* Schedule release */}
-          <div className="mt-3 border-t border-[#2a2a2a] pt-3">
-            {isArtistPro ? (
-              <div className="grid grid-cols-[2rem_1fr_auto] items-start gap-x-3">
-                <div className="flex h-8 w-8 shrink-0 items-center justify-center">
-                  <FaRegClock className="text-[20px] text-white-smoke" />
-                </div>
-                <div>
-                  <p className="flex items-center gap-1 text-[12px] font-semibold text-white-smoke">
-                    Schedule public release <span className="text-[#f5a623]">ARTIST PRO</span>
-                  </p>
-                  <p className="text-[11px] text-[#666]">Track will be made public at specific date and time.</p>
-                </div>
-                <Switch checked={scheduleRelease} onChange={setScheduleRelease} disabled={!isArtistPro} className={SWITCH_CLS} />
-              </div>
-            ) : (
-              <ProLockTooltip text={TOOLTIP_TEXT.proScheduleRelease} referenceClassName="w-full" placement="bottom">
-                <div className="grid grid-cols-[2rem_1fr_auto] items-start gap-x-3 opacity-60">
-                  <div className="flex h-8 w-8 shrink-0 items-center justify-center">
-                    <FaRegClock className="text-[20px] text-white-smoke" />
-                  </div>
-                  <div>
-                    <p className="flex items-center gap-1 text-[12px] font-semibold text-white-smoke">
-                      Schedule public release <span className="text-[#f5a623]">ARTIST PRO</span>
-                    </p>
-                    <p className="text-[11px] text-[#666]">Track will be made public at specific date and time.</p>
-                  </div>
-                  <span className="inline-flex">
-                    <Switch checked={scheduleRelease} onChange={setScheduleRelease} disabled={!isArtistPro} className={SWITCH_CLS} />
-                  </span>
-                </div>
-              </ProLockTooltip>
-            )}
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  function renderAdvancedDetailsSection() {
-    return (
-      <>
-        <button
-          onClick={() => toggleSection("advancedDetails")}
-          className="flex w-full items-center justify-between py-4 text-left border-b border-[#222] cursor-pointer"
-        >
-          <div>
-            <p className="text-[13px] font-semibold text-white-smoke">Advanced details</p>
-            <p className="text-[11px] text-white-smoke mt-0.5">Buy link, record label, release date, publisher...</p>
-          </div>
-          {expandedSections.advancedDetails
-            ? <UpOutlined className="text-[11px] text-white-smoke" />
-            : <DownOutlined className="text-[11px] text-white-smoke" />}
-        </button>
-
-        <AnimatePresence initial={false}>
-          {expandedSections.advancedDetails && (
-            <motion.div key="advanced-details" {...COLLAPSIBLE_MOTION_PROPS}>
-              <div className="space-y-5 py-4">
-
-                {/* Buy link + Record label */}
-                {[
-                  {
-                    label: "Buy link",
-                    value: buyLink, setter: setBuyLink,
-                    placeholder: "Add a link to let your fans purchase the track from another site",
-                    info: "",
-                  },
-                  {
-                    label: "Record label",
-                    value: recordLabel, setter: setRecordLabel,
-                    placeholder: "If your track is released under a specific record label, you can add that here.",
-                    info: "",
-                  },
-                ].map(({ label, value, setter, placeholder, info }) => (
-                  <div key={label}>
-                    <label className={LABEL_CLS}>{label}</label>
-                    <small className="flex pb-2 text-[12px] text-white/55">{info}</small>
-                    <input
-                      type="text"
-                      value={value}
-                      onChange={(e) => setter(e.target.value)}
-                      placeholder={placeholder}
-                      className={ADV_FIELD_CLS}
-                    />
-                  </div>
-                ))}
-
-                {/* Release Date */}
-                <div>
-                  <label className={LABEL_CLS}>Release date</label>
-                  <small className="flex pb-2 text-[12px] text-white/55">
-                    If your track has a specific release date, you can add that here.
-                  </small>
-                  <div className="relative" ref={releaseCalendarRef}>
-                    <div className="relative max-w-45">
-                      <input
-                        type="text"
-                        value={formatDisplayDate(releaseDate)}
-                        readOnly
-                        onClick={openReleaseCalendar}
-                        placeholder="MM/DD/YYYY"
-                        className={`${ADV_FIELD_CLS} pr-9 w-full cursor-pointer`}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => setReleaseCalendarOpen((prev) => !prev)}
-                        className="absolute right-2 top-1/2 -translate-y-1/2 text-white-smoke/85 hover:text-white-smoke cursor-pointer"
-                        aria-label="Open release date calendar"
-                      >
-                        <IoMdCalendar className="text-[22px]" />
-                      </button>
-                    </div>
-
-                    {releaseCalendarOpen && (
-                      <div className="absolute left-0 top-full z-40 mt-2 w-[min(18rem,calc(100vw-2.5rem))] rounded-md border border-[#2f3035] bg-chinese-black p-3 shadow-xl sm:w-72">
-                        <div className="mb-2 flex items-center justify-between">
-                          <button
-                            type="button"
-                            onClick={() => shiftReleaseCalendarMonth(-1)}
-                            className="rounded px-2 py-1 text-white-smoke/80 hover:bg-[#2a2b31] hover:text-white-smoke"
-                            aria-label="Previous month"
-                          >
-                            {"<"}
-                          </button>
-                          <p className="text-[12px] font-semibold text-white-smoke">
-                            {calendarMonthStart.toLocaleString("en-US", { month: "long", year: "numeric" })}
-                          </p>
-                          <button
-                            type="button"
-                            onClick={() => shiftReleaseCalendarMonth(1)}
-                            className="rounded px-2 py-1 text-white-smoke/80 hover:bg-[#2a2b31] hover:text-white-smoke"
-                            aria-label="Next month"
-                          >
-                            {">"}
-                          </button>
-                        </div>
-                        <div className="mb-2 grid grid-cols-7 text-center text-[10px] font-semibold uppercase text-[#8a8a91]">
-                          {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((day) => (
-                            <span key={day}>{day}</span>
-                          ))}
-                        </div>
-                        <div className="grid grid-cols-7 gap-1">
-                          {calendarDays.map((day) => {
-                            const inCurrentMonth = day.getMonth() === calendarMonthStart.getMonth();
-                            const isSelected     = selectedReleaseDate ? isSameDay(day, selectedReleaseDate) : false;
-                            const isToday        = isSameDay(day, new Date());
-                            return (
-                              <button
-                                key={day.toISOString()}
-                                type="button"
-                                onClick={() => handleSelectReleaseDate(day)}
-                                className={`h-8 rounded text-[11px] transition-colors ${
-                                  isSelected
-                                    ? "bg-[#1db954] text-chinese-black font-bold"
-                                    : inCurrentMonth
-                                      ? isToday
-                                        ? "border border-[#1db954] text-white-smoke"
-                                        : "text-white-smoke hover:bg-[#2a2b31]"
-                                      : "text-[#666] hover:bg-[#222]"
-                                }`}
-                              >
-                                {day.getDate()}
-                              </button>
-                            );
-                          })}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                </div>
-
-                {/* Publisher + ISRC */}
-                {[
-                  {
-                    label: "Publisher",
-                    value: publisher, setter: setPublisher, placeholder: "",
-                    info: "If you have a publisher, you can add that here. A music publisher is a person or organization that helps songwriters promote and monetize their songs and ensure that they are properly compensated when their songs are used.",
-                  },
-                  {
-                    label: "ISRC",
-                    value: isrc, setter: setIsrc, placeholder: "",
-                    info: "An ISRC (International Standard Recording Code) is a unique identifier that is assigned to a track. Use the same ISRC for a given track wherever you distribute it. If you work with a record label or distributor, ask them if they already have ISRCs for your tracks.",
-                  },
-                ].map(({ label, value, setter, placeholder, info }) => (
-                  <div key={label}>
-                    <label className={LABEL_CLS}>{label}</label>
-                    <small className="flex pb-2 text-[12px] text-white/55">{info}</small>
-                    <input
-                      type="text"
-                      value={value}
-                      onChange={(e) => setter(e.target.value)}
-                      placeholder={placeholder}
-                      className={ADV_FIELD_CLS}
-                    />
-                  </div>
-                ))}
-
-                {/* Explicit content */}
-                <div>
-                  <label className={LABEL_CLS}>Contains explicit content</label>
-                  <small className="flex pb-2 text-[12px] text-white/55">
-                    Please check this if your track contains explicit content. The badge will be displayed next to your track title.
-                  </small>
-                  <label className="flex items-center gap-2">
-                    <PrettyCheckbox checked={explicitContent} onChange={setExplicitContent} />
-                    <span className="text-[12px] text-white-smoke">Explicit content</span>
-                    <BsExplicitFill className="logo-dark" />
-                    <BsExplicitFill className="invert logo-light" />
-                  </label>
-                </div>
-
-                {/* P line */}
-                <div>
-                  <label className={LABEL_CLS}>P line</label>
-                  <small className="text-[12px] flex pb-2 text-white/55">
-                    P line notice identify the owner of the rights in the original sound recording (the masters) at the time the CD/carrier/file is manufactured.
-                  </small>
-                  <input
-                    type="text"
-                    value={pline}
-                    onChange={(e) => setPline(e.target.value)}
-                    placeholder=""
-                    className={ADV_FIELD_CLS}
-                  />
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </>
-    );
-  }
-
-  function renderPermissionsSection() {
-    return (
-      <>
-        <button
-          onClick={() => toggleSection("permissions")}
-          className="flex w-full items-center justify-between py-4 text-left border-b border-[#222] cursor-pointer"
-        >
-          <div className="flex items-start gap-3">
-            <span className="mt-1 pb-2 flex h-5 w-5 shrink-0 items-center justify-center text-white-smoke">
-              <IoToggleOutline className="mt-0.5 text-[22px]" />
-            </span>
-            <div>
-              <p className="text-[17px] font-semibold text-white-smoke">Permissions</p>
-              <p className="text-[15px] text-white-smoke mt-0.5">
-                Control the visibility of engagements on your track, direct downloads, and more.
-              </p>
-            </div>
-          </div>
-          {expandedSections.permissions
-            ? <UpOutlined className="text-[11px] text-white-smoke" />
-            : <DownOutlined className="text-[11px] text-white-smoke" />}
-        </button>
-
-        <AnimatePresence initial={false}>
-          {expandedSections.permissions && (
-            <motion.div key="permissions" {...COLLAPSIBLE_MOTION_PROPS}>
-              <div className="space-y-4 py-4 pl-14 pr-2">
-
-                {/* Access settings */}
-                <div className="space-y-4 pb-4 border-b border-[#1e1e1e]">
-                  <p className="text-[16px] font-bold text-white-smoke uppercase tracking-wide">Access settings</p>
-                  {[
-                    { label: "Enable direct downloads", desc: "Allow listeners to download the original audio file.",                                              val: enableDownloads,  set: setEnableDownloads  },
-                    { label: "Offline listening",        desc: "Allows this track to be played on devices without an internet connection.",                        val: offlineListening,  set: setOfflineListening  },
-                    { label: "Include in RSS feed",      desc: 'Choose whether you want this track to show up in the "Feed" tab.',                                 val: includeRssFeed,   set: setIncludeRssFeed   },
-                    { label: "Display embed code",       desc: "Choose whether you want this track's embedded player code to be displayed publicly.",              val: displayEmbedCode,  set: setDisplayEmbedCode  },
-                    { label: "Enable app playback",      desc: "Choose whether you want this track to be playable outside the app.",                              val: enableAppPlayback, set: setEnableAppPlayback },
-                  ].map(({ label, desc, val, set }) => (
-                    <div key={label} className="flex items-center justify-between gap-4 border-b border-[#2a2a2a] pb-4 last:border-b-0 last:pb-0">
-                      <div>
-                        <p className="text-[15px] font-semibold text-white-smoke">{label}</p>
-                        <p className="text-[13px] text-white/55">{desc}</p>
-                      </div>
-                      <Switch checked={val} onChange={set} className={SWITCH_CLS} />
-                    </div>
-                  ))}
-                </div>
-
-                {/* Engagement privacy */}
-                <div className="space-y-4 pb-4 border-b border-[#1e1e1e]">
-                  <p className="text-[16px] font-bold text-white-smoke uppercase tracking-wide">Engagement privacy</p>
-                  {[
-                    { label: "Allow people to comment on your track", val: allowComments,     set: setAllowComments     },
-                    { label: "Show track comments to public",          val: showTrackComments, set: setShowTrackComments  },
-                    { label: "Show track insights to public",          val: showTrackInsights, set: setShowTrackInsights  },
-                  ].map(({ label, val, set }) =>
-                    isArtistPro ? (
-                      <div key={label} className="flex items-center justify-between gap-4 border-b border-[#2a2a2a] pb-4 last:border-b-0 last:pb-0">
-                        <p className="text-[15px] font-semibold text-white-smoke">{label}</p>
-                        <div className="flex items-center gap-2">
-                          <RiLockFill className="text-[20px] text-white-smoke" />
-                          <Switch checked={val} onChange={set} disabled={!isArtistPro} className={SWITCH_CLS} />
-                        </div>
-                      </div>
-                    ) : (
-                      <div key={label} className="flex items-center justify-between gap-4 border-b border-[#2a2a2a] pb-4 opacity-70 last:border-b-0 last:pb-0">
-                        <p className="text-[15px] font-semibold text-white-smoke">{label}</p>
-                        <div className="flex items-center gap-2">
-                          <RiLockFill className="text-[20px] text-white-smoke" />
-                          <ProLockTooltip text={TOOLTIP_TEXT.proSwitch} referenceClassName="inline-flex h-fit w-fit" placement="bottom-end">
-                            <span className="inline-flex">
-                              <Switch checked={val} onChange={set} disabled={!isArtistPro} className={SWITCH_CLS} />
-                            </span>
-                          </ProLockTooltip>
-                        </div>
-                      </div>
-                    )
-                  )}
-                </div>
-
-                {/* Geoblocking */}
-                {isArtistPro ? (
-                  <div>
-                    <div className="ml-14">
-                      <div className="flex items-center gap-1.5 mb-1">
-                        <RiLockFill className="mb-1 text-[20px] text-white-smoke" />
-                        <p className="flex items-center gap-1 text-[17px] font-bold text-white-smoke tracking-wide">Geoblocking</p>
-                      </div>
-                      <p className="mb-3 text-[14px] text-white-smoke">Customize what countries your track will be available in.</p>
-                    </div>
-                    <div role="radiogroup" className="space-y-2">
-                      {["worldwide", "exclusive", "blocked"].map((opt) => (
-                        <label key={opt} className="flex cursor-pointer items-center gap-2">
-                          <PrettyRadio
-                            checked={geoblockingOption === opt}
-                            onSelect={() => { if (!isArtistPro) return; setGeoblockingOption(opt); }}
-                          />
-                          <span className="text-[15px] text-white-smoke">
-                            {opt === "worldwide" ? "Worldwide" : opt === "exclusive" ? "Exclusive regions" : "Blocked regions"}
-                          </span>
-                        </label>
-                      ))}
-                    </div>
-                  </div>
-                ) : (
-                  <ProLockTooltip text={TOOLTIP_TEXT.proGeoblocking}>
-                    <div className="opacity-55">
-                      <div className="ml-14">
-                        <div className="flex items-center gap-1.5 mb-1">
-                          <RiLockFill className="mb-1 text-[20px] text-white-smoke" />
-                          <p className="flex items-center gap-1 text-[17px] font-bold text-white-smoke tracking-wide">Geoblocking</p>
-                        </div>
-                        <p className="mb-3 text-[14px] text-white-smoke">Customize what countries your track will be available in.</p>
-                      </div>
-                      <div role="radiogroup" className="space-y-2">
-                        {["worldwide", "exclusive", "blocked"].map((opt) => (
-                          <label key={opt} className="flex cursor-not-allowed items-center gap-2 opacity-60">
-                            <PrettyRadio
-                              checked={geoblockingOption === opt}
-                              onSelect={() => { if (!isArtistPro) return; setGeoblockingOption(opt); }}
-                            />
-                            <span className="text-[15px] text-white-smoke">
-                              {opt === "worldwide" ? "Worldwide" : opt === "exclusive" ? "Exclusive regions" : "Blocked regions"}
-                            </span>
-                          </label>
-                        ))}
-                      </div>
-                    </div>
-                  </ProLockTooltip>
-                )}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </>
-    );
-  }
-
-  function renderAudioClipSection() {
-    return (
-      <>
-        <button
-          onClick={() => toggleSection("audioClip")}
-          className="flex w-full items-center justify-between py-4 text-left border-b border-[#222] cursor-pointer"
-        >
-          <div className="flex items-start gap-3">
-            <span className="mt-1 pb-2 flex h-5 w-5 shrink-0 items-center justify-center text-white-smoke">
-              <RxSpeakerLoud className="mt-1 text-[20px]" />
-            </span>
-            <div>
-              <p className="text-[17px] font-semibold text-white-smoke">Audio clip</p>
-              <p className="text-[14px] text-white-smoke mt-0.5">
-                Pick the 20 second clip you&apos;d like to use as your track preview. This will live on your feed and socials.
-              </p>
-            </div>
-          </div>
-          {expandedSections.audioClip
-            ? <UpOutlined className="text-[13px] text-white-smoke" />
-            : <DownOutlined className="text-[13px] text-white-smoke" />}
-        </button>
-
-        <AnimatePresence initial={false}>
-          {expandedSections.audioClip && (
-            <motion.div key="audio-clip" {...COLLAPSIBLE_MOTION_PROPS}>
-              <div className="py-4">
-                <div className="relative overflow-hidden bg-chinese-black">
-                  <div className="relative h-28 px-1.5 pt-3 sm:h-30 sm:px-2 sm:pt-6">
-
-                    {/* Background waveform */}
-                    <div className="pointer-events-none absolute inset-0 opacity-85">
-                      <div className="flex h-full w-full items-center gap-px px-1">{baseWaveformBars}</div>
-                    </div>
-                    <div className="pointer-events-none absolute bottom-0 left-1 right-1 top-1/2 bg-chinese-black/38" />
-                    <div className="pointer-events-none absolute left-1 right-1 top-1/2 z-10 h-0.5 -translate-y-1/2 bg-chinese-black/80 shadow-[0_0_6px_rgba(0,0,0,0.35)]" />
-
-                    {!canSetAudioPreview ? (
-                      <div className="absolute inset-0 flex items-center justify-center bg-chinese-black/55">
-                        <p className="px-4 text-center text-[14px] font-semibold leading-tight text-white/85 sm:text-[22px]">
-                          Can&apos;t set audio preview, because this track is shorter than preview time.
-                        </p>
-                      </div>
-                    ) : (
-                      <>
-                        {/* Left shade */}
-                        <div
-                          ref={clipLeftShadeRef}
-                          className="pointer-events-none absolute inset-y-0 left-1 overflow-hidden"
-                          style={{ width: `${clipLeftPercent}%` }}
-                        >
-                          <div ref={clipLeftShadeWaveRef} className="flex h-full items-center gap-px px-1">
-                            {leftMaskedWaveformBars}
-                          </div>
-                        </div>
-
-                        {/* Right shade */}
-                        <div
-                          ref={clipRightShadeRef}
-                          className="pointer-events-none absolute inset-y-0 right-0"
-                          style={{ width: `${rightShadePercent}%` }}
-                        />
-
-                        {/* Drag track */}
-                        <div ref={clipTrackRef} className="absolute inset-y-0 left-1 right-1">
-                          <div
-                            ref={clipSelectionRef}
-                            className={`absolute inset-y-0 z-30 cursor-grab overflow-hidden rounded-sm border border-white bg-transparent isolate will-change-transform ${isDraggingClip ? "cursor-grabbing" : ""}`}
-                            style={{ left: `${clipLeftPercent}%`, width: `${clipWidthPercent}%`, touchAction: "none", transform: "translate3d(0px, 0, 0)" }}
-                            onPointerDown={handleClipDragStart}
-                          >
-                            <div
-                              className="pointer-events-none absolute inset-px z-0 rounded-sm"
-                              style={{ backgroundColor: isClipWindowAtZeroStart ? "var(--waveform-window-fill-zero)" : "var(--waveform-window-fill)" }}
-                            />
-                            <div className="pointer-events-none absolute inset-px z-5 overflow-hidden rounded-sm">
-                              <div className="flex h-full w-full items-center gap-px px-1">{baseWaveformBars}</div>
-                            </div>
-                            <div
-                              className="pointer-events-none absolute bottom-px left-px top-px z-10 overflow-hidden rounded-l-sm"
-                              style={{ backgroundColor: "var(--waveform-playback-mask)", width: `${clipPlaybackOverlayPercent}%` }}
-                            >
-                              <div className="h-full w-full" />
-                            </div>
-                            <button
-                              type="button"
-                              onClick={(e) => { e.stopPropagation(); void handleClipPlayPause(); }}
-                              data-clip-control="true"
-                              className="absolute left-1/2 top-1/2 z-20 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white-smoke text-chinese-black shadow-lg cursor-pointer"
-                              aria-label={isClipPlaying ? "Pause clip preview" : "Play clip preview"}
-                            >
-                              {isClipPlaying ? <FaPause className="text-[16px] sm:text-[20px]" /> : <FaPlay className="text-[16px] sm:text-[20px]" />}
-                            </button>
-                            <div className="pointer-events-none absolute bottom-0 left-0 right-0 z-20 h-2 bg-white-smoke sm:h-3" />
-                            <div className="pointer-events-none absolute inset-0 z-30 rounded-sm border border-white-smoke" />
-                          </div>
-                        </div>
-                      </>
-                    )}
-                  </div>
-
-                  {/* Clip time controls */}
-                  <div className="flex items-end justify-between border-t border-[#2a2a2a] px-2 pb-2 pt-2 sm:px-4 sm:pb-3">
-                    <div className="flex min-w-14 flex-col gap-1 sm:min-w-16 sm:gap-1.5">
-                      <input
-                        value={isDraggingClip ? formatTimeLabel(clipDragDisplayRange?.start ?? safeClipStart) : audioClipStartDraft}
-                        onChange={(e) => setAudioClipStartDraft(e.target.value)}
-                        onBlur={() => void applyTypedClipTime("start")}
-                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void applyTypedClipTime("start"); } }}
-                        className="w-14 bg-transparent text-[16px] font-semibold leading-none text-white-smoke outline-none sm:w-18 sm:text-[22px]"
-                        aria-label="Audio clip start time"
-                      />
-                      <span className="h-px w-10 bg-[#4a4a4a] sm:w-12" />
-                    </div>
-
-                    <div className="flex flex-col items-center justify-end gap-1 sm:gap-1.5">
-                      {showClipResetButton ? (
-                        <button
-                          type="button"
-                          onClick={handleClipReset}
-                          className="rounded border border-white-smoke/30 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white-smoke hover:border-white-smoke hover:bg-white-smoke/10 cursor-pointer"
-                        >
-                          Reset
-                        </button>
-                      ) : (
-                        <div className="h-5.75" />
-                      )}
-                    </div>
-
-                    <div className="flex min-w-14 flex-col items-end gap-1 sm:min-w-16 sm:gap-1.5">
-                      <input
-                        value={isDraggingClip ? formatTimeLabel(clipDragDisplayRange?.end ?? safeClipEnd) : audioClipEndDraft}
-                        onChange={(e) => setAudioClipEndDraft(e.target.value)}
-                        onBlur={() => void applyTypedClipTime("end")}
-                        onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void applyTypedClipTime("end"); } }}
-                        className="w-14 bg-transparent text-right text-[16px] font-semibold leading-none text-white-smoke outline-none sm:w-18 sm:text-[22px]"
-                        aria-label="Audio clip end time"
-                      />
-                      <span className="h-px w-10 bg-[#4a4a4a] sm:w-12" />
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </>
-    );
-  }
-
-  function renderLicensingSection() {
-    return (
-      <>
-        <button
-          onClick={() => toggleSection("licensing")}
-          className="flex w-full items-center justify-between py-4 text-left border-b border-[#222] cursor-pointer"
-        >
-          <div className="flex items-start gap-3">
-            <span className="mt-1 pb-2 flex h-5 w-5 shrink-0 items-center justify-center text-white-smoke">
-              <BsCcCircle className="mt-1 text-[20px]" />
-            </span>
-            <div>
-              <p className="text-[17px] font-semibold text-white-smoke">Licensing</p>
-              <p className="text-[14px] text-white-smoke mt-0.5">Enable Creative Commons licenses options.</p>
-            </div>
-          </div>
-          {expandedSections.licensing
-            ? <UpOutlined className="text-[11px] text-white-smoke" />
-            : <DownOutlined className="text-[11px] text-white-smoke" />}
-        </button>
-
-        <AnimatePresence initial={false}>
-          {expandedSections.licensing && (
-            <motion.div key="licensing" {...COLLAPSIBLE_MOTION_PROPS}>
-              <div className="py-4 space-y-4 pl-14 pr-2">
-                {[
-                  {
-                    value: "all-rights",
-                    title: "All rights reserved",
-                    desc:  "By choosing All Rights Reserved, you ask that other creators not use your material. Copyright is automatically granted to you when you begin creating your work.",
-                  },
-                  {
-                    value: "creative-commons",
-                    title: "Creative Commons",
-                    desc:  "With Creative Commons licenses, creators have the choice to give up certain exclusive rights normally associated with copyright, while retaining others.",
-                  },
-                ].map(({ value, title, desc }) => (
-                  <label key={value} className="flex cursor-pointer items-start gap-3">
-                    <PrettyRadio
-                      checked={licenseType === value}
-                      onSelect={() => setLicenseType(value as "all-rights" | "creative-commons")}
-                    />
-                    <div>
-                      <p className="text-[14px] font-semibold text-white-smoke">{title}</p>
-                      <p className="mt-0.5 text-[13px] text-white-smoke">{desc}</p>
-                    </div>
-                  </label>
-                ))}
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
-      </>
-    );
-  }
-
-  function renderFooter() {
-    return (
-      <div className="fixed z-100 bottom-0 left-0 right-0 border-t border-silver/25 bg-chinese-black/90 px-4 py-4 sm:px-6 sm:py-5">
-        <div className="relative mx-auto flex w-full flex-col gap-3 sm:flex-row sm:items-center sm:justify-end">
-          <p className="text-center text-[11px] text-white-smoke sm:pointer-events-none sm:absolute sm:left-1/2 sm:-translate-x-1/2">
-            By uploading, you confirm that your sounds comply with our{" "}
-            <button className="pointer-events-auto text-white-smoke underline cursor-pointer">Terms of Use</button>{" "}
-            and you don&apos;t infringe anyone else&apos;s rights.
-          </p>
-          <button
-            onClick={handleSave}
-            disabled={isSubmitting}
-            className="w-full rounded-full bg-[#1db954] px-12 py-2 text-[13px] font-bold text-chines-black transition-colors hover:bg-[#1ed760] cursor-pointer disabled:cursor-not-allowed disabled:opacity-50 sm:w-auto"
-          >
-            {isSubmitting ? "Uploading..." : "Upload"}
-          </button>
-        </div>
-      </div>
-    );
-  }
-
-  // ── Render ────────────────────────────────────────────────────────────────
+  // Render
   return (
     <div className="min-h-screen bg-chinese-black text-white-smoke antialiased">
-      {renderHeader()}
-      {renderQuitModal()}
-      {renderProFeatureModal()}
+      <Header
+        replaceFileInputRef={replaceFileInputRef}
+        handleReplaceTrackChange={handleReplaceTrackChange}
+        isTrackDragActive={isTrackDragActive}
+        setIsTrackDragActive={setIsTrackDragActive}
+        handleTrackDrop={handleTrackDrop}
+        showUploadProgress={showUploadProgress}
+        currentFileName={currentFileName}
+        roundedUploadProgress={roundedUploadProgress}
+        uploadedFileUrl={uploadedFileUrl}
+        togglePlayPause={togglePlayPause}
+        isPlaying={isPlaying}
+        showReplaceTrack={showReplaceTrack}
+        handleReplaceTrack={handleReplaceTrack}
+        onGoHome={() => router.push("/home")}
+        onShowQuitModal={() => setShowQuitModal(true)}
+      />
+
+      <QuitModal
+        showQuitModal={showQuitModal}
+        onClose={() => setShowQuitModal(false)}
+        onQuit={() => router.push("/artists")}
+      />
+
+      <ProFeatureModal
+        showProFeatureModal={showProFeatureModal}
+        onClose={() => setShowProFeatureModal(false)}
+        onUpgrade={() => router.push("/artistpro")}
+      />
 
       <div className="mx-auto max-w-7xl px-4 py-8 pb-36 sm:px-5">
-        {/* Two-column layout: artwork | basic info */}
         <div className="grid grid-cols-1 gap-8 lg:grid-cols-12 lg:gap-10">
-          {renderArtworkPanel()}
-          {renderBasicInfoForm()}
+          <ArtworkPanel
+            artworkInputRef={artworkInputRef}
+            handleArtworkChange={handleArtworkChange}
+            artworkFrameRef={artworkFrameRef}
+            artworkUrl={artworkUrl}
+            isArtworkDragActive={isArtworkDragActive}
+            isPanningArtwork={isPanningArtwork}
+            artworkPosition={artworkPosition}
+            artworkZoom={artworkZoom}
+            handleArtworkPointerDown={handleArtworkPointerDown}
+            handleArtworkPointerMove={handleArtworkPointerMove}
+            handleArtworkPointerUp={handleArtworkPointerUp}
+            setIsArtworkDragActive={setIsArtworkDragActive}
+            handleArtworkDrop={handleArtworkDrop}
+            handleArtworkPick={handleArtworkPick}
+            handleDeleteArtwork={handleDeleteArtwork}
+            setArtworkZoom={setArtworkZoom}
+          />
+
+          <BasicInfoForm
+            submitError={submitError}
+            LABEL_CLS={LABEL_CLS}
+            FIELD_CLS={FIELD_CLS}
+            TOOLTIP_TEXT={TOOLTIP_TEXT}
+            InfoTooltip={InfoTooltip}
+            ProLockTooltip={ProLockTooltip}
+            SWITCH_CLS={SWITCH_CLS}
+            trackTitle={trackTitle}
+            setTrackTitle={setTrackTitle}
+            slug={slug}
+            artistName={artistName}
+            setArtistName={setArtistName}
+            genre={genre}
+            setGenre={setGenre}
+            genreMenuRef={genreMenuRef}
+            genreMenuOpen={genreMenuOpen}
+            setGenreMenuOpen={setGenreMenuOpen}
+            genreSearch={genreSearch}
+            setGenreSearch={setGenreSearch}
+            commitGenreSearch={commitGenreSearch}
+            shouldShowAddCustomGenre={shouldShowAddCustomGenre}
+            filteredMusicGenres={filteredMusicGenres}
+            filteredAudioGenres={filteredAudioGenres}
+            tags={tags}
+            setTags={setTags}
+            description={description}
+            setDescription={setDescription}
+            privacyMenuRef={privacyMenuRef}
+            privacyMenuOpen={privacyMenuOpen}
+            setPrivacyMenuOpen={setPrivacyMenuOpen}
+            visibilityOption={visibilityOption}
+            setVisibilityOption={setVisibilityOption}
+            isArtistPro={isArtistPro}
+            setShowProFeatureModal={setShowProFeatureModal}
+            scheduleRelease={scheduleRelease}
+            setScheduleRelease={setScheduleRelease}
+          />
         </div>
 
-        {/* Full-width collapsible sections */}
         <div className="mt-8 border-t border-[#222] bg-chinese-black/95">
-          {renderAdvancedDetailsSection()}
-          {renderPermissionsSection()}
-          {renderAudioClipSection()}
-          {renderLicensingSection()}
+          <AdvancedDetailsSection
+            expanded={expandedSections.advancedDetails}
+            onToggle={() => toggleSection("advancedDetails")}
+            COLLAPSIBLE_MOTION_PROPS={COLLAPSIBLE_MOTION_PROPS}
+            LABEL_CLS={LABEL_CLS}
+            ADV_FIELD_CLS={ADV_FIELD_CLS}
+            buyLink={buyLink}
+            setBuyLink={setBuyLink}
+            recordLabel={recordLabel}
+            setRecordLabel={setRecordLabel}
+            releaseCalendarRef={releaseCalendarRef}
+            releaseDate={releaseDate}
+            formatDisplayDate={formatDisplayDate}
+            openReleaseCalendar={openReleaseCalendar}
+            setReleaseCalendarOpen={setReleaseCalendarOpen}
+            releaseCalendarOpen={releaseCalendarOpen}
+            shiftReleaseCalendarMonth={shiftReleaseCalendarMonth}
+            calendarMonthStart={calendarMonthStart}
+            calendarDays={calendarDays}
+            selectedReleaseDate={selectedReleaseDate}
+            isSameDay={isSameDay}
+            handleSelectReleaseDate={handleSelectReleaseDate}
+            publisher={publisher}
+            setPublisher={setPublisher}
+            isrc={isrc}
+            setIsrc={setIsrc}
+            explicitContent={explicitContent}
+            setExplicitContent={setExplicitContent}
+            PrettyCheckbox={PrettyCheckbox}
+            pline={pline}
+            setPline={setPline}
+          />
+
+          <PermissionsSection
+            expanded={expandedSections.permissions}
+            onToggle={() => toggleSection("permissions")}
+            COLLAPSIBLE_MOTION_PROPS={COLLAPSIBLE_MOTION_PROPS}
+            SWITCH_CLS={SWITCH_CLS}
+            isArtistPro={isArtistPro}
+            enableDownloads={enableDownloads}
+            setEnableDownloads={setEnableDownloads}
+            offlineListening={offlineListening}
+            setOfflineListening={setOfflineListening}
+            includeRssFeed={includeRssFeed}
+            setIncludeRssFeed={setIncludeRssFeed}
+            displayEmbedCode={displayEmbedCode}
+            setDisplayEmbedCode={setDisplayEmbedCode}
+            enableAppPlayback={enableAppPlayback}
+            setEnableAppPlayback={setEnableAppPlayback}
+            allowComments={allowComments}
+            setAllowComments={setAllowComments}
+            showTrackComments={showTrackComments}
+            setShowTrackComments={setShowTrackComments}
+            showTrackInsights={showTrackInsights}
+            setShowTrackInsights={setShowTrackInsights}
+            geoblockingOption={geoblockingOption}
+            setGeoblockingOption={setGeoblockingOption}
+            PrettyRadio={PrettyRadio}
+            ProLockTooltip={ProLockTooltip}
+            TOOLTIP_TEXT={TOOLTIP_TEXT}
+          />
+
+          <AudioClipSection
+            expanded={expandedSections.audioClip}
+            onToggle={() => toggleSection("audioClip")}
+            COLLAPSIBLE_MOTION_PROPS={COLLAPSIBLE_MOTION_PROPS}
+            baseWaveformBars={baseWaveformBars}
+            leftMaskedWaveformBars={leftMaskedWaveformBars}
+            canSetAudioPreview={canSetAudioPreview}
+            clipLeftPercent={clipLeftPercent}
+            rightShadePercent={rightShadePercent}
+            clipTrackRef={clipTrackRef}
+            clipSelectionRef={clipSelectionRef}
+            clipLeftShadeRef={clipLeftShadeRef}
+            clipLeftShadeWaveRef={clipLeftShadeWaveRef}
+            clipRightShadeRef={clipRightShadeRef}
+            isDraggingClip={isDraggingClip}
+            clipWidthPercent={clipWidthPercent}
+            handleClipDragStart={handleClipDragStart}
+            isClipWindowAtZeroStart={isClipWindowAtZeroStart}
+            clipPlaybackOverlayPercent={clipPlaybackOverlayPercent}
+            handleClipPlayPause={handleClipPlayPause}
+            isClipPlaying={isClipPlaying}
+            showClipResetButton={showClipResetButton}
+            handleClipReset={handleClipReset}
+            formatTimeLabel={formatTimeLabel}
+            clipDragDisplayRange={clipDragDisplayRange}
+            safeClipStart={safeClipStart}
+            safeClipEnd={safeClipEnd}
+            audioClipStartDraft={audioClipStartDraft}
+            setAudioClipStartDraft={setAudioClipStartDraft}
+            applyTypedClipTime={applyTypedClipTime}
+            audioClipEndDraft={audioClipEndDraft}
+            setAudioClipEndDraft={setAudioClipEndDraft}
+          />
+
+          <LicensingSection
+            expanded={expandedSections.licensing}
+            onToggle={() => toggleSection("licensing")}
+            COLLAPSIBLE_MOTION_PROPS={COLLAPSIBLE_MOTION_PROPS}
+            licenseType={licenseType}
+            setLicenseType={setLicenseType}
+            PrettyRadio={PrettyRadio}
+          />
         </div>
       </div>
 
-      {renderFooter()}
+      <Footer isSubmitting={isSubmitting} handleSave={handleSave} />
 
       {/* Audio elements */}
       {uploadedFileUrl && (

@@ -17,6 +17,10 @@ export interface CreateTrackPermissions {
   includeInRssFeed?: boolean;
   displayedEmbedCode?: boolean;
   enableAppPlayback?: boolean;
+  allowComments?: boolean;
+  showTrackComments?: boolean;
+  showTrackInsights?: boolean;
+  geoblocking?: string;
 }
 
 export interface CreateTrackLicense {
@@ -77,6 +81,7 @@ export interface GetTracksResponse {
         tags: string[];
         description: string;
         isPrivate: boolean;
+        caption?: string;
       };
       audio: {
         audioLink: string;
@@ -154,6 +159,7 @@ export interface Track {
     tags?: string[];
     description?: string;
     isPrivate: boolean;
+    caption?: string;
   };
 
   audio: {
@@ -164,6 +170,41 @@ export interface Track {
   image: {
     imgLink: string;
     publicId: string;
+  };
+
+  permissions?: {
+    enableDirectDownload?: boolean;
+    offlineListening?: boolean;
+    includeInRssFeed?: boolean;
+    displayedEmbedCode?: boolean;
+    enableAppPlayback?: boolean;
+    allowComments?: boolean;
+    showTrackComments?: boolean;
+    showTrackInsights?: boolean;
+    geoblocking?: string;
+  };
+
+  license?: {
+    type?: "allRightsReserved" | "creativeCommons";
+    attribution?: boolean;
+    nonCommercial?: boolean;
+    noDerivativeWorks?: boolean;
+    shareAlike?: boolean;
+  };
+
+  advanced?: {
+    buyLink?: string;
+    recordLabel?: string;
+    releaseDate?: string;
+    publisher?: string;
+    ISRC?: string;
+    explicitContent?: boolean;
+    pLine?: string;
+    audioClipStart?: number;
+    audioClipEnd?: number;
+    composer?: string;
+    ISWC?: string;
+    albumTitle?: string;
   };
 
   numLikes: number;
