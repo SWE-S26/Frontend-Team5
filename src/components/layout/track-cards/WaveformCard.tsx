@@ -13,7 +13,9 @@ import { motion, AnimatePresence, Transition } from "framer-motion";
 
 import { useAppSelector } from "@/store/hooks";
 import { useAudioProgress } from "@/hooks/useAudioProgress";
+
 import { useStatelessComments } from "@/hooks/useComments";
+import { useLikeTrackOptimistic } from "@/hooks/useLikes";
 
 import { UserOutlined } from "@ant-design/icons";
 import { IoIosMore, IoMdPlay, IoMdPause } from "react-icons/io";
@@ -32,9 +34,10 @@ type CardProps = {
   img?: string;
   title?: string;
   artist?: string;
-  trackId?: string;
+  trackId: string;
   trackUrl?: string;
   duration?: number;
+  initialLikes?: number;
   allTracks?: Track[];
 };
 
@@ -47,9 +50,9 @@ export default function WaveformCard({
   trackId,
   trackUrl,
   duration,
+  initialLikes,
   allTracks,
 }: CardProps) {
-  const [isLiked, setIsLiked] = useState(false);
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
   const [canComment, setCanComment] = useState(false);
@@ -62,6 +65,11 @@ export default function WaveformCard({
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
+
+  const { likeTrack, liked, numOfLikes, loading } = useLikeTrackOptimistic(
+    trackId,
+    initialLikes,
+  );
   const { progress, currentTime, seekToPercentage } = useAudioProgress();
 
   const dispatch = useDispatch();
@@ -70,9 +78,6 @@ export default function WaveformCard({
   );
   const isThisCardPlaying = currentTrackId === trackId && isPlaying;
 
-  // Open comment box when this song starts playing, in addition to all
-  // other conditions (waveform click, avatar hover) that already call
-  // handleOpenCommentBox directly.
   useEffect(() => {
     if (isThisCardPlaying) setShowCommentBox(true);
   }, [isThisCardPlaying]);
@@ -266,11 +271,21 @@ export default function WaveformCard({
           <div className="flex items-center">
             <Tooltip label="Like">
               <Button
-                onClick={() => setIsLiked(!isLiked)}
+                onClick={likeTrack}
                 className="bg-off-black mr-4"
-                icon={<HiHeart className="text-[16px]" />}
+                icon={
+                  <HiHeart
+                    className={`text-[16px] transition-colors ${liked ? "text-inferno" : ""}`}
+                  />
+                }
               >
-                177
+                <span
+                  className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${liked ? "text-inferno" : ""} ${
+                    loading ? "opacity-50" : "opacity-100"
+                  }`}
+                >
+                  {numOfLikes}
+                </span>
               </Button>
             </Tooltip>
             <Tooltip label="Repost">
