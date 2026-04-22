@@ -16,6 +16,7 @@ import { useAudioProgress } from "@/hooks/useAudioProgress";
 
 import { useStatelessComments } from "@/hooks/useComments";
 import { useLikeTrackOptimistic } from "@/hooks/useLikes";
+import { useRepostTrack } from "@/hooks/useReposts";
 
 import { UserOutlined } from "@ant-design/icons";
 import { IoIosMore, IoMdPlay, IoMdPause } from "react-icons/io";
@@ -66,10 +67,20 @@ export default function WaveformCard({
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
 
-  const { likeTrack, liked, numOfLikes, loading } = useLikeTrackOptimistic(
-    trackId,
-    initialLikes,
-  );
+  const {
+    likeTrack,
+    liked,
+    numOfLikes,
+    loading: likeLoading,
+  } = useLikeTrackOptimistic(trackId);
+
+  const {
+    repostTrack,
+    reposted,
+    numOfReposts,
+    loading: repostLoading,
+  } = useRepostTrack(trackId);
+
   const { progress, currentTime, seekToPercentage } = useAudioProgress();
 
   const dispatch = useDispatch();
@@ -281,7 +292,7 @@ export default function WaveformCard({
               >
                 <span
                   className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${liked ? "text-inferno" : ""} ${
-                    loading ? "opacity-50" : "opacity-100"
+                    likeLoading ? "opacity-50" : "opacity-100"
                   }`}
                 >
                   {numOfLikes}
@@ -290,10 +301,21 @@ export default function WaveformCard({
             </Tooltip>
             <Tooltip label="Repost">
               <Button
+                onClick={() => repostTrack()}
                 className="bg-off-black mr-4"
-                icon={<LuRepeat2 className="text-[16px]" />}
+                icon={
+                  <LuRepeat2
+                    className={`text-[16px] transition-colors ${reposted ? "text-inferno" : ""}`}
+                  />
+                }
               >
-                177
+                <span
+                  className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${reposted ? "text-inferno" : ""} ${
+                    repostLoading ? "opacity-50" : "opacity-100"
+                  }`}
+                >
+                  {numOfReposts}
+                </span>
               </Button>
             </Tooltip>
             <Tooltip label="Share">
