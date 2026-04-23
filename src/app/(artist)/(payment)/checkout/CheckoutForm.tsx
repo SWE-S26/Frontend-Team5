@@ -1,22 +1,25 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useStripe, useElements, CardNumberElement, CardExpiryElement, CardCvcElement } from '@stripe/react-stripe-js'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
 import Image from 'next/image'
 
-import { useAppSelector } from '@/store/hooks'
-import { useLogout } from '@/hooks/useAuth'
+import { useAppSelector, useAppDispatch } from '@/store/hooks'
+import { useLogout, useRefreshToken } from '@/hooks/useAuth'
 import { usePaymentPlans, useCheckout } from '@/hooks/usePayment'
 import CB from '@/components/settings/CB'
 import { IoIosArrowDown } from 'react-icons/io'
 import { FaLock } from 'react-icons/fa'
 import FloatingInput from '@/components/payment/FloatingInput'
 import { COUNTRIES } from '@/components/payment/countries'
+import { useGetProfile } from '@/hooks/useProfile'
+import { setProfile, clearProfile } from '@/store/slices/profileSlice'
+
+// ── Constants ────────────────────────────────────────────────────
 
 const CURRENCY = '$'
-type BillingInterval = 'monthly' | 'yearly'
 
 const STRIPE_ELEMENT_STYLE = {
     style: {
@@ -29,55 +32,96 @@ const STRIPE_ELEMENT_STYLE = {
     },
 }
 
+type BillingInterval = 'monthly' | 'yearly'
+
+// ── Component ────────────────────────────────────────────────────
+
 export function CheckoutForm() {
-    const stripe = useStripe()
+const stripe = useStripe()
     const elements = useElements()
     const router = useRouter()
 
     const searchParams = useSearchParams()
     const intervalParam = searchParams.get('interval') as BillingInterval | null
 
-    const [showCoupon, setShowCoupon] = useState(false)
-    const [couponCode, setCouponCode] = useState('')
-    const [showBillingAddress, setShowBillingAddress] = useState(false)
-    const [selectedInterval, setSelectedInterval] = useState<BillingInterval>(intervalParam || 'yearly')
-    const [isDropdownOpen, setIsDropdownOpen] = useState(false)
-    const [stripeError, setStripeError] = useState<string | null>(null)
-
-    const [firstName, setFirstName] = useState('')
-    const [surname, setSurname] = useState('')
-
-    const [cardNumberError, setCardNumberError] = useState<string | null>(null)
-    const [cardExpiryError, setCardExpiryError] = useState<string | null>(null)
-    const [cardCvcError, setCardCvcError] = useState<string | null>(null)
-    const [cardNumberTouched, setCardNumberTouched] = useState(false)
-    const [cardExpiryTouched, setCardExpiryTouched] = useState(false)
-    const [cardCvcTouched, setCardCvcTouched] = useState(false)
-    const [cardBrand, setCardBrand] = useState<string | null>(null)
-
-    const isFormValid =
-        firstName.trim() !== '' &&
-        surname.trim() !== ''
-
+    // ── Auth state ───────────────────────────────────────────────
     const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
-    const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
-    const displayName = useAppSelector((state) => state.auth.displayName)
+    const profileImgLink  = useAppSelector((state) => state.auth.profileImgLink)
+    const displayName     = useAppSelector((state) => state.auth.displayName)
+    const userId          = useAppSelector((state) => state.auth.userId)
+    const hasHydrated     = useAppSelector((state) => state.auth.hasHydrated)
 
-    const { logout } = useLogout()
-    const { plans, loading: plansLoading } = usePaymentPlans()
+    // ── Profile state ────────────────────────────────────────────
+    const dispatch      = useAppDispatch()
+    const profileFirstName = useAppSelector((state) => state.profile.firstName)
+    const profileLastName  = useAppSelector((state) => state.profile.lastName)
+    const { getProfile } = useGetProfile()
+
+    useEffect(() => {
+        if (!hasHydrated || !userId) return
+
+        getProfile(userId).then((data) => {
+            if (!data) return
+            dispatch(setProfile({
+                userId:         data.userId,
+                displayName:    data.displayName,
+                firstName:      data.firstName,
+                lastName:       data.lastName,
+                profileImgLink: data.profileImgLink,
+                bannerImgLink:  data.bannerImgLink,
+                city:           data.city,
+                country:        data.country,
+                isOwnProfile:   true,
+            }))
+        })
+
+        return () => { dispatch(clearProfile()) }
+    }, [userId, hasHydrated])
+
+    // ── Hooks ────────────────────────────────────────────────────
+    const { logout }                                                   = useLogout()
+    const { refreshToken }                                             = useRefreshToken()
+    const { plans, loading: plansLoading }                             = usePaymentPlans()
     const { checkout, loading: checkoutLoading, error: checkoutError } = useCheckout()
 
+    // ── UI state ─────────────────────────────────────────────────
+    const [isDropdownOpen,    setIsDropdownOpen]    = useState(false)
+    const [selectedInterval,  setSelectedInterval]  = useState<BillingInterval>(intervalParam || 'yearly')
+    const [showCoupon,        setShowCoupon]        = useState(false)
+    const [couponCode,        setCouponCode]        = useState('')
+    const [showBillingAddress, setShowBillingAddress] = useState(false)
+
+    // ── Form state ───────────────────────────────────────────────
+    const [cardHolderFirstName, setCardHolderFirstName] = useState('')
+    const [cardHolderSurname,   setCardHolderSurname]   = useState('')
+    const [stripeError,         setStripeError]         = useState<string | null>(null)
+
+    // ── Stripe field error/touched state ─────────────────────────
+    const [cardNumberError,   setCardNumberError]   = useState<string | null>(null)
+    const [cardExpiryError,   setCardExpiryError]   = useState<string | null>(null)
+    const [cardCvcError,      setCardCvcError]      = useState<string | null>(null)
+    const [cardNumberTouched, setCardNumberTouched] = useState(false)
+    const [cardExpiryTouched, setCardExpiryTouched] = useState(false)
+    const [cardCvcTouched,    setCardCvcTouched]    = useState(false)
+    const [cardBrand,         setCardBrand]         = useState<string | null>(null)
+
+    // ── Derived values ───────────────────────────────────────────
+    const selectedPlan  = selectedInterval === 'yearly' ? plans?.pro_yearly : plans?.pro_monthly
+    const totalPrice    = selectedPlan?.amount ?? 0
+    const yearlyMonthly = plans ? (plans.pro_yearly.amount / 12).toFixed(2) : '...'
+    const savings       = plans
+        ? Math.round((plans.pro_monthly.amount * 12 - plans.pro_yearly.amount) / (plans.pro_monthly.amount * 12) * 100)
+        : 0
+    const headerName  = profileFirstName || profileLastName
+        ? `${profileFirstName || ''} ${profileLastName || ''}`.trim()
+        : displayName
+    const isFormValid = cardHolderFirstName.trim() !== '' && cardHolderSurname.trim() !== ''
+
+    // ── Handlers ─────────────────────────────────────────────────
     const handleSignOut = () => {
         setIsDropdownOpen(false)
         logout()
     }
-
-    const selectedPlan = selectedInterval === 'yearly' ? plans?.pro_yearly : plans?.pro_monthly
-    const totalPrice = selectedPlan?.amount ?? 0
-    const yearlyMonthly = plans ? (plans.pro_yearly.amount / 12).toFixed(2) : '...'
-    const savings = plans
-        ? Math.round((plans.pro_monthly.amount * 12 - plans.pro_yearly.amount) / (plans.pro_monthly.amount * 12) * 100)
-        : 0
 
     const handleBuySubscription = async () => {
         if (!stripe || !elements || !selectedPlan) return
@@ -104,10 +148,12 @@ export function CheckoutForm() {
 
         const success = await checkout(paymentMethod.id, selectedPlan.priceId)
         if (success) {
+            await refreshToken()
             router.push(`/success?plan=${selectedInterval}&price=${totalPrice}&currency=${CURRENCY}`)
         }
     }
 
+    // ── Render ───────────────────────────────────────────────────
     return (
         <div className="w-full min-h-screen bg-white">
 
@@ -135,7 +181,9 @@ export function CheckoutForm() {
                                             height={26}
                                             className="rounded-full w-6.5 h-6.5 object-cover mr-2"
                                         />
-                                        <h1 className="text-white-smoke font-bold text-[14px] mr-2 hover:opacity-80 transition-opacity">{displayName}</h1>
+                                        <h1 className="text-white-smoke font-bold text-[14px] mr-2 hover:opacity-80 transition-opacity truncate max-w-33">
+                                            {headerName}
+                                        </h1>
                                     </div>
                                     <IoIosArrowDown />
                                 </button>
@@ -144,7 +192,7 @@ export function CheckoutForm() {
                                     <div className="absolute top-full right-0 bg-[#101010] w-45 z-50">
                                         <button
                                             onClick={handleSignOut}
-                                            className="w-full px-4 py-2 text-left hover:bg-[#333333] text-sm"
+                                            className="w-full px-4 py-2 text-left hover:bg-[#333333] text-sm text-white-smoke"
                                         >
                                             Sign out
                                         </button>
@@ -157,22 +205,22 @@ export function CheckoutForm() {
             </div>
 
             {/* Content */}
-            <div className="flex justify-center px-6 pb-12 pt-25">
+            <div className="flex justify-center px-4 sm:px-6 pb-12 pt-20 sm:pt-25">
                 <div className="w-full max-w-237">
 
-                    <h1 className="text-3xl font-bold text-black mb-10">Get Artist Pro</h1>
+                    <h1 className="text-2xl sm:text-3xl font-bold text-black mb-8 sm:mb-10">Get Artist Pro</h1>
 
-                    <div className="flex gap-12 justify-center">
+                    <div className="flex flex-col lg:flex-row gap-8 lg:gap-12 justify-center">
 
                         {/* Left Column */}
-                        <div className="w-md space-y-10">
+                        <div className="w-full lg:w-md space-y-8 sm:space-y-10">
 
                             {/* 1. Billing Cycle */}
                             <div>
-                                <h2 className="text-xl font-bold text-black mb-6">1. Billing cycle</h2>
+                                <h2 className="text-lg sm:text-xl font-bold text-black mb-4 sm:mb-6">1. Billing cycle</h2>
                                 <div className="space-y-3">
 
-                                    {/* Yearly option */}
+                                    {/* Yearly */}
                                     <button
                                         onClick={() => setSelectedInterval('yearly')}
                                         className={`w-full flex items-center justify-between p-4 border-2 rounded-lg text-left transition-all ${
@@ -180,7 +228,7 @@ export function CheckoutForm() {
                                         }`}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
                                                 selectedInterval === 'yearly' ? 'border-orange-500' : 'border-[#666666]'
                                             }`}>
                                                 {selectedInterval === 'yearly' && (
@@ -188,18 +236,18 @@ export function CheckoutForm() {
                                                 )}
                                             </div>
                                             <div>
-                                                <p className="font-semibold text-black">Yearly billing</p>
-                                                <p className="text-sm text-gray-500">
+                                                <p className="font-semibold text-black text-sm sm:text-base">Yearly billing</p>
+                                                <p className="text-xs sm:text-sm text-gray-500">
                                                     {plansLoading ? '...' : `${CURRENCY} ${plans?.pro_yearly.amount.toFixed(2)}, that's ${CURRENCY} ${yearlyMonthly}/month`}
                                                 </p>
                                             </div>
                                         </div>
-                                        <span className={`text-white text-[10px] font-bold px-1 py-px rounded-[3px] ${selectedInterval === 'yearly' ? 'bg-red-600' : 'bg-[#666666]'}`}>
+                                        <span className={`text-white text-[10px] font-bold px-1 py-px rounded-[3px] shrink-0 ml-2 ${selectedInterval === 'yearly' ? 'bg-red-600' : 'bg-[#666666]'}`}>
                                             {savings}% YEARLY DISCOUNT
                                         </span>
                                     </button>
 
-                                    {/* Monthly option */}
+                                    {/* Monthly */}
                                     <button
                                         onClick={() => setSelectedInterval('monthly')}
                                         className={`w-full flex items-center justify-between p-4 border-2 rounded-lg text-left transition-all ${
@@ -207,7 +255,7 @@ export function CheckoutForm() {
                                         }`}
                                     >
                                         <div className="flex items-center gap-3">
-                                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center ${
+                                            <div className={`w-5 h-5 rounded-full border-2 flex items-center justify-center shrink-0 ${
                                                 selectedInterval === 'monthly' ? 'border-orange-500' : 'border-[#666666]'
                                             }`}>
                                                 {selectedInterval === 'monthly' && (
@@ -215,8 +263,8 @@ export function CheckoutForm() {
                                                 )}
                                             </div>
                                             <div>
-                                                <p className="font-semibold text-black">Monthly billing</p>
-                                                <p className="text-sm text-gray-500">
+                                                <p className="font-semibold text-black text-sm sm:text-base">Monthly billing</p>
+                                                <p className="text-xs sm:text-sm text-gray-500">
                                                     {plansLoading ? '...' : `${CURRENCY} ${plans?.pro_monthly.amount}/month`}
                                                 </p>
                                             </div>
@@ -227,23 +275,23 @@ export function CheckoutForm() {
 
                             {/* 2. Payment Details */}
                             <div>
-                                <div className="flex items-center gap-2 mb-6">
-                                    <h2 className="text-xl font-bold text-black">2. Payment details</h2>
+                                <div className="flex items-center gap-2 mb-4 sm:mb-6">
+                                    <h2 className="text-lg sm:text-xl font-bold text-black">2. Payment details</h2>
                                     <FaLock className="text-gray-400 text-sm" />
                                 </div>
 
                                 <div className="space-y-3">
                                     <FloatingInput
                                         placeholder="First name"
-                                        value={firstName}
-                                        onChange={(e) => setFirstName(e.target.value)}
+                                        value={cardHolderFirstName}
+                                        onChange={(e) => setCardHolderFirstName(e.target.value)}
                                         required
                                         errorMessage="Enter a first name"
                                     />
                                     <FloatingInput
                                         placeholder="Surname"
-                                        value={surname}
-                                        onChange={(e) => setSurname(e.target.value)}
+                                        value={cardHolderSurname}
+                                        onChange={(e) => setCardHolderSurname(e.target.value)}
                                         required
                                         errorMessage="Enter a surname"
                                     />
@@ -258,11 +306,7 @@ export function CheckoutForm() {
                                                     Card number
                                                 </p>
                                                 {cardBrand && cardBrand !== 'unknown' && (
-                                                    <img
-                                                        src={`/payment/${cardBrand}.svg`}
-                                                        alt={cardBrand}
-                                                        className="h-5"
-                                                    />
+                                                    <img src={`/payment/${cardBrand}.svg`} alt={cardBrand} className="h-5" />
                                                 )}
                                             </div>
                                             <CardNumberElement
@@ -322,6 +366,7 @@ export function CheckoutForm() {
                                         </div>
                                     </div>
 
+                                    {/* Billing Country */}
                                     <div className="relative">
                                         <select className="w-full bg-gray-100 rounded-lg px-4 pt-5 pb-2 text-sm text-gray-700 outline-none appearance-none">
                                             {COUNTRIES.map((country) => (
@@ -334,7 +379,7 @@ export function CheckoutForm() {
 
                                     <FloatingInput placeholder="Postcode (optional)" />
 
-                                    {/* Billing address checkbox */}
+                                    {/* Billing address */}
                                     <div className="flex items-center gap-2 pt-1">
                                         <CB
                                             checked={showBillingAddress}
@@ -358,12 +403,12 @@ export function CheckoutForm() {
                         </div>
 
                         {/* Right Column - Review Purchase */}
-                        <div className="w-md">
-                            <h2 className="text-xl font-bold text-black mb-6">3. Review your purchase</h2>
+                        <div className="w-full lg:w-md">
+                            <h2 className="text-lg sm:text-xl font-bold text-black mb-4 sm:mb-6">3. Review your purchase</h2>
 
                             <div className="flex items-center gap-3 mb-4">
-                                <img src="/app-logo/blacklogo.png" alt="BeatZa" className="w-20 h-15" />
-                                <span className="text-lg font-bold text-black">Artist Pro</span>
+                                <img src="/app-logo/blacklogo.png" alt="BeatZa" className="w-16 h-12 sm:w-20 sm:h-15" />
+                                <span className="text-base sm:text-lg font-bold text-black">Artist Pro</span>
                             </div>
 
                             <button
@@ -387,7 +432,8 @@ export function CheckoutForm() {
                                 </div>
                             )}
 
-                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-6 mb-6">
+                            {/* Order summary */}
+                            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-6 mb-6">
                                 <div className="flex justify-between items-center mb-4">
                                     <span className="font-bold text-black">Total</span>
                                     <span className="font-bold text-black text-lg">
@@ -435,7 +481,7 @@ export function CheckoutForm() {
             </div>
 
             {/* Footer */}
-            <div className="pb-10 bg-white w-full max-w-291 flex flex-col mx-auto">
+            <div className="pb-10 bg-white w-full max-w-291 flex flex-col mx-auto px-4 sm:px-0">
                 {isAuthenticated && (
                     <p className="text-xs text-gray-600 mb-1">
                         Signed in as {displayName}.
