@@ -48,7 +48,7 @@ export function AvailablePlans({
 
                     <div className="flex items-baseline gap-1 mb-1">
                         <span className="text-3xl font-bold text-[#545AEC]">{currency} {monthlyPrice}</span>
-                        <p className="text-gray-500 text-sm mb-6">/ month, billed yearly for EGP {(monthlyPrice * 12).toFixed(2)}</p>
+                        <p className="text-gray-500 text-sm mb-6">/ month, billed yearly for {currency} {(monthlyPrice * 12).toFixed(2)}</p>
                     </div>
 
                     <hr className="border-gray-200 mb-6" />
@@ -91,13 +91,13 @@ export function AvailablePlans({
 
                     <div className="flex items-baseline gap-1 mb-1">
                         <span className="text-3xl font-bold text-[#c79910]">{currency} {(yearlyPrice / 12).toFixed(2)}</span>
-                        <p className="text-gray-500 text-sm mb-6">/ month, billed yearly for EGP {yearlyPrice}</p>
+                        <p className="text-gray-500 text-sm mb-6">/ month, billed yearly for {currency} {yearlyPrice}</p>
                     </div>
 
                     <hr className="border-orange-200 mb-6" />
 
                     <ul className="space-y-2 mb-8">
-                        {['Best value', '2 months free'].map((item) => (
+                        {['Best value', `Save ${savings}%`].map((item) => (
                             <li key={item} className="flex items-center gap-2 text-sm text-gray-700">
                                 <span className="text-[#c79910]">✓</span>
                                 {item}
