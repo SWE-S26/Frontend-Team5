@@ -331,9 +331,7 @@ export function PrettyCheckbox({
       role="checkbox"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
-      className={`mt-0.5 flex h-4.5 w-4.5 items-center justify-center rounded border transition-colors cursor-pointer ${
-        checked ? "border-white-smoke bg-white-smoke" : "border-[#7a7a7a] bg-transparent"
-      }`}
+      className={`mt-0.5 flex h-4.5 w-4.5 items-center justify-center rounded border transition-colors cursor-pointer ${checked ? "border-white-smoke bg-white-smoke" : "border-[#7a7a7a] bg-transparent"}`}
     >
       {checked && <Check className="h-3.5 w-3.5 text-chinese-black" strokeWidth={3} />}
     </button>
@@ -355,10 +353,7 @@ export function PrettyRadio({
       onClick={onSelect}
       className="mt-0.5 flex h-4.5 w-4.5 items-center justify-center cursor-pointer"
     >
-      <Circle
-        className={`h-4.5 w-4.5 ${checked ? "text-white-smoke" : "text-[#7a7a7a]"}`}
-        strokeWidth={2.2}
-      />
+      <Circle className={`h-4.5 w-4.5 ${checked ? "text-white-smoke" : "text-[#7a7a7a]"}`} strokeWidth={2.2} />
       {checked && <span className="absolute h-2 w-2 rounded-full bg-white-smoke" />}
     </button>
   );
