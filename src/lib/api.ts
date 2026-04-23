@@ -18,6 +18,7 @@ const PUBLIC_ROUTES = [
   "/api/auth/v1/cross/desktop/poll",
   "/api/tracks/v1",
   "/api/auth/v1/google/resend-code",
+  "/api/tracks/v1/listen",
 ]
 
 const api = axios.create({

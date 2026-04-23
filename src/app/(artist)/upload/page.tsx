@@ -16,7 +16,7 @@ import {
   RecordingSegment,
   ALLOWED_EXTENSIONS,
   MAX_FILE_SIZE_BYTES,
-  TOTAL_MINUTES_LIMIT,
+  TOTAL_TRACK_LIMIT,
   MAX_RECORDING_SECONDS,
   UNDO_SEGMENT_SECONDS,
   generateId,
@@ -207,7 +207,7 @@ export default function UploadPage() {
   const totalMinutesUsed = uploadedFiles
     .filter((f) => f.status === "done")
     .reduce((acc, f) => acc + f.estimatedMinutes, 0);
-  const usagePercent = Math.min(100, (totalMinutesUsed / TOTAL_MINUTES_LIMIT) * 100);
+  const usagePercent = Math.min(100, (totalMinutesUsed / TOTAL_TRACK_LIMIT) * 100);
 
   const addToast = useCallback((type: Toast["type"], message: string) => {
     const id = generateId();
@@ -756,7 +756,7 @@ export default function UploadPage() {
                 <div className="absolute left-0 top-0 h-1 rounded-full bg-white transition-all duration-500" style={{ width: `${usagePercent}%` }} />
               </div>
               <span className="text-[13px] font-semibold text-[#f1f1f1] sm:whitespace-nowrap">
-                {Math.round(totalMinutesUsed)} of {TOTAL_MINUTES_LIMIT} minutes
+                {Math.round(totalMinutesUsed)} of {TOTAL_TRACK_LIMIT} tracks
               </span>
             </div>
             <button className="w-full rounded-full border border-silver/30 bg-chinese-black px-5 py-1.5 text-[13px] font-semibold text-white-smoke transition-colors hover:opacity-90 cursor-pointer sm:w-fit" type="button">

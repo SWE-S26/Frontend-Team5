@@ -31,7 +31,7 @@ export const ALLOWED_EXTENSIONS = ["wav", "flac", "aiff", "aif", "alac", "m4a", 
 const maxUploadMbRaw = Number(100);
 const maxUploadMb = Number.isFinite(maxUploadMbRaw) && maxUploadMbRaw > 0 ? maxUploadMbRaw : 4 * 1024;
 export const MAX_FILE_SIZE_BYTES = Math.floor(maxUploadMb * 1024 * 1024);
-export const TOTAL_MINUTES_LIMIT = 180;
+export const TOTAL_TRACK_LIMIT = 3;
 export const MAX_RECORDING_SECONDS = 180;
 export const UNDO_SEGMENT_SECONDS = 5;
 
