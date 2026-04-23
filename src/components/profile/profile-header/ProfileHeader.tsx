@@ -37,7 +37,8 @@ export default function ProfileHeader() {
   const lastName       = useAppSelector((state) => state.profile.lastName)
   const city           = useAppSelector((state) => state.profile.city)
   const country        = useAppSelector((state) => state.profile.country)
-  const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
+  const isOwn          = useAppSelector((state) => state.profile.isOwnProfile)
+  const role           = useAppSelector((state) => state.profile.role)
 
   
   const [avatarModalOpen,   setAvatarModalOpen]   = useState(false)
@@ -345,11 +346,18 @@ const handleCoverChange = async (file: File, previewUrl: string) => {
             {firstName || lastName ? `${firstName || ""} ${lastName || ""}`.trim() : displayName || "No Name"}
           </p>
         </div>
+        
         <div className="bg-black inline-block px-3 py-1 absolute -bottom-10">
           <p className="text-silver font-bold">
            {(city || country) ? [city, country].filter(Boolean).join(", ") : "No location"}
           </p>
         </div>
+        {role === 'Pro' && (
+          <div className="bg-black/60 inline-flex items-center gap-1.5 px-1 absolute -bottom-20">
+            <img src="/payment/pro-badge.svg" alt="Pro badge" className="w-3 h-3" />
+            <p className="text-white font-bold text-xs">ARTIST PRO</p>
+          </div>
+        )}
       </div>
 
     </div>

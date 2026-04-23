@@ -31,6 +31,8 @@ export default function AuthGoogle() {
               displayName: user?.displayName || null,
               profileImgLink: user?.profileImg?.imgLink || null,
               bannerImgLink: user?.bannerImg?.imgLink || null,
+              profileLink: user?.profileLink || null,
+              role: user?.role || null,
             })
           )
           return

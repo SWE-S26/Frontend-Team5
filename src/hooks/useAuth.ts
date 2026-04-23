@@ -10,6 +10,8 @@ type AuthUserShape = {
   profileImg?: {
     imgLink?: string
   }
+  profileLink?: string
+  role?: string
 }
 
 function extractAuthUser(payload: any): AuthUserShape | null {
@@ -32,6 +34,8 @@ function syncAuthUser(user: AuthUserShape | null, dispatch: ReturnType<typeof us
       displayName: user.displayName || null,
       profileImgLink: user.profileImg?.imgLink || null,
       bannerImgLink: null,
+      profileLink: user.profileLink || null,
+      role: user.role || null,
     })
   )
 }
@@ -394,6 +398,8 @@ export function useQRLogin() {
                 displayName: user.displayName || null,
                 profileImgLink: user.profileImg?.imgLink ?? null,
                 bannerImgLink: null,
+                profileLink: user.profileLink || null,
+                role: user.role || null,
               })
             )
           }

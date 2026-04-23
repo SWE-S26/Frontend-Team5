@@ -6,27 +6,22 @@ import Image from "next/image"
 
 import { useAppSelector } from "@/store/hooks"
 import { useLogout } from "@/hooks/useAuth"
+import { usePaymentPlans } from "@/hooks/usePayment"
 import { HeroSection } from '@/components/payment/HeroSection'
 import { AvailablePlans } from '@/components/payment/AvailablePlans'
 import { CompareFeatures } from '@/components/payment/CompareFeatures'
 
 import { IoIosArrowDown } from "react-icons/io";
 
-// TODO: Replace with actual values from your config/backend
-const PRICING_CONFIG = {
-  monthlyPrice: 29.99,
-  yearlyPrice: 74.99,
-  currency: 'EGP',
-}
+const CURRENCY = '$'
 
 export default function ArtistPage() {
     const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
-
-    // only pulling the two fields this component actually needs
     const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
     const displayName = useAppSelector((state) => state.auth.displayName)
 
-    const { logout, loading, success } = useLogout()
+    const { logout } = useLogout()
+    const { plans, loading, error } = usePaymentPlans()
 
     const plansRef = useRef<HTMLDivElement>(null)
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
@@ -37,12 +32,6 @@ export default function ArtistPage() {
 
     const handleSelectPlan = (plan: { interval: 'monthly' | 'yearly'; price: number }) => {
         console.log('Selected plan:', plan)
-        // TODO: Redirect to Stripe checkout with plan selection
-        // Example: router.push(`/checkout?interval=${plan.interval}`)
-    }
-
-    const handleUpgrade = () => {
-        handleSelectPlan({ interval: 'yearly', price: PRICING_CONFIG.yearlyPrice })
     }
 
     const handleSignOut = () => {
@@ -54,7 +43,7 @@ export default function ArtistPage() {
         <div className="w-full">
 
             {/* Header */}
-            <div className="flex justify-center bg-[#333333]">
+            <div className="flex justify-center bg-[#333333] fixed top-0 z-1000 w-full">
                 <div className="flex items-center justify-between h-11.5 w-full max-w-291">
                     <div>
                         <Link data-testid="navbar_logo" href={isAuthenticated ? "/home" : "/"} className="flex items-center">
@@ -103,33 +92,45 @@ export default function ArtistPage() {
 
             {/* Available Plans Section */}
             <div ref={plansRef}>
-                <AvailablePlans
-                    monthlyPrice={PRICING_CONFIG.monthlyPrice}
-                    yearlyPrice={PRICING_CONFIG.yearlyPrice}
-                    currency={PRICING_CONFIG.currency}
-                    onSelectPlan={handleSelectPlan}
-                />
+                {loading && (
+                    <div className="w-full bg-white flex justify-center py-20">
+                        <p className="text-gray-400 text-sm">Loading plans...</p>
+                    </div>
+                )}
+                {error && (
+                    <div className="w-full bg-white flex justify-center py-20">
+                        <p className="text-red-400 text-sm">{error}</p>
+                    </div>
+                )}
+                {!loading && !error && plans && (
+                    <AvailablePlans
+                        monthlyPrice={plans.pro_monthly.amount}
+                        yearlyPrice={plans.pro_yearly.amount}
+                        currency={CURRENCY}
+                        onSelectPlan={handleSelectPlan}
+                    />
+                )}
             </div>
 
             {/* Compare Features Section */}
-            <CompareFeatures
-                currentUserRole="listener"
-                onUpgrade={handleScrollToPlans}
-                proPrice={PRICING_CONFIG.yearlyPrice}
-                currency={PRICING_CONFIG.currency}
-            />
+            {plans && (
+                <CompareFeatures
+                    currentUserRole="listener"
+                    onUpgrade={handleScrollToPlans}
+                    proPrice={plans.pro_yearly.amount}
+                    currency={CURRENCY}
+                />
+            )}
 
             {/* Footer */}
             <div className="px-20 pb-20 bg-white">
                 {isAuthenticated && (
-                            <>
-                                <p className="text-xs text-gray-600 mb-1">
-                                    Signed in as {displayName}. 
-                                    <button onClick={handleSignOut} className="ml-1 text-gray-600 underline hover:text-black">
-                                        Sign out
-                                    </button>
-                                </p>
-                            </>
+                    <p className="text-xs text-gray-600 mb-1">
+                        Signed in as {displayName}. 
+                        <button onClick={handleSignOut} className="ml-1 text-gray-600 underline hover:text-black">
+                            Sign out
+                        </button>
+                    </p>
                 )}
                 <hr className="border-gray-200 mb-1" />
                 <div className="flex items-center gap-2 text-xs text-blue-600">
