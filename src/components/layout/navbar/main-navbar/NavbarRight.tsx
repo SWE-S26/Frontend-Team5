@@ -40,6 +40,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   // only pulling the two fields this component actually needs
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
   const userId = useAppSelector((state) => state.auth.userId)
+  const role = useAppSelector((state) => state.auth.role)
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false)
@@ -104,9 +105,11 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
     <div className="flex items-center gap-5.5 ml-5 mb-1">
       {isLoggedIn ? (
         <>
-          <Link data-testid="try_artist_pro" href="/artistpro" className="text-anger text-sm py-2 font-bold hover:text-white-smoke transition-all duration-300">
-            Try Artist Pro
-          </Link>
+          {role !== 'Pro' && (
+              <Link data-testid="try_artist_pro" href="/artist" className="text-anger text-sm py-2 font-bold hover:text-white-smoke transition-all duration-300">
+                  Try Artist Pro
+              </Link>
+          )}
           <Link data-testid="for_artists" href="/artists" className={NAV_LINK_CLASS}>
             For Artists
           </Link>

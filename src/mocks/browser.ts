@@ -5,6 +5,7 @@ import { messageHandlers } from "./handlers/messageHandlers";
 import { tracksHandlers } from "./handlers/tracks.handlers";
 import { profileHandlers } from "./handlers/profile.handlers"
 import { socialHandlers } from "./handlers/social.handlers"
+import { paymentHandlers } from "./handlers/payment.handlers"
 import { 
   privacyHandlers, 
   notificationHandlers, 
@@ -22,4 +23,5 @@ export const worker = setupWorker(
   ...notificationHandlers,
   ...accountHandlers,
   ...contentHandlers,
+  ...paymentHandlers,
 );

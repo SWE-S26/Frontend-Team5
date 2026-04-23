@@ -9,6 +9,8 @@ interface AuthState {
   displayName: string | null
   profileImgLink: string | null
   bannerImgLink: string | null
+  profileLink: string | null
+  role: string | null
 }
 
 const initialState: AuthState = {
@@ -18,6 +20,8 @@ const initialState: AuthState = {
   displayName: null,
   profileImgLink: null,
   bannerImgLink: null,
+  profileLink: null,
+  role: null,
 }
 
 const authSlice = createSlice({
@@ -32,6 +36,8 @@ const authSlice = createSlice({
       state.displayName = action.payload.displayName
       state.profileImgLink = action.payload.profileImgLink
       state.bannerImgLink = action.payload.bannerImgLink
+      state.profileLink = action.payload.profileLink
+      state.role = action.payload.role
     },
 
     // called on logout — wipes everything
@@ -41,6 +47,8 @@ const authSlice = createSlice({
       state.displayName = null
       state.profileImgLink = null
       state.bannerImgLink = null
+      state.profileLink = null
+      state.role = null
     },
 
     // called once on app load after reading localStorage

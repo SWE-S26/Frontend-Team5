@@ -13,6 +13,7 @@ export default function ThemeSwitcher({ onThemeChange, saveStatus = "idle" }: Th
   useEffect(() => {
     const current = localStorage.getItem("theme") || "dark"
     setTheme(current)
+    applyTheme(current)
 
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
 
