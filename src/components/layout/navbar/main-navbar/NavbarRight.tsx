@@ -93,7 +93,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
     { label: "Keyboard shortcuts", onClick: () => setIsShortcutsOpen(true) },
     { type: "separator" },
     ...(isLoggedIn ? [
-      { label: "Subscription", onClick: () => console.log("done")          },
+      { label: "Subscription", href: "/subscriptions"                      },
       { label: "Settings",     href: "/settings"                           },
       { label: "Sign out",     onClick: () => logout(), disabled: loading  },
     ] : [

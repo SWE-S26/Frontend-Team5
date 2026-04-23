@@ -73,4 +73,66 @@ export const paymentHandlers = [
     HttpResponse.json(mockGetSubscriptionResponse)
   ),
 
+  /* (6) */
+  http.get('/api/payment/v1/transactions', () =>
+      HttpResponse.json({
+          success: true,
+          message: 'Transaction history retrieved successfully',
+          data: {
+              transactions: [
+                  {
+                      _id: '69e26df337eb9b75127d4844',
+                      userId: '69bc1964148a2e47017de175',
+                      stripeCustomerId: 'cus_UFCuogr804sMjP',
+                      stripeSubscriptionId: 'sub_1TNGDCKiCVlMQgBUuowzCx2c',
+                      stripeInvoiceId: null,
+                      type: 'subscription_cancelled',
+                      amount: 0,
+                      currency: 'usd',
+                      subscriptionType: 'pro_monthly',
+                      description: 'Subscription cancelled immediately',
+                      createdAt: '2026-04-17T17:29:23.657Z',
+                      updatedAt: '2026-04-17T17:29:23.657Z',
+                  },
+                  {
+                      _id: '69e26def37eb9b75127d4840',
+                      userId: '69bc1964148a2e47017de175',
+                      stripeCustomerId: 'cus_UFCuogr804sMjP',
+                      stripeSubscriptionId: 'sub_1TNGDCKiCVlMQgBUuowzCx2c',
+                      stripeInvoiceId: 'in_1TNGDCKiCVlMQgBUYnSh7oDF',
+                      type: 'payment_succeeded',
+                      amount: 999,
+                      currency: 'usd',
+                      subscriptionType: 'pro_monthly',
+                      description: 'Payment of 9.99 USD for Pro Monthly',
+                      createdAt: '2026-04-17T17:29:19.939Z',
+                      updatedAt: '2026-04-17T17:29:19.939Z',
+                  },
+              ],
+              total: 2,
+              page: 1,
+              limit: 20,
+              totalPages: 1,
+          },
+      })
+  ),
+
+  /* (7) */
+  http.patch('/api/payment/v1/subscriptions', () =>
+      HttpResponse.json({
+          success: true,
+          message: 'Subscription updated successfully',
+          data: null,
+      })
+  ),
+
+  /* (8) */
+  http.delete('/api/payment/v1/subscriptions', () =>
+      HttpResponse.json({
+          success: true,
+          message: 'Subscription cancelled successfully',
+          data: null,
+      })
+  ),
+
 ]

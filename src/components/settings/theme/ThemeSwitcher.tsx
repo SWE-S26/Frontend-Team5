@@ -11,10 +11,6 @@ export default function ThemeSwitcher({ onThemeChange, saveStatus = "idle" }: Th
   const [theme, setTheme] = useState("dark")
 
   useEffect(() => {
-    const current = localStorage.getItem("theme") || "dark"
-    setTheme(current)
-    applyTheme(current)
-
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
 
     function applyTheme(choice: string) {
@@ -24,6 +20,10 @@ export default function ThemeSwitcher({ onThemeChange, saveStatus = "idle" }: Th
         document.documentElement.setAttribute("data-theme", choice)
       }
     }
+
+    const current = localStorage.getItem("theme") || "dark"
+    setTheme(current)
+    applyTheme(current)
 
     function handleSystemThemeChange() {
       const saved = localStorage.getItem("theme")
