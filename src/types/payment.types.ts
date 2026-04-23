@@ -60,6 +60,9 @@ export interface GetSubscriptionResponse {
   message: string
   data: SubscriptionData | null
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5f3fe4 (added - subscription page)
 }
 
 
@@ -120,6 +123,9 @@ export interface CancelSubscriptionResponse {
   success: boolean
   message: string
   data: null
+<<<<<<< HEAD
 =======
 >>>>>>> 077221e (added - implementation - checkout & artist & added success page)
+=======
+>>>>>>> e5f3fe4 (added - subscription page)
 }

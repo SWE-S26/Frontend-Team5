@@ -1,8 +1,11 @@
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
 // src/hooks/usePayment.ts
 
 >>>>>>> 077221e (added - implementation - checkout & artist & added success page)
+=======
+>>>>>>> e5f3fe4 (added - subscription page)
 import { useState, useEffect } from "react"
 import { useAppSelector } from "@/store/hooks"
 import { paymentService } from "@/services/payment.service"
@@ -10,10 +13,15 @@ import {
   PaymentPlansData,
   SubscriptionData,
 <<<<<<< HEAD
+<<<<<<< HEAD
   Transaction,
   GetTransactionsParams,
 =======
 >>>>>>> 077221e (added - implementation - checkout & artist & added success page)
+=======
+  Transaction,
+  GetTransactionsParams,
+>>>>>>> e5f3fe4 (added - subscription page)
 } from "@/types/payment.types"
 
 export const usePaymentPlans = () => {
@@ -55,6 +63,9 @@ export const useCheckout = () => {
     setError(null)
     try {
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5f3fe4 (added - subscription page)
       // Step 1: Register as Stripe customer — ignore if already registered
       try {
         await paymentService.registerStripeCustomer({ paymentMethodId })
@@ -64,10 +75,13 @@ export const useCheckout = () => {
           throw err
         }
       }
+<<<<<<< HEAD
 =======
       // Step 1: Register as Stripe customer
       await paymentService.registerStripeCustomer({ paymentMethodId })
 >>>>>>> 077221e (added - implementation - checkout & artist & added success page)
+=======
+>>>>>>> e5f3fe4 (added - subscription page)
 
       // Step 2: Create subscription
       const response = await paymentService.createSubscription({ priceId })
@@ -109,6 +123,9 @@ export const useSubscription = () => {
 
   return { subscription, loading, error }
 <<<<<<< HEAD
+<<<<<<< HEAD
+=======
+>>>>>>> e5f3fe4 (added - subscription page)
 }
 
 export const useTransactions = () => {
@@ -171,6 +188,9 @@ export const useManageSubscription = () => {
   }
 
   return { updateSubscription, cancelSubscription, loading, error }
+<<<<<<< HEAD
 =======
 >>>>>>> 077221e (added - implementation - checkout & artist & added success page)
+=======
+>>>>>>> e5f3fe4 (added - subscription page)
 }
