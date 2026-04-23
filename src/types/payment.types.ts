@@ -59,6 +59,7 @@ export interface GetSubscriptionResponse {
   success: boolean
   message: string
   data: SubscriptionData | null
+<<<<<<< HEAD
 }
 
 
@@ -119,4 +120,6 @@ export interface CancelSubscriptionResponse {
   success: boolean
   message: string
   data: null
+=======
+>>>>>>> 077221e (added - implementation - checkout & artist & added success page)
 }

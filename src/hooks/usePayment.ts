@@ -1,11 +1,19 @@
+<<<<<<< HEAD
+=======
+// src/hooks/usePayment.ts
+
+>>>>>>> 077221e (added - implementation - checkout & artist & added success page)
 import { useState, useEffect } from "react"
 import { useAppSelector } from "@/store/hooks"
 import { paymentService } from "@/services/payment.service"
 import {
   PaymentPlansData,
   SubscriptionData,
+<<<<<<< HEAD
   Transaction,
   GetTransactionsParams,
+=======
+>>>>>>> 077221e (added - implementation - checkout & artist & added success page)
 } from "@/types/payment.types"
 
 export const usePaymentPlans = () => {
@@ -46,6 +54,7 @@ export const useCheckout = () => {
     setLoading(true)
     setError(null)
     try {
+<<<<<<< HEAD
       // Step 1: Register as Stripe customer — ignore if already registered
       try {
         await paymentService.registerStripeCustomer({ paymentMethodId })
@@ -55,6 +64,10 @@ export const useCheckout = () => {
           throw err
         }
       }
+=======
+      // Step 1: Register as Stripe customer
+      await paymentService.registerStripeCustomer({ paymentMethodId })
+>>>>>>> 077221e (added - implementation - checkout & artist & added success page)
 
       // Step 2: Create subscription
       const response = await paymentService.createSubscription({ priceId })
@@ -95,6 +108,7 @@ export const useSubscription = () => {
   }, [])
 
   return { subscription, loading, error }
+<<<<<<< HEAD
 }
 
 export const useTransactions = () => {
@@ -157,4 +171,6 @@ export const useManageSubscription = () => {
   }
 
   return { updateSubscription, cancelSubscription, loading, error }
+=======
+>>>>>>> 077221e (added - implementation - checkout & artist & added success page)
 }
