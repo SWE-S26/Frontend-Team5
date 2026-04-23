@@ -504,3 +504,16 @@ export function useResendVerificationCode() {
 
   return { resendVerificationCode, loading, error, success }
 }
+
+export function useRefreshToken() {
+  const dispatch = useAppDispatch()
+
+  const refreshToken = useCallback(async () => {
+    try {
+      const res = await authService.refreshToken()
+      syncAuthUserFromRefresh(res.data, dispatch)
+    } catch {}
+  }, [dispatch])
+
+  return { refreshToken }
+}

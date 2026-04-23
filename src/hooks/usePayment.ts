@@ -1,11 +1,11 @@
-// src/hooks/usePayment.ts
-
 import { useState, useEffect } from "react"
 import { useAppSelector } from "@/store/hooks"
 import { paymentService } from "@/services/payment.service"
 import {
   PaymentPlansData,
   SubscriptionData,
+  Transaction,
+  GetTransactionsParams,
 } from "@/types/payment.types"
 
 export const usePaymentPlans = () => {
@@ -46,8 +46,15 @@ export const useCheckout = () => {
     setLoading(true)
     setError(null)
     try {
-      // Step 1: Register as Stripe customer
-      await paymentService.registerStripeCustomer({ paymentMethodId })
+      // Step 1: Register as Stripe customer — ignore if already registered
+      try {
+        await paymentService.registerStripeCustomer({ paymentMethodId })
+      } catch (err: any) {
+        const message = err?.response?.data?.message || ''
+        if (!message.includes('already has a Stripe customer ID')) {
+          throw err
+        }
+      }
 
       // Step 2: Create subscription
       const response = await paymentService.createSubscription({ priceId })
@@ -88,4 +95,66 @@ export const useSubscription = () => {
   }, [])
 
   return { subscription, loading, error }
+}
+
+export const useTransactions = () => {
+  const [transactions, setTransactions] = useState<Transaction[]>([])
+  const [total, setTotal] = useState(0)
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const fetchTransactions = async (params?: GetTransactionsParams) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const response = await paymentService.getTransactions(params)
+      setTransactions(response.data.data.transactions)
+      setTotal(response.data.data.total)
+    } catch {
+      setError('Failed to fetch transactions')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  useEffect(() => {
+    fetchTransactions()
+  }, [])
+
+  return { transactions, total, loading, error, fetchTransactions }
+}
+
+export const useManageSubscription = () => {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+
+  const updateSubscription = async (priceId: string) => {
+    setLoading(true)
+    setError(null)
+    try {
+      await paymentService.updateSubscription({ priceId })
+      return true
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Failed to update subscription')
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  const cancelSubscription = async (cancelAtPeriodEnd: boolean) => {
+    setLoading(true)
+    setError(null)
+    try {
+      await paymentService.cancelSubscription({ cancelAtPeriodEnd })
+      return true
+    } catch (err: any) {
+      setError(err?.response?.data?.message || 'Failed to cancel subscription')
+      return false
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  return { updateSubscription, cancelSubscription, loading, error }
 }

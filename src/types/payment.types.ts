@@ -60,3 +60,63 @@ export interface GetSubscriptionResponse {
   message: string
   data: SubscriptionData | null
 }
+
+
+/* (6) */
+export interface Transaction {
+  _id: string
+  userId: string
+  stripeCustomerId: string
+  stripeSubscriptionId: string
+  stripeInvoiceId: string | null
+  type: string
+  amount: number
+  currency: string
+  subscriptionType: string
+  description: string
+  createdAt: string
+  updatedAt: string
+}
+
+export interface TransactionsData {
+  transactions: Transaction[]
+  total: number
+  page: number
+  limit: number
+  totalPages: number
+}
+
+export interface GetTransactionsResponse {
+  success: boolean
+  message: string
+  data: TransactionsData
+}
+
+export interface GetTransactionsParams {
+  offset?: number
+  limit?: number
+}
+
+
+/* (7) */
+export interface UpdateSubscriptionRequest {
+  priceId: string
+}
+
+export interface UpdateSubscriptionResponse {
+  success: boolean
+  message: string
+  data: null
+}
+
+
+/* (8) */
+export interface CancelSubscriptionRequest {
+  cancelAtPeriodEnd: boolean
+}
+
+export interface CancelSubscriptionResponse {
+  success: boolean
+  message: string
+  data: null
+}

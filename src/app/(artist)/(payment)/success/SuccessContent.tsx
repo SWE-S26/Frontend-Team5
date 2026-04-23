@@ -1,5 +1,6 @@
 'use client'
 
+import { useState, useEffect } from 'react'
 import { useSearchParams } from 'next/navigation'
 import Link from 'next/link'
 import { FaCheckCircle } from 'react-icons/fa'
@@ -11,13 +12,19 @@ export default function SuccessContent() {
     const price = searchParams.get('price') || '0'
     const currency = searchParams.get('currency') || 'EGP'
 
-    const date = new Date().toLocaleDateString('en-GB', {
+    const [mounted, setMounted] = useState(false)
+    const [receiptNumber] = useState(() => `RCP-${Date.now().toString().slice(-8)}`)
+    const [date] = useState(() => new Date().toLocaleDateString('en-GB', {
         day: '2-digit',
         month: 'long',
         year: 'numeric',
-    })
+    }))
 
-    const receiptNumber = `RCP-${Date.now().toString().slice(-8)}`
+    useEffect(() => {
+        setMounted(true)
+    }, [])
+
+    if (!mounted) return <div className="w-full min-h-screen bg-white" />
 
     const handleDownload = () => {
         const content = `
@@ -57,25 +64,25 @@ For support, visit: beatza.me/need-help
     }
 
     return (
-        <div className="w-full min-h-screen bg-white flex flex-col items-center justify-center px-6 py-10">
+        <div className="w-full min-h-screen bg-white flex flex-col items-center justify-center px-4 sm:px-6 py-8 sm:py-10">
             <div className="w-full max-w-md">
 
                 {/* Success icon */}
-                <div className="flex flex-col items-center mb-10">
-                    <FaCheckCircle className="text-green-500 text-6xl mb-4" />
-                    <h1 className="text-3xl font-bold text-black text-center">Payment successful!</h1>
+                <div className="flex flex-col items-center mb-8 sm:mb-10">
+                    <FaCheckCircle className="text-green-500 text-5xl sm:text-6xl mb-4" />
+                    <h1 className="text-2xl sm:text-3xl font-bold text-black text-center">Payment successful!</h1>
                     <p className="text-gray-500 text-sm mt-2 text-center">
                         You are now an Artist Pro subscriber.
                     </p>
                 </div>
 
                 {/* Receipt */}
-                <div className="border-2 border-gray-200 rounded-2xl p-8 mb-6 space-y-4">
+                <div className="border-2 border-gray-200 rounded-2xl p-5 sm:p-8 mb-6 space-y-4">
 
                     {/* Receipt header */}
                     <div className="flex items-center justify-between border-b border-gray-100 pb-4">
                         <div>
-                            <h2 className="font-bold text-black text-lg">Beatza</h2>
+                            <h2 className="font-bold text-black text-base sm:text-lg">Beatza</h2>
                             <p className="text-xs text-gray-400">Receipt No. {receiptNumber}</p>
                         </div>
                         <span className="text-xs bg-green-50 text-green-600 font-semibold px-3 py-1 rounded-full">
@@ -110,7 +117,7 @@ For support, visit: beatza.me/need-help
                     {/* Total */}
                     <div className="flex justify-between items-center border-t border-gray-100 pt-4">
                         <span className="font-bold text-black">Total paid</span>
-                        <span className="font-black text-black text-xl">
+                        <span className="font-black text-black text-lg sm:text-xl">
                             {currency} {parseFloat(price).toFixed(2)}
                         </span>
                     </div>
