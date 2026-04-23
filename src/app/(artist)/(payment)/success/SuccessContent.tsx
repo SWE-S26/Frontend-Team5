@@ -43,7 +43,7 @@ STATUS:         PAYMENT SUCCESSFUL
 Thank you for subscribing to Beatza Artist Pro.
 Your subscription is now active.
 
-For support, visit: beatza.me/help
+For support, visit: beatza.me/need-help
 ========================================
         `.trim()
 
@@ -57,7 +57,7 @@ For support, visit: beatza.me/help
     }
 
     return (
-        <div className="w-full min-h-screen bg-white flex flex-col items-center justify-center px-6 py-20">
+        <div className="w-full min-h-screen bg-white flex flex-col items-center justify-center px-6 py-10">
             <div className="w-full max-w-md">
 
                 {/* Success icon */}
