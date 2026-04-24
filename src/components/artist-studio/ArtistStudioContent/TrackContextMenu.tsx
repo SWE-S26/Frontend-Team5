@@ -1,5 +1,6 @@
 import { useRef, useEffect } from "react";
 import { FiEdit2, FiPlusSquare, FiDollarSign, FiSliders, FiGlobe, FiBarChart2, FiDownload, FiLink, FiTrash2 } from "react-icons/fi";
+import { PiPencilSimple } from "react-icons/pi";
 
 export function TrackContextMenu({
   trackId,
@@ -27,7 +28,7 @@ export function TrackContextMenu({
   }, [onClose]);
 
   const menuItems = [
-    { icon: FiEdit2,      label: "Edit",            action: () => { onEdit(trackId); onClose(); } },
+    { icon: PiPencilSimple,      label: "Edit",            action: () => { onEdit(trackId); onClose(); } },
     { icon: FiPlusSquare, label: "Add to playlist", action: () => { onAddToPlaylist(trackId); onClose(); } },
     { icon: FiDollarSign, label: "Monetize",        action: onClose },
     { icon: FiSliders,    label: "Master",           action: onClose },

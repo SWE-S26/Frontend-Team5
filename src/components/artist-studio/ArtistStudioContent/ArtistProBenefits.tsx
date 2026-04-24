@@ -1,14 +1,52 @@
-function BenefitCard({ img, title, save, fallback }: { img: string; title: string; save: string; fallback: string }) {
+function BenefitCard({
+  img,
+  title,
+  save,
+  fallback,
+}: {
+  img: string;
+  title: string;
+  save: string;
+  fallback: string;
+}) {
   return (
-    <div className="overflow-hidden rounded-lg bg-[#1a1a1a]">
-      <div className="relative h-36 w-full bg-linear-to-br from-[#2b2b2b] via-[#1d1d1d] to-[#111] overflow-hidden">
-        <img src={img} alt={title} className="h-full w-full object-cover" onError={(e) => { e.currentTarget.style.opacity = "0"; }} />
-        <div className="absolute inset-0 z-10 pointer-events-none" style={{ clipPath: "polygon(0 0, 60% 0, 40% 100%, 0% 100%)", background: "rgba(0,0,0,0.7)" }} />
-        <img src={fallback} className="pointer-events-none absolute bottom-10 left-0 text-[18px] font-bold text-white/85 z-20" onError={(e) => { e.currentTarget.style.opacity = "0"; }} />
+    <div className="group overflow-hidden rounded-lg bg-[#1a1a1a] cursor-pointer">
+      <div className="relative h-36 w-full overflow-hidden bg-linear-to-br from-[#2b2b2b] via-[#1d1d1d] to-[#111]">
+        <img
+          src={img}
+          alt={title}
+          className="h-full w-full object-cover transition-transform duration-500 ease-out group-hover:scale-127"
+          onError={(e) => {
+            e.currentTarget.style.opacity = "0";
+          }}
+        />
+
+        <div
+          className="absolute inset-0 z-10 pointer-events-none"
+          style={{
+            clipPath: "polygon(0 0, 60% 0, 40% 120%, 0% 100%)",
+            background: "rgba(0,0,0,0.7)",
+          }}
+        />
+
+        <img
+          src={fallback}
+          className="pointer-events-none absolute bottom-10 left-0 z-20 text-[18px] font-bold text-white/85"
+          onError={(e) => {
+            e.currentTarget.style.opacity = "0";
+          }}
+        />
       </div>
-      <div className="p-3">
-        <p className="text-[12px] font-semibold leading-tight text-white">{title}</p>
-        <span className="mt-1 inline-block rounded bg-[#232323] px-2 py-0.5 text-[11px] font-bold text-[#f7c873]">{save}</span>
+
+      <div className="p-3 flex flex-col gap-2">
+        <p className="text-[15px] font-bold leading-tight text-white-smoke line-clamp-2">
+          {title}
+        </p>
+        <div className="flex flex-row gap-2">
+          <span className="shrink-0 rounded-full bg-green-500 px-3 py-1 text-[11px] font-bold text-black shadow-md transition-all hover:bg-green-400 hover:scale-105">
+            {save}
+          </span>
+        </div>
       </div>
     </div>
   );
