@@ -46,7 +46,7 @@ export default function TrackHeader({ trackId }: Props) {
 
         dispatch(
           setTrack({
-            trackId: data._id,
+            trackId: data.trackId,
 
             title: data.basicInfo.title,
             permalink: data.basicInfo.permalink,
@@ -111,13 +111,13 @@ export default function TrackHeader({ trackId }: Props) {
   // ================= Loading =================
   if (loading || track.isLoading) {
     return (
-      <div className="w-full h-[300px] rounded-xl bg-gray-200 animate-pulse" />
+      <div className="w-full h-75 rounded-xl bg-gray-200 animate-pulse" />
     );
   }
 
   if (error || track.error || !track.trackId) {
     return (
-      <div className="w-full h-[300px] flex items-center justify-center text-red-500">
+      <div className="w-full h-75 flex items-center justify-center text-red-500">
         Failed to load track
       </div>
     );
@@ -185,11 +185,11 @@ export default function TrackHeader({ trackId }: Props) {
         </div>
 
         {/* Waveform */}
-        <div className="w-full h-[80px] bg-white/30 rounded-md overflow-hidden flex items-end gap-[2px] px-1">
+        <div className="w-full h-20 bg-white/30 rounded-md overflow-hidden flex items-end gap-0.5 px-1">
           {Array.from({ length: 120 }).map((_, i) => (
             <div
               key={i}
-              className="w-[2px] bg-white/80"
+              className="w-0.5 bg-white/80"
               style={{ height: `${Math.random() * 100}%` }}
             />
           ))}
@@ -200,7 +200,7 @@ export default function TrackHeader({ trackId }: Props) {
       </div>
 
       {/* IMAGE */}
-      <div className="w-[325px] h-[325px] relative rounded-xl overflow-hidden">
+      <div className="w-81.25 h-81.25 relative rounded-xl overflow-hidden">
         <Image
           src={track.imageLink || ""}
           alt="track cover"

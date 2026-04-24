@@ -102,7 +102,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
               </Link>
           )}
           <Link data-testid="for_artists" href="/artists" className={NAV_LINK_CLASS}>
-            For Artists
+            Artist Studio
           </Link>
           <Link data-testid="upload" href="/upload" className={NAV_LINK_CLASS}>
             Upload
