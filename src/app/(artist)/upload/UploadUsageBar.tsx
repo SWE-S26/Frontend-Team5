@@ -27,18 +27,30 @@ export default function UploadUsageBar({
             <CloudUploadOutlined style={{ fontSize: "24px" }} />
           </div>
           <span className="text-[13px] font-semibold text-[#f1f1f1]">
-            {isArtistPro ? "Artist Pro: unlimited uploads" : `${Math.round(usagePercent)}% of uploads used`}
+            {isArtistPro ? (
+              <>
+                Artist Pro{" "}
+                <img
+                  src="payment/pro-badge.svg"
+                  alt="pro badge"
+                  className="inline-block w-4 h-4 mx-1"
+                />
+                Unlimited uploads
+              </>
+            ) : (
+              `${Math.round(usagePercent)}% of uploads used`
+            )}
           </span>
-          <div className="relative h-1 w-full rounded-full bg-[#3f4047] sm:flex-1 md:min-w-48">
-            <div
-              className={`absolute left-0 top-0 h-1 rounded-full transition-all duration-500 ${
-                isArtistPro ? "bg-[#31d27c]" : "bg-white"
-              }`}
-              style={{ width: `${isArtistPro ? 100 : usagePercent}%` }}
-            />
-          </div>
+          {!isArtistPro && (
+            <div className="relative h-1 w-full rounded-full bg-[#3f4047] sm:flex-1 md:min-w-48">
+              <div
+                className="absolute left-0 top-0 h-1 rounded-full bg-white transition-all duration-500"
+                style={{ width: `${usagePercent}%` }}
+              />
+            </div>
+          )}
           <span className="text-[13px] font-semibold text-[#f1f1f1] sm:whitespace-nowrap">
-            {isArtistPro ? `${Math.round(usedTracks)} tracks uploaded` : `${Math.round(usedTracks)} of ${totalTracks} tracks`}
+            {!isArtistPro && `${Math.round(usedTracks)} of ${totalTracks} tracks`}
           </span>
         </div>
 
