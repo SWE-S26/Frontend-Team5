@@ -74,6 +74,14 @@ function encodeAudioBufferToWav(buffer: AudioBuffer): Blob {
   return new Blob([arrayBuffer], { type: "audio/wav" });
 }
 
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+}
+
 async function mergeRecordingBlobs(previousBlob: Blob, nextBlob: Blob): Promise<Blob> {
   const AudioCtx = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!AudioCtx) {
@@ -177,7 +185,10 @@ export default function UploadPage() {
   // Track Info form state
   const [trackTitle, setTrackTitle] = useState("");
   const [artistName, setArtistName] = useState("");
+  const [permalink, setPermalink] = useState("https://beatza.me/");
   const [genre, setGenre] = useState("");
+    const artistNameInitializedRef = useRef(false);
+    const permalinkInitializedRef = useRef(false);
   const [tags, setTags] = useState("");
   const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(true);
@@ -629,10 +640,18 @@ export default function UploadPage() {
   }, [recordingSeconds]);
 
   useEffect(() => {
-    if (!artistName && authDisplayName) {
+    if (!artistNameInitializedRef.current && authDisplayName) {
       setArtistName(authDisplayName);
+      artistNameInitializedRef.current = true;
     }
-  }, [artistName, authDisplayName]);
+  }, [authDisplayName]);
+
+  useEffect(() => {
+    if (!permalinkInitializedRef.current && authDisplayName) {
+      setPermalink(`https://beatza.me/${slugify(authDisplayName)}/`);
+      permalinkInitializedRef.current = true;
+    }
+  }, [authDisplayName]);
 
   useEffect(() => {
     return () => {
@@ -710,6 +729,8 @@ export default function UploadPage() {
           showTrackInsights={showTrackInsights} setShowTrackInsights={setShowTrackInsights}
           geoblockingOption={geoblockingOption} setGeoblockingOption={setGeoblockingOption}
           licenseType={licenseType} setLicenseType={setLicenseType}
+          permalink={permalink}
+          setPermalink={setPermalink}
           isArtistPro={isArtistPro}
           onReplaceTrackFile={handleReplaceTrackFile}
         />
