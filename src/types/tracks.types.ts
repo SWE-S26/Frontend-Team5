@@ -67,32 +67,8 @@ export interface CreateTrackResponse {
 export interface GetTracksResponse {
   message: string;
   data: {
-    tracks: {
-      _id: string;
-      basicInfo: {
-        title: string;
-        permalink: string;
-        mainArtists: string[];
-        genre: string;
-        tags: string[];
-        description: string;
-        isPrivate: boolean;
-      };
-      audio: {
-        audioLink: string;
-        id: string;
-      };
-      durationInSeconds: number;
-      image: {
-        imgLink: string;
-        publicId: string;
-      };
-      numLikes: number;
-      numPlays: number;
-      numReposts: number;
-      numComments: number;
-      releaseDate: string;
-    }[];
+    tracks: Track[];
+
     paginationInfo: {
       totalNumTracks: number;
       page: number;
@@ -110,41 +86,13 @@ export interface GetTracksErrorResponse {
   }[];
 }
 
-export interface PostedTrack {
-	_id: string;
-	basicInfo: {
-		title: string;
-		permalink: string;
-		mainArtists: string[];
-		genre?: string;
-		tags?: string[];
-		isPrivate: boolean;
-	};
-	audio?: {
-		audioLink?: string;
-		id?: string;
-	};
-	audioLink?: string;
-	image?: {
-		imgLink?: string;
-		publicId?: string;
-	};
-	numLikes?: number;
-	numPlays?: number;
-	numReposts?: number;
-	numComments?: number;
-	releaseDate?: string;
-}
-
 export interface GetPostedTracksResponse {
-	message: string;
-	data: PostedTrack[];
+  message: string;
+  data: Track[];
 }
-
-
 
 export interface Track {
-  _id: string;
+  trackId: string;
 
   basicInfo: {
     title: string;
@@ -156,9 +104,16 @@ export interface Track {
     isPrivate: boolean;
   };
 
+  posterId: string;
+
+  durationInSeconds: number;
+
   audio: {
     audioLink: string;
     id: string;
+    cloudIndex: number;
+    downloadLink: string;
+    waveformLink: string;
   };
 
   image: {

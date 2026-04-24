@@ -21,7 +21,7 @@ export default function Feed() {
   const reduxTracks: Track[] = useMemo(
     () =>
       (tracks ?? []).map((t) => ({
-        id: t._id,
+        id: t.trackId,
         url: t.audio?.audioLink ?? "",
         title: t.basicInfo?.title,
         artist: t.basicInfo?.mainArtists?.[0],
@@ -63,7 +63,7 @@ export default function Feed() {
 
           <div>
             {tracks?.map((track) => (
-              <div key={track._id} className="flex-none mb-4">
+              <div key={track.trackId} className="flex-none mb-4">
                 <PopoverProvider>
                   <FeedHeader
                     artistName={
@@ -79,9 +79,10 @@ export default function Feed() {
                   img={track.image?.imgLink}
                   title={track.basicInfo?.title}
                   artist={track.basicInfo?.mainArtists?.[0]}
-                  trackId={track._id}
+                  trackId={track.trackId}
                   trackUrl={track.audio?.audioLink}
                   duration={track.durationInSeconds}
+                  initialLikes={track.numLikes}
                   allTracks={reduxTracks}
                 />
               </div>
