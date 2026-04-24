@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { FaCheckCircle } from "react-icons/fa"
+import { useAppSelector } from "@/store/hooks"
 
 interface ComparisonFeature {
   category: string
@@ -166,27 +167,20 @@ const COMPARISON_DATA: ComparisonFeature[] = [
   },
 ]
 
-interface ComparisonRow {
-  name: string
-  description: string
-  listener: string | boolean
-  pro: string | boolean
-}
-
 interface CompareFeatureProps {
-  currentUserRole: 'listener' | 'pro'
   onUpgrade: () => void
   proPrice: number
   currency: string
 }
 
 export function CompareFeatures({
-  currentUserRole,
   onUpgrade,
   proPrice,
   currency,
 }: CompareFeatureProps) {
   const [expandedCategory, setExpandedCategory] = useState<string | null>(null)
+  const role = useAppSelector((state) => state.auth.role)
+  const isPro = role === 'Pro'
 
   const toggleCategory = (category: string) => {
     setExpandedCategory(expandedCategory === category ? null : category)
@@ -228,14 +222,15 @@ export function CompareFeatures({
   }
 
   return (
-    <section className="w-full bg-white px-6 py-20 sm:px-12 md:px-16 lg:px-20">
+    <section className="w-full bg-white px-4 sm:px-6 py-12 sm:py-20 md:px-16 lg:px-20">
       <div className="mx-auto max-w-6xl">
+
         {/* Section title */}
-        <h2 className="mb-16 text-center text-[60px] font-bold text-black sm:text-5xl">
+        <h2 className="mb-10 sm:mb-16 text-center text-4xl sm:text-5xl lg:text-[60px] font-bold text-black">
           Compare features
         </h2>
 
-        {/* Comparison header - desktop */}
+        {/* Comparison header - desktop only */}
         <div className="mb-5 hidden grid-cols-3 gap-8 md:grid">
           <div />
           {/* Listener column */}
@@ -243,64 +238,64 @@ export function CompareFeatures({
             <h3 className="text-[32px] font-bold text-black">Listener</h3>
             <p className="mt-2 text-sm text-gray-600">Free</p>
             <button
-              disabled={currentUserRole === 'listener'}
-              className="w-fit mt-6 rounded-full border-2 border-gray-300 px-6 py-2 text-sm font-semibold text-gray-600 transition-all hover:bg-gray-100 disabled:bg-gray-100 disabled:text-gray-700"
+              disabled
+              className="w-fit mt-6 rounded-full border-2 border-gray-300 px-6 py-2 text-sm font-semibold text-gray-600 bg-gray-100"
             >
-              {currentUserRole === 'listener' ? 'Current plan' : 'Downgrade'}
+              {isPro ? "You're on Artist Pro" : 'Current plan'}
             </button>
           </div>
 
           {/* Pro column */}
           <div className="p-8 flex flex-col items-center">
             <h3 className="text-[32px] font-bold text-black">Artist Pro</h3>
-            <div className="flex items-end">
-              <p className="mt-2 text-sm text-[#008850] font-semibold">
-                <span className="text-gray-600">Monthly or Yearly</span>
-              </p>
-            </div>
+            <p className="mt-2 text-sm text-gray-600">Monthly or Yearly</p>
             <button
               onClick={onUpgrade}
-              disabled={currentUserRole === 'pro'}
+              disabled={isPro}
               className="w-fit mt-6 rounded-full bg-black px-6 py-2 text-sm font-semibold text-white transition-all hover:bg-gray-900 disabled:bg-gray-400"
             >
-              {currentUserRole === 'pro' ? 'Current plan' : 'Get started'}
+              {isPro ? "You're on Artist Pro" : 'Get started'}
             </button>
           </div>
         </div>
 
         {/* Comparison table */}
-        <div className="space-y-0 ">
+        <div className="space-y-0">
           {COMPARISON_DATA.map((section) => (
-            <div key={section.category} className="border-b-2 border-gray-200 mb-20 pb-6">
-              {/* Category header - clickable on mobile */}
+            <div key={section.category} className="border-b-2 border-gray-200 mb-10 sm:mb-20 pb-6">
+
+              {/* Category header — tappable on mobile */}
               <button
                 onClick={() => toggleCategory(section.category)}
                 className="w-full px-0 pb-6 text-left transition-colors hover:bg-gray-50 md:cursor-default md:hover:bg-white"
               >
-                <h3 className="text-xl font-bold text-black border-b border-black pb-8 px-4">{section.category}</h3>
+                <h3 className="text-lg sm:text-xl font-bold text-black border-b border-black pb-6 sm:pb-8 px-4">
+                  {section.category}
+                </h3>
               </button>
 
               {/* Features */}
               <div
-                className={`space-y-8 md:block px-4 ${
+                className={`space-y-6 sm:space-y-8 md:block px-4 ${
                   expandedCategory === section.category ? 'block' : 'hidden'
                 }`}
               >
                 {section.features.map((feature, idx) => (
-                  <div key={idx} className="grid grid-cols-1 gap-6 md:grid-cols-3">
-                    {/* Feature name & description */}
+                  <div key={idx} className="grid grid-cols-1 gap-3 md:gap-6 md:grid-cols-3">
                     <div className="md:col-span-1">
-                      <h4 className="font-semibold text-black">{feature.name}</h4>
-                      <p className="text-sm text-gray-600">{feature.description}</p>
+                      <h4 className="font-semibold text-black text-sm sm:text-base">{feature.name}</h4>
+                      <p className="text-xs sm:text-sm text-gray-600">{feature.description}</p>
                     </div>
 
-                    {/* Listener column */}
-                    <div className="md:col-span-1 flex items-center justify-center">
+                    <div className="md:col-span-1 flex items-center md:justify-center gap-2">
+                      <span className="text-xs text-gray-400 md:hidden">Listener:</span>
                       {renderValue(feature.listener, 'listener')}
                     </div>
 
-                    {/* Pro column */}
-                    <div className="md:col-span-1 flex items-center justify-center">{renderValue(feature.pro, 'pro')}</div>
+                    <div className="md:col-span-1 flex items-center md:justify-center gap-2">
+                      <span className="text-xs text-gray-400 md:hidden">Pro:</span>
+                      {renderValue(feature.pro, 'pro')}
+                    </div>
                   </div>
                 ))}
               </div>
@@ -309,30 +304,29 @@ export function CompareFeatures({
         </div>
 
         {/* Mobile comparison cards */}
-        <div className="mt-12 space-y-6 md:hidden">
+        <div className="mt-8 sm:mt-12 space-y-6 md:hidden">
           <div className="rounded-xl border-2 border-gray-200 bg-gray-50 p-6">
             <h3 className="mb-4 text-xl font-black text-black">Listener</h3>
             <p className="mb-4 text-sm text-gray-600">Free</p>
             <button
-              disabled={currentUserRole === 'listener'}
-              className="w-full rounded-full border-2 border-gray-300 px-4 py-2 text-sm font-semibold text-gray-600 transition-all hover:bg-gray-100 disabled:bg-gray-100"
+              disabled
+              className="w-full rounded-full border-2 border-gray-300 px-4 py-2 text-sm font-semibold text-gray-600 bg-gray-100"
             >
-              {currentUserRole === 'listener' ? 'Current plan' : 'Downgrade'}
+              {isPro ? "You're on Artist Pro" : 'Current plan'}
             </button>
           </div>
 
           <div className="rounded-xl border-2 border-teal-600 bg-teal-50 p-6">
             <h3 className="mb-4 text-xl font-black text-black">Artist Pro</h3>
             <p className="mb-4 text-sm text-teal-600 font-semibold">
-              {currency}
-              {proPrice.toFixed(2)}
+              {currency}{proPrice.toFixed(2)}
             </p>
             <button
               onClick={onUpgrade}
-              disabled={currentUserRole === 'pro'}
+              disabled={isPro}
               className="w-full rounded-full bg-black px-4 py-2 text-sm font-semibold text-white transition-all hover:bg-gray-900 disabled:bg-gray-400"
             >
-              {currentUserRole === 'pro' ? 'Current plan' : 'Get started'}
+              {isPro ? "You're on Artist Pro" : 'Get started'}
             </button>
           </div>
         </div>

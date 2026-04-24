@@ -1,51 +1,59 @@
+import Link from "next/link"
+import { useAppSelector } from "@/store/hooks"
+
 interface HeroSectionProps {
   onScrollToPlans: () => void
 }
 
 export function HeroSection({ onScrollToPlans }: HeroSectionProps) {
+
+    const role = useAppSelector((state) => state.auth.role)
+
     return (
-    <section className="bg-[#121212] flex justify-center min-h-screen "
+    <section className="bg-[#121212] flex justify-center min-h-screen"
              style={{ 
                 backgroundImage: "url('/artist/hero-background-image-speakers.svg')",
                 backgroundSize: '64%',
                 backgroundPosition: '100% 0',
                 backgroundRepeat: 'no-repeat'
              }}>
-        <div className="relative w-full max-w-291 overflow-hidden">
+        <div className="relative w-full max-w-291 overflow-hidden px-4 sm:px-5.5">
             {/* Content */}
-            <div className="flex flex-col items-start justify-center min-h-screen mt-36 ml-5.5 relative z-10"> 
-                <div className="">
+            <div className="flex flex-col items-start justify-center min-h-screen mt-20 sm:mt-36 relative z-10">
+                <div>
 
                     {/* Main heading */}
-                    <h1 className="text-[86px] font-black text-white">
+                    <h1 className="text-4xl sm:text-6xl lg:text-[86px] font-black text-white leading-tight">
                         Reach more listeners.
                     </h1>
 
-                    {/* Subheading with avatars */}
+                    {/* Subheading */}
                     <div className="mt-2.5">
-                        <p className="text-[28px] font-bold text-white">
+                        <p className="text-lg sm:text-2xl lg:text-[28px] font-bold text-white">
                             Join millions of artists that use SoundCloud to get heard.
                         </p>
                     </div>
 
                     {/* CTA Buttons */}
-                    <div className="flex flex-wrap gap-8 mt-14.5">
+                    <div className="flex flex-wrap gap-4 sm:gap-8 mt-10 sm:mt-14.5">
+                        {role !== 'Pro' && (
+                            <Link
+                                href="/checkout"
+                                className="rounded-full bg-white px-6 py-2.5 font-semibold text-black transition-all duration-200 text-sm hover:bg-black hover:text-white"
+                            >
+                                Get Artist Pro
+                            </Link>
+                        )}
                         <button
                             onClick={onScrollToPlans}
-                            className="rounded-full bg-white px-6 py-2.5 font-semibold text-black transition-all duration-200 text-sm hover:bg-black hover:text-white"
-                            >
-                            Get Artist Pro
-                        </button>
-                        <button
-                            onClick={onScrollToPlans}
-                            className="rounded-full border border-white px-6 font-semibold text-white transition-all duration-200 text-sm hover:bg-white hover:text-black"
-                            >
+                            className="rounded-full border border-white px-6 py-2.5 font-semibold text-white transition-all duration-200 text-sm hover:bg-white hover:text-black"
+                        >
                             See all plans
                         </button>
                     </div>
 
                     {/* Features grid */}
-                    <div className="flex gap-9 mt-20 mb-20">
+                    <div className="grid grid-cols-1 sm:grid-cols-4 gap-8 sm:gap-9 mt-16 sm:mt-20 mb-20">
                         {[
                         {
                             icon: '/artist/bullseye.svg',
@@ -72,9 +80,9 @@ export function HeroSection({ onScrollToPlans }: HeroSectionProps) {
                             'Distribute and get paid on SoundCloud and 60+ platforms including Spotify, Apple Music, and TikTok.',
                         },
                         ].map((feature, idx) => (
-                        <div key={idx} className="w-[50%]">
-                            <img src={feature.icon} alt={feature.title} className="w-15 h-15 mb-5" />
-                            <h3 className="text-[20px] font-semibold text-white mb-1">{feature.title}</h3>
+                        <div key={idx} className="w-full">
+                            <img src={feature.icon} alt={feature.title} className="w-12 h-12 sm:w-15 sm:h-15 mb-4 sm:mb-5" />
+                            <h3 className="text-base sm:text-[20px] font-semibold text-white mb-1">{feature.title}</h3>
                             <p className="text-sm text-white">{feature.description}</p>
                         </div>                        
                         ))}

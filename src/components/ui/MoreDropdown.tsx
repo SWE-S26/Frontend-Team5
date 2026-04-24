@@ -1,5 +1,5 @@
 "use client";
-
+import Link from "next/link"
 import { useRef, useState } from "react";
 import {
   useFloating,
@@ -23,6 +23,7 @@ export interface DropdownItem {
   icon?: React.ReactNode;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
+  href?: string 
 }
 
 interface MoreDropdownProps {
@@ -30,6 +31,8 @@ interface MoreDropdownProps {
   items: DropdownItem[];
   width?: string;
   tooltipLabel?: string;
+  testId?: string
+  gap?: string
 }
 
 export default function MoreDropdown({
@@ -37,6 +40,8 @@ export default function MoreDropdown({
   items,
   width = "w-auto",
   tooltipLabel,
+  testId,
+  gap = "gap-1",
 }: MoreDropdownProps) {
   const [isOpen, setIsOpen] = useState(false);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -104,7 +109,7 @@ export default function MoreDropdown({
             ref={tooltipRefs.setFloating}
             style={tooltipStyles}
             {...getTooltipFloatingProps()}
-            className="z-[9999] pointer-events-none"
+            className="z-9999 pointer-events-none"
           >
             <FloatingArrow
               ref={arrowRef}
@@ -126,9 +131,23 @@ export default function MoreDropdown({
             ref={dropdownRefs.setFloating}
             style={dropdownStyles}
             {...getFloatingProps()}
-            className={`z-[9999] flex flex-col ${width} bg-chinese-black border border-silver/40 rounded-sm py-2`}
+            data-testid={testId}
+            className={`z-9999 flex flex-col ${width} ${gap} bg-chinese-black border border-silver/40 rounded-sm py-2`}
           >
-            {items.map((item, index) => (
+          {items.map((item, index) =>
+            item.type === "separator" ? (
+              <hr key={index} className="border-silver/40 my-1" />
+            ) : item.href ? (
+              <Link
+                key={index}
+                href={item.href}
+                onClick={() => setIsOpen(false)}
+                className="flex items-center gap-3 pl-3 pr-6 py-1.5 text-left text-white-smoke hover:text-white-smoke/50 transition-colors"
+              >
+                {item.icon && <span className="text-lg shrink-0">{item.icon}</span>}
+                <span className="text-sm font-bold">{item.label}</span>
+              </Link>
+            ) : (
               <button
                 key={index}
                 disabled={item.disabled}
@@ -143,12 +162,11 @@ export default function MoreDropdown({
                     : "text-white-smoke hover:text-white-smoke/50 cursor-pointer"
                 }`}
               >
-                {item.icon && (
-                  <span className="text-lg shrink-0">{item.icon}</span>
-                )}
+                {item.icon && <span className="text-lg shrink-0">{item.icon}</span>}
                 <span className="text-sm font-bold">{item.label}</span>
               </button>
-            ))}
+            )
+          )}
           </div>
         )}
       </FloatingPortal>

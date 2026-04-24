@@ -1,12 +1,14 @@
 'use client'
 
-import { useRef, useState } from 'react'
+import { useRef, useState, useEffect } from 'react'
 import Link from "next/link";
 import Image from "next/image"
 
-import { useAppSelector } from "@/store/hooks"
+import { useAppSelector, useAppDispatch } from "@/store/hooks"
 import { useLogout } from "@/hooks/useAuth"
 import { usePaymentPlans } from "@/hooks/usePayment"
+import { useGetProfile } from "@/hooks/useProfile"
+import { setProfile, clearProfile } from "@/store/slices/profileSlice"
 import { HeroSection } from '@/components/payment/HeroSection'
 import { AvailablePlans } from '@/components/payment/AvailablePlans'
 import { CompareFeatures } from '@/components/payment/CompareFeatures'
@@ -16,15 +18,49 @@ import { IoIosArrowDown } from "react-icons/io";
 const CURRENCY = '$'
 
 export default function ArtistPage() {
+    const dispatch = useAppDispatch()
+
     const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
-    const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
-    const displayName = useAppSelector((state) => state.auth.displayName)
+    const profileImgLink  = useAppSelector((state) => state.auth.profileImgLink)
+    const displayName     = useAppSelector((state) => state.auth.displayName)
+    const userId          = useAppSelector((state) => state.auth.userId)
+    const hasHydrated     = useAppSelector((state) => state.auth.hasHydrated)
+
+    const profileFirstName = useAppSelector((state) => state.profile.firstName)
+    const profileLastName  = useAppSelector((state) => state.profile.lastName)
+
+    const { getProfile } = useGetProfile()
+
+    useEffect(() => {
+        if (!hasHydrated || !userId) return
+
+        getProfile(userId).then((data) => {
+            if (!data) return
+            dispatch(setProfile({
+                userId:         data.userId,
+                displayName:    data.displayName,
+                firstName:      data.firstName,
+                lastName:       data.lastName,
+                profileImgLink: data.profileImgLink,
+                bannerImgLink:  data.bannerImgLink,
+                city:           data.city,
+                country:        data.country,
+                isOwnProfile:   true,
+            }))
+        })
+
+        return () => { dispatch(clearProfile()) }
+    }, [userId, hasHydrated])
 
     const { logout } = useLogout()
     const { plans, loading, error } = usePaymentPlans()
 
     const plansRef = useRef<HTMLDivElement>(null)
     const [isDropdownOpen, setIsDropdownOpen] = useState(false)
+
+    const headerName = profileFirstName || profileLastName
+        ? `${profileFirstName || ''} ${profileLastName || ''}`.trim()
+        : displayName
 
     const handleScrollToPlans = () => {
         plansRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -60,13 +96,15 @@ export default function ArtistPage() {
                                 >
                                     <div className="flex items-center">
                                         <Image
-                                        src={profileImgLink || "/profpic.jpg"}
-                                        alt="Profile"
-                                        width={26}
-                                        height={26}
-                                        className="rounded-full w-6.5 h-6.5 object-cover mr-2"
+                                            src={profileImgLink || "/profpic.jpg"}
+                                            alt="Profile"
+                                            width={26}
+                                            height={26}
+                                            className="rounded-full w-6.5 h-6.5 object-cover mr-2"
                                         />
-                                        <h1 className="text-white-smoke font-bold text-[14px] mr-2 hover:opacity-80 transition-opacity">{displayName}</h1>
+                                        <h1 className="text-white-smoke font-bold text-[14px] mr-2 hover:opacity-80 transition-opacity truncate max-w-33">
+                                            {headerName}
+                                        </h1>
                                     </div>
                                     <IoIosArrowDown/>
                                 </button>
@@ -75,7 +113,7 @@ export default function ArtistPage() {
                                     <div className="absolute top-full right-0 bg-[#101010] w-45 z-50">
                                         <button
                                             onClick={handleSignOut}
-                                            className="w-full px-4 py-2 text-left hover:bg-[#333333] text-sm"
+                                            className="w-full px-4 py-2 text-left hover:bg-[#333333] text-sm text-white-smoke"
                                         >
                                             Sign out
                                         </button>
@@ -115,18 +153,17 @@ export default function ArtistPage() {
             {/* Compare Features Section */}
             {plans && (
                 <CompareFeatures
-                    currentUserRole="listener"
                     onUpgrade={handleScrollToPlans}
-                    proPrice={plans.pro_yearly.amount}
+                    proPrice={plans?.pro_yearly.amount ?? 0}
                     currency={CURRENCY}
                 />
             )}
 
             {/* Footer */}
-            <div className="px-20 pb-20 bg-white">
+            <div className="px-4 sm:px-20 pb-10 sm:pb-20 bg-white">
                 {isAuthenticated && (
                     <p className="text-xs text-gray-600 mb-1">
-                        Signed in as {displayName}. 
+                        Signed in as {headerName}. 
                         <button onClick={handleSignOut} className="ml-1 text-gray-600 underline hover:text-black">
                             Sign out
                         </button>
