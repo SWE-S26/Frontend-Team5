@@ -11,7 +11,7 @@ import { FaRegClock } from "react-icons/fa";
 import { BsLightningChargeFill } from "react-icons/bs";
 import { type ArtistTrackRow } from "../ArtistStudioContent";
 import { MdOutlineDownloadForOffline } from "react-icons/md";
-import { PrettyCheckbox } from "@/app/(artist)/upload/components/TrackInfoForm";
+import { PrettyCheckbox } from "@/components/upload/TrackInfoForm";
 
 export function TrackRow({
   track,

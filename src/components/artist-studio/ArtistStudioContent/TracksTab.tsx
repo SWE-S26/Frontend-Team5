@@ -9,7 +9,7 @@ import { ImEqualizer2 } from "react-icons/im";
 import { LuSearch } from "react-icons/lu";
 import { LoadingOutlined } from '@ant-design/icons';
 import { Flex, Spin } from 'antd';
-import { PrettyCheckbox } from "@/app/(artist)/upload/components/TrackInfoForm";
+import { PrettyCheckbox } from "@/components/upload/TrackInfoForm";
 import { formatDuration, formatDate, SortField ,ArtistTrackRow } from "../ArtistStudioContent";
 import { BulkSelectionHeader } from "./BulkSelectionHeader";
 import { TrackRow } from "./TrackRow";

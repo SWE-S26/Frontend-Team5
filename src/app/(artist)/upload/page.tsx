@@ -23,8 +23,8 @@ import {
   estimateMinutes,
   formatBytes,
 } from "@/types/upload.types";
-import { MicrophoneSection } from "./components/MicrophoneSection";
-import { TrackInfoForm } from "./components/TrackInfoForm";
+import { MicrophoneSection } from "@/components/upload/MicrophoneSection";
+import { TrackInfoForm } from "@/components/upload/TrackInfoForm";
 import { useAppSelector } from "@/store/hooks";
 import { consumePendingUploadAudioFile } from "@/lib/pendingUploadAudio";
 import UploadUsageBar from "@/app/(artist)/upload/UploadUsageBar";

@@ -31,14 +31,14 @@ import {
   parseTimeInputToSeconds,
   isSameDay,
   createZoomCroppedArtworkFile,
-} from "@/app/(artist)/upload/components/TrackInfoForm";
+} from "@/components/upload/TrackInfoForm";
 
-import { ArtworkPanel }          from "@/app/(artist)/upload/components/TrackInfoForm/ArtworkPanel";
-import { BasicInfoForm }         from "@/app/(artist)/upload/components/TrackInfoForm/BasicInfoForm";
-import { AdvancedDetailsSection } from "@/app/(artist)/upload/components/TrackInfoForm/AdvancedDetailsSection";
-import { PermissionsSection }    from "@/app/(artist)/upload/components/TrackInfoForm/PermissionsSection";
-import { LicensingSection }      from "@/app/(artist)/upload/components/TrackInfoForm/LicensingSection";
-import { AudioClipSection }      from "@/app/(artist)/upload/components/TrackInfoForm/AudioClipSection";
+import { ArtworkPanel }          from "@/components/upload/TrackInfoForm/ArtworkPanel";
+import { BasicInfoForm }         from "@/components/upload/TrackInfoForm/BasicInfoForm";
+import { AdvancedDetailsSection } from "@/components/upload/TrackInfoForm/AdvancedDetailsSection";
+import { PermissionsSection }    from "@/components/upload/TrackInfoForm/PermissionsSection";
+import { LicensingSection }      from "@/components/upload/TrackInfoForm/LicensingSection";
+import { AudioClipSection }      from "@/components/upload/TrackInfoForm/AudioClipSection";
 
 interface EditTrackPanelProps {
   track: ArtistTrackRow;

@@ -1,4 +1,4 @@
-import { PrettyCheckbox } from "@/app/(artist)/upload/components/TrackInfoForm";
+import { PrettyCheckbox } from "@/components/upload/TrackInfoForm";
 import { FiPlusSquare } from "react-icons/fi";
 import { PiPencilSimple } from "react-icons/pi";
 

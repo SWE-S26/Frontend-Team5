@@ -15,7 +15,7 @@ import { VinylTab } from "./ArtistStudioContent/VinylTab";
 import { CommentsTab } from "./ArtistStudioContent/CommentsTab";
 import { PromotionsTab } from "./ArtistStudioContent/PromotionsTab";
 
-import { PrettyCheckbox } from "@/app/(artist)/upload/components/TrackInfoForm";
+import { PrettyCheckbox } from "@/components/upload/TrackInfoForm";
 
 
 export type ArtistTab = "tracks" | "distribution" | "vinyl" | "comments" | "promotions";

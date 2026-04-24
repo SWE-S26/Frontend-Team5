@@ -1,12 +1,12 @@
 "use client";
 
-import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { FiMail } from "react-icons/fi";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { LuSearch } from "react-icons/lu";
 import { SlBell } from "react-icons/sl";
+import ProfileImage from "@/components/ui/ProfileImage"
 
 import { useLogout } from "@/hooks/useAuth";
 import { useAppSelector } from "@/store/hooks";
@@ -140,7 +140,7 @@ export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
             >
               {
               profileImgLink && (
-              <Image
+              <ProfileImage
                 src={profileImgLink}
                 alt="Profile"
                 width={32}
