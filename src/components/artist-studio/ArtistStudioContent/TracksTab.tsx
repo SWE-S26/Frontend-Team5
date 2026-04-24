@@ -7,7 +7,10 @@ import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import { BsSortDown } from "react-icons/bs";
 import { ImEqualizer2 } from "react-icons/im";
 import { LuSearch } from "react-icons/lu";
-import { Checkbox, formatDuration, formatDate, SortField ,ArtistTrackRow } from "../ArtistStudioContent";
+import { LoadingOutlined } from '@ant-design/icons';
+import { Flex, Spin } from 'antd';
+import { PrettyCheckbox } from "@/app/(artist)/upload/components/TrackInfoForm";
+import { formatDuration, formatDate, SortField ,ArtistTrackRow } from "../ArtistStudioContent";
 import { BulkSelectionHeader } from "./BulkSelectionHeader";
 import { TrackRow } from "./TrackRow";
 import { ArtistProBenefits } from "./ArtistProBenefits";
@@ -22,17 +25,19 @@ function TracksTableHeader({ onSelectAll, allSelected }: { onSelectAll: (v: bool
   return (
     <div
       className="mt-4 grid border-b border-[#2a2a2a] px-3 pb-2"
-      style={{ gridTemplateColumns: "32px 1fr 80px 120px 220px 80px 130px 30px" }}
+      style={{
+        gridTemplateColumns:
+          "32px minmax(200px, 1fr) 80px 120px 220px 80px 130px 30px",
+      }}
     >
       <div className="flex items-center">
-        <Checkbox checked={allSelected} onChange={onSelectAll} />
+        <PrettyCheckbox checked={allSelected} onChange={onSelectAll} />
       </div>
-      <div className="text-[11px] font-bold tracking-[0.8px] text-[#888]">TRACKS</div>
-      <div className="text-center text-[11px] font-bold tracking-[0.8px] text-[#888]">DURATION</div>
-      <div className="text-center text-[11px] font-bold tracking-[0.8px] text-[#888]">DATE</div>
-      <div className="text-center text-[11px] font-bold tracking-[0.8px] text-[#888]">ENGAGEMENTS</div>
-      <div className="text-right text-[11px] font-bold tracking-[0.8px] text-[#888]">PLAYS</div>
-      <div /><div />
+      <div className="text-[11px] font-bold tracking-[0.8px] text-white-smoke">TRACKS</div>
+      <div className="text-center text-[11px] font-bold tracking-[0.8px] text-white-smoke">DURATION</div>
+      <div className="text-center text-[11px] font-bold tracking-[0.8px] text-white-smoke">DATE</div>
+      <div className="text-center text-[11px] font-bold tracking-[0.8px] text-white-smoke">ENGAGEMENTS</div>
+      <div className="text-right text-[11px] font-bold tracking-[0.8px] text-white-smoke">PLAYS</div>
     </div>
   );
 }
@@ -93,15 +98,15 @@ function SortDropdown({ sortField, sortDir, onSortField, onSortDir }: {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 rounded-full bg-[#222] px-3 py-1.5 text-[13px] text-white hover:bg-[#2a2a2a] transition-colors cursor-pointer"
+        className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] text-white-smoke hover:bg-[#2a2a2a] transition-colors cursor-pointer"
       >
         <BsSortDown className="text-sm" />
         {options.find((o) => o.value === sortField)?.label}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-1 w-44 rounded-lg border border-[#2a2a2a] bg-[#1a1a1a] py-2 shadow-xl">
-          <p className="px-4 pb-2 pt-1 text-[10px] font-bold tracking-widest text-[#555]">SORT BY</p>
+        <div className="absolute right-0 top-full z-50 mt-1 w-44 rounded-lg bg-[#1a1a1a] py-2 shadow-xl">
+          <p className="px-4 pb-2 pt-1 text-[10px] font-bold tracking-widest text-white-smoke">SORT BY</p>
           {options.map((opt) => (
             <button
               key={opt.value}
@@ -109,7 +114,7 @@ function SortDropdown({ sortField, sortDir, onSortField, onSortDir }: {
               onClick={() => handleSelect(opt.value)}
               className="flex w-full items-center justify-between px-4 py-2.5 text-[13px] hover:bg-[#252525] transition-colors cursor-pointer"
             >
-              <span className={sortField === opt.value ? "font-bold text-white" : "font-normal text-[#ccc]"}>{opt.label}</span>
+              <span className={sortField === opt.value ? "font-bold text-white" : "font-normal text-white-smoke"}>{opt.label}</span>
               {sortField === opt.value && (
                 <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
                   <path d="M1 5L4.5 8.5L11 1" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -148,13 +153,13 @@ function TracksFilterBar({ isMobile, search, onSearch, filter, onFilter, count, 
           value={search}
           onChange={(e) => onSearch(e.target.value)}
           placeholder="Search tracks"
-          className="w-full rounded-full border border-[#333] bg-transparent py-1.5 pl-9 pr-3 text-[13px] text-white outline-none placeholder:text-[#666] focus:border-[#555]"
+          className="w-full rounded-full border border-[#333] bg-transparent py-1.5 pl-9 pr-3 text-[13px] text-white-smoke outline-none placeholder:text-[#666] focus:border-[#555]"
         />
       </div>
       <button type="button" onClick={() => onFilter("public")}  className={pillClass(filter === "public")}>Public</button>
       <button type="button" onClick={() => onFilter("private")} className={pillClass(filter === "private")}>Private</button>
       <div className={`flex items-center gap-2 text-[13px] ${isMobile ? "w-full justify-between" : "ml-auto"}`}>
-        <span className="font-semibold text-white">{count} tracks</span>
+        <span className="font-semibold text-white-smoke">{count} tracks</span>
         <SortDropdown sortField={sortField} onSortField={onSortField} sortDir={sortDir} onSortDir={onSortDir} />
       </div>
     </div>
@@ -303,10 +308,20 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
         )
       )}
 
-      {loading && <div className="px-3 py-6 text-[13px] text-[#888]">Loading tracks…</div>}
-      {!loading && !isAuthenticated && <div className="px-3 py-6 text-[13px] text-red-400">You must be logged in to view your tracks.</div>}
-      {!loading && isAuthenticated && error && <div className="px-3 py-6 text-[13px] text-red-400">Failed to load tracks. Please try again.</div>}
-      {!loading && isAuthenticated && !error && rows.length === 0 && <div className="px-3 py-6 text-[13px] text-[#888]">No tracks found.</div>}
+      {loading && (
+        <div className="px-3 py-6">
+          <Spin indicator={<LoadingOutlined style={{ fontSize: 32, color: 'white' }} spin />} />
+        </div>
+      )}
+      {!loading && !isAuthenticated && (
+        <div className="px-3 py-6 text-[13px] text-red-400">You must be logged in to view your tracks.</div>
+      )}
+      {!loading && isAuthenticated && error && (
+        <div className="px-3 py-6 text-[13px] text-red-400">Failed to load tracks. Please try again.</div>
+      )}
+      {!loading && isAuthenticated && !error && rows.length === 0 && (
+        <div className="px-3 py-6 text-[13px] text-[#888]">No tracks found.</div>
+      )}
       {!loading && isAuthenticated && !error && rows.map((track) => (
         <TrackRow
           key={track.id}
@@ -319,7 +334,6 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
           isDeleting={deletingId === track.id}
         />
       ))}
-
       {errorDelete && (
         <div className="px-3 py-2 text-[13px] text-red-400">{errorDelete}</div>
       )}
@@ -339,9 +353,15 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
           onDelete={(id) => { void handleDelete(id); }}
         />
       )}
-      {editTrack    && <EditTrackPanel track={editTrack} onClose={() => setEditTrackId(null)} onSave={(updated) => {
-        setLocalOverrides((prev) => ({ ...prev, [editTrack.id]: { ...prev[editTrack.id], ...updated } }));
-      }} />}
+      {editTrack && (
+        <EditTrackPanel
+          track={editTrack}
+          onClose={() => setEditTrackId(null)}
+          onSave={(updated) => {
+            setLocalOverrides((prev) => ({ ...prev, [editTrack.id]: { ...prev[editTrack.id], ...updated } }));
+          }}
+        />
+      )}
       {bulkEditOpen && <BulkEditPanel selectedIds={selectedIds} tracks={rows} onClose={() => setBulkEditOpen(false)} />}
       {addToPlaylistOpen && <AddToPlaylistPanel onClose={() => setAddToPlaylistOpen(false)} />}
     </div>

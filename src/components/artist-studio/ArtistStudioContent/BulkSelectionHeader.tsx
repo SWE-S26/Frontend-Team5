@@ -1,5 +1,8 @@
-import { Checkbox } from "../ArtistStudioContent";
-import { FiEdit2, FiPlusSquare } from "react-icons/fi";
+import { PrettyCheckbox } from "@/app/(artist)/upload/components/TrackInfoForm";
+import { FiPlusSquare } from "react-icons/fi";
+import { PiPencilSimple } from "react-icons/pi";
+
+const GRID = "32px minmax(200px, 1fr) 80px 120px 220px 80px 130px 30px";
 
 export function BulkSelectionHeader({
   selectedCount,
@@ -20,36 +23,45 @@ export function BulkSelectionHeader({
 
   return (
     <div
-      className="grid items-center border-b border-[#2a2a2a] px-3 pb-2 pt-2"
-      style={{ gridTemplateColumns: "32px 1fr 80px 120px 220px 80px 130px 30px" }}
+      className="grid items-center border-b border-[#2a2a2a] px-3 py-2"
+      style={{ gridTemplateColumns: GRID }}
     >
       <div className="flex items-center">
-        <Checkbox
+        <PrettyCheckbox
           checked={allSelected}
-          indeterminate={selectedCount > 0 && !allSelected}
           onChange={(v) => (v ? onSelectAll() : onDeselectAll())}
         />
       </div>
+
       <div className="flex items-center gap-3">
-        <span className="text-[13px] font-bold text-white">{selectedCount} SELECTED</span>
-        <button
-          type="button"
-          onClick={onEditSelected}
-          title="Edit selected"
-          className="flex items-center justify-center rounded p-1 text-[#888] hover:text-white transition-colors"
-        >
-          <FiEdit2 className="text-[15px]" />
+        <span className="text-[13px] font-bold text-white-smoke">
+          {selectedCount} SELECTED
+        </span>
+
+        <button onClick={onEditSelected}>
+          <PiPencilSimple className="text-[15px] text-white-smoke cursor-pointer" />
         </button>
-        <button
-          type="button"
-          onClick={onAddSelectedToPlaylist}
-          title="Add to playlist"
-          className="flex items-center justify-center rounded p-1 text-[#888] hover:text-white transition-colors"
-        >
-          <FiPlusSquare className="text-[15px]" />
+
+        <button onClick={onAddSelectedToPlaylist}>
+          <FiPlusSquare className="text-[15px] text-white-smoke cursor-pointer" />
         </button>
       </div>
-      <div /><div /><div /><div /><div /><div />
+
+      <div className="text-[11px] font-bold tracking-[0.8px] text-white-smoke text-center">
+        DURATION
+      </div>
+
+      <div className="text-[11px] font-bold tracking-[0.8px] text-white-smoke text-center">
+        DATE
+      </div>
+
+      <div className="text-[11px] font-bold tracking-[0.8px] text-white-smoke text-center">
+        ENGAGEMENTS
+      </div>
+
+      <div className="text-[11px] font-bold tracking-[0.8px] text-white-smoke text-right">
+        PLAYS
+      </div>
     </div>
   );
 }
