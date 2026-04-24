@@ -43,9 +43,10 @@ import { AudioClipSection }      from "@/app/(artist)/upload/components/TrackInf
 interface EditTrackPanelProps {
   track: ArtistTrackRow;
   onClose: () => void;
+  onSave?: (updated: Partial<ArtistTrackRow>) => void;
 }
 
-export function EditTrackPanel({ track, onClose }: EditTrackPanelProps) {
+export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) {
   // API hooks
   const { getTrackById, track: fullTrack, loading: loadingTrack } = useGetTrackById();
   const { updateTrack, loading: saving } = useUpdateTrack();
@@ -509,9 +510,11 @@ export function EditTrackPanel({ track, onClose }: EditTrackPanelProps) {
     if (!frame) return;
     const dx = e.clientX - artworkPanStartRef.current.clientX;
     const dy = e.clientY - artworkPanStartRef.current.clientY;
+    const overflowX = Math.max(1, frame.clientWidth  * (artworkZoom - 1));
+    const overflowY = Math.max(1, frame.clientHeight * (artworkZoom - 1));
     setArtworkPosition({
-      x: clampArtworkPos(artworkPanStartRef.current.startX + dx / Math.max(1, frame.clientWidth)),
-      y: clampArtworkPos(artworkPanStartRef.current.startY + dy / Math.max(1, frame.clientHeight)),
+      x: clampArtworkPos(artworkPanStartRef.current.startX + dx / overflowX),
+      y: clampArtworkPos(artworkPanStartRef.current.startY + dy / overflowY),
     });
   };
 
@@ -787,6 +790,15 @@ export function EditTrackPanel({ track, onClose }: EditTrackPanelProps) {
 
     try {
       await updateTrack(payload);
+      const coverPreview = zoomCroppedArtwork
+        ? URL.createObjectURL(zoomCroppedArtwork)
+        : artworkUrl ?? track.cover;
+      onSave?.({
+        title:     parsedTitle,
+        label:     mainArtists.join(", "),
+        isPrivate: !isPublic,
+        cover:     coverPreview,
+      });
       onClose();
     } catch (err: any) {
       const ve = err?.response?.data?.errors;

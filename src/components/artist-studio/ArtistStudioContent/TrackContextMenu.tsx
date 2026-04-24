@@ -54,7 +54,7 @@ export function TrackContextMenu({
           key={label}
           type="button"
           onClick={action}
-          className={`flex w-full items-center gap-3 px-4 py-2.5 text-[13px] transition-colors hover:bg-[#222] ${
+          className={`flex w-full items-center gap-3 px-4 py-2.5 text-[13px] transition-colors hover:bg-[#222] cursor-pointer ${
             danger ? "text-red-400 hover:text-red-300" : "text-[#ccc] hover:text-white"
           }`}
         >

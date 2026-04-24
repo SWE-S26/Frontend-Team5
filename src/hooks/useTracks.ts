@@ -235,3 +235,31 @@ export function useIncrementPlayCount() {
 
   return { incrementPlayCount, loading, error, success };
 }
+
+export function useDeleteTrack() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+
+  const deleteTrack = useCallback(
+    async (id: string) => {
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+      try {
+        const res = await tracksService.deleteTrack(id);
+        setSuccess(true);
+        return res.data;
+      } catch (err: any) {
+        setError(err.response?.data?.message || "Failed to delete track.");
+        setSuccess(false);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  return { deleteTrack, loading, error, success };
+}
