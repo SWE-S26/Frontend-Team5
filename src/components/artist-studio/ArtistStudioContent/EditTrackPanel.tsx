@@ -218,35 +218,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   );
   const waveformMax = useMemo(() => Math.max(...waveformDisplaySamples, 1), [waveformDisplaySamples]);
 
-  const baseWaveformBars = useMemo(
-    () =>
-      waveformDisplaySamples.map((sample, idx) => {
-        const normalized = Math.max(0.12, sample / waveformMax);
-        return (
-          <span
-            key={`wave-${idx}`}
-            className="block flex-1 rounded-[1px]"
-            style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-base)" }}
-          />
-        );
-      }),
-    [waveformDisplaySamples, waveformMax],
-  );
 
-  const leftMaskedWaveformBars = useMemo(
-    () =>
-      waveformDisplaySamples.map((sample, idx) => {
-        const normalized = Math.max(0.12, sample / waveformMax);
-        return (
-          <span
-            key={`wave-left-mask-${idx}`}
-            className="block flex-1 rounded-[1px]"
-            style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-left-wave)" }}
-          />
-        );
-      }),
-    [waveformDisplaySamples, waveformMax],
-  );
 
   // Fetch track on mount
 
@@ -1012,8 +984,8 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
                     expanded={expandedSections.audioClip}
                     onToggle={() => toggleSection("audioClip")}
                     COLLAPSIBLE_MOTION_PROPS={COLLAPSIBLE_MOTION_PROPS}
-                    baseWaveformBars={baseWaveformBars}
-                    leftMaskedWaveformBars={leftMaskedWaveformBars}
+                    waveformSamples={waveformDisplaySamples}
+                    waveformMax={waveformMax}
                     canSetAudioPreview={canSetAudioPreview}
                     clipLeftPercent={clipLeftPercent}
                     rightShadePercent={rightShadePercent}
