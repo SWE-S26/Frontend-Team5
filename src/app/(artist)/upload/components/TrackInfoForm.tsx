@@ -118,6 +118,8 @@ export interface TrackInfoFormProps {
   uploadedFileUrl: string | null;
   trackTitle: string;
   setTrackTitle: (v: string) => void;
+  permalink: string;
+  setPermalink: (v: string) => void;
   artistName: string;
   setArtistName: (v: string) => void;
   genre: string;
@@ -175,6 +177,13 @@ export interface TrackInfoFormProps {
   onReplaceTrackFile: (file: File) => void;
 }
 
+function slugify(value: string): string {
+  return value
+    .toLowerCase()
+    .trim()
+    .replace(/\s+/g, "-")
+    .replace(/[^a-z0-9-]/g, "");
+}
 export function clamp(value: number, min: number, max: number): number {
   return Math.min(max, Math.max(min, value));
 }
@@ -254,13 +263,6 @@ export function isAudioFile(file: File): boolean {
     file.type.startsWith("audio/") ||
     SUPPORTED_AUDIO_EXTENSIONS.some((ext) => lower.endsWith(ext))
   );
-}
-
-export function buildTrackSlug(trackTitle: string, currentFileName: string): string {
-  return (trackTitle || currentFileName.replace(/\.[^/.]+$/, ""))
-    .toLowerCase()
-    .replace(/\s+/g, "-")
-    .replace(/[^a-z0-9-]/g, "");
 }
 
 export async function createZoomCroppedArtworkFile(
@@ -535,7 +537,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   // Props
   const {
     isUploading, uploadProgress, currentFileName, currentFile, uploadedFileUrl,
-    trackTitle, setTrackTitle, artistName, setArtistName, genre, setGenre,
+    trackTitle, setTrackTitle, permalink, setPermalink, artistName, setArtistName, genre, setGenre,
     tags, setTags, description, setDescription, isPublic, setIsPublic,
     scheduleRelease, setScheduleRelease, expandedSections, toggleSection,
     buyLink, setBuyLink, recordLabel, setRecordLabel, releaseDate, setReleaseDate,
@@ -554,7 +556,6 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   const hasTrackForReplacement = Boolean(currentFile || uploadedFileUrl);
   const hasFinishedUpload      = !isUploading && uploadProgress >= 99.5;
   const showReplaceTrack       = hasTrackForReplacement && hasFinishedUpload;
-  const slug                   = buildTrackSlug(trackTitle, currentFileName);
 
   const permaLinkRegex        = /^[a-z0-9_-]+$/;
   const permaLinkHasCharRegex = /[a-z0-9_-]/;
@@ -931,7 +932,12 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
 
   // Handlers: Form Submit
   const buildCreateTrackPayload = async (): Promise<CreateTrackRequest> => {
-    const permalink         = (slug || "").trim();
+    const permalinkInput    = permalink.trim();
+    const permalinkValue    = permalinkInput
+      .replace(/^https?:\/\/beatza\.me\//i, "")
+      .replace(/^beatza\.me\//i, "")
+      .replace(/^\/+/, "")
+      .replace(/\/+$/, "");
     const mainArtists       = toList(artistName);
     const parsedTags        = toList(tags);
     const parsedDescription = toOptionalTrimmed(description);
@@ -949,8 +955,8 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     if (!currentFile)                                                       throw new Error("An audio file is required.");
     if (currentFile.size > MAX_FILE_SIZE_BYTES)                             throw new Error(`Audio file exceeds the ${formatBytes(MAX_FILE_SIZE_BYTES)} limit.`);
     if (!parsedTitle)                                                       throw new Error("Track title is required.");
-    if (!permaLinkRegex.test(permalink))                                    throw new Error("Use only lowercase letters, numbers, underscores, or hyphens.");
-    if (!permaLinkHasCharRegex.test(permalink))                             throw new Error("Permalink cannot be only digits.");
+    if (!permaLinkRegex.test(permalinkValue))                               throw new Error("Use only lowercase letters, numbers, underscores, or hyphens.");
+    if (!permaLinkHasCharRegex.test(permalinkValue))                        throw new Error("Permalink cannot be only digits.");
     if (mainArtists.length < 1)                                             throw new Error("At least one artist is required");
     if (tags.trim().length > 0 && parsedTags.length < 1)                   throw new Error("At least one tag is required");
     if (description.length > 0 && !parsedDescription)                      throw new Error("Description cannot be empty");
@@ -963,13 +969,16 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     const zoomCroppedArtwork = artworkFile
       ? await createZoomCroppedArtworkFile(artworkFile, artworkZoom, artworkPosition)
       : undefined;
+    if (!permalinkInput)                                               throw new Error("Permalink is required.");
+    if (!permaLinkRegex.test(permalinkValue))                           throw new Error("Use only lowercase letters, numbers, underscores, or hyphens.");
+    if (!permaLinkHasCharRegex.test(permalinkValue))                    throw new Error("Permalink cannot be only digits.");
 
     return {
       audio: currentFile,
       image: zoomCroppedArtwork,
       basicInfo: {
         title: parsedTitle,
-        permalink,
+        permalink: permalinkValue,
         mainArtists,
         genre: parsedGenre,
         tags: parsedTags.length > 0 ? parsedTags : undefined,
@@ -1254,7 +1263,8 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
             SWITCH_CLS={SWITCH_CLS}
             trackTitle={trackTitle}
             setTrackTitle={setTrackTitle}
-            slug={slug}
+            permalink={permalink}
+            setPermalink={setPermalink}
             artistName={artistName}
             setArtistName={setArtistName}
             genre={genre}

@@ -32,7 +32,8 @@ interface BasicInfoFormProps {
 	SWITCH_CLS: string;
 	trackTitle: string;
 	setTrackTitle: (value: string) => void;
-	slug: string;
+	permalink: string;
+	setPermalink: (value: string) => void;
 	artistName: string;
 	setArtistName: (value: string) => void;
 	genre: string;
@@ -71,7 +72,8 @@ export function BasicInfoForm({
 	SWITCH_CLS,
 	trackTitle,
 	setTrackTitle,
-	slug,
+	permalink,
+	setPermalink,
 	artistName,
 	setArtistName,
 	genre,
@@ -120,9 +122,13 @@ export function BasicInfoForm({
 
 			<div>
 				<label className={LABEL_CLS}>Track link</label>
-				<div className="border-b border-[#333] pb-2 pt-1 text-[13px] text-white-smoke truncate">
-					https://beatza.me/{slug || "your-track"}/
-				</div>
+				<input
+					type="text"
+					value={permalink}
+					onChange={(e) => setPermalink(e.target.value)}
+					placeholder="https://beatza.me/displayname/"
+					className={FIELD_CLS}
+				/>
 			</div>
 
 			<div>
