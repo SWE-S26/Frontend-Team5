@@ -7,7 +7,6 @@ import { useRouter } from "next/navigation";
 import { useRef, useState, useCallback, useEffect } from "react";
 import {
   CloseOutlined,
-  CloudUploadOutlined,
 } from "@ant-design/icons";
 import {
   UploadedFile,
@@ -28,6 +27,8 @@ import { MicrophoneSection } from "./components/MicrophoneSection";
 import { TrackInfoForm } from "./components/TrackInfoForm";
 import { useAppSelector } from "@/store/hooks";
 import { consumePendingUploadAudioFile } from "@/lib/pendingUploadAudio";
+import UploadUsageBar from "@/app/(artist)/upload/UploadUsageBar";
+import { useGetUploadQuota } from "@/hooks/useTracks";
 
 function encodeAudioBufferToWav(buffer: AudioBuffer): Blob {
   const numChannels = buffer.numberOfChannels;
@@ -132,6 +133,9 @@ export default function UploadPage() {
   const playbackProgressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const authDisplayName = useAppSelector((state) => state.auth.displayName);
+  const role = useAppSelector((state) => state.auth.role);
+  const isArtistPro = role === "Pro";
+  const { getUploadQuota, quota } = useGetUploadQuota();
 
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
@@ -204,10 +208,13 @@ export default function UploadPage() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [recordingDurationSeconds, setRecordingDurationSeconds] = useState(0);
 
-  const totalMinutesUsed = uploadedFiles
+  const uploadedTracksCount = uploadedFiles
     .filter((f) => f.status === "done")
-    .reduce((acc, f) => acc + f.estimatedMinutes, 0);
-  const usagePercent = Math.min(100, (totalMinutesUsed / TOTAL_TRACK_LIMIT) * 100);
+    .length;
+  const serverQuota = quota ?? TOTAL_TRACK_LIMIT;
+  const totalTrackQuota = Math.max(1, serverQuota);
+  const usedTracks = Math.max(0, Math.min(totalTrackQuota, uploadedTracksCount));
+  const usagePercent = Math.min(100, (usedTracks / totalTrackQuota) * 100);
 
   const addToast = useCallback((type: Toast["type"], message: string) => {
     const id = generateId();
@@ -298,6 +305,10 @@ export default function UploadPage() {
     if (!pending) return;
     processFiles([pending], true, true);
   }, []);
+
+  useEffect(() => {
+    void getUploadQuota().catch(() => undefined);
+  }, [getUploadQuota]);
 
   const hasAtLeastOneSupportedAudioFile = (files: File[]) => {
     return files.some((file) => {
@@ -699,6 +710,7 @@ export default function UploadPage() {
           showTrackInsights={showTrackInsights} setShowTrackInsights={setShowTrackInsights}
           geoblockingOption={geoblockingOption} setGeoblockingOption={setGeoblockingOption}
           licenseType={licenseType} setLicenseType={setLicenseType}
+          isArtistPro={isArtistPro}
           onReplaceTrackFile={handleReplaceTrackFile}
         />
       </>
@@ -744,26 +756,13 @@ export default function UploadPage() {
         </div>
 
         <main className="mx-auto max-w-6xl mt-5 w-full flex-1">
-        {/* Usage bar */}
-        <div className="rounded-md border border-[#27272d] bg-[#212121] px-4 py-3">
-          <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
-            <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
-              <div className="flex h-12 w-5 items-center justify-center text-[10px] text-[#dadadd]">
-                <CloudUploadOutlined style={{ fontSize: '24px' }} />
-              </div>
-              <span className="text-[13px] font-semibold text-[#f1f1f1]">{Math.round(usagePercent)}% of uploads used</span>
-              <div className="relative h-1 w-full rounded-full bg-[#3f4047] sm:flex-1 md:min-w-48">
-                <div className="absolute left-0 top-0 h-1 rounded-full bg-white transition-all duration-500" style={{ width: `${usagePercent}%` }} />
-              </div>
-              <span className="text-[13px] font-semibold text-[#f1f1f1] sm:whitespace-nowrap">
-                {Math.round(totalMinutesUsed)} of {TOTAL_TRACK_LIMIT} tracks
-              </span>
-            </div>
-            <button className="w-full rounded-full border border-silver/30 bg-chinese-black px-5 py-1.5 text-[13px] font-semibold text-white-smoke transition-colors hover:opacity-90 cursor-pointer sm:w-fit" type="button">
-              Get unlimited uploads
-            </button>
-          </div>
-        </div>
+        <UploadUsageBar
+          usedTracks={usedTracks}
+          totalTracks={totalTrackQuota}
+          usagePercent={usagePercent}
+          isArtistPro={isArtistPro}
+          onUpgradeClick={() => router.push("/artistpro")}
+        />
 
         <section className="mt-8">
           <h1 className="pb-2 text-[24px] font-black tracking-[-0.03em] text-white-smoke sm:text-[28px]">Upload your audio files.</h1>

@@ -1,12 +1,12 @@
 "use client";
 
 import React from "react";
-import { CloudUploadOutlined } from "@ant-design/icons";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 
-import { useGetPostedTracks } from "@/hooks/useTracks";
-import { TOTAL_TRACK_LIMIT } from "@/types/upload.types";
+import { useGetPostedTracks, useGetUploadQuota } from "@/hooks/useTracks";
+import { useAppSelector } from "@/store/hooks";
+import UploadUsageBar from "@/app/(artist)/upload/UploadUsageBar";
 
 import { ArtistStudioHeader } from "./ArtistStudioContent/ArtistStudioHeader";
 import { TracksTab } from "./ArtistStudioContent/TracksTab";
@@ -169,32 +169,12 @@ function TabBar({ activeTab, onChangeTab }: { activeTab: ArtistTab; onChangeTab:
   );
 }
 
-function UploadQuotaBanner({ usagePercent, minutesUsed }: { usagePercent: number; minutesUsed: number }) {
-  return (
-    <div className="mb-6 rounded-lg border border-[#2a2a2a] bg-[#1f2023] p-4">
-      <div className="flex flex-wrap items-center justify-between gap-3">
-        <div className="flex items-center gap-3">
-          <CloudUploadOutlined style={{ fontSize: 22, color: "#d0d0d0" }} />
-          <span className="text-[15px] font-semibold text-white">{Math.round(usagePercent)}% of uploads used</span>
-          <div className="relative h-1.5 w-48 rounded-full bg-[#474747]">
-            <div
-              className="absolute left-0 top-0 h-1.5 rounded-full bg-green-500 transition-all duration-500"
-              style={{ width: `${usagePercent}%` }}
-            />
-          </div>
-          <span className="text-[15px] text-[#d0d0d0]">{Math.round(minutesUsed)} of {TOTAL_TRACK_LIMIT} tracks</span>
-        </div>
-        <button type="button" className="rounded-full border border-[#444] bg-[#0e0e10] px-5 py-1.5 text-[14px] font-bold text-white hover:border-[#666] transition-colors">
-          Get unlimited uploads
-        </button>
-      </div>
-    </div>
-  );
-}
-
 export default function ArtistStudioContent({ activeTab, onChangeTab }: ArtistStudioContentProps) {
   const [isMobile, setIsMobile] = useState(false);
   const { getPostedTracks, tracks: postedTracks } = useGetPostedTracks();
+  const { getUploadQuota, quota } = useGetUploadQuota();
+  const role = useAppSelector((state) => state.auth.role);
+  const isArtistPro = role === "Pro";
 
   useEffect(() => {
     const update = () => setIsMobile(window.innerWidth < 1024);
@@ -203,8 +183,14 @@ export default function ArtistStudioContent({ activeTab, onChangeTab }: ArtistSt
     return () => window.removeEventListener("resize", update);
   }, []);
 
-  const totalMinutesUsed = 0;
-  const usagePercent = Math.min(100, (totalMinutesUsed / TOTAL_TRACK_LIMIT) * 100);
+  const usedTracks = (postedTracks ?? []).length;
+  const serverQuota = quota ?? 0;
+  const totalTrackQuota = Math.max(1, serverQuota + usedTracks);
+  const usagePercent = Math.min(100, (usedTracks / totalTrackQuota) * 100);
+
+  useEffect(() => {
+    void getUploadQuota().catch(() => undefined);
+  }, [getUploadQuota]);
 
   const stats = useMemo(() => {
     const tracks = postedTracks ?? [];
@@ -219,7 +205,13 @@ export default function ArtistStudioContent({ activeTab, onChangeTab }: ArtistSt
 
   return (
     <section className="min-h-screen bg-[#111] px-6 pb-4 pt-0">
-      <UploadQuotaBanner usagePercent={usagePercent} minutesUsed={totalMinutesUsed} />
+      <UploadUsageBar
+        className="mb-6"
+        usedTracks={usedTracks}
+        totalTracks={totalTrackQuota}
+        usagePercent={usagePercent}
+        isArtistPro={isArtistPro}
+      />
       <ArtistStudioHeader stats={stats} />
       <TabBar activeTab={activeTab} onChangeTab={onChangeTab} />
       <div className="py-5">
