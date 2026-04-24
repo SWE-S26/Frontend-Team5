@@ -15,16 +15,22 @@ import { useCallback, useEffect, useState } from "react";
 
 // ─── Track ────────────────────────────────────────────────────────────────────
 
-export function useRepostTrack(trackId: string) {
+export function useRepostTrack(
+  trackId: string,
+  enabled = true,
+  initialNumReposts?: number,
+) {
   const [reposted, setReposted] = useState(false);
   const [caption, setCaption] = useState<string | null>(null);
-  const [numOfReposts, setNumOfReposts] = useState<number | null>(null);
+  const [numOfReposts, setNumOfReposts] = useState<number | null>(
+    initialNumReposts ?? null,
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch initial repost status
+  // Fetch initial repost status — only when visible
   useEffect(() => {
-    if (!trackId) return;
+    if (!trackId || !enabled) return;
 
     const loadStatus = async () => {
       try {
@@ -41,11 +47,11 @@ export function useRepostTrack(trackId: string) {
     };
 
     loadStatus();
-  }, [trackId]);
+  }, [trackId, enabled]);
 
-  // Fetch initial repost count
+  // Fetch repost count on mount only if no initial value was provided
   useEffect(() => {
-    if (!trackId) return;
+    if (!trackId || !enabled || initialNumReposts !== undefined) return;
 
     const loadCount = async () => {
       try {
@@ -55,7 +61,7 @@ export function useRepostTrack(trackId: string) {
     };
 
     loadCount();
-  }, [trackId]);
+  }, [trackId, enabled, initialNumReposts]);
 
   const repostTrack = useCallback(
     async (newCaption?: string) => {
@@ -95,7 +101,7 @@ export function useRepostTrack(trackId: string) {
   );
 
   return {
-    repostTrack: repostTrack,
+    repostTrack,
     reposted,
     caption,
     numOfReposts,
@@ -141,15 +147,21 @@ export function useTrackRepostsList(trackId: string) {
 
 // ─── Playlist ─────────────────────────────────────────────────────────────────
 
-export function useRepostPlaylistOptimistic(playlistId: string) {
+export function useRepostPlaylist(
+  playlistId: string,
+  enabled = true,
+  initialNumReposts?: number,
+) {
   const [reposted, setReposted] = useState(false);
-  const [numOfReposts, setNumOfReposts] = useState<number | null>(null);
+  const [numOfReposts, setNumOfReposts] = useState<number | null>(
+    initialNumReposts ?? null,
+  );
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // Fetch initial repost count
+  // Fetch repost count on mount only if no initial value was provided
   useEffect(() => {
-    if (!playlistId) return;
+    if (!playlistId || !enabled || initialNumReposts !== undefined) return;
 
     const loadCount = async () => {
       try {
@@ -159,7 +171,7 @@ export function useRepostPlaylistOptimistic(playlistId: string) {
     };
 
     loadCount();
-  }, [playlistId]);
+  }, [playlistId, enabled, initialNumReposts]);
 
   const repostPlaylistOptimistic = useCallback(
     async (caption?: string) => {
