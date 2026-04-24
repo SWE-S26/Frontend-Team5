@@ -20,6 +20,7 @@ export function TrackRow({
   onSelect,
   onAmplify,
   onContextMenu,
+  isDeleting,
 }: {
   track: ArtistTrackRow;
   isMobile: boolean;
@@ -27,6 +28,7 @@ export function TrackRow({
   onSelect: (id: string, v: boolean) => void;
   onAmplify: (id: string) => void;
   onContextMenu: (id: string, e: React.MouseEvent) => void;
+  isDeleting: boolean;
 }) {
   const dispatch = useDispatch();
   const { currentTrackId, isPlaying } = useAppSelector((state: RootState) => state.player);
@@ -144,7 +146,7 @@ export function TrackRow({
         <button
           type="button"
           onClick={(e) => onContextMenu(track.id, e)}
-          className="text-[18px] text-[#666] hover:text-[#aaa] transition-colors"
+          className="text-[18px] text-[#666] hover:text-[#aaa] transition-colors cursor-pointer"
           aria-label="Track actions"
         >
           ⋮

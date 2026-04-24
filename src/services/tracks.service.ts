@@ -8,6 +8,7 @@ import {
 	UpdateTrackRequest,
 	UpdateTrackResponse,
 	incrementPlayCountResponse,
+	deleteTrackResponse,
 } from "@/types/tracks.types";
 
 export const tracksService = {
@@ -76,4 +77,7 @@ export const tracksService = {
 
 	incrementPlayCount: (id: string) =>
 		api.patch<incrementPlayCountResponse>(`/api/tracks/v1/listen/${id}`),
+
+	deleteTrack: (id: string) =>
+		api.delete<deleteTrackResponse>(`/api/tracks/v1/${id}`),
 };
