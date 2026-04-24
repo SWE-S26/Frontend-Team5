@@ -6,14 +6,17 @@ import SausageWaveform from "@/components/ui/SausageWaveform";
 import Tooltip from "@/components/ui/Tooltip";
 import MoreDropdown from "@/components/ui/MoreDropdown";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useEffect } from "react";
 import { Avatar } from "antd";
 
 import { motion, AnimatePresence, Transition } from "framer-motion";
 
 import { useAppSelector } from "@/store/hooks";
 import { useAudioProgress } from "@/hooks/useAudioProgress";
+
 import { useStatelessComments } from "@/hooks/useComments";
+import { useLikeTrackOptimistic } from "@/hooks/useLikes";
+import { useRepostTrack } from "@/hooks/useReposts";
 
 import { UserOutlined } from "@ant-design/icons";
 import { IoIosMore, IoMdPlay, IoMdPause } from "react-icons/io";
@@ -32,9 +35,10 @@ type CardProps = {
   img?: string;
   title?: string;
   artist?: string;
-  trackId?: string;
+  trackId: string;
   trackUrl?: string;
   duration?: number;
+  initialLikes?: number;
   allTracks?: Track[];
 };
 
@@ -47,15 +51,14 @@ export default function WaveformCard({
   trackId,
   trackUrl,
   duration,
+  initialLikes,
   allTracks,
 }: CardProps) {
-  const [isLiked, setIsLiked] = useState(false);
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
   const [canComment, setCanComment] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [commentTimestamp, setCommentTimestamp] = useState(0);
-  // The submitted comment text shown as a flash bubble for 2s, null = no flash
   const [flashComment, setFlashComment] = useState<string | null>(null);
   const [reloadTrigger, setReloadTrigger] = useState(0);
 
@@ -63,6 +66,21 @@ export default function WaveformCard({
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
+
+  const {
+    likeTrack,
+    liked,
+    numOfLikes,
+    loading: likeLoading,
+  } = useLikeTrackOptimistic(trackId, initialLikes);
+
+  const {
+    repostTrack,
+    reposted,
+    numOfReposts,
+    loading: repostLoading,
+  } = useRepostTrack(trackId);
+
   const { progress, currentTime, seekToPercentage } = useAudioProgress();
 
   const dispatch = useDispatch();
@@ -70,6 +88,10 @@ export default function WaveformCard({
     (state: RootState) => state.player,
   );
   const isThisCardPlaying = currentTrackId === trackId && isPlaying;
+
+  useEffect(() => {
+    if (isThisCardPlaying) setShowCommentBox(true);
+  }, [isThisCardPlaying]);
 
   const { submitComment } = useStatelessComments();
 
@@ -109,7 +131,6 @@ export default function WaveformCard({
 
       if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
       setFlashComment(content);
-      // Reload comments 200ms before flash ends so real avatar is ready when flash disappears
       setTimeout(() => setReloadTrigger((n) => n + 1), FLASH_DURATION - 1500);
       flashTimerRef.current = setTimeout(
         () => setFlashComment(null),
@@ -211,7 +232,6 @@ export default function WaveformCard({
           />
         </div>
 
-        {/* Comment box + buttons wrapped together so layout animates as one unit */}
         <motion.div
           layout
           transition={{ layout: transitionConfig }}
@@ -262,19 +282,40 @@ export default function WaveformCard({
           <div className="flex items-center">
             <Tooltip label="Like">
               <Button
-                onClick={() => setIsLiked(!isLiked)}
+                onClick={likeTrack}
                 className="bg-off-black mr-4"
-                icon={<HiHeart className="text-[16px]" />}
+                icon={
+                  <HiHeart
+                    className={`text-[16px] transition-colors ${liked ? "text-inferno" : ""}`}
+                  />
+                }
               >
-                177
+                <span
+                  className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${liked ? "text-inferno" : ""} ${
+                    likeLoading ? "opacity-50" : "opacity-100"
+                  }`}
+                >
+                  {numOfLikes}
+                </span>
               </Button>
             </Tooltip>
             <Tooltip label="Repost">
               <Button
+                onClick={() => repostTrack()}
                 className="bg-off-black mr-4"
-                icon={<LuRepeat2 className="text-[16px]" />}
+                icon={
+                  <LuRepeat2
+                    className={`text-[16px] transition-colors ${reposted ? "text-inferno" : ""}`}
+                  />
+                }
               >
-                177
+                <span
+                  className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${reposted ? "text-inferno" : ""} ${
+                    repostLoading ? "opacity-50" : "opacity-100"
+                  }`}
+                >
+                  {numOfReposts}
+                </span>
               </Button>
             </Tooltip>
             <Tooltip label="Share">
@@ -316,10 +357,4 @@ export default function WaveformCard({
       </div>
     </div>
   );
-}
-
-function formatTime(seconds: number): string {
-  const m = Math.floor(seconds / 60);
-  const s = Math.floor(seconds % 60);
-  return `${m}:${s.toString().padStart(2, "0")}`;
 }

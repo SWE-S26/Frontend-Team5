@@ -15,13 +15,13 @@ export default function Feed() {
   const { getTracks, loading, error, tracks } = useGetTracks();
 
   useEffect(() => {
-    getTracks(1, 100);
+    getTracks(1, 10);
   }, [getTracks]);
 
   const reduxTracks: Track[] = useMemo(
     () =>
       (tracks ?? []).map((t) => ({
-        id: t._id,
+        id: t.trackId,
         url: t.audio?.audioLink ?? "",
         title: t.basicInfo?.title,
         artist: t.basicInfo?.mainArtists?.[0],
@@ -35,7 +35,6 @@ export default function Feed() {
     <FeedGuard>
       <div className="flex justify-between">
         <div className="w-full md:w-[68%]">
-
           <div className="flex items-center mb-4">
             <h2 className="flex-1 text-[22px] font-bold text-white-smoke text-tracking-[-0.02em]">
               Hear the latest posts from the people you're following:
@@ -64,10 +63,12 @@ export default function Feed() {
 
           <div>
             {tracks?.map((track) => (
-              <div key={track._id} className="flex-none mb-4">
+              <div key={track.trackId} className="flex-none mb-4">
                 <PopoverProvider>
                   <FeedHeader
-                    artistName={track.basicInfo?.mainArtists?.[0] || "Unknown Artist"}
+                    artistName={
+                      track.basicInfo?.mainArtists?.[0] || "Unknown Artist"
+                    }
                     followCount={Math.floor(Math.random() * 10000)}
                     profileImgLink="https://xsgames.co/randomusers/avatar.php?g=pixel&f=male"
                     location="United States"
@@ -78,15 +79,15 @@ export default function Feed() {
                   img={track.image?.imgLink}
                   title={track.basicInfo?.title}
                   artist={track.basicInfo?.mainArtists?.[0]}
-                  trackId={track._id}
+                  trackId={track.trackId}
                   trackUrl={track.audio?.audioLink}
                   duration={track.durationInSeconds}
+                  initialLikes={track.numLikes}
                   allTracks={reduxTracks}
                 />
               </div>
             ))}
           </div>
-
         </div>
         <div className="hidden md:block md:w-[27.75%]" />
       </div>

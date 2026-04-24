@@ -67,11 +67,35 @@ export interface CreateTrackResponse {
     id?: string;
   };
 }
+/* (1) "/api/public/tracks/v1/?page=1&limit=10" */
+export interface GetTracksResponse {
+  message: string;
+  data: {
+    tracks: Track[];
 
+    paginationInfo: {
+      totalNumTracks: number;
+      page: number;
+      totalPages: number;
+      hasNext: boolean;
+    };
+  };
+}
 
-/* ======================== BASE TRACK ======================== */
+export interface GetTracksErrorResponse {
+  message: string;
+  errors?: {
+    field: string;
+    message: string;
+  }[];
+}
 
-export interface TrackBase {
+export interface GetPostedTracksResponse {
+  message: string;
+  data: Track[];
+}
+
+export interface Track {
   trackId: string;
 
   basicInfo: {
