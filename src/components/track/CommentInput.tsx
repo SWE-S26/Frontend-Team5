@@ -12,7 +12,8 @@ interface CommentInputProps {
 
 export default function CommentInput({ trackId }: CommentInputProps) {
   const [comment, setComment] = useState("")
-  const profileImgLink = useAppSelector((state) => state.profile.profileImgLink)
+  const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
+  
   const { submitComment, loading } = useComments()
 
   const handleSubmit = async () => {

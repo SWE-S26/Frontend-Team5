@@ -1,10 +1,12 @@
 "use client"
-import { useEffect } from "react"
+import { useEffect, useState, useMemo } from "react"
 import { Avatar } from "antd"
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai"
-import { useComments } from "@/hooks/useComments"
+import { useComments, useReplies } from "@/hooks/useComments"
 import { useAppSelector } from "@/store/hooks"
 import { formatDistanceToNow } from "date-fns"
+import { TrackComment } from "@/types/comments.types"
+import SortDropdown, { SortOption } from "./SortDropdown"
 
 interface CommentListProps {
   trackId: string
@@ -22,10 +24,25 @@ export default function CommentList({ trackId }: CommentListProps) {
   const total    = useAppSelector((s) => s.comments.total)
   const loading  = useAppSelector((s) => s.comments.loading)
   const hasMore  = comments.length < total
+  const [sortBy, setSortBy] = useState<SortOption>("Newest")
 
   useEffect(() => {
     loadComments(trackId)
   }, [trackId])
+
+  const sortedComments = useMemo(() => {
+    const copy = [...comments]
+    switch (sortBy) {
+      case "Newest":
+        return copy.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      case "Oldest":
+        return copy.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+      case "Track Time":
+        return copy.sort((a, b) => a.timestamp - b.timestamp)
+      default:
+        return copy
+    }
+  }, [comments, sortBy])
 
   return (
     <div className="flex flex-col w-full mt-4">
@@ -34,15 +51,12 @@ export default function CommentList({ trackId }: CommentListProps) {
         <h2 className="text-white font-bold text-lg">
           {total.toLocaleString()} comments
         </h2>
-        <button className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white text-sm rounded">
-          Sorted by: Newest
-          <span>▾</span>
-        </button>
+        <SortDropdown value={sortBy} onChange={setSortBy} />
       </div>
 
       {/* Comments */}
-      <div className="flex flex-col divide-y divide-white/5">
-        {comments.map((comment) => (
+      <div className="flex flex-col divide-y divide-white/0">
+        {sortedComments.map((comment) => (
           <div key={comment.commentId} className="flex gap-4 py-5">
             {/* Avatar */}
             <Avatar
@@ -54,13 +68,13 @@ export default function CommentList({ trackId }: CommentListProps) {
             {/* Content */}
             <div className="flex flex-col flex-1 gap-1">
               <div className="flex items-center gap-1 text-sm">
-                <span className="font-semibold text-white">{comment.displayName}</span>
+                <span className="font-bold text-white">{comment.displayName}</span>
                 <span>at</span>
-                <span className="text-gray-500 font-medium">
+                <span className="text-[#888888] font-bold">
                   {formatTimestamp(comment.timestamp)}
                 </span>
-                <span className="text-gray-500">·</span>
-                <span className="text-gray-500">
+                <span className="text-[#888888]">·</span>
+                <span className="text-[#888888]">
                   {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
                 </span>
               </div>
