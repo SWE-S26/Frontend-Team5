@@ -212,8 +212,8 @@ var SoundCloudWaveform = {
     if (this.settings.wave_color === "gradient") {
       if (drawTop) {
         var topGrad = ctx.createLinearGradient(0, dividerY - topH, 0, dividerY);
-        topGrad.addColorStop(0, "#ff6000");
-        topGrad.addColorStop(1, "#ff2000");
+        topGrad.addColorStop(0, "#ff6100");
+        topGrad.addColorStop(1, "#ff1100");
         ctx.fillStyle = topGrad;
         ctx.fillRect(x, dividerY - topH, w, topH);
       }

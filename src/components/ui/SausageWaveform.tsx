@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useEffect, useRef, useState } from "react";
+import React, { use, useEffect, useRef, useState } from "react";
 import { useStatelessComments } from "@/hooks/useComments";
 import { TrackComment } from "@/types/comments.types";
 
@@ -10,6 +10,14 @@ const imgFix = {
   imageRendering: "auto" as const,
   mixBlendMode: "normal" as const,
 };
+
+const LAYER_OPACITIES = {
+  bgTop: 0.85,
+  bgBottom: 0.82,
+  fgTopGradient: 1.1,
+  fgTopFlat: 0.8,
+  fgBottom: 1,
+} as const;
 
 const maskLeft = (pct: number) => ({
   WebkitMaskImage: `linear-gradient(to right, black ${pct}%, transparent ${pct}%)`,
@@ -75,7 +83,7 @@ function CommentAvatar({
     >
       {/* Bubble — always in DOM, fades in/out, anchored to fixed container */}
       <div
-        className="absolute top-full mt-1 pointer-events-none flex items-baseline gap-1.5 bg-off-black text-white text-[11px] rounded px-2 py-1.5 shadow-lg overflow-hidden transition-opacity duration-150"
+        className="absolute top-full mt-1 pointer-events-none flex items-baseline gap-1.5 bg-off-black text-white-smoke text-[11px] rounded px-2 py-1.5 shadow-lg overflow-hidden transition-opacity duration-150"
         style={{
           maxWidth: 220,
           opacity: expanded ? 1 : 0,
@@ -87,18 +95,22 @@ function CommentAvatar({
             <span className="font-semibold truncate shrink-0 max-w-[80px]">
               {comment.displayName}
             </span>
-            <span className="text-white/60 truncate">{comment.content}</span>
+            <span className="text-white-smoke/60 truncate">
+              {comment.content}
+            </span>
           </>
         ) : (
           <>
-            <span className="text-white/60 truncate">{comment.content}</span>
+            <span className="text-white-smoke/60 truncate">
+              {comment.content}
+            </span>
             <span className="font-semibold truncate shrink-0 max-w-[80px]">
               {comment.displayName}
             </span>
           </>
         )}
       </div>
-      {/* Avatar — centered in the fixed 20×20 container */}
+      {/* Avatar */}
       <img
         src={comment.avatarUrl}
         alt={comment.displayName}
@@ -127,7 +139,6 @@ function PendingAvatar({
 
   useEffect(() => {
     if (flashText !== null) {
-      // Mount first at opacity 0, then flip to 1 next frame so CSS transition fires
       requestAnimationFrame(() => setVisible(true));
     } else {
       setVisible(false);
@@ -167,7 +178,7 @@ function PendingAvatar({
       onMouseDown={handleMouseDown}
     >
       <div
-        className="absolute top-full mt-1 bg-off-black text-white text-[11px] rounded px-2 py-1.5 flex items-baseline gap-1.5 shadow-lg whitespace-nowrap pointer-events-none transition-opacity duration-200"
+        className="absolute top-full mt-1 bg-off-black text-white-smoke text-[11px] rounded px-2 py-1.5 flex items-baseline gap-1.5 shadow-lg whitespace-nowrap pointer-events-none transition-opacity duration-200"
         style={{
           maxWidth: 220,
           opacity: visible ? 1 : 0,
@@ -176,7 +187,7 @@ function PendingAvatar({
             : { right: "calc(-50% + 10px)" }),
         }}
       >
-        <span className="text-white/60 truncate">{flashText ?? ""}</span>
+        <span className="text-white-smoke/60 truncate">{flashText ?? ""}</span>
       </div>
       <img
         src={avatarUrl}
@@ -229,6 +240,16 @@ export default function SausageWaveform({
   const [fgTopGradient, setFgTopGradient] = useState<string | null>(null);
   const [fgTopFlat, setFgTopFlat] = useState<string | null>(null);
   const [fgBottom, setFgBottom] = useState<string | null>(null);
+  const [isReady, setIsReady] = useState(false);
+
+  const [theme] = useState<"light" | "dark">(() => {
+    if (typeof window !== "undefined") {
+      const saved = localStorage.getItem("theme");
+      if (saved === "light" || saved === "dark") return saved;
+    }
+    return "dark";
+  });
+  const loadedCountRef = useRef(0);
 
   const [isHovering, setIsHovering] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
@@ -236,6 +257,20 @@ export default function SausageWaveform({
   const [isDragging, setIsDragging] = useState(false);
   const dragEndedRef = useRef(false);
   const [isPendingDrag, setIsPendingDrag] = useState(false);
+
+  const lastProgressRef = useRef(0);
+  const hasPlayedRef = useRef(false);
+
+  if (externalProgress === 0 && !isPlaying) {
+    lastProgressRef.current = 0;
+    hasPlayedRef.current = false;
+  } else if (isPlaying && externalProgress != null) {
+    lastProgressRef.current = externalProgress;
+    hasPlayedRef.current = true;
+  }
+
+  const progress =
+    (isPlaying ? externalProgress : lastProgressRef.current) ?? 0;
 
   const { comments, loadComments } = useStatelessComments();
   useEffect(() => {
@@ -251,7 +286,6 @@ export default function SausageWaveform({
   const expandedId = isActive ? hoveredId : (hoveredId ?? atCurrentTime);
 
   const pendingLeftPct = duration > 0 ? (commentTimestamp / duration) * 100 : 0;
-  const progress = isPlaying ? (externalProgress ?? 0) : 0;
 
   useEffect(() => {
     import("@/lib/waveform").then((mod) => {
@@ -264,18 +298,56 @@ export default function SausageWaveform({
 
   const generateAll = (samples: number[]) => {
     if (!scwRef.current) return;
+    loadedCountRef.current = 0;
+    const markLoaded = () => {
+      loadedCountRef.current += 1;
+      if (loadedCountRef.current === 5) setIsReady(true);
+    };
     const base = {
       canvas_width: 1264,
       canvas_height: 120,
       bar_width: 8,
       bar_gap: 0.3,
     };
+
+    const bgTopColor = theme === "dark" ? "#ffffff" : "#121212";
+    const bgBottomColor = theme === "dark" ? "#e5e5e5" : "#b2b2b2";
     const layers: [string, (png: string) => void][] = [
-      ["#ffffff", setBgTop],
-      ["#e5e5e5", setBgBottom],
-      ["gradient", setFgTopGradient],
-      ["#faad87", setFgTopFlat],
-      ["#faad87", setFgBottom],
+      [
+        bgTopColor,
+        (png) => {
+          setBgTop(png);
+          markLoaded();
+        },
+      ],
+      [
+        bgBottomColor,
+        (png) => {
+          setBgBottom(png);
+          markLoaded();
+        },
+      ],
+      [
+        "gradient",
+        (png) => {
+          setFgTopGradient(png);
+          markLoaded();
+        },
+      ],
+      [
+        "#faad87",
+        (png) => {
+          setFgTopFlat(png);
+          markLoaded();
+        },
+      ],
+      [
+        "#faad87",
+        (png) => {
+          setFgBottom(png);
+          markLoaded();
+        },
+      ],
     ];
     const halves = ["top", "bottom", "top", "top", "bottom"];
     layers.forEach(([wave_color, onComplete], i) => {
@@ -369,9 +441,8 @@ export default function SausageWaveform({
     setPreviewPct(null);
   };
 
-  const waveformOpacity =
-    isPlaying || isHovering ? "opacity-100" : "opacity-70";
-  const fadeIn = `transition-opacity duration-150 ${waveformOpacity}`;
+  const hoverFade = isPlaying || isHovering ? 1 : 0.7;
+  const fadeIn = "transition-opacity duration-150";
   const showFlatWindow = isPreviewing && previewPct !== null && !isDragging;
 
   return (
@@ -384,37 +455,57 @@ export default function SausageWaveform({
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
         className="relative w-full h-[60px] cursor-pointer select-none isolate overflow-visible pt-5"
+        style={{ opacity: isReady ? 1 : 0, transition: "opacity 300ms ease" }}
       >
-        <WaveImg src={bgTop} z="z-0" extra={`grayscale ${fadeIn}`} />
-        <WaveImg src={bgBottom} z="z-0" extra={`grayscale ${fadeIn}`} />
+        <WaveImg
+          src={bgTop}
+          z="z-0"
+          extra={`grayscale ${fadeIn}`}
+          style={{ opacity: LAYER_OPACITIES.bgTop * hoverFade }}
+        />
+        <WaveImg
+          src={bgBottom}
+          z="z-0"
+          extra={`grayscale ${fadeIn}`}
+          style={{ opacity: LAYER_OPACITIES.bgBottom * hoverFade }}
+        />
         <WaveImg
           src={fgTopGradient}
           z="z-10"
           extra={fadeIn}
-          style={maskLeft(progress)}
+          style={{
+            ...maskLeft(progress),
+            opacity: LAYER_OPACITIES.fgTopGradient * hoverFade,
+          }}
         />
         {showFlatWindow && (
           <WaveImg
             src={fgTopFlat}
             z="z-20"
             extra={`pointer-events-none ${fadeIn}`}
-            style={maskWindow(
-              Math.min(progress, previewPct!),
-              Math.max(progress, previewPct!),
-            )}
+            style={{
+              ...maskWindow(
+                Math.min(progress, previewPct!),
+                Math.max(progress, previewPct!),
+              ),
+              opacity: LAYER_OPACITIES.fgTopFlat * hoverFade,
+            }}
           />
         )}
         <WaveImg
           src={fgBottom}
           z="z-10"
           extra={fadeIn}
-          style={maskLeft(progress)}
+          style={{
+            ...maskLeft(progress),
+            opacity: LAYER_OPACITIES.fgBottom * hoverFade,
+          }}
         />
 
         <div className="absolute bottom-[26px] left-0 w-full h-[1px] bg-chinese-black -translate-y-1/2 z-30 pointer-events-none" />
 
         <div className="absolute left-0 w-full flex justify-between text-[10px] z-40 bottom-[27px]">
-          {isPlaying ? (
+          {hasPlayedRef.current ? (
             <span className="bg-black px-[3px] flex items-center justify-center text-papaya">
               {formatTime(currentTime)}
             </span>
