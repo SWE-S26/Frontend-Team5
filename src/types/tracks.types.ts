@@ -239,3 +239,7 @@ export interface incrementPlayCountResponse {
   message: string;
   errors?: CreateTrackValidationError[];
 }
+
+export interface deleteTrackResponse {
+  message: string;
+}

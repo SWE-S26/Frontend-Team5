@@ -1,7 +1,7 @@
 import { useState, useMemo, useEffect, useRef } from "react";
 import { useRouter } from "next/navigation";
 import { useAppSelector } from "@/store/hooks";
-import { useGetPostedTracks } from "@/hooks/useTracks";
+import { useGetPostedTracks, useDeleteTrack } from "@/hooks/useTracks";
 import { IoIosGlobe } from "react-icons/io";
 import { RiMoneyDollarCircleLine } from "react-icons/ri";
 import { BsSortDown } from "react-icons/bs";
@@ -167,11 +167,15 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
   const hasHydrated = useAppSelector((state) => state.auth.hasHydrated);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
   const { getPostedTracks, tracks: postedTracks, loading, error } = useGetPostedTracks();
+  const { deleteTrack, loading: loadingDelete, error: errorDelete, success } = useDeleteTrack();
   const [filter, setFilter]       = useState<"public" | "private">("public");
   const [search, setSearch]       = useState("");
   const [sortField, setSortField] = useState<SortField>("date");
   const [sortDir, setSortDir]     = useState<"asc" | "desc">("desc");
   const [durationById, setDurationById] = useState<Record<string, string>>({});
+  const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
+  const [localOverrides, setLocalOverrides] = useState<Record<string, Partial<ArtistTrackRow>>>({});
 
   // Selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -197,23 +201,27 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
 
   const rows = useMemo<ArtistTrackRow[]>(() => {
     return (postedTracks ?? [])
-      .map((track) => ({
-        id: track._id,
-        title: track.basicInfo.title,
-        label: track.basicInfo.mainArtists?.length ? track.basicInfo.mainArtists.join(", ") : "Unknown Artist",
-        duration: formatDuration((track as { durationInSeconds?: number }).durationInSeconds),
-        date: formatDate(track.releaseDate),
-        plays: track.numPlays ?? 0,
-        likes: track.numLikes ?? 0,
-        comments: track.numComments ?? 0,
-        reposts: track.numReposts ?? 0,
-        hd: false,
-        cover: track.image?.imgLink || "/test.jpg",
-        url: track.audio?.audioLink || track.audioLink || "",
-        isPrivate: Boolean(track.basicInfo.isPrivate),
-        rawDate: track.releaseDate ?? "",
-        rawDuration: (track as { durationInSeconds?: number }).durationInSeconds ?? 0,
-      }))
+      .filter((track) => !deletedIds.has(track._id))
+      .map((track) => {
+        const base: ArtistTrackRow = {
+          id: track._id,
+          title: track.basicInfo.title,
+          label: track.basicInfo.mainArtists?.length ? track.basicInfo.mainArtists.join(", ") : "Unknown Artist",
+          duration: formatDuration((track as { durationInSeconds?: number }).durationInSeconds),
+          date: formatDate(track.releaseDate),
+          plays: track.numPlays ?? 0,
+          likes: track.numLikes ?? 0,
+          comments: track.numComments ?? 0,
+          reposts: track.numReposts ?? 0,
+          hd: false,
+          cover: track.image?.imgLink || "/test.jpg",
+          url: track.audio?.audioLink || track.audioLink || "",
+          isPrivate: Boolean(track.basicInfo.isPrivate),
+          rawDate: track.releaseDate ?? "",
+          rawDuration: (track as { durationInSeconds?: number }).durationInSeconds ?? 0,
+        };
+        return { ...base, ...localOverrides[track._id] };
+      })
       .filter((row) => (filter === "public" ? !row.isPrivate : row.isPrivate))
       .filter((row) => row.title.toLowerCase().includes(search.toLowerCase()))
       .sort((a, b) => {
@@ -224,7 +232,7 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
         else if (sortField === "likes")    diff = a.likes - b.likes;
         return sortDir === "asc" ? diff : -diff;
       });
-  }, [postedTracks, filter, search, sortField, sortDir]);
+  }, [postedTracks, filter, search, sortField, sortDir, deletedIds, localOverrides]);
 
   useEffect(() => {
     rows.forEach((row) => {
@@ -241,6 +249,20 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
   const hasSelection = selectedIds.size > 0;
   const allSelected  = selectedIds.size === rows.length && rows.length > 0;
   const editTrack    = rows.find((r) => r.id === editTrackId) ?? null;
+
+  const handleDelete = async (id: string) => {
+    if (loadingDelete) return;
+    setDeletingId(id);
+    try {
+      await deleteTrack(id);
+      setDeletedIds((prev) => new Set(prev).add(id));
+      setContextMenu(null);
+    } catch {
+      // error is surfaced via errorDelete from the hook
+    } finally {
+      setDeletingId(null);
+    }
+  };
 
   return (
     <div className="space-y-4">
@@ -294,8 +316,13 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
           onSelect={toggleSelect}
           onAmplify={() => setAmplifyOpen(true)}
           onContextMenu={openContextMenu}
+          isDeleting={deletingId === track.id}
         />
       ))}
+
+      {errorDelete && (
+        <div className="px-3 py-2 text-[13px] text-red-400">{errorDelete}</div>
+      )}
 
       <ArtistProBenefits />
 
@@ -309,10 +336,12 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
           onClose={() => setContextMenu(null)}
           onEdit={(id) => setEditTrackId(id)}
           onAddToPlaylist={() => setAddToPlaylistOpen(true)}
-          onDelete={(id) => console.log("delete", id)}
+          onDelete={(id) => { void handleDelete(id); }}
         />
       )}
-      {editTrack    && <EditTrackPanel track={editTrack} onClose={() => setEditTrackId(null)} />}
+      {editTrack    && <EditTrackPanel track={editTrack} onClose={() => setEditTrackId(null)} onSave={(updated) => {
+        setLocalOverrides((prev) => ({ ...prev, [editTrack.id]: { ...prev[editTrack.id], ...updated } }));
+      }} />}
       {bulkEditOpen && <BulkEditPanel selectedIds={selectedIds} tracks={rows} onClose={() => setBulkEditOpen(false)} />}
       {addToPlaylistOpen && <AddToPlaylistPanel onClose={() => setAddToPlaylistOpen(false)} />}
     </div>
