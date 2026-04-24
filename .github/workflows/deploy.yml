@@ -33,6 +33,7 @@ jobs:
           build-args: |
             NEXT_PUBLIC_API_URL=${{ secrets.NEXT_PUBLIC_API_URL }}
             NEXT_PUBLIC_USE_MSW=${{ secrets.NEXT_PUBLIC_USE_MSW }}
+            NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
 
   deploy:
     runs-on: ubuntu-latest
@@ -46,17 +47,19 @@ jobs:
           GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
           GOOGLE_CLIENT_SECRET: ${{ secrets.GOOGLE_CLIENT_SECRET }}
           AUTH_SECRET: ${{ secrets.AUTH_SECRET }}
+          NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY: ${{ secrets.NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY }}
         with:
           host: ${{ secrets.VM_IP }}
           username: azureuser
           key: ${{ secrets.VM_SSH_KEY }}
-          envs: GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,AUTH_SECRET
+          envs: GOOGLE_CLIENT_ID,GOOGLE_CLIENT_SECRET,AUTH_SECRET,NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY
           script: |
             echo "${{ secrets.GITHUB_TOKEN }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
             {
                 echo "GOOGLE_CLIENT_ID=${GOOGLE_CLIENT_ID}"
                 echo "GOOGLE_CLIENT_SECRET=${GOOGLE_CLIENT_SECRET}"
                 echo "AUTH_SECRET=${AUTH_SECRET}"
+                echo "NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY=${NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY}"
             } > ~/beatza/.env.frontend
 
             cd ~/beatza
