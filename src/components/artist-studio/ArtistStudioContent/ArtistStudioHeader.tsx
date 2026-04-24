@@ -1,4 +1,7 @@
+import { useState } from "react";
 import { InsightsIcon, CoinIcon, GoldenHeartIcon, PurpleHeartIcon } from "../ArtistStudioContent";
+import { useAppSelector } from "@/store/hooks";
+
 
 function StatItem({ label, value, hasBorder }: { label: string; value: string; hasBorder: boolean }) {
   return (
@@ -9,11 +12,47 @@ function StatItem({ label, value, hasBorder }: { label: string; value: string; h
   );
 }
 
-function IconItem({ label, icon: Icon }: { label: string; icon: React.ComponentType<{ className?: string }> }) {
+function IconItem({
+  label,
+  tooltip,
+  tooltipColor = "#9a9a9a",
+  showStar,
+  icon: Icon,
+}: {
+  label: string;
+  tooltip: string;
+  tooltipColor?: string;
+  showStar?: boolean;
+  icon: React.ComponentType<{ className?: string; hovered?: boolean; showStar?: boolean }>;
+}) {
+  const [hovered, setHovered] = useState(false);
+
   return (
-    <div className="flex flex-col items-center gap-1 px-5">
-      <Icon className="text-[24px] text-[#d6d6d6]" />
-      <span className="text-[11px] text-[#666]">{label}</span>
+    <div
+      className="relative flex flex-col items-center justify-center gap-1 px-5 cursor-pointer"
+      onMouseEnter={() => setHovered(true)}
+      onMouseLeave={() => setHovered(false)}
+    >
+      <span
+        className="inline-flex flex-col items-center transition-transform duration-200"
+        style={{ transform: hovered ? "translateY(-4px)" : "translateY(0)" }}
+      >
+        <Icon hovered={hovered} showStar={showStar} />
+        <span className="text-[11px] text-[#666] mt-1">
+          {label}
+        </span>
+      </span>
+
+      <span
+        className="pointer-events-none text-[8px] font-bold leading-none transition-all duration-200"
+        style={{
+          color: tooltipColor,
+          opacity: hovered ? 1 : 0,
+          transform: hovered ? "translateY(0)" : "translateY(4px)",
+        }}
+      >
+        {tooltip}
+      </span>
     </div>
   );
 }
@@ -21,11 +60,14 @@ function IconItem({ label, icon: Icon }: { label: string; icon: React.ComponentT
 export function ArtistStudioHeader({ stats }: {
   stats: { plays: number; reposts: number; downloads: number; likes: number; comments: number };
 }) {
+  const role = useAppSelector((state) => state.auth.role);
+  const isArtistPro = role === "Pro";
+
   return (
     <div className="w-full mb-6 rounded-lg border border-[#2a2a2a] bg-[#111] p-6">
       <div className="mb-4 flex items-center gap-2">
-        <h2 className="text-[24px] font-bold text-white">Artist Studio</h2>
-        <span className="text-[12px] text-[#666]">All time stats updated daily.</span>
+        <h2 className="text-[24px] font-bold text-white-smoke">Artist Studio</h2>
+        <span className="text-[12px] mt-2 text-[#666]">All time stats updated daily.</span>
       </div>
       <div className="flex">
         <div className="flex flex-wrap items-center gap-19">
@@ -36,10 +78,10 @@ export function ArtistStudioHeader({ stats }: {
           <StatItem label="Comments"  value={String(stats.comments)}  hasBorder={true} />
         </div>
         <div className="flex flex-wrap items-center gap-22">
-          <IconItem label="Insights" icon={InsightsIcon} />
-          <IconItem label="Earnings" icon={CoinIcon} />
-          <IconItem label="Fans"     icon={GoldenHeartIcon} />
-          <IconItem label="Benefits" icon={PurpleHeartIcon} />
+          <IconItem label="Insights" tooltip="Limited"  tooltipColor="white"    icon={InsightsIcon} />
+          <IconItem label="Earnings" tooltip=""          tooltipColor="white"    icon={CoinIcon} />
+          <IconItem label="Fans"     tooltip={isArtistPro ? "UNLOCKED" : "ARTIST PRO"} tooltipColor="#cfb25d" showStar={!isArtistPro} icon={GoldenHeartIcon} />
+          <IconItem label="Benefits" tooltip={isArtistPro ? "UNLOCKED" : "ARTIST PRO"} tooltipColor="#7564f5" showStar={!isArtistPro} icon={PurpleHeartIcon} />
         </div>
       </div>
     </div>

@@ -9,9 +9,9 @@ import { FiMessageSquare } from "react-icons/fi";
 import { TbRepeat } from "react-icons/tb";
 import { FaRegClock } from "react-icons/fa";
 import { BsLightningChargeFill } from "react-icons/bs";
-import { Checkbox, type ArtistTrackRow } from "../ArtistStudioContent";
+import { type ArtistTrackRow } from "../ArtistStudioContent";
 import { MdOutlineDownloadForOffline } from "react-icons/md";
-
+import { PrettyCheckbox } from "@/app/(artist)/upload/components/TrackInfoForm";
 
 export function TrackRow({
   track,
@@ -65,8 +65,8 @@ export function TrackRow({
       {(isHovered || rowIsPlaying) && (
         <div className="absolute inset-0 flex items-center justify-center bg-black/50">
           {rowIsPlaying
-            ? <IoPauseCircleSharp className="text-white text-[32px]" />
-            : <IoIosPlayCircle    className="text-white text-[32px]" />
+            ? <IoPauseCircleSharp className="text-white-smoke text-[32px]" />
+            : <IoIosPlayCircle    className="text-white-smoke text-[32px]" />
           }
         </div>
       )}
@@ -112,7 +112,7 @@ export function TrackRow({
       onMouseLeave={() => setIsHovered(false)}
     >
       <div className="flex items-center">
-        <Checkbox checked={isSelected} onChange={(v) => onSelect(track.id, v)} />
+        <PrettyCheckbox checked={isSelected} onChange={(v) => onSelect(track.id, v)} />
       </div>
 
       <div className="flex min-w-0 items-center gap-3">
@@ -120,17 +120,17 @@ export function TrackRow({
         {trackMeta}
       </div>
 
-      <div className="text-center text-[12px] text-[#aaa]">{track.duration}</div>
-      <div className="text-center text-[12px] text-[#aaa]">{track.date}</div>
+      <div className="text-center text-[12px] text-white-smoke">{track.duration}</div>
+      <div className="text-center text-[12px] text-white-smoke">{track.date}</div>
 
-      <div className="flex items-center justify-center gap-3 text-[11px] text-[#777]">
+      <div className="flex items-center justify-center gap-3 text-[11px] text-white-smoke">
         <span className="inline-flex items-center gap-1"><IoHeartOutline />   {track.likes    > 0 ? track.likes    : "-"}</span>
         <span className="inline-flex items-center gap-1"><FiMessageSquare /> {track.comments > 0 ? track.comments : "-"}</span>
         <span className="inline-flex items-center gap-1"><TbRepeat />        {track.reposts  > 0 ? track.reposts  : "-"}</span>
         <span className="inline-flex items-center gap-1"><MdOutlineDownloadForOffline />      -</span>
       </div>
 
-      <div className="text-right text-[13px] font-semibold text-[#aaa]">{track.plays}</div>
+      <div className="text-center text-[13px] font-semibold text-white-smoke">{track.plays}</div>
 
       <div className="flex justify-center">
         <button

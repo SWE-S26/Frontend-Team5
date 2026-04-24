@@ -66,6 +66,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
 
   // Basic info
   const [trackTitle, setTrackTitle]     = useState("");
+  const [permalink, setPermalink]       = useState("");
   const [artistName, setArtistName]     = useState("");
   const [genre, setGenre]               = useState("");
   const [tags, setTags]                 = useState("");
@@ -232,7 +233,6 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
       }),
     [waveformDisplaySamples, waveformMax],
   );
-
   const leftMaskedWaveformBars = useMemo(
     () =>
       waveformDisplaySamples.map((sample, idx) => {
@@ -256,13 +256,14 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     if (!fullTrack) return;
     const b = fullTrack.basicInfo;
     setTrackTitle(b.title ?? "");
+    setPermalink(b.permalink ?? "");
     setArtistName((b.mainArtists ?? []).join(", "));
     setGenre(b.genre ?? "");
     setTags((b.tags ?? []).join(", "));
     setDescription(b.description ?? "");
     setIsPublic(!b.isPrivate);
     setVisibilityOption(b.isPrivate ? "private" : "public");
-    setScheduleRelease(scheduleRelease ?? false);
+    setScheduleRelease(false);
 
     // Permissions
     if (fullTrack.permissions) {
@@ -753,7 +754,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
       image: zoomCroppedArtwork,
       basicInfo: {
         title: parsedTitle,
-        permalink: slug,
+        permalink: toOptionalTrimmed(permalink) ?? slug,
         mainArtists,
         genre: toOptionalTrimmed(genre),
         tags: toList(tags).length > 0 ? toList(tags) : undefined,
@@ -910,7 +911,8 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
                     SWITCH_CLS={SWITCH_CLS}
                     trackTitle={trackTitle}
                     setTrackTitle={setTrackTitle}
-                    slug={slug}
+                    permalink={permalink}
+                    setPermalink={setPermalink}
                     artistName={artistName}
                     setArtistName={setArtistName}
                     genre={genre}
