@@ -149,13 +149,16 @@ const ProfilePage = ({ params }: Props) => {
   const profileTracks = [...(postedTracks ?? [])]
     .sort((a, b) => getTrackSortTime(b) - getTrackSortTime(a))
     .map((track) => ({
-    trackId: track._id,
+    trackId: track.trackId,
     title: track.basicInfo.title,
     artist: track.basicInfo.mainArtists?.length
       ? track.basicInfo.mainArtists.join(", ")
       : "Unknown Artist",
     img: track.image?.imgLink || "/Graduation.jpg",
-    trackUrl: track.audio?.audioLink || track.audioLink,
+    trackUrl: track.audio?.audioLink,
+    numLikes: track.numLikes,
+    numReposts: track.numReposts,
+    isLikedByUser: track.isLikedByUser,
   }))
 
   const trackCount = profileTracks.length

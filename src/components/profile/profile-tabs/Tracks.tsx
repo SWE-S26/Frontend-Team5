@@ -1,7 +1,6 @@
-import Card from "@/components/layout/track-cards/WaveformCard"
+import WaveformCard from "@/components/layout/track-cards/WaveformCard"
 
-
-interface Item { img: string; title: string; artist: string; trackId: string; trackUrl?: string }
+interface Item { img: string; title: string; artist: string; trackId: string; trackUrl?: string; numLikes?: number; numReposts?: number; isLikedByUser?: boolean }
 interface Props { items: Item[]; isLoading?: boolean }
 
 export default function Tracks({ items, isLoading = false }: Props) {
@@ -27,13 +26,16 @@ export default function Tracks({ items, isLoading = false }: Props) {
                  </div>
                ))
              : items.map((item, index) => (
-                 <Card
+                 <WaveformCard
                    key={`${item.trackId || "track"}-${item.title || "untitled"}-${index}`}
-                   trackId={item.trackId}
+                   img={item.img}
                    title={item.title}
                    artist={item.artist}
-                   img={item.img}
+                   trackId={item.trackId}
                    trackUrl={item.trackUrl}
+                   likeCount={item.numLikes ?? 0}
+                   repostCount={item.numReposts ?? 0}
+                   isLikedByUser={item.isLikedByUser}
                  />
                ))}
          </div>
