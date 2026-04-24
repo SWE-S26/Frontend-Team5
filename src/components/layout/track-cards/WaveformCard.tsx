@@ -13,6 +13,7 @@ import { motion, AnimatePresence, Transition } from "framer-motion";
 
 import { useAppSelector } from "@/store/hooks";
 import { useAudioProgress } from "@/hooks/useAudioProgress";
+import { useIsVisible } from "@/hooks/useIsVisible";
 
 import { useStatelessComments } from "@/hooks/useComments";
 import { useLikeTrackOptimistic } from "@/hooks/useLikes";
@@ -39,6 +40,7 @@ type CardProps = {
   trackUrl?: string;
   duration?: number;
   likeCount: number;
+  repostCount: number;
   isLikedByUser?: boolean;
   allTracks?: Track[];
 };
@@ -53,6 +55,7 @@ export default function WaveformCard({
   trackUrl,
   duration,
   likeCount,
+  repostCount,
   isLikedByUser,
   allTracks,
 }: CardProps) {
@@ -71,14 +74,16 @@ export default function WaveformCard({
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
 
-  const { likeTrack, loading: likeLoading } = useLikeTrackOptimistic(trackId);
+  const { ref, isVisible } = useIsVisible("200px");
+
+  const { likeTrack } = useLikeTrackOptimistic(trackId);
 
   const {
     repostTrack,
     reposted,
     numOfReposts,
     loading: repostLoading,
-  } = useRepostTrack(trackId);
+  } = useRepostTrack(trackId, isVisible, repostCount);
 
   const { progress, currentTime, seekToPercentage } = useAudioProgress();
 
@@ -196,7 +201,7 @@ export default function WaveformCard({
   const transitionConfig: Transition = { duration: 0.25, ease: "easeOut" };
 
   return (
-    <div className="flex items-stretch">
+    <div ref={ref} className="flex items-stretch">
       <div className="h-full overflow-hidden -m-1 -mb-1.75">
         <Card type="static" img={img} />
       </div>
@@ -301,9 +306,7 @@ export default function WaveformCard({
                 }
               >
                 <span
-                  className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${isLiked ? "text-inferno" : ""} ${
-                    likeLoading ? "opacity-50" : "opacity-100"
-                  }`}
+                  className={`ml-0.5 inline-block min-w-[1ch] text-left transition-colors ${isLiked ? "text-inferno" : ""}`}
                 >
                   {likeCountState}
                 </span>

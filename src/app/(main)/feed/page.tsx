@@ -83,6 +83,7 @@ export default function Feed() {
                   trackUrl={track.audio?.audioLink}
                   duration={track.durationInSeconds}
                   likeCount={track.numLikes}
+                  repostCount={track.numReposts}
                   allTracks={reduxTracks}
                   isLikedByUser={track.isLikedByUser}
                 />
