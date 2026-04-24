@@ -1,15 +1,21 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { playerEngine } from "@/lib/playerEngine";
 import { usePlayerPersistence } from "@/hooks/usePlayerPersistence";
 import { next } from "@/store/slices/playerSlice";
+import { tracksService } from "@/services/tracks.service";
+
+const LISTEN_THRESHOLD_SECONDS = 15;
+
 
 export default function PlayerController() {
   usePlayerPersistence();
   const dispatch = useDispatch();
+  const listenTrackedForCurrentRef = useRef(false);
+  const listenTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { tracks, currentTrackId, currentTrackUrl, isPlaying, volume, loop } =
     useSelector((state: RootState) => state.player);
@@ -32,12 +38,60 @@ export default function PlayerController() {
   }, [isPlaying, trackUrl]);
 
   useEffect(() => {
+    listenTrackedForCurrentRef.current = false;
+    if (listenTimerRef.current) {
+      clearInterval(listenTimerRef.current);
+      listenTimerRef.current = null;
+    }
+  }, [currentTrackId]);
+
+  useEffect(() => {
+    if (!isPlaying || !currentTrackId || !trackUrl || listenTrackedForCurrentRef.current) {
+      if (listenTimerRef.current) {
+        clearInterval(listenTimerRef.current);
+        listenTimerRef.current = null;
+      }
+      return;
+    }
+
+    listenTimerRef.current = setInterval(() => {
+      const currentTime = playerEngine.getCurrentTime();
+      if (currentTime < LISTEN_THRESHOLD_SECONDS || listenTrackedForCurrentRef.current) {
+        return;
+      }
+
+      listenTrackedForCurrentRef.current = true;
+      if (listenTimerRef.current) {
+        clearInterval(listenTimerRef.current);
+        listenTimerRef.current = null;
+      }
+
+      void tracksService.incrementPlayCount(currentTrackId).catch(() => undefined);
+    }, 1000);
+
+    return () => {
+      if (listenTimerRef.current) {
+        clearInterval(listenTimerRef.current);
+        listenTimerRef.current = null;
+      }
+    };
+  }, [isPlaying, currentTrackId, trackUrl]);
+
+  useEffect(() => {
     playerEngine.setVolume(volume / 100);
   }, [volume]);
 
   useEffect(() => {
     playerEngine.setLoop(loop);
   }, [loop]);
+
+  useEffect(() => {
+    return () => {
+      if (listenTimerRef.current) {
+        clearInterval(listenTimerRef.current);
+      }
+    };
+  }, []);
 
   return null;
 }

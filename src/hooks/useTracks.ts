@@ -5,6 +5,7 @@ import { CreateTrackRequest } from "@/types/tracks.types";
 import {
   GetPostedTracksResponse,
   GetTracksErrorResponse,
+  GetUploadQuotaResponse,
   GetTracksResponse,
   UpdateTrackRequest,
 } from "@/types/tracks.types";
@@ -206,4 +207,87 @@ export function useUpdateTrack() {
   );
 
   return { updateTrack, loading, error, success };
+}
+
+export function useIncrementPlayCount() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+
+  const incrementPlayCount = useCallback(
+    async (id: string) => {
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+      try {
+        const res = await tracksService.incrementPlayCount(id);
+        setSuccess(true);
+        return res.data;
+      } catch (err: any) {
+        setError(err.response?.data?.message || "Failed to increment play count");
+        setSuccess(false);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  return { incrementPlayCount, loading, error, success };
+}
+
+export function useDeleteTrack() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+
+  const deleteTrack = useCallback(
+    async (id: string) => {
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+      try {
+        const res = await tracksService.deleteTrack(id);
+        setSuccess(true);
+        return res.data;
+      } catch (err: any) {
+        setError(err.response?.data?.message || "Failed to delete track.");
+        setSuccess(false);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  return { deleteTrack, loading, error, success };
+}
+
+export function useGetUploadQuota() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [quota, setQuota] = useState<number | null>(null);
+
+  const getUploadQuota = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await tracksService.getUploadQuota();
+      setQuota(res.data.data.quota);
+      return res.data;
+    } catch (err) {
+      if (axios.isAxiosError<GetUploadQuotaResponse>(err)) {
+        setError(err.response?.data?.message || "Failed to fetch upload quota");
+      } else {
+        setError("Failed to fetch upload quota");
+      }
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { getUploadQuota, loading, error, quota };
 }
