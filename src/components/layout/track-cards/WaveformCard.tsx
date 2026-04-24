@@ -72,7 +72,7 @@ export default function WaveformCard({
     liked,
     numOfLikes,
     loading: likeLoading,
-  } = useLikeTrackOptimistic(trackId);
+  } = useLikeTrackOptimistic(trackId, initialLikes);
 
   const {
     repostTrack,

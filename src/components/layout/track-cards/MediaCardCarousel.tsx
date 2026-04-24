@@ -53,7 +53,6 @@ export default function MediaCardCarousel() {
 
   return (
     <div className="sm:w-1/5 md:w-full max-w-6xl py-8">
-      {/* OM - removed this from className (mx-auto px-4) for alignment purposes, re-add them to see yourself */}
       {/* Title */}
       <h2 className="text-[22px] font-bold pb-4 text-white-smoke">
         More of what you like
@@ -82,7 +81,7 @@ export default function MediaCardCarousel() {
                   </div>
                 ))
               : tracks?.map((track) => (
-                  <div key={track._id} className="flex-none">
+                  <div key={track.trackId} className="flex-none">
                     <Card
                       img={track.image.imgLink || undefined}
                       title={track.basicInfo.title}
@@ -91,7 +90,7 @@ export default function MediaCardCarousel() {
                           ? track.basicInfo.mainArtists.join(", ")
                           : "Unknown Artist"
                       }
-                      trackId={track._id}
+                      trackId={track.trackId}
                       trackUrl={track.audio.audioLink}
                       duration={track.durationInSeconds}
                     />
