@@ -1,4 +1,4 @@
-//* ======================== API Integration ======================== */
+//* ======================== CREATE TRACK ======================== */
 
 export interface CreateTrackBasicInfo {
   title: string;
@@ -67,37 +67,98 @@ export interface CreateTrackResponse {
     id?: string;
   };
 }
-/* (1) "/api/public/tracks/v1/?page=1&limit=10" */
+
+
+/* ======================== BASE TRACK ======================== */
+
+export interface TrackBase {
+  trackId: string;
+
+  basicInfo: {
+    title: string;
+    permalink: string;
+    mainArtists: string[];
+    genre?: string;
+    tags?: string[];
+    description?: string;
+    isPrivate: boolean;
+    caption?: string;
+  };
+
+  posterId?: string;
+
+  durationInSeconds?: number;
+
+  audio: {
+    audioLink: string;
+    id: string;
+    cloudIndex?: number;
+    downloadLink?: string;
+    waveformLink?: string;
+  };
+
+  image: {
+    imgLink: string;
+    publicId: string;
+  };
+
+  numLikes: number;
+  numPlays: number;
+  numReposts: number;
+  numComments: number;
+
+  releaseDate: string;
+}
+
+
+/* ======================== GET TRACK BY ID ======================== */
+
+export interface GetTrackByIdResponse {
+  message: string;
+  data: TrackBase;
+}
+
+
+/* ======================== GET TRACKS (LIST) ======================== */
+
+export interface TrackListItem {
+  trackId: string;
+
+  basicInfo: {
+    title: string;
+    permalink: string;
+    mainArtists: string[];
+    genre: string;
+    tags: string[];
+    description: string;
+    isPrivate: boolean;
+    caption?: string;
+  };
+
+  audio: {
+    audioLink: string;
+    id: string;
+  };
+
+  durationInSeconds: number;
+
+  image: {
+    imgLink: string;
+    publicId: string;
+  };
+
+  numLikes: number;
+  numPlays: number;
+  numReposts: number;
+  numComments: number;
+
+  releaseDate: string;
+}
+
 export interface GetTracksResponse {
   message: string;
   data: {
-    tracks: {
-      _id: string;
-      basicInfo: {
-        title: string;
-        permalink: string;
-        mainArtists: string[];
-        genre: string;
-        tags: string[];
-        description: string;
-        isPrivate: boolean;
-        caption?: string;
-      };
-      audio: {
-        audioLink: string;
-        id: string;
-      };
-      durationInSeconds: number;
-      image: {
-        imgLink: string;
-        publicId: string;
-      };
-      numLikes: number;
-      numPlays: number;
-      numReposts: number;
-      numComments: number;
-      releaseDate: string;
-    }[];
+    tracks: TrackListItem[];
     paginationInfo: {
       totalNumTracks: number;
       page: number;
@@ -115,41 +176,11 @@ export interface GetTracksErrorResponse {
   }[];
 }
 
+
+/* ======================== POSTED TRACKS ======================== */
+
 export interface PostedTrack {
-	_id: string;
-	basicInfo: {
-		title: string;
-		permalink: string;
-		mainArtists: string[];
-		genre?: string;
-		tags?: string[];
-		isPrivate: boolean;
-	};
-	audio?: {
-		audioLink?: string;
-		id?: string;
-	};
-	audioLink?: string;
-	image?: {
-		imgLink?: string;
-		publicId?: string;
-	};
-	numLikes?: number;
-	numPlays?: number;
-	numReposts?: number;
-	numComments?: number;
-	releaseDate?: string;
-}
-
-export interface GetPostedTracksResponse {
-	message: string;
-	data: PostedTrack[];
-}
-
-
-
-export interface Track {
-  _id: string;
+  trackId: string;
 
   basicInfo: {
     title: string;
@@ -157,68 +188,34 @@ export interface Track {
     mainArtists: string[];
     genre?: string;
     tags?: string[];
-    description?: string;
     isPrivate: boolean;
-    caption?: string;
   };
 
-  audio: {
-    audioLink: string;
-    id: string;
+  audio?: {
+    audioLink?: string;
+    id?: string;
   };
 
-  image: {
-    imgLink: string;
-    publicId: string;
+  image?: {
+    imgLink?: string;
+    publicId?: string;
   };
 
-  permissions?: {
-    enableDirectDownload?: boolean;
-    offlineListening?: boolean;
-    includeInRssFeed?: boolean;
-    displayedEmbedCode?: boolean;
-    enableAppPlayback?: boolean;
-    allowComments?: boolean;
-    showTrackComments?: boolean;
-    showTrackInsights?: boolean;
-    geoblocking?: string;
-  };
+  numLikes?: number;
+  numPlays?: number;
+  numReposts?: number;
+  numComments?: number;
 
-  license?: {
-    type?: "allRightsReserved" | "creativeCommons";
-    attribution?: boolean;
-    nonCommercial?: boolean;
-    noDerivativeWorks?: boolean;
-    shareAlike?: boolean;
-  };
-
-  advanced?: {
-    buyLink?: string;
-    recordLabel?: string;
-    releaseDate?: string;
-    publisher?: string;
-    ISRC?: string;
-    explicitContent?: boolean;
-    pLine?: string;
-    audioClipStart?: number;
-    audioClipEnd?: number;
-    composer?: string;
-    ISWC?: string;
-    albumTitle?: string;
-  };
-
-  numLikes: number;
-  numPlays: number;
-  numReposts: number;
-  numComments: number;
-
-  releaseDate: string;
+  releaseDate?: string;
 }
 
-export interface GetTrackByIdResponse {
+export interface GetPostedTracksResponse {
   message: string;
-  data: Track;
+  data: PostedTrack[];
 }
+
+
+/* ======================== UPDATE TRACK ======================== */
 
 export interface UpdateTrackRequest {
   id: string;
@@ -235,11 +232,14 @@ export interface UpdateTrackResponse {
   data?: string;
 }
 
-export interface incrementPlayCountResponse {
+
+/* ======================== OTHER RESPONSES ======================== */
+
+export interface IncrementPlayCountResponse {
   message: string;
   errors?: CreateTrackValidationError[];
 }
 
-export interface deleteTrackResponse {
+export interface DeleteTrackResponse {
   message: string;
 }

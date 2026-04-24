@@ -7,6 +7,7 @@ import { Avatar, Popover } from "antd";
 import { BsFillPersonFill } from "react-icons/bs";
 import FollowButton from "../ui/FollowButton";
 import { useLikeTrack } from "@/hooks/useLikes";
+import ProfilePopover from "../layout/track-cards/ProfilePopover";
 
 interface TrackSidebarProps {
   trackId: string

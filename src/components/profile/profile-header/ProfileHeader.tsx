@@ -153,7 +153,13 @@ const handleDeleteAvatar = async () => {
   }, [bannerImgLink])
 
   useEffect(() => {
-    if (profileImgLink) setAvatarImage(profileImgLink)
+    if (profileImgLink && profileImgLink !== DEFAULT_COVER)
+    {
+      setAvatarImage(profileImgLink)
+    }
+    else{
+      setAvatarImage(null)
+    }
   }, [profileImgLink])
 
   // generate gradient from avatar color

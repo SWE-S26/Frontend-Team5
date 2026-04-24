@@ -24,7 +24,7 @@ interface ProfilePopoverProps {
   artistName: string;
   followCount: number;
   profileImgLink: string;
-  location: string;
+  location?: string;
 }
 
 export default function ProfilePopover({
@@ -132,3 +132,4 @@ export default function ProfilePopover({
     </>
   );
 }
+

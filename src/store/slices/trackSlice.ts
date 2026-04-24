@@ -11,6 +11,7 @@ interface TrackState {
   tags:           string[]
   description:    string | null
   isPrivate:      boolean
+  posterId:       string | null
 
   // media
   audioLink:      string | null
@@ -44,6 +45,7 @@ const initialState: TrackState = {
   tags:           [],
   description:    null,
   isPrivate:      false,
+  posterId: null,
 
   audioLink:      null,
   audioId:        null,

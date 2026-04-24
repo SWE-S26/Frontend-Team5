@@ -9,6 +9,7 @@ export interface TrackComment {
   replyCount:    number
   isLikedByUser: boolean
   isOwnComment:  boolean
+  mentionedUserProfileLink?: string
   createdAt:     string
 }
 
