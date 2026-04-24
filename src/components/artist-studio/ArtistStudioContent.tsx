@@ -1,7 +1,6 @@
 "use client";
 
 import React from "react";
-import { CloudUploadOutlined } from "@ant-design/icons";
 import { useEffect, useMemo, useState } from "react";
 import Image from "next/image";
 
