@@ -66,6 +66,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
 
   // Basic info
   const [trackTitle, setTrackTitle]     = useState("");
+  const [permalink, setPermalink]       = useState("");
   const [artistName, setArtistName]     = useState("");
   const [genre, setGenre]               = useState("");
   const [tags, setTags]                 = useState("");
@@ -218,7 +219,34 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   );
   const waveformMax = useMemo(() => Math.max(...waveformDisplaySamples, 1), [waveformDisplaySamples]);
 
-
+  const baseWaveformBars = useMemo(
+    () =>
+      waveformDisplaySamples.map((sample, idx) => {
+        const normalized = Math.max(0.12, sample / waveformMax);
+        return (
+          <span
+            key={`wave-${idx}`}
+            className="block flex-1 rounded-[1px]"
+            style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-base)" }}
+          />
+        );
+      }),
+    [waveformDisplaySamples, waveformMax],
+  );
+  const leftMaskedWaveformBars = useMemo(
+    () =>
+      waveformDisplaySamples.map((sample, idx) => {
+        const normalized = Math.max(0.12, sample / waveformMax);
+        return (
+          <span
+            key={`wave-left-mask-${idx}`}
+            className="block flex-1 rounded-[1px]"
+            style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-left-wave)" }}
+          />
+        );
+      }),
+    [waveformDisplaySamples, waveformMax],
+  );
 
   // Fetch track on mount
 
@@ -228,13 +256,14 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     if (!fullTrack) return;
     const b = fullTrack.basicInfo;
     setTrackTitle(b.title ?? "");
+    setPermalink(b.permalink ?? "");
     setArtistName((b.mainArtists ?? []).join(", "));
     setGenre(b.genre ?? "");
     setTags((b.tags ?? []).join(", "));
     setDescription(b.description ?? "");
     setIsPublic(!b.isPrivate);
     setVisibilityOption(b.isPrivate ? "private" : "public");
-    setScheduleRelease(scheduleRelease ?? false);
+    setScheduleRelease(false);
 
     // Permissions
     if (fullTrack.permissions) {
@@ -725,7 +754,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
       image: zoomCroppedArtwork,
       basicInfo: {
         title: parsedTitle,
-        permalink: slug,
+        permalink: toOptionalTrimmed(permalink) ?? slug,
         mainArtists,
         genre: toOptionalTrimmed(genre),
         tags: toList(tags).length > 0 ? toList(tags) : undefined,
@@ -882,7 +911,8 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
                     SWITCH_CLS={SWITCH_CLS}
                     trackTitle={trackTitle}
                     setTrackTitle={setTrackTitle}
-                    slug={slug}
+                    permalink={permalink}
+                    setPermalink={setPermalink}
                     artistName={artistName}
                     setArtistName={setArtistName}
                     genre={genre}
@@ -984,8 +1014,8 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
                     expanded={expandedSections.audioClip}
                     onToggle={() => toggleSection("audioClip")}
                     COLLAPSIBLE_MOTION_PROPS={COLLAPSIBLE_MOTION_PROPS}
-                    waveformSamples={waveformDisplaySamples}
-                    waveformMax={waveformMax}
+                    baseWaveformBars={baseWaveformBars}
+                    leftMaskedWaveformBars={leftMaskedWaveformBars}
                     canSetAudioPreview={canSetAudioPreview}
                     clipLeftPercent={clipLeftPercent}
                     rightShadePercent={rightShadePercent}

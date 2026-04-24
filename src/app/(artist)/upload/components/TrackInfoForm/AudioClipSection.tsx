@@ -10,8 +10,8 @@ interface AudioClipSectionProps {
 	expanded: boolean;
 	onToggle: () => void;
 	COLLAPSIBLE_MOTION_PROPS: any;
-	waveformSamples: number[];
-	waveformMax: number;
+	baseWaveformBars: React.ReactNode[];
+	leftMaskedWaveformBars: React.ReactNode[];
 	canSetAudioPreview: boolean;
 	clipLeftPercent: number;
 	rightShadePercent: number;
@@ -44,8 +44,8 @@ export function AudioClipSection({
 	expanded,
 	onToggle,
 	COLLAPSIBLE_MOTION_PROPS,
-	waveformSamples,
-	waveformMax,
+	baseWaveformBars,
+	leftMaskedWaveformBars,
 	canSetAudioPreview,
 	clipLeftPercent,
 	rightShadePercent,
@@ -102,18 +102,7 @@ export function AudioClipSection({
 							<div className="relative overflow-hidden bg-chinese-black">
 								<div className="relative h-28 px-1.5 pt-3 sm:h-30 sm:px-2 sm:pt-6">
 									<div className="pointer-events-none absolute inset-0 opacity-85">
-										<div className="flex h-full w-full items-center gap-px px-1">
-											{waveformSamples.map((sample, idx) => {
-												const normalized = Math.max(0.12, sample / waveformMax);
-												return (
-													<span
-														key={`wave-${idx}`}
-														className="block flex-1 rounded-[1px]"
-														style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-base)" }}
-													/>
-												);
-											})}
-										</div>
+										<div className="flex h-full w-full items-center gap-px px-1">{baseWaveformBars}</div>
 									</div>
 									<div className="pointer-events-none absolute bottom-0 left-1 right-1 top-1/2 bg-chinese-black/38" />
 									<div className="pointer-events-none absolute left-1 right-1 top-1/2 z-10 h-0.5 -translate-y-1/2 bg-chinese-black/80 shadow-[0_0_6px_rgba(0,0,0,0.35)]" />
@@ -132,16 +121,7 @@ export function AudioClipSection({
 												style={{ width: `${clipLeftPercent}%` }}
 											>
 												<div ref={clipLeftShadeWaveRef} className="flex h-full items-center gap-px px-1">
-													{waveformSamples.map((sample, idx) => {
-														const normalized = Math.max(0.12, sample / waveformMax);
-														return (
-															<span
-																key={`wave-left-mask-${idx}`}
-																className="block flex-1 rounded-[1px]"
-																style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-left-wave)" }}
-															/>
-														);
-													})}
+													{leftMaskedWaveformBars}
 												</div>
 											</div>
 
@@ -163,18 +143,7 @@ export function AudioClipSection({
 														style={{ backgroundColor: isClipWindowAtZeroStart ? "var(--waveform-window-fill-zero)" : "var(--waveform-window-fill)" }}
 													/>
 													<div className="pointer-events-none absolute inset-px z-5 overflow-hidden rounded-sm">
-														<div className="flex h-full w-full items-center gap-px px-1">
-															{waveformSamples.map((sample, idx) => {
-																const normalized = Math.max(0.12, sample / waveformMax);
-																return (
-																	<span
-																		key={`wave-window-${idx}`}
-																		className="block flex-1 rounded-[1px]"
-																		style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-base)" }}
-																	/>
-																);
-															})}
-														</div>
+														<div className="flex h-full w-full items-center gap-px px-1">{baseWaveformBars}</div>
 													</div>
 													<div
 														className="pointer-events-none absolute bottom-px left-px top-px z-10 overflow-hidden rounded-l-sm"

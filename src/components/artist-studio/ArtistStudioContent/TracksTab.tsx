@@ -206,10 +206,14 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
 
   const rows = useMemo<ArtistTrackRow[]>(() => {
     return (postedTracks ?? [])
-      .filter((track) => !deletedIds.has(track._id))
+      .filter((track) => {
+        const trackId = track.trackId ?? (track as { _id?: string })._id;
+        return Boolean(trackId) && !deletedIds.has(trackId);
+      })
       .map((track) => {
+        const trackId = track.trackId ?? (track as { _id?: string })._id;
         const base: ArtistTrackRow = {
-          id: track._id,
+          id: trackId,
           title: track.basicInfo.title,
           label: track.basicInfo.mainArtists?.length ? track.basicInfo.mainArtists.join(", ") : "Unknown Artist",
           duration: formatDuration((track as { durationInSeconds?: number }).durationInSeconds),
@@ -220,12 +224,12 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
           reposts: track.numReposts ?? 0,
           hd: false,
           cover: track.image?.imgLink || "/test.jpg",
-          url: track.audio?.audioLink || track.audioLink || "",
+          url: track.audio?.audioLink ,
           isPrivate: Boolean(track.basicInfo.isPrivate),
           rawDate: track.releaseDate ?? "",
           rawDuration: (track as { durationInSeconds?: number }).durationInSeconds ?? 0,
         };
-        return { ...base, ...localOverrides[track._id] };
+        return { ...base, ...localOverrides[trackId] };
       })
       .filter((row) => (filter === "public" ? !row.isPrivate : row.isPrivate))
       .filter((row) => row.title.toLowerCase().includes(search.toLowerCase()))
