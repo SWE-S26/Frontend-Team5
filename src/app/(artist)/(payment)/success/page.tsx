@@ -1,25 +1,33 @@
 'use client'
 
 import { Suspense, useEffect } from 'react'
-import { useRouter } from 'next/navigation'
+import { useRouter, useSearchParams } from 'next/navigation'
 import { useAppSelector } from '@/store/hooks'
 import SuccessContent from './SuccessContent'
 
-export default function Page() {
+function SuccessPage() {
     const role = useAppSelector((state) => state.auth.role)
     const router = useRouter()
+    const searchParams = useSearchParams()
+    const fromCheckout = searchParams.get('from') === 'checkout'
 
     useEffect(() => {
-        if (role === 'Pro') {
-            router.replace('/alreadypro')
-        } else if (role === 'Listener') {
-            router.replace('/checkout')
+        if (!fromCheckout) {
+            if (role === 'Pro') {
+                router.replace('/alreadypro')
+            } else {
+                router.replace('/checkout')
+            }
         }
-    }, [role])
+    }, [role, fromCheckout])
 
+    return <SuccessContent />
+}
+
+export default function Page() {
     return (
         <Suspense fallback={<div className="w-full min-h-screen bg-white" />}>
-            <SuccessContent />
+            <SuccessPage />
         </Suspense>
     )
 }
