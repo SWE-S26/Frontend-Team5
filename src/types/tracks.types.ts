@@ -113,6 +113,8 @@ export interface Track {
 
   durationInSeconds: number;
 
+  isLikedByUser: boolean;
+
   audio: {
     audioLink: string;
     id: string;

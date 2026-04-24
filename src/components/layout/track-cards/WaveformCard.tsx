@@ -38,7 +38,8 @@ type CardProps = {
   trackId: string;
   trackUrl?: string;
   duration?: number;
-  initialLikes?: number;
+  likeCount: number;
+  isLikedByUser?: boolean;
   allTracks?: Track[];
 };
 
@@ -51,7 +52,8 @@ export default function WaveformCard({
   trackId,
   trackUrl,
   duration,
-  initialLikes,
+  likeCount,
+  isLikedByUser,
   allTracks,
 }: CardProps) {
   const [showCommentBox, setShowCommentBox] = useState(false);
@@ -61,18 +63,15 @@ export default function WaveformCard({
   const [commentTimestamp, setCommentTimestamp] = useState(0);
   const [flashComment, setFlashComment] = useState<string | null>(null);
   const [reloadTrigger, setReloadTrigger] = useState(0);
+  const [isLiked, setIsLiked] = useState(isLikedByUser ?? false);
+  const [likeCountState, setLikeCountState] = useState(likeCount);
 
   const commentBoxRef = useRef<HTMLInputElement>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
 
-  const {
-    likeTrack,
-    liked,
-    numOfLikes,
-    loading: likeLoading,
-  } = useLikeTrackOptimistic(trackId, initialLikes);
+  const { likeTrack, loading: likeLoading } = useLikeTrackOptimistic(trackId);
 
   const {
     repostTrack,
@@ -148,6 +147,17 @@ export default function WaveformCard({
       setInputFocused(false);
     }
   };
+
+  function handleLikeClick() {
+    likeTrack();
+
+    setIsLiked((l) => !l);
+    if (isLiked) {
+      setLikeCountState((c) => c - 1);
+    } else {
+      setLikeCountState((c) => c + 1);
+    }
+  }
 
   function handlePlayClick(e: React.MouseEvent) {
     e.stopPropagation();
@@ -282,20 +292,20 @@ export default function WaveformCard({
           <div className="flex items-center">
             <Tooltip label="Like">
               <Button
-                onClick={likeTrack}
+                onClick={handleLikeClick}
                 className="bg-off-black mr-4"
                 icon={
                   <HiHeart
-                    className={`text-[16px] transition-colors ${liked ? "text-inferno" : ""}`}
+                    className={`text-[16px] transition-colors ${isLiked ? "text-inferno" : ""}`}
                   />
                 }
               >
                 <span
-                  className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${liked ? "text-inferno" : ""} ${
+                  className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${isLiked ? "text-inferno" : ""} ${
                     likeLoading ? "opacity-50" : "opacity-100"
                   }`}
                 >
-                  {numOfLikes}
+                  {likeCountState}
                 </span>
               </Button>
             </Tooltip>
