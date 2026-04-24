@@ -10,12 +10,12 @@ import Button from "@/components/ui/Button"
 import AuthModal from "@/components/auth/AuthModal"
 import ViewMessages from "@/components/messages/messageSidebar/ViewMessages"
 import KeyboardShortcutsModal from "@/app/(main)/(more-dropdown)/keyboardShortcuts/keyboardShortcutsModal"
+import NotificationBell from "@/components/notifications/NotificationBell"
 
 import { useLogout } from "@/hooks/useAuth"
 import { useAppSelector } from "@/store/hooks"
 
 import { MdOutlineExpandMore } from "react-icons/md"
-import { SlBell } from "react-icons/sl"
 import { GrMailOption } from "react-icons/gr"
 import { IoIosMore } from "react-icons/io"
 import { FaUser, FaHeart, FaStar } from "react-icons/fa"
@@ -124,9 +124,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
             items={profileItems}
           />
 
-          <button data-testid="notifications" className={ICON_BTN_CLASS}>
-            <SlBell />
-          </button>
+          <NotificationBell notifications={[]} />
 
           <div className="relative" ref={messagesRef}>
             <button data-testid="messages" className={ICON_BTN_CLASS} onClick={() => setIsMessagesOpen((prev) => !prev)}>
