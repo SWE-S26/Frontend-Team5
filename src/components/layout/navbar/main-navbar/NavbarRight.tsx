@@ -24,7 +24,6 @@ import { BiSolidCopy } from "react-icons/bi"
 import { HiMiniSignal } from "react-icons/hi2"
 import { PiWaveformBold } from "react-icons/pi"
 import { ImStatsBars } from "react-icons/im"
-import { BsArrowsExpandVertical } from "react-icons/bs"
 
 interface NavbarRightProps {
   isLoggedIn: boolean
