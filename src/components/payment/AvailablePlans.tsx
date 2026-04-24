@@ -42,40 +42,12 @@ export function AvailablePlans({
 
                 <div className="flex flex-col sm:flex-row gap-6 justify-center items-stretch">
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e5f3fe4 (added - subscription page)
                     {/* Monthly Plan Card */}
                     <div
                         onClick={role !== 'Pro' ? () => handleSelectPlan('monthly', monthlyPrice) : undefined}
                         className={`relative rounded-2xl border-2 bg-white p-6 sm:p-8 w-full sm:w-[41%] transition-all duration-200 ${
                             role === 'Pro' ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:shadow-lg'
                         } ${selectedInterval === 'monthly' ? 'border-gray-300' : 'border-gray-200'}`}
-<<<<<<< HEAD
-=======
-                    <div className="flex items-baseline gap-1 mb-1">
-                        <span className="text-3xl font-bold text-[#545AEC]">{currency} {monthlyPrice}</span>
-                        <p className="text-gray-500 text-sm mb-6">/ month, billed yearly for {currency} {(monthlyPrice * 12).toFixed(2)}</p>
-                    </div>
-
-                    <hr className="border-gray-200 mb-6" />
-
-                    <ul className="space-y-2 mb-8">
-                        {['Cancel anytime', 'Flexible billing'].map((item) => (
-                            <li key={item} className="flex items-center gap-2 text-sm text-gray-700">
-                                <span className="text-[#545AEC]">✓</span>
-                                {item}
-                            </li>
-                        ))}
-                    </ul>
-
-                    <button
-                        disabled={isLoading}
-                        className="w-full rounded-full bg-black py-3 font-semibold text-white transition-all duration-200 hover:bg-gray-800 disabled:opacity-50"
->>>>>>> 077221e (added - implementation - checkout & artist & added success page)
-=======
->>>>>>> e5f3fe4 (added - subscription page)
                     >
                         <p className="text-2xl sm:text-4xl font-bold text-black mb-4">Monthly Plan</p>
 
@@ -103,48 +75,12 @@ export function AvailablePlans({
                         </button>
                     </div>
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e5f3fe4 (added - subscription page)
                     {/* Yearly Plan Card */}
                     <div
                         onClick={role !== 'Pro' ? () => handleSelectPlan('yearly', yearlyPrice) : undefined}
                         className={`relative rounded-2xl border-2 bg-orange-50 p-6 sm:p-8 w-full sm:w-[41%] transition-all duration-200 ${
                             role === 'Pro' ? 'cursor-not-allowed opacity-60' : 'cursor-pointer hover:shadow-lg'
                         } ${selectedInterval === 'yearly' ? 'border-[#c79910]' : 'border-orange-300'}`}
-<<<<<<< HEAD
-=======
-                    {selectedInterval === 'yearly' && (
-                    <div className="absolute top-4 right-4 w-7 h-7 bg-[#c79910] rounded-full flex items-center justify-center">
-                        <span className="text-white text-xs">✓</span>
-                    </div>
-                    )}
-
-                    <p className="text-4xl font-bold text-black mb-4">Yearly Plan</p>
-
-                    <div className="flex items-baseline gap-1 mb-1">
-                        <span className="text-3xl font-bold text-[#c79910]">{currency} {(yearlyPrice / 12).toFixed(2)}</span>
-                        <p className="text-gray-500 text-sm mb-6">/ month, billed yearly for {currency} {yearlyPrice}</p>
-                    </div>
-
-                    <hr className="border-orange-200 mb-6" />
-
-                    <ul className="space-y-2 mb-8">
-                        {['Best value', `Save ${savings}%`].map((item) => (
-                            <li key={item} className="flex items-center gap-2 text-sm text-gray-700">
-                                <span className="text-[#c79910]">✓</span>
-                                {item}
-                            </li>
-                        ))}
-                    </ul>
-
-                    <button
-                        disabled={isLoading}
-                        className="w-full rounded-full bg-[#c79910] py-3 font-semibold text-white transition-all duration-200 hover:bg-[#b08a0e] disabled:opacity-50"
->>>>>>> 077221e (added - implementation - checkout & artist & added success page)
-=======
->>>>>>> e5f3fe4 (added - subscription page)
                     >
                         <div className="absolute -top-4 left-6 bg-[#c79910] text-white text-xs font-bold px-4 py-1.5 rounded-full">
                             MOST POPULAR

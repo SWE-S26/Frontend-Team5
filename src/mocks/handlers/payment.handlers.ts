@@ -73,10 +73,6 @@ export const paymentHandlers = [
     HttpResponse.json(mockGetSubscriptionResponse)
   ),
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e5f3fe4 (added - subscription page)
   /* (6) */
   http.get('/api/payment/v1/transactions', () =>
       HttpResponse.json({
@@ -139,9 +135,4 @@ export const paymentHandlers = [
       })
   ),
 
-<<<<<<< HEAD
-=======
->>>>>>> 077221e (added - implementation - checkout & artist & added success page)
-=======
->>>>>>> e5f3fe4 (added - subscription page)
 ]

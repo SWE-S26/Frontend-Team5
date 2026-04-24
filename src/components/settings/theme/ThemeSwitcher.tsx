@@ -11,16 +11,6 @@ export default function ThemeSwitcher({ onThemeChange, saveStatus = "idle" }: Th
   const [theme, setTheme] = useState("dark")
 
   useEffect(() => {
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
-    const current = localStorage.getItem("theme") || "dark"
-    setTheme(current)
-    applyTheme(current)
-
->>>>>>> 077221e (added - implementation - checkout & artist & added success page)
-=======
->>>>>>> e5f3fe4 (added - subscription page)
     const mediaQuery = window.matchMedia("(prefers-color-scheme: dark)")
 
     function applyTheme(choice: string) {

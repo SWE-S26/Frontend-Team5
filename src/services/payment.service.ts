@@ -8,21 +8,12 @@ import {
   CreateSubscriptionRequest,
   CreateSubscriptionResponse,
   GetSubscriptionResponse,
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e5f3fe4 (added - subscription page)
   GetTransactionsResponse,
   GetTransactionsParams,
   UpdateSubscriptionRequest,
   UpdateSubscriptionResponse,
   CancelSubscriptionRequest,
   CancelSubscriptionResponse,
-<<<<<<< HEAD
-=======
->>>>>>> 077221e (added - implementation - checkout & artist & added success page)
-=======
->>>>>>> e5f3fe4 (added - subscription page)
 } from "@/types/payment.types"
 
 export const paymentService = {
@@ -47,10 +38,6 @@ export const paymentService = {
     getSubscription: () =>
         api.get<GetSubscriptionResponse>("/api/payment/v1/subscriptions"),
 
-<<<<<<< HEAD
-<<<<<<< HEAD
-=======
->>>>>>> e5f3fe4 (added - subscription page)
     /* (6) */
     getTransactions: (params?: GetTransactionsParams) =>
         api.get<GetTransactionsResponse>('/api/payment/v1/transactions', { params }),
@@ -62,9 +49,4 @@ export const paymentService = {
     /* (8) */
     cancelSubscription: (data: CancelSubscriptionRequest) =>
         api.delete<CancelSubscriptionResponse>('/api/payment/v1/subscriptions', { data }),
-<<<<<<< HEAD
-=======
->>>>>>> 077221e (added - implementation - checkout & artist & added success page)
-=======
->>>>>>> e5f3fe4 (added - subscription page)
 }
