@@ -5,7 +5,7 @@ import Link from "next/link"
 import Image from "next/image"
 import { useRouter } from "next/navigation"
 
-import Dropdown, { DropdownItem } from "@/components/ui/Dropdown"
+import Dropdown, { DropdownItem } from "@/components/ui/MoreDropdown"
 import Button from "@/components/ui/Button"
 import AuthModal from "@/components/auth/AuthModal"
 import ViewMessages from "@/components/messages/messageSidebar/ViewMessages"
@@ -71,33 +71,25 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
     { label: "Stations",       icon: <HiMiniSignal />,           href: "/library/stations"                    },
     { label: "Following",      icon: <FaUserCheck />,            href: "/library/following"                   },
     { label: "Who to follow",  icon: <FaUserPlus />,             onClick: () => console.log("done")           },
-    { label: "Try Artist Pro", icon: <FaStar />,                 href: "/artistpro"                           },
+    ...(role !== 'Pro' ? [{ label: "Try Artist Pro", icon: <img src="/payment/already-pro-bg-red.svg" alt="Artist Pro" className="w-4.5 h-4.5" />, href: "/artist" }] : []),
     { label: "Tracks",         icon: <PiWaveformBold />,         href: "/artists"                             },
     { label: "Insights",       icon: <ImStatsBars />,            onClick: () => console.log("done")           },
-    { label: "Distribute",     icon: <BsArrowsExpandVertical />, href: "/artistpro"                           },
   ], [profileTarget, userId])
 
   const moreItems: DropdownItem[] = useMemo(() => [
-    { label: "About us",           onClick: () => console.log("done")      },
+    { label: "About us",           href: "/about-us"                       },
     { label: "Legal",              href: "/legal"                          },
     { label: "Copyright",          href: "/copyright"                      },
-    { type: "separator" },
-    { label: "Mobile apps",        onClick: () => console.log("done")      },
-    { label: "Artist Membership",  onClick: () => console.log("done")      },
-    { label: "Newsroom",           onClick: () => console.log("done")      },
-    { label: "Jobs",               onClick: () => console.log("done")      },
-    { label: "Developers",         onClick: () => console.log("done")      },
-    { label: "SoundCloud Store",   onClick: () => console.log("done")      },
     { type: "separator" },
     { label: "Support",            href: "/need-help"                      },
     { label: "Keyboard shortcuts", onClick: () => setIsShortcutsOpen(true) },
     { type: "separator" },
     ...(isLoggedIn ? [
-      { label: "Subscription", onClick: () => console.log("done")          },
+      { label: "Subscription", href: "/subscriptions"                      },
       { label: "Settings",     href: "/settings"                           },
       { label: "Sign out",     onClick: () => logout(), disabled: loading  },
     ] : [
-      { label: "Pro Plans",    onClick: () => console.log("done")          },
+      { label: "Pro Plans",    href: "/artist"                             },
     ]),
   ], [isLoggedIn, loading, router])
 
@@ -117,7 +109,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
             Upload
           </Link>
 
-          <Dropdown testId="profile_dropdown" width="w-40" position="left-0"
+          <Dropdown testId="profile_dropdown" width="w-42" gap="gap-2"
             trigger={
               <button data-testid="profile_button" className="text-silver font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2 text-4xl cursor-pointer">
                 <Image
@@ -164,7 +156,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
         </>
       )}
 
-      <Dropdown testId="more_dropdown" width="w-43" position="right-0"
+      <Dropdown testId="more_dropdown" width="w-44"
         trigger={
           <button data-testid="more_button" className="text-silver text-2xl font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2 cursor-pointer">
             <IoIosMore />
