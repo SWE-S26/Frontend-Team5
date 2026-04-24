@@ -2,7 +2,6 @@
 
 import { useEffect, useState, useMemo, useRef } from "react"
 import Link from "next/link"
-import Image from "next/image"
 import { useRouter } from "next/navigation"
 
 import Dropdown, { DropdownItem } from "@/components/ui/MoreDropdown"
@@ -11,6 +10,7 @@ import AuthModal from "@/components/auth/AuthModal"
 import ViewMessages from "@/components/messages/messageSidebar/ViewMessages"
 import KeyboardShortcutsModal from "@/app/(main)/(more-dropdown)/keyboardShortcuts/keyboardShortcutsModal"
 import NotificationBell from "@/components/notifications/NotificationBell"
+import ProfileImage from "@/components/ui/ProfileImage"
 
 import { useLogout } from "@/hooks/useAuth"
 import { useAppSelector } from "@/store/hooks"
@@ -64,31 +64,31 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   const profileTarget = userId ? `/profile/${userId}` : "/home"
 
   const profileItems: DropdownItem[] = useMemo(() => [
-    { label: "Profile",        icon: <FaUser />,                 href: profileTarget,       disabled: !userId },
-    { label: "Likes",          icon: <FaHeart />,                href: "/library/likes"                       },
-    { label: "Playlists",      icon: <BiSolidCopy />,            href: "/library/playlists"                   },
-    { label: "Stations",       icon: <HiMiniSignal />,           href: "/library/stations"                    },
-    { label: "Following",      icon: <FaUserCheck />,            href: "/library/following"                   },
-    { label: "Who to follow",  icon: <FaUserPlus />,             onClick: () => console.log("done")           },
+    { label: "Profile",        icon: <FaUser />,                 href: profileTarget,       disabled: !userId ,   testId: "profile-item-link-btn"       },
+    { label: "Likes",          icon: <FaHeart />,                href: "/library/likes"                       ,   testId: "likes-item-link-btn"         },
+    { label: "Playlists",      icon: <BiSolidCopy />,            href: "/library/playlists"                   ,   testId: "playlists-item-link-btn"     },
+    { label: "Stations",       icon: <HiMiniSignal />,           href: "/library/stations"                    ,   testId: "stations-item-link-btn"      },
+    { label: "Following",      icon: <FaUserCheck />,            href: "/library/following"                   ,   testId: "following-item-link-btn"     },
+    { label: "Who to follow",  icon: <FaUserPlus />,             onClick: () => console.log("done")           ,   testId: "who-to-follow-item-link-btn" },
     ...(role !== 'Pro' ? [{ label: "Try Artist Pro", icon: <img src="/payment/already-pro-bg-red.svg" alt="Artist Pro" className="w-4.5 h-4.5" />, href: "/artist" }] : []),
-    { label: "Tracks",         icon: <PiWaveformBold />,         href: "/artists"                             },
-    { label: "Insights",       icon: <ImStatsBars />,            onClick: () => console.log("done")           },
+    { label: "Tracks",         icon: <PiWaveformBold />,         href: "/artists"                             ,   testId: "tracks-item-link-btn"        },
+    { label: "Insights",       icon: <ImStatsBars />,            onClick: () => console.log("done")           ,   testId: "insights-item-link-btn"      },
   ], [profileTarget, userId])
 
   const moreItems: DropdownItem[] = useMemo(() => [
-    { label: "About us",           href: "/about-us"                       },
-    { label: "Legal",              href: "/legal"                          },
-    { label: "Copyright",          href: "/copyright"                      },
+    { label: "About us",           href: "/about-us"                        ,   testId: "about-us-item-link-btn"           },
+    { label: "Legal",              href: "/legal"                           ,   testId: "legal-item-link-btn"              },
+    { label: "Copyright",          href: "/copyright"                       ,   testId: "copyright-item-link-btn"          },
     { type: "separator" },
-    { label: "Support",            href: "/need-help"                      },
-    { label: "Keyboard shortcuts", onClick: () => setIsShortcutsOpen(true) },
+    { label: "Support",            href: "/need-help"                       ,   testId: "support-item-link-btn"            },
+    { label: "Keyboard shortcuts", onClick: () => setIsShortcutsOpen(true)  ,   testId: "keyboard-shortcuts-item-link-btn" },
     { type: "separator" },
     ...(isLoggedIn ? [
-      { label: "Subscription", href: "/subscriptions"                      },
-      { label: "Settings",     href: "/settings"                           },
-      { label: "Sign out",     onClick: () => logout(), disabled: loading  },
+      { label: "Subscription", href: "/subscriptions"                      ,   testId: "subscription-item-link-btn" },
+      { label: "Settings",     href: "/settings"                           ,   testId: "settings-item-link-btn"     },
+      { label: "Sign out",     onClick: () => logout(), disabled: loading  ,   testId: "sign-out-item-link-btn"     },
     ] : [
-      { label: "Pro Plans",    href: "/artist"                             },
+      { label: "Pro Plans",    href: "/artist"                             ,   testId: "pro-plans-item-link-btn"    },
     ]),
   ], [isLoggedIn, loading, router])
 
@@ -111,8 +111,8 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
           <Dropdown testId="profile_dropdown" width="w-42" gap="gap-2"
             trigger={
               <button data-testid="profile_button" className="text-silver font-bold hover:text-white-smoke transition-all duration-300 flex items-center gap-2 text-4xl cursor-pointer">
-                <Image
-                  src={profileImgLink || "/profpic.jpg"}
+                <ProfileImage
+                  src={profileImgLink}
                   alt="Profile"
                   width={26}
                   height={26}

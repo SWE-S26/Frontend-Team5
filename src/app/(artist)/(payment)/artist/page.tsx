@@ -2,7 +2,6 @@
 
 import { useRef, useState, useEffect } from 'react'
 import Link from "next/link";
-import Image from "next/image"
 
 import { useAppSelector, useAppDispatch } from "@/store/hooks"
 import { useLogout } from "@/hooks/useAuth"
@@ -12,6 +11,7 @@ import { setProfile, clearProfile } from "@/store/slices/profileSlice"
 import { HeroSection } from '@/components/payment/HeroSection'
 import { AvailablePlans } from '@/components/payment/AvailablePlans'
 import { CompareFeatures } from '@/components/payment/CompareFeatures'
+import ProfileImage from "@/components/ui/ProfileImage"
 
 import { IoIosArrowDown } from "react-icons/io";
 
@@ -95,8 +95,8 @@ export default function ArtistPage() {
                                     className={`cursor-pointer flex items-center w-full h-11.5 justify-between px-2 ${isDropdownOpen ? 'bg-[#101010]' : ''}`}
                                 >
                                     <div className="flex items-center">
-                                        <Image
-                                            src={profileImgLink || "/profpic.jpg"}
+                                        <ProfileImage
+                                            src={profileImgLink}
                                             alt="Profile"
                                             width={26}
                                             height={26}

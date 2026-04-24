@@ -26,6 +26,7 @@ import { BsArrowsExpandVertical } from "react-icons/bs";
 import { GoHome } from "react-icons/go";
 import { MdOutlineFeed, MdOutlineLibraryMusic, MdOutlineExpandMore, MdOutlineExpandLess } from "react-icons/md";
 import { CiSearch } from "react-icons/ci";
+import ProfileImage from "@/components/ui/ProfileImage"
 
 interface MobileNavbarProps {
   isLoggedIn: boolean;
@@ -153,7 +154,7 @@ export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
               onClick={() => setIsProfileExpanded((prev) => !prev)}
               className="flex items-center gap-3 w-full mb-4 cursor-pointer"
             >
-              <Image src={profileImgLink || "/profpic.jpg"} alt="Profile" width={40} height={40} className="rounded-full w-10 h-10 object-cover" />
+              <ProfileImage src={profileImgLink} alt="Profile" width={40} height={40} className="rounded-full w-10 h-10 object-cover" />
               <span className="text-white-smoke font-bold flex-1 text-left">{displayName || "No Name"}</span>
               {isProfileExpanded
                 ? <MdOutlineExpandLess className="text-silver text-xl" />

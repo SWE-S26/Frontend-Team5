@@ -4,7 +4,6 @@ import { useState, useEffect } from 'react'
 import { useStripe, useElements, CardNumberElement, CardExpiryElement, CardCvcElement } from '@stripe/react-stripe-js'
 import { useSearchParams, useRouter } from 'next/navigation'
 import Link from 'next/link'
-import Image from 'next/image'
 
 import { useAppSelector, useAppDispatch } from '@/store/hooks'
 import { useLogout, useRefreshToken } from '@/hooks/useAuth'
@@ -16,6 +15,7 @@ import FloatingInput from '@/components/payment/FloatingInput'
 import { COUNTRIES } from '@/components/payment/countries'
 import { useGetProfile } from '@/hooks/useProfile'
 import { setProfile, clearProfile } from '@/store/slices/profileSlice'
+import ProfileImage from "@/components/ui/ProfileImage"
 
 // ── Constants ────────────────────────────────────────────────────
 
@@ -174,8 +174,8 @@ const stripe = useStripe()
                                     className={`cursor-pointer flex items-center w-full h-11.5 justify-between px-2 ${isDropdownOpen ? 'bg-[#101010]' : ''}`}
                                 >
                                     <div className="flex items-center">
-                                        <Image
-                                            src={profileImgLink || '/profpic.jpg'}
+                                        <ProfileImage
+                                            src={profileImgLink}
                                             alt="Profile"
                                             width={26}
                                             height={26}

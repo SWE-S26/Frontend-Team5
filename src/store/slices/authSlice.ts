@@ -1,7 +1,8 @@
 import { createSlice, PayloadAction } from "@reduxjs/toolkit"
 
-// mirrors exactly what authStore.ts currently tracks
-// once all components are migrated off authStore.ts, this becomes the only source of truth
+export const DEFAULT_PROFILE_IMAGE_URL = "https://res.cloudinary.com/dr1sqiouu/image/upload/v1776357570/profile/file_ud25rn.png"
+export const DEFAULT_PROFILE_GRADIENT = "linear-gradient(to right, #c3adb4, #8f6f79)"
+
 interface AuthState {
   isAuthenticated: boolean
   hasHydrated: boolean       // true once we've checked localStorage on first load
@@ -34,7 +35,9 @@ const authSlice = createSlice({
       state.hasHydrated = true
       state.userId = action.payload.userId
       state.displayName = action.payload.displayName
-      state.profileImgLink = action.payload.profileImgLink
+      state.profileImgLink = action.payload.profileImgLink === DEFAULT_PROFILE_IMAGE_URL
+        ? null
+        : action.payload.profileImgLink
       state.bannerImgLink = action.payload.bannerImgLink
       state.profileLink = action.payload.profileLink
       state.role = action.payload.role
@@ -53,12 +56,21 @@ const authSlice = createSlice({
 
     // called once on app load after reading localStorage
     hydrateAuth: (state, action: PayloadAction<Partial<AuthState>>) => {
-      return { ...state, ...action.payload, hasHydrated: true }
+      return {
+        ...state,
+        ...action.payload,
+        hasHydrated: true,
+        profileImgLink: (action.payload.profileImgLink ?? state.profileImgLink) === DEFAULT_PROFILE_IMAGE_URL
+          ? DEFAULT_PROFILE_GRADIENT
+          : (action.payload.profileImgLink ?? state.profileImgLink)
+      }
     },
 
     // individual field updates — used when user edits profile pic, name, etc.
     setProfileImgLink: (state, action: PayloadAction<string | null>) => {
-      state.profileImgLink = action.payload
+      state.profileImgLink = action.payload === DEFAULT_PROFILE_IMAGE_URL
+        ? DEFAULT_PROFILE_GRADIENT
+        : action.payload
     },
 
     setBannerImgLink: (state, action: PayloadAction<string | null>) => {
