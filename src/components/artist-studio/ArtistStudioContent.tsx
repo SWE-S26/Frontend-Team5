@@ -129,7 +129,7 @@ export const CoinIcon = ({ className = "", hovered }: { className?: string; hove
   <Image src="/artists-icons/coin.svg" alt="Coin" width={24} height={24} className={`invert w-12 h-12 ${className}`} />
 );
 
-export const PurpleHeartIcon = ({ hovered =false , className = ""} : {hovered?: boolean; className?: string }) => (
+export const PurpleHeartIcon = ({ hovered = false, className = "", showStar = true }: { hovered?: boolean; className?: string; showStar?: boolean }) => (
   <div className={`relative w-12 h-12 ${className}`}>
     <RisingFillIcon
       svgContent={<HeartPath />}
@@ -137,11 +137,13 @@ export const PurpleHeartIcon = ({ hovered =false , className = ""} : {hovered?: 
       color="#7564f5"
       viewBox="0 0 32 28"
     />
-    <Image src="/artists-icons/purple-star.svg" alt="Star" width={16} height={16} className="absolute top-0 ml-11 w-4 h-4" />
+    {showStar && (
+      <Image src="/artists-icons/purple-star.svg" alt="Star" width={16} height={16} className="absolute top-0 ml-11 w-4 h-4" />
+    )}
   </div>
 );
 
-export const GoldenHeartIcon = ({ hovered =false , className = "" }: {hovered?: boolean; className?: string }) => (
+export const GoldenHeartIcon = ({ hovered = false, className = "", showStar = true }: { hovered?: boolean; className?: string; showStar?: boolean }) => (
   <div className={`relative w-12 h-12 ${className}`}>
     <RisingFillIcon
       svgContent={<HeartListeningPaths />}
@@ -149,7 +151,9 @@ export const GoldenHeartIcon = ({ hovered =false , className = "" }: {hovered?: 
       color="#cfb25d"
       viewBox="0 0 67 62"
     />
-    <Image src="/artists-icons/golden-star.svg" alt="Star" width={16} height={16} className="absolute top-0 ml-11 w-4 h-4" />
+    {showStar && (
+      <Image src="/artists-icons/golden-star.svg" alt="Star" width={16} height={16} className="absolute top-0 ml-11 w-4 h-4" />
+    )}
   </div>
 );
 
