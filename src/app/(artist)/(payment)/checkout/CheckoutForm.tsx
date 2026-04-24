@@ -149,7 +149,7 @@ const stripe = useStripe()
         const success = await checkout(paymentMethod.id, selectedPlan.priceId)
         if (success) {
             await refreshToken()
-            router.push(`/success?plan=${selectedInterval}&price=${totalPrice}&currency=${CURRENCY}`)
+            router.push(`/success?plan=${selectedInterval}&price=${totalPrice}&currency=${CURRENCY}&from=checkout`)
         }
     }
 
