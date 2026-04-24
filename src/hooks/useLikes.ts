@@ -94,52 +94,51 @@ export function useLikeTrack() {
   };
 }
 
-export function useLikeTrackOptimistic(trackId: string, initialLikes?: number) {
-  const { isLiked: initialIsLiked } = useLikeStatus(trackId);
+export function useLikeTrackOptimistic(trackId: string) {
+  // const { isLiked: initialIsLiked } = useLikeStatus(trackId);
 
-  const [liked, setLiked] = useState(false);
-  const [numOfLikes, setNumOfLikes] = useState<number | null>(null);
+  // const [liked, setLiked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
-    setLiked(initialIsLiked);
-  }, [initialIsLiked]);
+  // useEffect(() => {
+  //   setLiked(initialIsLiked);
+  // }, [initialIsLiked]);
 
-  useEffect(() => {
-    if (!trackId) return;
+  // useEffect(() => {
+  //   if (!trackId) return;
 
-    const load = async () => {
-      try {
-        const res = await fetchTrackLikes(trackId, 1, 1);
-        setNumOfLikes(res.total);
-      } catch {}
-    };
+  //   const load = async () => {
+  //     try {
+  //       const res = await fetchTrackLikes(trackId, 1, 1);
+  //       setNumOfLikes(res.total);
+  //     } catch {}
+  //   };
 
-    load();
-  }, [trackId]);
+  //   load();
+  // }, [trackId]);
 
   const likeTrackOptimistic = useCallback(async () => {
     if (!trackId || loading) return;
 
-    const prevLiked = liked;
-    const prevLikes = numOfLikes;
+    // const prevLiked = liked;
+    // const prevLikes = numOfLikes;
 
-    const nextLiked = !liked;
+    // const nextLiked = !liked;
 
-    setLiked(nextLiked);
-    setNumOfLikes((prev) => (prev ?? 0) + (nextLiked ? 1 : -1));
+    // setLiked(nextLiked);
+    // setNumOfLikes((prev) => (prev ?? 0) + (nextLiked ? 1 : -1));
     setLoading(true);
     setError(null);
 
     try {
       const res = await likeService.likeTrack(trackId);
 
-      setLiked(res.data.liked);
-      setNumOfLikes(res.data.numOfLikes);
+      // setLiked(res.data.liked);
+      // setNumOfLikes(res.data.numOfLikes);
     } catch (err) {
-      setLiked(prevLiked);
-      setNumOfLikes(prevLikes);
+      // setLiked(prevLiked);
+      // setNumOfLikes(prevLikes);
 
       if (axios.isAxiosError<LikeTrackErrorResponse>(err)) {
         setError(err.response?.data?.message || "Something went wrong");
@@ -149,12 +148,10 @@ export function useLikeTrackOptimistic(trackId: string, initialLikes?: number) {
     } finally {
       setLoading(false);
     }
-  }, [trackId, liked, numOfLikes, loading]);
+  }, [trackId, loading]);
 
   return {
     likeTrack: likeTrackOptimistic,
-    liked,
-    numOfLikes,
     loading,
     error,
   };
