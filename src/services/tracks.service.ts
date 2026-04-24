@@ -5,13 +5,14 @@ import {
 } from "@/types/tracks.types";
 
 import {
-  CreateTrackRequest,
-  CreateTrackResponse,
-  GetTrackByIdResponse,
-  UpdateTrackRequest,
-  UpdateTrackResponse,
-  incrementPlayCountResponse,
-  deleteTrackResponse,
+	CreateTrackRequest,
+	CreateTrackResponse,
+	GetTrackByIdResponse,
+	UpdateTrackRequest,
+	UpdateTrackResponse,
+	incrementPlayCountResponse,
+	deleteTrackResponse,
+	GetUploadQuotaResponse,
 } from "@/types/tracks.types";
 
 export const tracksService = {
@@ -82,6 +83,8 @@ export const tracksService = {
   incrementPlayCount: (id: string) =>
     api.patch<incrementPlayCountResponse>(`/api/tracks/v1/listen/${id}`),
 
-  deleteTrack: (id: string) =>
-    api.delete<deleteTrackResponse>(`/api/tracks/v1/${id}`),
+	deleteTrack: (id: string) =>
+		api.delete<deleteTrackResponse>(`/api/tracks/v1/${id}`),
+	getUploadQuota: (userId: string) =>
+		api.get<GetUploadQuotaResponse>(`/api/tracks/v1/quota/${userId}`),
 };

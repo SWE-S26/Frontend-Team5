@@ -196,6 +196,13 @@ export interface incrementPlayCountResponse {
   errors?: CreateTrackValidationError[];
 }
 
+export interface GetUploadQuotaResponse {
+  message: string;
+  data: {
+    quota: number;
+  };
+}
+
 export interface deleteTrackResponse {
   message: string;
 }
