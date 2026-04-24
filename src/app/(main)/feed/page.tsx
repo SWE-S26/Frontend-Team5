@@ -1,7 +1,8 @@
 "use client";
 
-import { useEffect, useMemo } from "react";
-import { ConfigProvider, Switch } from "antd";
+import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { ConfigProvider, Switch, Spin } from "antd";
+import { LoadingOutlined } from "@ant-design/icons";
 
 import WaveformCard from "@/components/layout/track-cards/WaveformCard";
 import FeedHeader from "@/components/layout/track-cards/FeedHeader";
@@ -10,17 +11,54 @@ import FeedGuard from "./FeedGuard";
 
 import { useGetTracks } from "@/hooks/useTracks";
 import { Track } from "@/store/slices/playerSlice";
+import { Track as ApiTrack } from "@/types/tracks.types";
+
+const PAGE_SIZE = 5;
 
 export default function Feed() {
-  const { getTracks, loading, error, tracks } = useGetTracks();
+  const { getTracks, loading, tracks, paginationInfo } = useGetTracks();
+
+  const [allTracks, setAllTracks] = useState<ApiTrack[]>([]);
+  const [page, setPage] = useState(1);
+
+  const sentinelRef = useRef<HTMLDivElement>(null);
+  const hasNext = paginationInfo?.hasNext ?? true;
 
   useEffect(() => {
-    getTracks(1, 10);
-  }, [getTracks]);
+    getTracks(page, PAGE_SIZE);
+  }, [page]);
+
+  useEffect(() => {
+    if (!tracks) return;
+    setAllTracks((prev) =>
+      page === 1
+        ? tracks
+        : [
+            ...prev,
+            ...tracks.filter((t) => !prev.some((p) => p.trackId === t.trackId)),
+          ],
+    );
+  }, [tracks]);
+
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting && !loading && hasNext) {
+          setPage((p) => p + 1);
+        }
+      },
+      { rootMargin: "200px" },
+    );
+
+    observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
+  }, [loading, hasNext]);
 
   const reduxTracks: Track[] = useMemo(
     () =>
-      (tracks ?? []).map((t) => ({
+      allTracks.map((t) => ({
         id: t.trackId,
         url: t.audio?.audioLink ?? "",
         title: t.basicInfo?.title,
@@ -28,7 +66,7 @@ export default function Feed() {
         img: t.image?.imgLink,
         duration: t.durationInSeconds,
       })),
-    [tracks],
+    [allTracks],
   );
 
   return (
@@ -62,7 +100,7 @@ export default function Feed() {
           </div>
 
           <div>
-            {tracks?.map((track) => (
+            {allTracks.map((track) => (
               <div key={track.trackId} className="flex-none mb-4">
                 <PopoverProvider>
                   <FeedHeader
@@ -83,12 +121,31 @@ export default function Feed() {
                   trackUrl={track.audio?.audioLink}
                   duration={track.durationInSeconds}
                   likeCount={track.numLikes}
-                  allTracks={reduxTracks}
+                  repostCount={track.numReposts}
                   isLikedByUser={track.isLikedByUser}
+                  allTracks={reduxTracks}
                 />
               </div>
             ))}
           </div>
+
+          <div ref={sentinelRef} />
+
+          {loading && page > 1 && (
+            <div className="flex justify-center py-8">
+              <ConfigProvider
+                theme={{ token: { colorPrimary: "var(--inferno)" } }}
+              >
+                <Spin indicator={<LoadingOutlined spin />} size="large" />
+              </ConfigProvider>
+            </div>
+          )}
+
+          {!hasNext && !loading && allTracks.length > 0 && (
+            <p className="text-center text-silver text-sm py-8">
+              You're all caught up
+            </p>
+          )}
         </div>
         <div className="hidden md:block md:w-[27.75%]" />
       </div>
