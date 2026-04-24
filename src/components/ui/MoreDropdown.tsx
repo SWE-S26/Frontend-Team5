@@ -24,6 +24,7 @@ export interface DropdownItem {
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
   href?: string 
+  testId?: string;
 }
 
 interface MoreDropdownProps {
@@ -142,6 +143,7 @@ export default function MoreDropdown({
                 key={index}
                 href={item.href}
                 onClick={() => setIsOpen(false)}
+                data-testid={item.testId}
                 className="flex items-center gap-3 pl-3 pr-6 py-1.5 text-left text-white-smoke hover:text-white-smoke/50 transition-colors"
               >
                 {item.icon && <span className="text-lg shrink-0">{item.icon}</span>}
@@ -151,6 +153,7 @@ export default function MoreDropdown({
               <button
                 key={index}
                 disabled={item.disabled}
+                data-testid={item.testId}
                 onClick={(e) => {
                   e.stopPropagation();
                   item.onClick?.(e);

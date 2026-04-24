@@ -6,8 +6,8 @@ import { useLogout } from '@/hooks/useAuth'
 import { useGetProfile } from '@/hooks/useProfile'
 import { setProfile, clearProfile } from '@/store/slices/profileSlice'
 import Link from 'next/link'
-import Image from 'next/image'
 import { IoIosArrowDown } from 'react-icons/io'
+import ProfileImage from "@/components/ui/ProfileImage"
 
 export default function page() {
     const dispatch = useAppDispatch()
@@ -76,13 +76,13 @@ export default function page() {
                                     className={`cursor-pointer flex items-center w-full h-11.5 justify-between px-2 ${isDropdownOpen ? 'bg-[#101010]' : ''}`}
                                 >
                                     <div className="flex items-center">
-                                        <Image
-                                            src={profileImgLink || '/profpic.jpg'}
-                                            alt="Profile"
-                                            width={26}
-                                            height={26}
-                                            className="rounded-full w-6.5 h-6.5 object-cover mr-2"
-                                        />
+                                    <ProfileImage
+                                        src={profileImgLink}
+                                        alt="Profile"
+                                        width={26}
+                                        height={26}
+                                        className="rounded-full w-6.5 h-6.5 object-cover mr-2"
+                                    />
                                         <h1 className="text-white-smoke font-bold text-[14px] mr-2 hover:opacity-80 transition-opacity truncate max-w-33">
                                             {fullName}
                                         </h1>
@@ -136,8 +136,8 @@ export default function page() {
 
                 {/* Right — avatar + info */}
                 <div className="w-full md:w-[35%] flex flex-col items-center gap-6">
-                    <Image
-                        src={profileImgLink || '/profpic.jpg'}
+                    <ProfileImage
+                        src={profileImgLink}
                         alt="Profile"
                         width={200}
                         height={200}
