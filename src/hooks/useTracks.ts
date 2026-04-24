@@ -5,6 +5,7 @@ import { CreateTrackRequest } from "@/types/tracks.types";
 import {
   GetPostedTracksResponse,
   GetTracksErrorResponse,
+  GetUploadQuotaResponse,
   GetTracksResponse,
   UpdateTrackRequest,
 } from "@/types/tracks.types";
@@ -262,4 +263,31 @@ export function useDeleteTrack() {
   );
 
   return { deleteTrack, loading, error, success };
+}
+
+export function useGetUploadQuota() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [quota, setQuota] = useState<number | null>(null);
+
+  const getUploadQuota = useCallback(async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await tracksService.getUploadQuota();
+      setQuota(res.data.data.quota);
+      return res.data;
+    } catch (err) {
+      if (axios.isAxiosError<GetUploadQuotaResponse>(err)) {
+        setError(err.response?.data?.message || "Failed to fetch upload quota");
+      } else {
+        setError("Failed to fetch upload quota");
+      }
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { getUploadQuota, loading, error, quota };
 }

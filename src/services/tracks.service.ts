@@ -81,6 +81,6 @@ export const tracksService = {
 
 	deleteTrack: (id: string) =>
 		api.delete<deleteTrackResponse>(`/api/tracks/v1/${id}`),
-	getUploadQuota: (userId: string) =>
-		api.get<GetUploadQuotaResponse>(`/api/tracks/v1/quota/${userId}`),
+	getUploadQuota: () =>
+		api.get<GetUploadQuotaResponse>("/api/tracks/v1/quota"),
 };
