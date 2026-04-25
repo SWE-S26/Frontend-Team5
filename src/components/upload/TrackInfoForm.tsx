@@ -286,10 +286,10 @@ export async function createZoomCroppedArtworkFile(
     const boundedZoom = Math.max(1, Math.min(3, zoom));
 
     const cropSize = Math.max(1, Math.round(shortestSide / boundedZoom));
-    const maxOffsetX = Math.max(0, (imageWidth - cropSize) / 2);
-    const maxOffsetY = Math.max(0, (imageHeight - cropSize) / 2);
-    const centerX = imageWidth / 2 - clampPos(position.x) * maxOffsetX;
-    const centerY = imageHeight / 2 - clampPos(position.y) * maxOffsetY;
+    // Keep pan offsets constrained to the square area shown by object-cover before zoom.
+    const maxOffsetWithinSquare = Math.max(0, (shortestSide - cropSize) / 2);
+    const centerX = imageWidth / 2 - clampPos(position.x) * maxOffsetWithinSquare;
+    const centerY = imageHeight / 2 - clampPos(position.y) * maxOffsetWithinSquare;
     const sourceX = Math.max(0, Math.min(imageWidth - cropSize, Math.floor(centerX - cropSize / 2)));
     const sourceY = Math.max(0, Math.min(imageHeight - cropSize, Math.floor(centerY - cropSize / 2)));
 
@@ -558,7 +558,6 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   const showReplaceTrack       = hasTrackForReplacement && hasFinishedUpload;
 
   const permaLinkRegex        = /^[a-z0-9_-]+$/;
-  const permaLinkHasCharRegex = /[a-z0-9_-]/;
   const isrcRegex             = /^[A-Z]{2}[A-Z0-9]{3}\d{7}$/;
 
   // Genre filtering
@@ -933,11 +932,14 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   // Handlers: Form Submit
   const buildCreateTrackPayload = async (): Promise<CreateTrackRequest> => {
     const permalinkInput    = permalink.trim();
-    const permalinkValue    = permalinkInput
+    const permalinkSegments = permalinkInput
       .replace(/^https?:\/\/beatza\.me\//i, "")
       .replace(/^beatza\.me\//i, "")
       .replace(/^\/+/, "")
-      .replace(/\/+$/, "");
+      .replace(/\/+$/, "")
+      .split("/")
+      .filter(Boolean);
+    const permalinkValue    = permalinkSegments[permalinkSegments.length - 1] ?? "";
     const mainArtists       = toList(artistName);
     const parsedTags        = toList(tags);
     const parsedDescription = toOptionalTrimmed(description);
@@ -955,8 +957,9 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     if (!currentFile)                                                       throw new Error("An audio file is required.");
     if (currentFile.size > MAX_FILE_SIZE_BYTES)                             throw new Error(`Audio file exceeds the ${formatBytes(MAX_FILE_SIZE_BYTES)} limit.`);
     if (!parsedTitle)                                                       throw new Error("Track title is required.");
-    if (!permaLinkRegex.test(permalinkValue))                               throw new Error("Use only lowercase letters, numbers, underscores, or hyphens.");
-    if (!permaLinkHasCharRegex.test(permalinkValue))                        throw new Error("Permalink cannot be only digits.");
+    if (!permalinkInput)                                                     throw new Error("Permalink is required.");
+    if (!permalinkValue)                                                     throw new Error("Track permalink segment is required.");
+    if (!permaLinkRegex.test(permalinkValue))                                throw new Error("Permalink must contain only lowercase letters, numbers, hyphens (-), or underscores (_).");
     if (mainArtists.length < 1)                                             throw new Error("At least one artist is required");
     if (tags.trim().length > 0 && parsedTags.length < 1)                   throw new Error("At least one tag is required");
     if (description.length > 0 && !parsedDescription)                      throw new Error("Description cannot be empty");
@@ -969,10 +972,6 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     const zoomCroppedArtwork = artworkFile
       ? await createZoomCroppedArtworkFile(artworkFile, artworkZoom, artworkPosition)
       : undefined;
-    if (!permalinkInput)                                               throw new Error("Permalink is required.");
-    if (!permaLinkRegex.test(permalinkValue))                           throw new Error("Use only lowercase letters, numbers, underscores, or hyphens.");
-    if (!permaLinkHasCharRegex.test(permalinkValue))                    throw new Error("Permalink cannot be only digits.");
-
     return {
       audio: currentFile,
       image: zoomCroppedArtwork,

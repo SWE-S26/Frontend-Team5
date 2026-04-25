@@ -92,7 +92,7 @@ function CommentAvatar({
       >
         {isLeft ? (
           <>
-            <span className="font-semibold truncate shrink-0 max-w-[80px]">
+            <span className="font-semibold truncate shrink-0 max-w-20">
               {comment.displayName}
             </span>
             <span className="text-white-smoke/60 truncate">
@@ -104,7 +104,7 @@ function CommentAvatar({
             <span className="text-white-smoke/60 truncate">
               {comment.content}
             </span>
-            <span className="font-semibold truncate shrink-0 max-w-[80px]">
+            <span className="font-semibold truncate shrink-0 max-w-20">
               {comment.displayName}
             </span>
           </>
@@ -454,7 +454,7 @@ export default function SausageWaveform({
         onMouseMove={handleMouseMove}
         onMouseEnter={handleMouseEnter}
         onMouseLeave={handleMouseLeave}
-        className="relative w-full h-[60px] cursor-pointer select-none isolate overflow-visible pt-5"
+        className="relative w-full h-15 cursor-pointer select-none isolate overflow-visible pt-5"
         style={{ opacity: isReady ? 1 : 0, transition: "opacity 300ms ease" }}
       >
         <WaveImg
@@ -502,19 +502,19 @@ export default function SausageWaveform({
           }}
         />
 
-        <div className="absolute bottom-[26px] left-0 w-full h-[1px] bg-chinese-black -translate-y-1/2 z-30 pointer-events-none" />
+        <div className="absolute bottom-6.5 left-0 w-full h-px bg-chinese-black -translate-y-1/2 z-30 pointer-events-none" />
 
-        <div className="absolute left-0 w-full flex justify-between text-[10px] z-40 bottom-[27px]">
+        <div className="absolute left-0 w-full flex justify-between text-[10px] z-40 bottom-6.75">
           {hasPlayedRef.current ? (
-            <span className="bg-black px-[3px] flex items-center justify-center text-papaya">
+            <span className="bg-black px-0.75 flex items-center justify-center text-papaya">
               {formatTime(currentTime)}
             </span>
           ) : (
-            <span className="bg-black px-[3px] flex items-center justify-center text-papaya opacity-0">
+            <span className="bg-black px-0.75 flex items-center justify-center text-papaya opacity-0">
               0:00
             </span>
           )}
-          <span className="bg-black px-[3px] flex items-center justify-center text-white/50">
+          <span className="bg-black px-0.75 flex items-center justify-center text-white/50">
             {formatTime(duration)}
           </span>
         </div>

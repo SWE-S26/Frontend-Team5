@@ -23,7 +23,7 @@ export function BulkSelectionHeader({
 
   return (
     <div
-      className="grid items-center border-b border-[#2a2a2a] px-3 py-2"
+      className="grid min-w-175 items-center border-b border-[#2a2a2a] px-3 py-2"
       style={{ gridTemplateColumns: GRID }}
     >
       <div className="flex items-center">

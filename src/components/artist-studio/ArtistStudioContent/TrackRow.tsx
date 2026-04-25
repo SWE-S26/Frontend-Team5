@@ -21,6 +21,7 @@ export function TrackRow({
   onAmplify,
   onContextMenu,
   isDeleting,
+  isArtistPro,
 }: {
   track: ArtistTrackRow;
   isMobile: boolean;
@@ -29,6 +30,7 @@ export function TrackRow({
   onAmplify: (id: string) => void;
   onContextMenu: (id: string, e: React.MouseEvent) => void;
   isDeleting: boolean;
+  isArtistPro: boolean;
 }) {
   const dispatch = useDispatch();
   const { currentTrackId, isPlaying } = useAppSelector((state: RootState) => state.player);
@@ -96,9 +98,40 @@ export function TrackRow({
         onMouseEnter={() => setIsHovered(true)}
         onMouseLeave={() => setIsHovered(false)}
       >
-        <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2.5">
+          <PrettyCheckbox checked={isSelected} onChange={(v) => onSelect(track.id, v)} />
           {trackCover}
-          <div className="flex-1 min-w-0">{trackMeta}</div>
+          <div className="min-w-0 flex-1">{trackMeta}</div>
+          <button
+            type="button"
+            onClick={(e) => onContextMenu(track.id, e)}
+            className="text-[18px] text-[#666] hover:text-[#aaa] transition-colors cursor-pointer"
+            aria-label="Track actions"
+          >
+            ⋮
+          </button>
+        </div>
+
+        <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-white-smoke">
+          <span className="inline-flex items-center gap-1"><FaRegClock /> {track.duration}</span>
+          <span>{track.date}</span>
+          <span className="inline-flex items-center gap-1"><IoHeartOutline /> {track.likes > 0 ? track.likes : "-"}</span>
+          <span className="inline-flex items-center gap-1"><FiMessageSquare /> {track.comments > 0 ? track.comments : "-"}</span>
+          <span className="inline-flex items-center gap-1"><TbRepeat /> {track.reposts > 0 ? track.reposts : "-"}</span>
+          <span className="inline-flex items-center gap-1"><MdOutlineDownloadForOffline /> 0</span>
+          <span className="font-semibold">{track.plays} plays</span>
+        </div>
+
+        <div className="mt-2.5 flex flex-wrap items-center gap-2">
+          {!isArtistPro && (
+            <button
+              type="button"
+              onClick={() => onAmplify(track.id)}
+              className="inline-flex items-center gap-1 rounded-full bg-linear-to-br from-[#7b4fff] to-[#5533ff] px-3 py-1 text-[11px] font-bold text-white-smoke"
+            >
+              <BsLightningChargeFill /> Amplify
+            </button>
+          )}
         </div>
       </div>
     );
@@ -106,7 +139,7 @@ export function TrackRow({
 
   return (
     <div
-      className={`grid items-center border-b border-[#1e1e1e] px-3 py-2 transition-colors ${rowBg}`}
+      className={`grid min-w-175 items-center border-b border-[#1e1e1e] px-3 py-2 transition-colors ${rowBg}`}
       style={{ gridTemplateColumns: "32px 1fr 80px 120px 220px 80px 130px 30px" }}
       onMouseEnter={() => setIsHovered(true)}
       onMouseLeave={() => setIsHovered(false)}
@@ -127,19 +160,21 @@ export function TrackRow({
         <span className="inline-flex items-center gap-1"><IoHeartOutline />   {track.likes    > 0 ? track.likes    : "-"}</span>
         <span className="inline-flex items-center gap-1"><FiMessageSquare /> {track.comments > 0 ? track.comments : "-"}</span>
         <span className="inline-flex items-center gap-1"><TbRepeat />        {track.reposts  > 0 ? track.reposts  : "-"}</span>
-        <span className="inline-flex items-center gap-1"><MdOutlineDownloadForOffline />      -</span>
+        <span className="inline-flex items-center gap-1"><MdOutlineDownloadForOffline /> 0</span>
       </div>
 
       <div className="text-center text-[13px] font-semibold text-white-smoke">{track.plays}</div>
 
       <div className="flex justify-center">
-        <button
-          type="button"
-          onClick={() => onAmplify(track.id)}
-          className="flex items-center gap-1 rounded-full bg-linear-to-br from-[#7b4fff] to-[#5533ff] px-3 py-1 text-[11px] font-bold text-white-smoke hover:opacity-90 transition-opacity cursor-pointer"
-        >
-          <BsLightningChargeFill /> Amplify
-        </button>
+        {!isArtistPro && (
+          <button
+            type="button"
+            onClick={() => onAmplify(track.id)}
+            className="flex items-center gap-1 rounded-full bg-linear-to-br from-[#7b4fff] to-[#5533ff] px-3 py-1 text-[11px] font-bold text-white-smoke hover:opacity-90 transition-opacity cursor-pointer"
+          >
+            <BsLightningChargeFill /> Amplify
+          </button>
+        )}
       </div>
 
       <div className="flex justify-center">

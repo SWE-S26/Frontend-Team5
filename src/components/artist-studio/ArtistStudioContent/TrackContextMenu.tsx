@@ -9,6 +9,7 @@ export function TrackContextMenu({
   onEdit,
   onAddToPlaylist,
   onDelete,
+  isArtistPro,
 }: {
   trackId: string;
   position: { x: number; y: number };
@@ -16,6 +17,7 @@ export function TrackContextMenu({
   onEdit: (id: string) => void;
   onAddToPlaylist: (id: string) => void;
   onDelete: (id: string) => void;
+  isArtistPro: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -30,14 +32,13 @@ export function TrackContextMenu({
   const menuItems = [
     { icon: PiPencilSimple,      label: "Edit",            action: () => { onEdit(trackId); onClose(); } },
     { icon: FiPlusSquare, label: "Add to playlist", action: () => { onAddToPlaylist(trackId); onClose(); } },
-    { icon: FiDollarSign, label: "Monetize",        action: onClose },
-    { icon: FiSliders,    label: "Master",           action: onClose },
-    { icon: FiGlobe,      label: "Distribute",       action: onClose },
-    { icon: FiBarChart2,  label: "Track insights",   action: onClose },
     { icon: FiDownload,   label: "Download file",    action: onClose },
     { icon: FiLink,       label: "Copy link",        action: onClose },
     { icon: FiTrash2,     label: "Delete track",     action: () => { onDelete(trackId); onClose(); }, danger: true },
-  ];
+  ].filter((item) => {
+    if (!isArtistPro) return true;
+    return !["Monetize", "Master", "Distribute", "Track insights"].includes(item.label);
+  });
 
   // Adjust position if menu would overflow viewport bottom
   const menuHeight = menuItems.length * 44;

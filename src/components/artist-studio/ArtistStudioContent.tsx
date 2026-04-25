@@ -37,6 +37,7 @@ export type ArtistTrackRow = {
   hd: boolean;
   cover: string;
   url: string;
+  downloadUrl?: string;
   isPrivate: boolean;
   rawDate?: string;
   rawDuration?: number;
@@ -202,7 +203,7 @@ function TabBar({ activeTab, onChangeTab }: { activeTab: ArtistTab; onChangeTab:
       activeTab === id ? "border-white-smoke font-semibold text-white-smoke" : "border-transparent text-white-smoke hover:text-upload-select"
     }`;
   return (
-    <div className="sticky top-11.5 z-100 flex overflow-x-auto overflow-y-hidden border-b border-[#222] bg-chinese-black [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
+    <div className="sticky top-13 z-100 flex overflow-x-auto overflow-y-hidden border-b border-[#222] bg-chinese-black [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
       <button type="button" onClick={() => onChangeTab("tracks")}       className={tabClass("tracks")}>BeatZa Tracks</button>
       <button type="button" onClick={() => onChangeTab("distribution")} className={tabClass("distribution")}>Distribution</button>
       <button type="button" onClick={() => onChangeTab("vinyl")}        className={tabClass("vinyl")}>Vinyl Records</button>
@@ -247,7 +248,7 @@ export default function ArtistStudioContent({ activeTab, onChangeTab }: ArtistSt
   }, [postedTracks]);
 
   return (
-    <section className="min-h-screen bg-chinese-black px-6 pb-4 pt-0">
+    <section className="min-h-screen bg-chinese-black px-3 pt-0 pb-4 sm:px-4 lg:px-6">
       <UploadUsageBar
         className="mb-6"
         usedTracks={usedTracks}
@@ -258,11 +259,11 @@ export default function ArtistStudioContent({ activeTab, onChangeTab }: ArtistSt
       <ArtistStudioHeader stats={stats} />
       <TabBar activeTab={activeTab} onChangeTab={onChangeTab} />
       <div className="py-5">
-        {activeTab === "tracks"       && <TracksTab isMobile={isMobile} />}
-        {activeTab === "distribution" && <DistributionTab />}
-        {activeTab === "vinyl"        && <VinylTab />}
-        {activeTab === "comments"     && <CommentsTab />}
-        {activeTab === "promotions"   && <PromotionsTab />}
+        {activeTab === "tracks"       && <TracksTab isMobile={isMobile} isArtistPro={isArtistPro} />}
+        {activeTab === "distribution" && <DistributionTab isArtistPro={isArtistPro} />}
+        {activeTab === "vinyl"        && <VinylTab isArtistPro={isArtistPro} />}
+        {activeTab === "comments"     && <CommentsTab isArtistPro={isArtistPro} />}
+        {activeTab === "promotions"   && <PromotionsTab isArtistPro={isArtistPro} />}
       </div>
     </section>
   );

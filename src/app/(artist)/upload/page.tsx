@@ -141,6 +141,7 @@ export default function UploadPage() {
   const playbackProgressIntervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const authDisplayName = useAppSelector((state) => state.auth.displayName);
+  const authProfileLink = useAppSelector((state) => state.auth.profileLink);
   const role = useAppSelector((state) => state.auth.role);
   const isArtistPro = role === "Pro";
   const { getUploadQuota, quota } = useGetUploadQuota();
@@ -647,11 +648,20 @@ export default function UploadPage() {
   }, [authDisplayName]);
 
   useEffect(() => {
-    if (!permalinkInitializedRef.current && authDisplayName) {
+    if (permalinkInitializedRef.current) return;
+
+    const profileSlug = (authProfileLink ?? "").trim();
+    if (profileSlug) {
+      setPermalink(`https://beatza.me/${profileSlug}/`);
+      permalinkInitializedRef.current = true;
+      return;
+    }
+
+    if (authDisplayName) {
       setPermalink(`https://beatza.me/${slugify(authDisplayName)}/`);
       permalinkInitializedRef.current = true;
     }
-  }, [authDisplayName]);
+  }, [authDisplayName, authProfileLink]);
 
   useEffect(() => {
     return () => {

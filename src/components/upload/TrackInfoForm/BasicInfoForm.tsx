@@ -34,6 +34,8 @@ interface BasicInfoFormProps {
 	setTrackTitle: (value: string) => void;
 	permalink: string;
 	setPermalink: (value: string) => void;
+	showPermalink?: boolean;
+	permalinkReadOnly?: boolean;
 	artistName: string;
 	setArtistName: (value: string) => void;
 	genre: string;
@@ -74,6 +76,8 @@ export function BasicInfoForm({
 	setTrackTitle,
 	permalink,
 	setPermalink,
+	showPermalink = true,
+	permalinkReadOnly = false,
 	artistName,
 	setArtistName,
 	genre,
@@ -101,6 +105,17 @@ export function BasicInfoForm({
 	scheduleRelease,
 	setScheduleRelease,
 }: BasicInfoFormProps) {
+	const rawPermalink = permalink.trim();
+	const strippedPermalink = rawPermalink
+		.replace(/^https?:\/\/beatza\.me\//i, "")
+		.replace(/^beatza\.me\//i, "")
+		.replace(/^\/+/, "");
+	const [profileLinkPart, ...restParts] = strippedPermalink.split("/").filter(Boolean);
+	const permalinkPrefix = profileLinkPart
+		? `https://beatza.me/${profileLinkPart}/`
+		: "https://beatza.me/";
+	const permalinkSuffix = restParts.join("/");
+
 	return (
 		<div className="space-y-6 lg:col-span-8">
 			{submitError && (
@@ -120,16 +135,26 @@ export function BasicInfoForm({
 				/>
 			</div>
 
-			<div>
-				<label className={LABEL_CLS}>Track link</label>
-				<input
-					type="text"
-					value={permalink}
-					onChange={(e) => setPermalink(e.target.value)}
-					placeholder="https://beatza.me/displayname/"
-					className={FIELD_CLS}
-				/>
-			</div>
+			{showPermalink && (
+				<div>
+					<label className={LABEL_CLS}>Track link</label>
+					<div className={`${FIELD_CLS} flex items-center gap-1 ${permalinkReadOnly ? "opacity-80" : ""}`}>
+						<span className="shrink-0 text-[13px] text-[#9a9a9a]">{permalinkPrefix}</span>
+						<input
+							type="text"
+							value={permalinkSuffix}
+							onChange={(e) => {
+								if (permalinkReadOnly) return;
+								setPermalink(`${permalinkPrefix}${e.target.value}`);
+							}}
+							readOnly={permalinkReadOnly}
+							disabled={permalinkReadOnly}
+							placeholder="track-slug"
+							className={`min-w-0 flex-1 bg-transparent text-[13px] text-white-smoke placeholder-[#555] focus:outline-none ${permalinkReadOnly ? "cursor-not-allowed" : ""}`}
+						/>
+					</div>
+				</div>
+			)}
 
 			<div>
 				<label className={LABEL_CLS}>Main Artist(s) <InfoTooltip text={TOOLTIP_TEXT.mainArtists} /></label>
@@ -195,7 +220,7 @@ export function BasicInfoForm({
 											key={item}
 											type="button"
 											onClick={() => { setGenre(item); setGenreSearch(""); setGenreMenuOpen(false); }}
-											className="block w-full px-4 py-2 text-left text-[13px] bg-[#1e1e1e] text-white-smoke hover:bg-[#3a3b3f]"
+											className="block w-full px-4 py-2 text-left text-[13px] bg-off-black text-white-smoke hover:bg-[#3a3b3f]"
 										>
 											{item}
 										</button>

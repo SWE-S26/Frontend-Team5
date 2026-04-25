@@ -1,12 +1,13 @@
 import axios from "axios";
 import { tracksService } from "@/services/tracks.service";
-import { useCallback, useState } from "react";
+import { useCallback, useRef, useState } from "react";
 import { CreateTrackRequest } from "@/types/tracks.types";
 import {
   GetPostedTracksResponse,
   GetTracksErrorResponse,
   GetUploadQuotaResponse,
   GetTracksResponse,
+  GetLikedTracksResponse,
   UpdateTrackRequest,
 } from "@/types/tracks.types";
 import { GetTrackByIdResponse } from "@/types/tracks.types";
@@ -104,15 +105,62 @@ export function useGetPostedTracks() {
   const [tracks, setTracks] = useState<GetPostedTracksResponse["data"] | null>(
     null,
   );
+  const lastSnapshotRef = useRef<string>("");
 
-  const getPostedTracks = useCallback(async (userId: string) => {
+  const getPostedTracks = useCallback(async (userId: string, options?: { silent?: boolean }) => {
+    if (!userId) return;
+    const silent = options?.silent === true;
+    if (!silent) setLoading(true);
+    setError(null);
+    setValidationErrors(null);
+    try {
+      const res = await tracksService.getPostedTracks(userId);
+      const snapshot = JSON.stringify(res.data.data ?? []);
+      if (snapshot !== lastSnapshotRef.current) {
+        lastSnapshotRef.current = snapshot;
+        setTracks(res.data.data);
+      }
+      return res.data;
+    } catch (err) {
+      if (axios.isAxiosError<GetTracksErrorResponse>(err)) {
+        const data = err.response?.data;
+        setError(data?.message || "Something went wrong");
+        if (data?.errors) setValidationErrors(data.errors);
+      } else {
+        setError("Something went wrong");
+      }
+    } finally {
+      if (!silent) setLoading(false);
+    }
+  }, []);
+
+  return {
+    getPostedTracks,
+    loading,
+    error,
+    validationErrors,
+    tracks,
+  };
+}
+
+export function useGetLikedTracks() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [validationErrors, setValidationErrors] = useState<
+    GetTracksErrorResponse["errors"] | null
+  >(null);
+  const [tracks, setTracks] = useState<GetLikedTracksResponse["data"] | null>(
+    null,
+  );
+
+  const getLikedTracks = useCallback(async (userId: string) => {
     if (!userId) return;
     setLoading(true);
     setError(null);
     setValidationErrors(null);
     setTracks(null);
     try {
-      const res = await tracksService.getPostedTracks(userId);
+      const res = await tracksService.getLikedTracks(userId);
       setTracks(res.data.data);
       return res.data;
     } catch (err) {
@@ -129,13 +177,14 @@ export function useGetPostedTracks() {
   }, []);
 
   return {
-    getPostedTracks,
+    getLikedTracks,
     loading,
     error,
     validationErrors,
     tracks,
   };
 }
+
 
 export function useGetTrackById() {
   const [loading, setLoading] = useState(false);

@@ -9,7 +9,7 @@ import Button from "@/components/ui/Button";
 import WaveformCard from "@/components/layout/track-cards/WaveformCard"
 
 
-interface Item { id: string; title: string; artist: string; img: string; numLikes?: number; numReposts?: number; isLikedByUser?: boolean }
+interface Item { id: string; trackId?: string; title: string; artist: string; img: string; trackUrl?: string; duration?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean }
 interface Props { items: Item[] }
 
 export default function All({ items }: Props) {
@@ -24,7 +24,9 @@ export default function All({ items }: Props) {
           img={item.img}
           title={item.title}
           artist={item.artist}
-          trackId={item.id}
+          trackId={item.trackId ?? item.id}
+          trackUrl={item.trackUrl}
+          duration={item.duration}
           likeCount={item.numLikes ?? 0}
           repostCount={item.numReposts ?? 0}
           isLikedByUser={item.isLikedByUser}

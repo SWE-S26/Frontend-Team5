@@ -30,7 +30,7 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
   ]
 
   return (
-    <aside className="w-[340px] sticky top-20 h-fit flex flex-col gap-10 text-white">
+    <aside className="w-85 sticky top-20 h-fit flex flex-col gap-10 text-white">
       
       <section className="flex flex-col gap-3 mt-5">
         <div className="flex">

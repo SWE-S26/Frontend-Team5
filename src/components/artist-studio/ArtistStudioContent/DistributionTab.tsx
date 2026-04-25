@@ -3,16 +3,16 @@ import { useRouter } from "next/navigation";
 function StreamingPlatformItem({ mark, className }: { mark: string; className: string }) {
   return (
     <div className="flex min-h-8 items-center justify-center text-white-smoke opacity-90">
-      <span className={`text-[18px] ${className}`}>{mark}</span>
+      <span className={`text-[14px] sm:text-[16px] lg:text-[18px] ${className}`}>{mark}</span>
     </div>
   );
 }
 
 function DistributionHowItWorksStep({ num, title, body }: { num: string; title: string; body: string }) {
   return (
-    <div className="flex items-start gap-4">
-      <span className="shrink-0 text-[60px] font-black leading-none text-white-smoke">{num}</span>
-      <div className="pt-3">
+    <div className="flex items-start gap-3 sm:gap-4">
+      <span className="shrink-0 text-[44px] font-black leading-none text-white-smoke sm:text-[60px]">{num}</span>
+      <div className="pt-1.5 sm:pt-3">
         <h4 className="text-[15px] font-bold text-white-smoke">{title}</h4>
         <p className="mt-1.5 text-[13px] leading-relaxed text-[#888]">{body}</p>
       </div>
@@ -20,13 +20,22 @@ function DistributionHowItWorksStep({ num, title, body }: { num: string; title: 
   );
 }
 
-export function DistributionTab() {
+export function DistributionTab({ isArtistPro }: { isArtistPro: boolean }) {
   const router = useRouter();
+
+  if (isArtistPro) {
+    return (
+      <div className="rounded-lg border border-[#2a2a2a] bg-chinese-black p-5 text-center text-[14px] font-semibold text-white-smoke">
+        Artist Pro active. Distribution tools are already unlocked.
+      </div>
+    );
+  }
+
   return (
-    <div className="space-y-10">
+    <div className="space-y-8 sm:space-y-10">
       <div className="flex flex-col gap-6 border-b border-[#262626] pb-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-2xl">
-          <h2 className="text-[28px] font-bold leading-tight text-white-smoke">
+          <h2 className="text-[24px] font-bold leading-tight text-white-smoke sm:text-[28px]">
             Distribute your music to Spotify, Apple Music, YouTube, and more
           </h2>
           <p className="mt-3 text-[14px] leading-relaxed text-[#aaa]">
@@ -43,7 +52,7 @@ export function DistributionTab() {
         </div>
       </div>
 
-      <div className="mt-2 grid grid-cols-3 gap-x-8 gap-y-6 border-b border-[#262626] pb-8 md:grid-cols-5 lg:grid-cols-9">
+      <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-5 border-b border-[#262626] pb-8 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-6 md:grid-cols-5 lg:grid-cols-9">
         <StreamingPlatformItem mark="Spotify"      className="font-bold" />
         <StreamingPlatformItem mark="Apple Music"  className="font-medium" />
         <StreamingPlatformItem mark="DEEZER"       className="font-semibold tracking-[1px]" />

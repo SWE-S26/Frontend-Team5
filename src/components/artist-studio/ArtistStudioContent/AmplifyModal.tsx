@@ -2,7 +2,7 @@ export function AmplifyModal({ onClose, onUnlock }: { onClose: () => void; onUnl
   return (
     <div className="fixed inset-0 z-200 flex items-center justify-center bg-chinese-black/70" onClick={onClose}>
       <div
-        className="relative mx-4 w-full max-w-2xl rounded-2xl bg-chinese-black p-8 shadow-2xl"
+        className="relative mx-3 w-full max-w-2xl rounded-2xl bg-chinese-black p-5 shadow-2xl sm:mx-4 sm:p-8"
         onClick={(e) => e.stopPropagation()}
       >
         <button
@@ -15,7 +15,7 @@ export function AmplifyModal({ onClose, onUnlock }: { onClose: () => void; onUnl
 
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">
           <div className="flex-1">
-            <h2 className="text-[26px] font-black leading-tight text-white-smoke">
+            <h2 className="text-[22px] font-black leading-tight text-white-smoke sm:text-[26px]">
               Reach more listeners with Artist Pro
             </h2>
             <p className="mt-3 text-[14px] leading-relaxed text-[#aaa]">
@@ -42,7 +42,7 @@ export function AmplifyModal({ onClose, onUnlock }: { onClose: () => void; onUnl
               </ul>
             </div>
 
-            <div className="mt-6 flex items-center gap-4">
+            <div className="mt-6 flex flex-col items-start gap-3 sm:flex-row sm:items-center sm:gap-4">
               <button
                 type="button"
                 onClick={onUnlock}

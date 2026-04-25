@@ -8,7 +8,7 @@ import { BsSortDown } from "react-icons/bs";
 import { ImEqualizer2 } from "react-icons/im";
 import { LuSearch } from "react-icons/lu";
 import { LoadingOutlined } from '@ant-design/icons';
-import { Flex, Spin } from 'antd';
+import { Spin } from 'antd';
 import { PrettyCheckbox } from "@/components/upload/TrackInfoForm";
 import { formatDuration, formatDate, SortField ,ArtistTrackRow } from "../ArtistStudioContent";
 import { BulkSelectionHeader } from "./BulkSelectionHeader";
@@ -24,7 +24,7 @@ import { TrackContextMenu } from "./TrackContextMenu";
 function TracksTableHeader({ onSelectAll, allSelected }: { onSelectAll: (v: boolean) => void; allSelected: boolean }) {
   return (
     <div
-      className="mt-4 grid border-b border-[#2a2a2a] px-3 pb-2"
+      className="mt-4 grid min-w-175 border-b border-[#2a2a2a] px-3 pb-2"
       style={{
         gridTemplateColumns:
           "32px minmax(200px, 1fr) 80px 120px 220px 80px 130px 30px",
@@ -42,19 +42,29 @@ function TracksTableHeader({ onSelectAll, allSelected }: { onSelectAll: (v: bool
   );
 }
 
-function TracksActionBar({ onUpload, onDistribute, onMonetize, onMaster }: {
+function TracksActionBar({ onUpload, onDistribute, onMonetize, onMaster, isArtistPro }: {
   onUpload: () => void;
   onDistribute: () => void;
   onMonetize: () => void;
   onMaster: () => void;
+  isArtistPro: boolean;
 }) {
-  const btnClass = "flex items-center gap-2 rounded-md border border-[#3a3a3a] bg-transparent px-5 py-3 text-[18px] font-semibold text-white-smoke transition-colors hover:border-[#555] cursor-pointer";
+  const btnClass = "flex w-full items-center justify-center gap-2 rounded-md border border-[#3a3a3a] bg-transparent px-3 py-2 text-[13px] font-semibold text-white-smoke transition-colors hover:border-[#555] cursor-pointer sm:w-auto sm:justify-start sm:px-5 sm:py-3 sm:text-[15px] lg:text-[18px]";
   return (
-    <div className="flex flex-wrap gap-3">
+    <div className="grid grid-cols-1 gap-2.5 sm:flex sm:flex-wrap sm:gap-3">
       <button type="button" onClick={onUpload}     className={btnClass}><span>+ Upload or drop tracks</span></button>
-      <button type="button" onClick={onDistribute} className={btnClass}><IoIosGlobe /><span>Distribute tracks</span></button>
-      <button type="button" onClick={onMonetize}   className={btnClass}><RiMoneyDollarCircleLine /><span>Monetize tracks</span></button>
-      <button type="button" onClick={onMaster}     className={btnClass}><ImEqualizer2 /><span>Master track audio</span></button>
+      {!isArtistPro ? (
+        <>
+          <button type="button" onClick={onDistribute} className={btnClass}><IoIosGlobe /><span>Distribute tracks</span></button>
+          <button type="button" onClick={onMonetize}   className={btnClass}><RiMoneyDollarCircleLine /><span>Monetize tracks</span></button>
+          <button type="button" onClick={onMaster}     className={btnClass}><ImEqualizer2 /><span>Master track audio</span></button>
+        </>
+      ) : (
+        <div className="flex w-full items-center justify-between rounded-md border border-[#2a2a2a] bg-chinese-black px-4 py-3 text-[13px] font-semibold text-white-smoke sm:w-auto sm:justify-start sm:gap-3">
+          <span>Artist Pro active</span>
+          <span className="rounded-full bg-[#1db954] px-2.5 py-1 text-[11px] font-bold text-chinese-black">PRO</span>
+        </div>
+      )}
     </div>
   );
 }
@@ -166,7 +176,49 @@ function TracksFilterBar({ isMobile, search, onSearch, filter, onFilter, count, 
   );
 }
 
-export function TracksTab({ isMobile }: { isMobile: boolean }) {
+function MobileSelectionBar({
+  selectedCount,
+  totalCount,
+  onSelectAll,
+  onDeselectAll,
+  onEditSelected,
+  onAddSelectedToPlaylist,
+}: {
+  selectedCount: number;
+  totalCount: number;
+  onSelectAll: () => void;
+  onDeselectAll: () => void;
+  onEditSelected: () => void;
+  onAddSelectedToPlaylist: () => void;
+}) {
+  const allSelected = selectedCount === totalCount && totalCount > 0;
+  return (
+    <div className="rounded-lg border border-[#2a2a2a] bg-chinese-black p-2.5">
+      <div className="flex items-center gap-2.5">
+        <PrettyCheckbox checked={allSelected} onChange={(v) => (v ? onSelectAll() : onDeselectAll())} />
+        <span className="text-[12px] font-bold text-white-smoke">{selectedCount} SELECTED</span>
+      </div>
+      <div className="mt-2.5 grid grid-cols-2 gap-2">
+        <button
+          type="button"
+          onClick={onEditSelected}
+          className="rounded-md border border-[#3a3a3a] px-3 py-1.5 text-[12px] font-semibold text-white-smoke"
+        >
+          Edit
+        </button>
+        <button
+          type="button"
+          onClick={onAddSelectedToPlaylist}
+          className="rounded-md border border-[#3a3a3a] px-3 py-1.5 text-[12px] font-semibold text-white-smoke"
+        >
+          Add to playlist
+        </button>
+      </div>
+    </div>
+  );
+}
+
+export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArtistPro: boolean }) {
   const router = useRouter();
   const userId = useAppSelector((state) => state.auth.userId);
   const hasHydrated = useAppSelector((state) => state.auth.hasHydrated);
@@ -200,18 +252,40 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
   };
 
   useEffect(() => {
+    if (isArtistPro) setAmplifyOpen(false);
+  }, [isArtistPro]);
+
+  useEffect(() => {
     if (!hasHydrated || !userId || typeof userId !== "string" || userId.trim() === "") return;
     void getPostedTracks(userId);
+  }, [userId, getPostedTracks, hasHydrated]);
+
+  useEffect(() => {
+    if (!hasHydrated || !userId || typeof userId !== "string" || userId.trim() === "") return;
+
+    const intervalId = window.setInterval(() => {
+      void getPostedTracks(userId, { silent: true });
+    }, 15000);
+
+    const handleFocus = () => {
+      void getPostedTracks(userId, { silent: true });
+    };
+
+    window.addEventListener("focus", handleFocus);
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocus);
+    };
   }, [userId, getPostedTracks, hasHydrated]);
 
   const rows = useMemo<ArtistTrackRow[]>(() => {
     return (postedTracks ?? [])
       .filter((track) => {
         const trackId = track.trackId ?? (track as { _id?: string })._id;
-        return Boolean(trackId) && !deletedIds.has(trackId);
+        return trackId !== undefined && !deletedIds.has(trackId);
       })
       .map((track) => {
-        const trackId = track.trackId ?? (track as { _id?: string })._id;
+        const trackId = (track.trackId ?? (track as { _id?: string })._id) as string;
         const base: ArtistTrackRow = {
           id: trackId,
           title: track.basicInfo.title,
@@ -225,6 +299,7 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
           hd: false,
           cover: track.image?.imgLink || "/test.jpg",
           url: track.audio?.audioLink ,
+          downloadUrl: track.audio?.downloadLink,
           isPrivate: Boolean(track.basicInfo.isPrivate),
           rawDate: track.releaseDate ?? "",
           rawDuration: (track as { durationInSeconds?: number }).durationInSeconds ?? 0,
@@ -280,6 +355,7 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
         onDistribute={ () => router.push("/artistpro")}
         onMonetize={   () => router.push("/artistpro")}
         onMaster={     () => router.push("/upload")}
+        isArtistPro={isArtistPro}
       />
       <TracksFilterBar
         isMobile={isMobile}
@@ -290,59 +366,86 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
         sortDir={sortDir}     onSortDir={setSortDir}
       />
 
-      {!isMobile && (
-        hasSelection ? (
-          <BulkSelectionHeader
-            selectedCount={selectedIds.size}
-            totalCount={rows.length}
-            onSelectAll={selectAll}
-            onDeselectAll={deselectAll}
-            onEditSelected={() => {
-              if (selectedIds.size > 1) {
-                setBulkEditOpen(true);
-              } else {
-                const firstId = Array.from(selectedIds)[0];
-                if (firstId) setEditTrackId(firstId);
-              }
-            }}
-            onAddSelectedToPlaylist={() => setAddToPlaylistOpen(true)}
-          />
-        ) : (
-          <TracksTableHeader allSelected={allSelected} onSelectAll={(v) => v ? selectAll() : deselectAll()} />
-        )
+      {isMobile && hasSelection && (
+        <MobileSelectionBar
+          selectedCount={selectedIds.size}
+          totalCount={rows.length}
+          onSelectAll={selectAll}
+          onDeselectAll={deselectAll}
+          onEditSelected={() => {
+            if (selectedIds.size > 1) {
+              setBulkEditOpen(true);
+            } else {
+              const firstId = Array.from(selectedIds)[0];
+              if (firstId) setEditTrackId(firstId);
+            }
+          }}
+          onAddSelectedToPlaylist={() => setAddToPlaylistOpen(true)}
+        />
       )}
 
-      {loading && (
-        <div className="px-3 py-6">
-          <Spin indicator={<LoadingOutlined style={{ fontSize: 32, color: 'white' }} spin />} />
-        </div>
-      )}
-      {!loading && !isAuthenticated && (
-        <div className="px-3 py-6 text-[13px] text-red-400">You must be logged in to view your tracks.</div>
-      )}
-      {!loading && isAuthenticated && error && (
-        <div className="px-3 py-6 text-[13px] text-red-400">Failed to load tracks. Please try again.</div>
-      )}
-      {!loading && isAuthenticated && !error && rows.length === 0 && (
-        <div className="px-3 py-6 text-[13px] text-[#888]">No tracks found.</div>
-      )}
-      {!loading && isAuthenticated && !error && rows.map((track) => (
-        <TrackRow
-          key={track.id}
-          track={{ ...track, duration: durationById[track.id] || track.duration }}
-          isMobile={isMobile}
-          isSelected={selectedIds.has(track.id)}
-          onSelect={toggleSelect}
-          onAmplify={() => setAmplifyOpen(true)}
-          onContextMenu={openContextMenu}
-          isDeleting={deletingId === track.id}
-        />
-      ))}
+      <div className={!isMobile ? "overflow-x-auto" : undefined}>
+        {!isMobile && (
+          hasSelection ? (
+            <BulkSelectionHeader
+              selectedCount={selectedIds.size}
+              totalCount={rows.length}
+              onSelectAll={selectAll}
+              onDeselectAll={deselectAll}
+              onEditSelected={() => {
+                if (selectedIds.size > 1) {
+                  setBulkEditOpen(true);
+                } else {
+                  const firstId = Array.from(selectedIds)[0];
+                  if (firstId) setEditTrackId(firstId);
+                }
+              }}
+              onAddSelectedToPlaylist={() => setAddToPlaylistOpen(true)}
+            />
+          ) : (
+            <TracksTableHeader allSelected={allSelected} onSelectAll={(v) => v ? selectAll() : deselectAll()} />
+          )
+        )}
+
+        {loading && (
+          <div className="px-3 py-6">
+            <Spin indicator={<LoadingOutlined style={{ fontSize: 32, color: 'white' }} spin />} />
+          </div>
+        )}
+        {!loading && !isAuthenticated && (
+          <div className="px-3 py-6 text-[13px] text-red-400">You must be logged in to view your tracks.</div>
+        )}
+        {!loading && isAuthenticated && error && (
+          <div className="px-3 py-6 text-[13px] text-red-400">Failed to load tracks. Please try again.</div>
+        )}
+        {!loading && isAuthenticated && !error && rows.length === 0 && (
+          <div className="px-3 py-6 text-[13px] text-[#888]">No tracks found.</div>
+        )}
+        {!loading && isAuthenticated && !error && rows.map((track) => (
+          <TrackRow
+            key={track.id}
+            track={{ ...track, duration: durationById[track.id] || track.duration }}
+            isMobile={isMobile}
+            isSelected={selectedIds.has(track.id)}
+            onSelect={toggleSelect}
+            onAmplify={() => setAmplifyOpen(true)}
+            onContextMenu={openContextMenu}
+            isDeleting={deletingId === track.id}
+            isArtistPro={isArtistPro}
+          />
+        ))}
+      </div>
       {errorDelete && (
         <div className="px-3 py-2 text-[13px] text-red-400">{errorDelete}</div>
       )}
 
-      <ArtistProBenefits />
+      {isArtistPro ? (
+        <div className="mt-8 rounded-lg border border-[#2a2a2a] bg-chinese-black p-5 text-center text-[14px] font-semibold text-white-smoke">
+          Artist Pro active. Pro-only artist tools are already unlocked.
+        </div>
+      ) : (
+        <ArtistProBenefits />
+      )}
 
       {amplifyOpen && (
         <AmplifyModal onClose={() => setAmplifyOpen(false)} onUnlock={() => router.push("/artistpro")} />
@@ -355,6 +458,7 @@ export function TracksTab({ isMobile }: { isMobile: boolean }) {
           onEdit={(id) => setEditTrackId(id)}
           onAddToPlaylist={() => setAddToPlaylistOpen(true)}
           onDelete={(id) => { void handleDelete(id); }}
+          isArtistPro={isArtistPro}
         />
       )}
       {editTrack && (

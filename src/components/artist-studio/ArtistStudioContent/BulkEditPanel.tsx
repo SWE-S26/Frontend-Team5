@@ -41,7 +41,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
       <div className="fixed right-0 top-0 z-110 flex h-full w-full max-w-150 flex-col bg-chinese-black shadow-2xl">
 
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#2a2a2a] px-5 py-3.5">
+        <div className="flex items-center justify-between border-b border-[#2a2a2a] px-4 py-3.5 sm:px-5">
           <div className="flex items-center gap-3">
             <button type="button" onClick={onClose} className="text-white-smoke hover:text-[#aaa] transition-colors text-[20px] leading-none cursor-pointer">✕</button>
             <h2 className="text-[15px] font-bold text-white-smoke">Edit {count} tracks</h2>
@@ -49,7 +49,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+        <div className="flex-1 space-y-6 overflow-y-auto px-4 py-5 sm:px-6">
 
           {/* Artwork */}
           <div>
@@ -176,10 +176,10 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end border-t border-[#2a2a2a] px-6 py-4">
+        <div className="flex justify-end border-t border-[#2a2a2a] px-4 py-4 sm:px-6">
           <button
             type="button"
-            className="mb-6 rounded-full bg-chinese-black px-7 py-2.5 text-[13px] font-bold text-white-smoke hover:bg-upload-select transition-colors cursor-pointer"
+            className="rounded-full bg-chinese-black px-7 py-2.5 text-[13px] font-bold text-white-smoke hover:bg-upload-select transition-colors cursor-pointer"
           >
             Apply changes
           </button>

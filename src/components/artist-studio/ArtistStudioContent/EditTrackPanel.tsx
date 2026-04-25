@@ -168,6 +168,17 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "");
 
+  const normalizePermalinkSlug = (value: string) =>
+    value
+      .trim()
+      .replace(/^https?:\/\/beatza\.me\//i, "")
+      .replace(/^beatza\.me\//i, "")
+      .replace(/^\/+/, "")
+      .replace(/\/+$/, "")
+      .split("/")
+      .filter(Boolean)
+      .pop() ?? "";
+
   const normalizedGenreSearch    = genreSearch.trim().toLowerCase();
   const filteredMusicGenres      = MUSIC_GENRES.filter((g) => g.toLowerCase().includes(normalizedGenreSearch));
   const filteredAudioGenres      = AUDIO_GENRES.filter((g) => g.toLowerCase().includes(normalizedGenreSearch));
@@ -722,8 +733,15 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     if (saving) return;
     const parsedTitle = trackTitle.trim();
     const mainArtists = toList(artistName);
+    const permalinkSlug = normalizePermalinkSlug(toOptionalTrimmed(permalink) ?? slug);
+    const permaLinkRegex = /^[a-z0-9_-]+$/;
     if (!parsedTitle)           { setSubmitError("Track title is required.");         return; }
     if (mainArtists.length < 1) { setSubmitError("At least one artist is required."); return; }
+    if (!permalinkSlug)         { setSubmitError("Permalink is required.");            return; }
+    if (!permaLinkRegex.test(permalinkSlug)) {
+      setSubmitError("Permalink must contain only lowercase letters, numbers, hyphens (-), or underscores (_).");
+      return;
+    }
     setSubmitError(null);
 
     let zoomCroppedArtwork: File | undefined;
@@ -754,7 +772,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
       image: zoomCroppedArtwork,
       basicInfo: {
         title: parsedTitle,
-        permalink: toOptionalTrimmed(permalink) ?? slug,
+        permalink: permalinkSlug,
         mainArtists,
         genre: toOptionalTrimmed(genre),
         tags: toList(tags).length > 0 ? toList(tags) : undefined,
@@ -913,6 +931,8 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
                     setTrackTitle={setTrackTitle}
                     permalink={permalink}
                     setPermalink={setPermalink}
+                    showPermalink={false}
+                    permalinkReadOnly={true}
                     artistName={artistName}
                     setArtistName={setArtistName}
                     genre={genre}

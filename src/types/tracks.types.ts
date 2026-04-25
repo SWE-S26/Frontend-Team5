@@ -96,7 +96,8 @@ export interface GetPostedTracksResponse {
 }
 
 export interface Track {
-  trackId: string;
+  trackId?: string;
+  _id?: string;
 
   basicInfo: {
     title: string;
@@ -111,7 +112,7 @@ export interface Track {
 
   posterId: string;
 
-  durationInSeconds: number;
+  durationInSeconds?: number;
 
   isLikedByUser: boolean;
 
@@ -119,7 +120,7 @@ export interface Track {
     audioLink: string;
     id: string;
     cloudIndex: number;
-    downloadLink: string;
+    downloadLink?: string;
     waveformLink: string;
   };
 
@@ -204,5 +205,14 @@ export interface GetUploadQuotaResponse {
 }
 
 export interface deleteTrackResponse {
+  message: string;
+}
+
+export interface GetLikedTracksResponse {
+  message: string;
+  data: Track[];
+}
+
+export interface AddTrackToHistoryResponse {
   message: string;
 }

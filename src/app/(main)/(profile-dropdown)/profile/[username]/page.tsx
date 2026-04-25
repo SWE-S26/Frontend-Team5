@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useMemo, useState } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
 import { useAppSelector, useAppDispatch } from "@/store/hooks"
@@ -36,7 +36,8 @@ import SpamPopUp from "@/components/messages/conversation/SpamPopUp"
 import Button from "@/components/ui/Button"
 import { useBlockUser, useUnblockUser } from "@/hooks/useSocial"
 import { setProfile } from "@/store/slices/profileSlice"
-import { useGetPostedTracks } from "@/hooks/useTracks"
+import { useGetLikedTracks, useGetPostedTracks} from "@/hooks/useTracks"
+import { Track } from "@/types/tracks.types"
 
 interface Props {
   params: { username: string }
@@ -51,27 +52,7 @@ const profileTabs = [
   { href: "", label: "Reposts",        value: "reposts"        },
 ]
 
-// ── Mock data — replace each array with real API data when ready ──
-const mockAll = [
-  { id: "1", title: "Track One",   artist: "Artist A", img: "/Graduation.jpg" },
-  { id: "2", title: "Track Two",   artist: "Artist B", img: "/Graduation.jpg" },
-  { id: "3", title: "Track Three", artist: "Artist C", img: "/Graduation.jpg" },
-]
-
-const mockPopular = [
-  { id: "1", title: "Popular One",   artist: "Artist A", img: "/Graduation.jpg" },
-  { id: "2", title: "Popular Two",   artist: "Artist B", img: "/Graduation.jpg" },
-]
-
-const mockAlbums = [
-  { id: "1", title: "Album One",   artist: "Artist A", img: "/Graduation.jpg" },
-  { id: "2", title: "Album Two",   artist: "Artist B", img: "/Graduation.jpg" },
-]
-
-const mockPlaylists: any[] = [] // ← empty to test EmptyTab, add items when API is ready
-
-const mockReposts: any[] = []   // ← empty to test EmptyTab, add items when API is ready
-// ─────────────────────────────────────────────────────────────────
+const emptyCollections: any[] = []
 
 const ProfilePage = ({ params }: Props) => {
   const router       = useRouter()
@@ -105,7 +86,7 @@ const ProfilePage = ({ params }: Props) => {
   
   const role = useAppSelector((state) => state.profile.role)
   const { getPostedTracks, tracks: postedTracks, loading: postedTracksLoading } = useGetPostedTracks()
-
+  const { getLikedTracks, tracks: likedTracks, loading: likedTracksLoading } = useGetLikedTracks()
   const artist = role === "Artist"
 
    
@@ -129,9 +110,16 @@ const ProfilePage = ({ params }: Props) => {
 }, [openMoreMenu])
 
   useEffect(() => {
-    if (activeTab !== "tracks" || !profileUserId || isLoading || profileTrackCount <= 0) return
-    void getPostedTracks(profileUserId)
-  }, [activeTab, profileUserId, getPostedTracks, isLoading, profileTrackCount])
+    if (!profileUserId || isLoading) return
+    if (activeTab === "tracks" || activeTab === "all" || activeTab === "popular-tracks") {
+      void getPostedTracks(profileUserId)
+    }
+    if (activeTab === "all") {
+      void getLikedTracks(profileUserId)
+    }
+    if (activeTab === "reposts") {
+    }
+  }, [activeTab, profileUserId, getPostedTracks, getLikedTracks, isLoading])
 
   const getTrackSortTime = (track: { releaseDate?: string; _id?: string }) => {
     const releaseTime = track.releaseDate ? new Date(track.releaseDate).getTime() : NaN
@@ -146,24 +134,58 @@ const ProfilePage = ({ params }: Props) => {
     return 0
   }
 
-  const profileTracks = [...(postedTracks ?? [])]
-    .sort((a, b) => getTrackSortTime(b) - getTrackSortTime(a))
-    .map((track) => ({
-    trackId: track.trackId,
-    title: track.basicInfo.title,
-    artist: track.basicInfo.mainArtists?.length
-      ? track.basicInfo.mainArtists.join(", ")
-      : "Unknown Artist",
-    img: track.image?.imgLink || "/Graduation.jpg",
-    trackUrl: track.audio?.audioLink,
-    numLikes: track.numLikes,
-    numReposts: track.numReposts,
-    isLikedByUser: track.isLikedByUser,
-  }))
+  const mapTrackToProfileItem = (track: Track, fallbackIndex: number) => {
+    const stableId = track.trackId ?? track._id ?? `track-${fallbackIndex}`
+    return {
+      id: stableId,
+      trackId: stableId,
+      title: track.basicInfo.title,
+      artist: track.basicInfo.mainArtists?.length
+        ? track.basicInfo.mainArtists.join(", ")
+        : "Unknown Artist",
+      img: track.image?.imgLink || "/Graduation.jpg",
+      trackUrl: track.audio?.audioLink,
+      downloadUrl: track.audio?.downloadLink,
+      duration: track.durationInSeconds,
+      numLikes: track.numLikes,
+      numReposts: track.numReposts,
+      isLikedByUser: track.isLikedByUser,
+      numPlays: track.numPlays,
+      releaseDate: track.releaseDate,
+    }
+  }
 
-  const trackCount = profileTracks.length
+  const postedTrackItems = [...(postedTracks ?? [])]
+    .sort((a, b) => getTrackSortTime(b) - getTrackSortTime(a))
+    .map((track, index) => mapTrackToProfileItem(track, index))
+
+  const likedTrackItems = [...(likedTracks ?? [])]
+    .sort((a, b) => getTrackSortTime(b) - getTrackSortTime(a))
+    .map((track, index) => mapTrackToProfileItem(track, index + 10000))
+
+  const popularTrackItems = useMemo(
+    () => [...postedTrackItems].sort((a, b) => (b.numPlays ?? 0) - (a.numPlays ?? 0)),
+    [postedTrackItems],
+  )
+
+  const allTabItems = useMemo(() => {
+    const seen = new Set<string>()
+    const merged = [...postedTrackItems, ...likedTrackItems]
+    const deduped = merged.filter((item) => {
+      if (seen.has(item.id)) return false
+      seen.add(item.id)
+      return true
+    })
+    return deduped.sort((a, b) => {
+      const at = a.releaseDate ? new Date(a.releaseDate).getTime() : 0
+      const bt = b.releaseDate ? new Date(b.releaseDate).getTime() : 0
+      return bt - at
+    })
+  }, [postedTrackItems, likedTrackItems])
+
+  const trackCount = postedTrackItems.length
   const hasKnownNoTracks = !isLoading && profileTrackCount <= 0
-  const shouldShowTracksSkeleton = postedTracksLoading && profileTrackCount > 0
+  const shouldShowTracksSkeleton = (postedTracksLoading || likedTracksLoading) && profileTrackCount > 0
 
   return (
     <div>
@@ -337,11 +359,13 @@ const ProfilePage = ({ params }: Props) => {
           <div >
 
             {activeTab === "all" && (
-              mockAll.length === 0 ? <EmptyTab /> : <All items={mockAll} />
+              allTabItems.length === 0
+                ? <EmptyTab />
+                : <All items={allTabItems} />
             )}
 
             {activeTab === "popular-tracks" && (
-              mockPopular.length === 0 ? <EmptyTab /> : <PopularTracks items={mockPopular} />
+              popularTrackItems.length === 0 ? <EmptyTab /> : <PopularTracks items={popularTrackItems} />
             )}
 
             {activeTab === "tracks" && (
@@ -349,33 +373,29 @@ const ProfilePage = ({ params }: Props) => {
                 ? <EmptyTab />
                 : shouldShowTracksSkeleton || postedTracks === null
                   ? <Tracks items={[]} isLoading />
-                  : profileTracks.length === 0
+                  : postedTrackItems.length === 0
                   ? <EmptyTab />
-                  : <Tracks items={profileTracks} />
+                  : <Tracks items={postedTrackItems} />
             )}
 
             {activeTab === "albums" && (
-              mockAlbums.length === 0 ? <EmptyTab /> : <Albums items={mockAlbums} />
+              emptyCollections.length === 0 ? <EmptyTab /> : <Albums items={emptyCollections} />
             )}
 
             {activeTab === "playlists" && (
-              mockPlaylists.length === 0 ? (
+              emptyCollections.length === 0 ? (
                 <h2 className="font-bold text-lg flex items-center justify-center text-center">
                   You haven't created any playlists.
                 </h2>
               ) : (
-                <Playlists items={mockPlaylists} />
+                <Playlists items={emptyCollections} />
               )
             )}
 
             {activeTab === "reposts" && (
-              mockReposts.length === 0 ? (
                 <h2 className="font-bold text-lg flex items-center justify-center text-center">
                   You haven't reposted any sounds.
                 </h2>
-              ) : (
-                <Reposts items={mockReposts} />
-              )
             )}
 
           </div>

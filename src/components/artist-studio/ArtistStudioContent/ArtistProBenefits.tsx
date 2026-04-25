@@ -54,19 +54,19 @@ function BenefitCard({
 
 export function ArtistProBenefits() {
   return (
-    <div className="mt-8 rounded-lg border border-[#2a2a2a] bg-chinese-black p-5">
-      <div className="mb-4 flex items-center justify-between">
-        <div>
+    <div className="mt-8 rounded-lg border border-[#2a2a2a] bg-chinese-black p-4 sm:p-5">
+      <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+        <div className="max-w-3xl">
           <h3 className="text-[16px] font-bold text-white-smoke">Artist Pro Membership Benefits</h3>
           <p className="mt-1 text-[13px] text-[#888]">
             Jump start your music career with Artist Pro and immediately unlock $100+ in premium music tools and services.
           </p>
         </div>
-        <button type="button" className="shrink-0 rounded-full border border-white px-5 py-2 text-[13px] font-bold text-white-smoke hover:bg-white hover:text-black transition-colors">
+        <button type="button" className="w-full shrink-0 rounded-full border border-white px-5 py-2 text-[13px] font-bold text-white-smoke hover:bg-white hover:text-black transition-colors sm:w-auto">
           See all
         </button>
       </div>
-      <div className="grid grid-cols-2 gap-3 lg:grid-cols-4">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
         <BenefitCard img="/artists-icons/man-headphones.svg" title="Get 2 free months of Splice Sounds+ royalty-free samples" save="Save $25.98" fallback="/artists-icons/splice.svg" />
         <BenefitCard img="/artists-icons/send-campaign.svg"  title="Get 20% off all campaigns on Groover.co and free hype add-on" save="Save $21" fallback="/artists-icons/groover.svg" />
         <BenefitCard img="/artists-icons/dg-set.svg"         title="Get 1 month free of Native Instrument's 360 Pro suite" save="Save $50" fallback="/artists-icons/NI.svg" />

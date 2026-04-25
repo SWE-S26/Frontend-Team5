@@ -5,6 +5,9 @@ const isDev = process.env.NEXT_PUBLIC_ENV === "development"
 const nextConfig: NextConfig = {
   reactCompiler: true,
   output: "standalone",
+  experimental: {
+    proxyClientMaxBodySize: "200mb",
+  },
   images: {
     remotePatterns: [
       {

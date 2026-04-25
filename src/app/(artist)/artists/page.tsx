@@ -14,7 +14,7 @@ export default function Artists() {
     <div className="min-h-screen bg-chinese-black pb-20">
       <ArtistSidebar />
       <ArtistTopbar />
-      <main className="ml-16.5 mt-14">
+      <main className="mt-14 ml-0 lg:ml-20">
         <ArtistStudioContent key={pathname} activeTab={activeTab} onChangeTab={setActiveTab} />
       </main>
       <PlayerBar />
