@@ -48,7 +48,7 @@ function TracksActionBar({ onUpload, onDistribute, onMonetize, onMaster }: {
   onMonetize: () => void;
   onMaster: () => void;
 }) {
-  const btnClass = "flex items-center gap-2 rounded-md border border-[#3a3a3a] bg-transparent px-5 py-3 text-[18px] font-semibold text-white transition-colors hover:border-[#555] cursor-pointer";
+  const btnClass = "flex items-center gap-2 rounded-md border border-[#3a3a3a] bg-transparent px-5 py-3 text-[18px] font-semibold text-white-smoke transition-colors hover:border-[#555] cursor-pointer";
   return (
     <div className="flex flex-wrap gap-3">
       <button type="button" onClick={onUpload}     className={btnClass}><span>+ Upload or drop tracks</span></button>
@@ -98,23 +98,23 @@ function SortDropdown({ sortField, sortDir, onSortField, onSortDir }: {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] text-white-smoke hover:bg-[#2a2a2a] transition-colors cursor-pointer"
+        className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] text-white-smoke transition-colors cursor-pointer"
       >
         <BsSortDown className="text-sm" />
         {options.find((o) => o.value === sortField)?.label}
       </button>
 
       {open && (
-        <div className="absolute right-0 top-full z-50 mt-1 w-44 rounded-lg bg-[#1a1a1a] py-2 shadow-xl">
+        <div className="absolute right-0 top-full z-50 mt-1 w-44 rounded-lg bg-chinese-black py-2 shadow-xl">
           <p className="px-4 pb-2 pt-1 text-[10px] font-bold tracking-widest text-white-smoke">SORT BY</p>
           {options.map((opt) => (
             <button
               key={opt.value}
               type="button"
               onClick={() => handleSelect(opt.value)}
-              className="flex w-full items-center justify-between px-4 py-2.5 text-[13px] hover:bg-[#252525] transition-colors cursor-pointer"
+              className="flex w-full items-center justify-between px-4 py-2.5 text-[13px] hover:bg-upload-select transition-colors cursor-pointer"
             >
-              <span className={sortField === opt.value ? "font-bold text-white" : "font-normal text-white-smoke"}>{opt.label}</span>
+              <span className={sortField === opt.value ? "font-bold text-white-smoke" : "font-normal text-white-smoke"}>{opt.label}</span>
               {sortField === opt.value && (
                 <svg width="12" height="10" viewBox="0 0 12 10" fill="none">
                   <path d="M1 5L4.5 8.5L11 1" stroke="white" strokeWidth="1.6" strokeLinecap="round" strokeLinejoin="round" />
@@ -142,7 +142,7 @@ function TracksFilterBar({ isMobile, search, onSearch, filter, onFilter, count, 
 }) {
   const pillClass = (active: boolean) =>
     `rounded-full border px-5 py-1.5 text-[13px] transition-colors cursor-pointer ${
-      active ? "border-white text-white" : "border-[#444] text-[#888] hover:border-[#666]"
+      active ? "border-white-smoke text-white-smoke" : "border-[#444] text-[#888] hover:border-upload-select"
     }`;
 
   return (

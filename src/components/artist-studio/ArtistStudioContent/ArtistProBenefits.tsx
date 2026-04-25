@@ -10,7 +10,7 @@ function BenefitCard({
   fallback: string;
 }) {
   return (
-    <div className="group overflow-hidden rounded-lg bg-[#1a1a1a] cursor-pointer">
+    <div className="group overflow-hidden rounded-lg bg-chinese-black cursor-pointer">
       <div className="relative h-36 w-full overflow-hidden bg-linear-to-br from-[#2b2b2b] via-[#1d1d1d] to-[#111]">
         <img
           src={img}
@@ -24,14 +24,14 @@ function BenefitCard({
         <div
           className="absolute inset-0 z-10 pointer-events-none"
           style={{
-            clipPath: "polygon(0 0, 60% 0, 40% 120%, 0% 100%)",
+            clipPath: "polygon(0 0, 60% 0, 40% 120%, 0% 120%)",
             background: "rgba(0,0,0,0.7)",
           }}
         />
 
         <img
           src={fallback}
-          className="pointer-events-none absolute bottom-10 left-0 z-20 text-[18px] font-bold text-white/85"
+          className="pointer-events-none absolute bottom-10 left-0 z-20 text-[18px] font-bold text-white-smoke/85"
           onError={(e) => {
             e.currentTarget.style.opacity = "0";
           }}
@@ -43,7 +43,7 @@ function BenefitCard({
           {title}
         </p>
         <div className="flex flex-row gap-2">
-          <span className="shrink-0 rounded-full bg-green-500 px-3 py-1 text-[11px] font-bold text-black shadow-md transition-all hover:bg-green-400 hover:scale-105">
+          <span className="shrink-0 rounded-full bg-green-500 px-3 py-1 text-[11px] font-bold text-chinese-black shadow-md transition-all hover:bg-green-400 hover:scale-105">
             {save}
           </span>
         </div>
@@ -54,15 +54,15 @@ function BenefitCard({
 
 export function ArtistProBenefits() {
   return (
-    <div className="mt-8 rounded-lg border border-[#2a2a2a] bg-[#161616] p-5">
+    <div className="mt-8 rounded-lg border border-[#2a2a2a] bg-chinese-black p-5">
       <div className="mb-4 flex items-center justify-between">
         <div>
-          <h3 className="text-[16px] font-bold text-white">Artist Pro Membership Benefits</h3>
+          <h3 className="text-[16px] font-bold text-white-smoke">Artist Pro Membership Benefits</h3>
           <p className="mt-1 text-[13px] text-[#888]">
             Jump start your music career with Artist Pro and immediately unlock $100+ in premium music tools and services.
           </p>
         </div>
-        <button type="button" className="shrink-0 rounded-full border border-white px-5 py-2 text-[13px] font-bold text-white hover:bg-white hover:text-black transition-colors">
+        <button type="button" className="shrink-0 rounded-full border border-white px-5 py-2 text-[13px] font-bold text-white-smoke hover:bg-white hover:text-black transition-colors">
           See all
         </button>
       </div>

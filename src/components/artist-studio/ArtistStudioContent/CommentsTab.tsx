@@ -3,7 +3,7 @@ import { useRouter } from "next/navigation";
 function CommentBubble({ text, rightOffset, topOffset }: { text: string; rightOffset: number; topOffset: number }) {
   return (
     <div
-      className="absolute rounded-full px-5 py-2 text-[14px] font-semibold text-[#1b1b1b] shadow-lg"
+      className="absolute rounded-full px-5 py-2 text-[14px] font-semibold text-chinese-black shadow-lg"
       style={{ backgroundColor: "#f39f86", right: `${rightOffset}px`, top: `${topOffset}px` }}
     >
       {text}
@@ -19,14 +19,14 @@ export function CommentsTab() {
       <div className="grid items-start gap-8 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
           <div className="mb-3 flex items-center gap-2">
-            <span className="rounded bg-[#333] px-2 py-0.5 text-[10px] font-bold text-yellow-400">★ ARTIST PRO</span>
+            <span className="rounded bg-chinese-black px-2 py-0.5 text-[10px] font-bold text-yellow-400">★ ARTIST PRO</span>
           </div>
-          <h2 className="mb-6 text-[32px] font-bold text-white">Every comment in one place</h2>
+          <h2 className="mb-6 text-[32px] font-bold text-white-smoke">Every comment in one place</h2>
           <p className="max-w-xl text-[14px] leading-relaxed text-[#aaa]">
             With Artist Pro, you get access to Comments Hub which brings together every comment across all of your tracks,
             so you can easily see what fans are saying about you. Read, moderate and respond to your comments, all in one place.
           </p>
-          <button type="button" onClick={() => router.push("/artistpro")} className="mt-6 rounded-full bg-white px-7 py-2.5 text-[14px] font-bold text-black hover:bg-[#eee] transition-colors">
+          <button type="button" onClick={() => router.push("/artistpro")} className="mt-6 rounded-full bg-white-smoke px-7 py-2.5 text-[14px] font-bold text-chinese-black hover:bg-upload-select transition-colors">
             Get Artist Pro
           </button>
         </div>

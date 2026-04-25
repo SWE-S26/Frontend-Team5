@@ -49,7 +49,7 @@ export function TrackRow({
     <button
       type="button"
       onClick={togglePlay}
-      className="relative h-12 w-12 shrink-0 overflow-hidden rounded bg-[#222] cursor-pointer"
+      className="relative h-12 w-12 shrink-0 overflow-hidden rounded bg-chinese-black cursor-pointer"
       aria-label={rowIsPlaying ? "Pause track" : "Play track"}
     >
       <img
@@ -63,7 +63,7 @@ export function TrackRow({
         }}
       />
       {(isHovered || rowIsPlaying) && (
-        <div className="absolute inset-0 flex items-center justify-center bg-black/50">
+        <div className="absolute inset-0 flex items-center justify-center bg-chinese-black/50">
           {rowIsPlaying
             ? <IoPauseCircleSharp className="text-white-smoke text-[32px]" />
             : <IoIosPlayCircle    className="text-white-smoke text-[32px]" />
@@ -76,17 +76,17 @@ export function TrackRow({
   const trackMeta = (
     <div className="min-w-0">
       <div className="flex items-center gap-1.5">
-        <span className="truncate text-[13px] font-medium text-white">{track.title}</span>
-        {track.hd && <span className="shrink-0 rounded bg-[#555] px-1 py-px text-[9px] font-bold text-white">HD</span>}
+        <span className="truncate text-[13px] font-medium text-white-smoke">{track.title}</span>
+        {track.hd && <span className="shrink-0 rounded bg-[#555] px-1 py-px text-[9px] font-bold text-white-smoke">HD</span>}
       </div>
-      <p className="text-[11px] text-[#888]">{track.label}</p>
+      <p className="text-[11px] text-white-smoke">{track.label}</p>
     </div>
   );
 
   const rowBg = isSelected
-    ? "bg-[#1d1d2e]"
+    ? "bg-upload-select"
     : isHovered || rowIsPlaying
-    ? "bg-[#1a1a1a]"
+    ? "bg-upload-select"
     : "bg-transparent";
 
   if (isMobile) {
@@ -136,7 +136,7 @@ export function TrackRow({
         <button
           type="button"
           onClick={() => onAmplify(track.id)}
-          className="flex items-center gap-1 rounded-full bg-linear-to-br from-[#7b4fff] to-[#5533ff] px-3 py-1 text-[11px] font-bold text-white hover:opacity-90 transition-opacity cursor-pointer"
+          className="flex items-center gap-1 rounded-full bg-linear-to-br from-[#7b4fff] to-[#5533ff] px-3 py-1 text-[11px] font-bold text-white-smoke hover:opacity-90 transition-opacity cursor-pointer"
         >
           <BsLightningChargeFill /> Amplify
         </button>

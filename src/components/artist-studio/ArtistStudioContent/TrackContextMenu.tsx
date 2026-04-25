@@ -47,7 +47,7 @@ export function TrackContextMenu({
   return (
     <div
       ref={ref}
-      className="fixed z-150 w-52 rounded-xl border border-[#2a2a2a] bg-[#161616] py-1.5 shadow-2xl"
+      className="fixed z-150 w-52 rounded-xl border border-[#2a2a2a] bg-chinese-black py-1.5 shadow-2xl"
       style={{ top: adjustedY, left: adjustedX }}
     >
       {menuItems.map(({ icon: Icon, label, action, danger }) => (
@@ -55,8 +55,8 @@ export function TrackContextMenu({
           key={label}
           type="button"
           onClick={action}
-          className={`flex w-full items-center gap-3 px-4 py-2.5 text-[13px] transition-colors hover:bg-[#222] cursor-pointer ${
-            danger ? "text-red-400 hover:text-red-300" : "text-[#ccc] hover:text-white"
+          className={`flex w-full items-center gap-3 px-4 py-2.5 text-[13px] transition-colors hover:bg-chinese-black cursor-pointer ${
+            danger ? "text-red-400 hover:text-red-300" : "text-[#ccc] hover:text-white-smoke"
           }`}
         >
           <Icon className="shrink-0 text-[15px]" />
