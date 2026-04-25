@@ -9,6 +9,7 @@ export function TrackContextMenu({
   onEdit,
   onAddToPlaylist,
   onDelete,
+  isArtistPro,
 }: {
   trackId: string;
   position: { x: number; y: number };
@@ -16,6 +17,7 @@ export function TrackContextMenu({
   onEdit: (id: string) => void;
   onAddToPlaylist: (id: string) => void;
   onDelete: (id: string) => void;
+  isArtistPro: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
 
@@ -30,14 +32,13 @@ export function TrackContextMenu({
   const menuItems = [
     { icon: PiPencilSimple,      label: "Edit",            action: () => { onEdit(trackId); onClose(); } },
     { icon: FiPlusSquare, label: "Add to playlist", action: () => { onAddToPlaylist(trackId); onClose(); } },
-    { icon: FiDollarSign, label: "Monetize",        action: onClose },
-    { icon: FiSliders,    label: "Master",           action: onClose },
-    { icon: FiGlobe,      label: "Distribute",       action: onClose },
-    { icon: FiBarChart2,  label: "Track insights",   action: onClose },
     { icon: FiDownload,   label: "Download file",    action: onClose },
     { icon: FiLink,       label: "Copy link",        action: onClose },
     { icon: FiTrash2,     label: "Delete track",     action: () => { onDelete(trackId); onClose(); }, danger: true },
-  ];
+  ].filter((item) => {
+    if (!isArtistPro) return true;
+    return !["Monetize", "Master", "Distribute", "Track insights"].includes(item.label);
+  });
 
   // Adjust position if menu would overflow viewport bottom
   const menuHeight = menuItems.length * 44;
@@ -47,7 +48,7 @@ export function TrackContextMenu({
   return (
     <div
       ref={ref}
-      className="fixed z-150 w-52 rounded-xl border border-[#2a2a2a] bg-[#161616] py-1.5 shadow-2xl"
+      className="fixed z-150 w-52 rounded-xl border border-[#2a2a2a] bg-chinese-black py-1.5 shadow-2xl"
       style={{ top: adjustedY, left: adjustedX }}
     >
       {menuItems.map(({ icon: Icon, label, action, danger }) => (
@@ -55,8 +56,8 @@ export function TrackContextMenu({
           key={label}
           type="button"
           onClick={action}
-          className={`flex w-full items-center gap-3 px-4 py-2.5 text-[13px] transition-colors hover:bg-[#222] cursor-pointer ${
-            danger ? "text-red-400 hover:text-red-300" : "text-[#ccc] hover:text-white"
+          className={`flex w-full items-center gap-3 px-4 py-2.5 text-[13px] transition-colors hover:bg-chinese-black cursor-pointer ${
+            danger ? "text-red-400 hover:text-red-300" : "text-[#ccc] hover:text-white-smoke"
           }`}
         >
           <Icon className="shrink-0 text-[15px]" />

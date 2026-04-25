@@ -57,17 +57,19 @@ export default function Feed() {
   }, [loading, hasNext]);
 
   const reduxTracks: Track[] = useMemo(
-    () =>
-      allTracks.map((t) => ({
-        id: t.trackId,
+  () =>
+    allTracks
+      .filter((t) => t.trackId)
+      .map((t) => ({
+        id: t.trackId!,
         url: t.audio?.audioLink ?? "",
-        title: t.basicInfo?.title,
-        artist: t.basicInfo?.mainArtists?.[0],
-        img: t.image?.imgLink,
-        duration: t.durationInSeconds,
+        title: t.basicInfo?.title ?? "Untitled",
+        artist: t.basicInfo?.mainArtists?.[0] ?? "Unknown Artist",
+        img: t.image?.imgLink ?? "",
+        duration: t.durationInSeconds ?? 0,
       })),
-    [allTracks],
-  );
+  [allTracks],
+);
 
   return (
     <FeedGuard>
@@ -100,7 +102,12 @@ export default function Feed() {
           </div>
 
           <div>
-            {allTracks.map((track) => (
+            {allTracks
+              .filter(
+                (track): track is ApiTrack & { trackId: string } =>
+                  Boolean(track.trackId),
+              )
+              .map((track) => (
               <div key={track.trackId} className="flex-none mb-4">
                 <PopoverProvider>
                   <FeedHeader

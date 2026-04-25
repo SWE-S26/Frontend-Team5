@@ -168,6 +168,17 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     .replace(/\s+/g, "-")
     .replace(/[^a-z0-9-]/g, "");
 
+  const normalizePermalinkSlug = (value: string) =>
+    value
+      .trim()
+      .replace(/^https?:\/\/beatza\.me\//i, "")
+      .replace(/^beatza\.me\//i, "")
+      .replace(/^\/+/, "")
+      .replace(/\/+$/, "")
+      .split("/")
+      .filter(Boolean)
+      .pop() ?? "";
+
   const normalizedGenreSearch    = genreSearch.trim().toLowerCase();
   const filteredMusicGenres      = MUSIC_GENRES.filter((g) => g.toLowerCase().includes(normalizedGenreSearch));
   const filteredAudioGenres      = AUDIO_GENRES.filter((g) => g.toLowerCase().includes(normalizedGenreSearch));
@@ -722,8 +733,15 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     if (saving) return;
     const parsedTitle = trackTitle.trim();
     const mainArtists = toList(artistName);
+    const permalinkSlug = normalizePermalinkSlug(toOptionalTrimmed(permalink) ?? slug);
+    const permaLinkRegex = /^[a-z0-9_-]+$/;
     if (!parsedTitle)           { setSubmitError("Track title is required.");         return; }
     if (mainArtists.length < 1) { setSubmitError("At least one artist is required."); return; }
+    if (!permalinkSlug)         { setSubmitError("Permalink is required.");            return; }
+    if (!permaLinkRegex.test(permalinkSlug)) {
+      setSubmitError("Permalink must contain only lowercase letters, numbers, hyphens (-), or underscores (_).");
+      return;
+    }
     setSubmitError(null);
 
     let zoomCroppedArtwork: File | undefined;
@@ -754,7 +772,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
       image: zoomCroppedArtwork,
       basicInfo: {
         title: parsedTitle,
-        permalink: toOptionalTrimmed(permalink) ?? slug,
+        permalink: permalinkSlug,
         mainArtists,
         genre: toOptionalTrimmed(genre),
         tags: toList(tags).length > 0 ? toList(tags) : undefined,
@@ -820,7 +838,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
 
   const tabClass = (t: typeof activeTab) =>
     `pb-3 text-[13px] font-semibold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
-      activeTab === t ? "border-white text-white" : "border-transparent text-[#666] hover:text-[#aaa]"
+      activeTab === t ? "border-white text-white-smoke" : "border-transparent text-[#666] hover:text-[#aaa]"
     }`;
 
   // Render
@@ -828,10 +846,10 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-100 bg-black/40" onClick={onClose} />
+      <div className="fixed inset-0 z-100 bg-chinese-black/40" onClick={onClose} />
 
       {/* Drawer */}
-      <div className="fixed right-0 top-0 z-110 flex h-full w-full max-w-150 flex-col bg-[#111] shadow-2xl">
+      <div className="fixed right-0 top-0 z-110 flex h-full w-full max-w-150 flex-col bg-chinese-black shadow-2xl">
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#2a2a2a] px-5 py-3.5">
@@ -839,22 +857,22 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
             <button
               type="button"
               onClick={onClose}
-              className="text-[#aaa] hover:text-white transition-colors text-[20px] leading-none cursor-pointer"
+              className="text-[#aaa] hover:text-white-smoke transition-colors text-[20px] leading-none cursor-pointer"
             >
               ✕
             </button>
-            <h2 className="text-[15px] font-bold text-white">Edit Track</h2>
+            <h2 className="text-[15px] font-bold text-white-smoke">Edit Track</h2>
           </div>
           <div className="flex items-center gap-2">
             <button
               type="button"
-              className="flex items-center gap-1.5 rounded-md border border-[#333] px-3 py-1.5 text-[12px] text-[#ccc] hover:border-[#555] transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 rounded-md border border-[#333] px-3 py-1.5 text-[12px] text-white-smoke hover:border-[#555] transition-colors cursor-pointer"
             >
               <FiDownload className="text-[13px]" /> Download file
             </button>
             <button
               type="button"
-              className="flex items-center gap-1.5 rounded-md border border-[#333] px-3 py-1.5 text-[12px] text-[#ccc] hover:border-[#555] transition-colors cursor-pointer"
+              className="flex items-center gap-1.5 rounded-md border border-[#333] px-3 py-1.5 text-[12px] text-white-smoke hover:border-[#555] transition-colors cursor-pointer"
             >
               Replace file
             </button>
@@ -913,6 +931,8 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
                     setTrackTitle={setTrackTitle}
                     permalink={permalink}
                     setPermalink={setPermalink}
+                    showPermalink={false}
+                    permalinkReadOnly={true}
                     artistName={artistName}
                     setArtistName={setArtistName}
                     genre={genre}
@@ -1067,7 +1087,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
             <button
               type="button"
               onClick={onClose}
-              className="rounded-full border border-[#333] px-5 py-2 text-[13px] font-semibold text-[#ccc] hover:border-[#555] transition-colors cursor-pointer"
+              className="rounded-full border border-[#333] px-5 py-2 text-[13px] font-semibold text-white-smoke hover:border-[#555] transition-colors cursor-pointer"
             >
               Cancel
             </button>
@@ -1075,7 +1095,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
               type="button"
               onClick={() => void handleSave()}
               disabled={saving}
-              className="rounded-full bg-[#1db954] px-7 py-2.5 text-[13px] font-bold text-black hover:bg-[#1ed760] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              className="rounded-full bg-[#1db954] px-7 py-2.5 text-[13px] font-bold text-chinese-black hover:bg-[#1ed760] transition-colors cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {saving ? "Saving…" : "Save changes"}
             </button>

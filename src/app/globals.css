@@ -169,3 +169,11 @@ body {
 .notif-dropdown-popup .ant-select-item-option-active { background-color: var(--bg) !important; }
 .notif-dropdown-popup .ant-select-item-option-selected { background-color: var(--bg) !important; }
 .notif-dropdown-popup .ant-select-item-option-selected .ant-select-item-option-content { color: var(--fg) !important; }
+
+.theme-invert {
+  filter: invert(1);
+}
+
+[data-theme="light"] .theme-invert {
+  filter: invert(0);
+}

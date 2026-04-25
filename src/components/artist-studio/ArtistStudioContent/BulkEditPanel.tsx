@@ -31,32 +31,32 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
       onClick={() => onChange(!value)}
       className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors ${value ? "bg-[#1db954]" : "bg-[#444]"}`}
     >
-      <span className={`inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform ${value ? "translate-x-4" : "translate-x-0.5"}`} />
+      <span className={`inline-block h-4 w-4 transform rounded-full bg-white-smoke shadow transition-transform ${value ? "translate-x-4" : "translate-x-0.5"}`} />
     </button>
   );
 
   return (
     <>
-      <div className="fixed inset-0 z-100 bg-black/40" onClick={onClose} />
-      <div className="fixed right-0 top-0 z-110 flex h-full w-full max-w-150 flex-col bg-[#111] shadow-2xl">
+      <div className="fixed inset-0 z-100 bg-chinese-black/40" onClick={onClose} />
+      <div className="fixed right-0 top-0 z-110 flex h-full w-full max-w-150 flex-col bg-chinese-black shadow-2xl">
 
         {/* Header */}
-        <div className="flex items-center justify-between border-b border-[#2a2a2a] px-5 py-3.5">
+        <div className="flex items-center justify-between border-b border-[#2a2a2a] px-4 py-3.5 sm:px-5">
           <div className="flex items-center gap-3">
-            <button type="button" onClick={onClose} className="text-[#aaa] hover:text-white transition-colors text-[20px] leading-none cursor-pointer">✕</button>
-            <h2 className="text-[15px] font-bold text-white">Edit {count} tracks</h2>
+            <button type="button" onClick={onClose} className="text-white-smoke hover:text-[#aaa] transition-colors text-[20px] leading-none cursor-pointer">✕</button>
+            <h2 className="text-[15px] font-bold text-white-smoke">Edit {count} tracks</h2>
           </div>
         </div>
 
         {/* Body */}
-        <div className="flex-1 overflow-y-auto px-6 py-5 space-y-6">
+        <div className="flex-1 space-y-6 overflow-y-auto px-4 py-5 sm:px-6">
 
           {/* Artwork */}
           <div>
             <button
               type="button"
               onClick={() => artworkInputRef.current?.click()}
-              className="flex h-55 w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-[#333] bg-[#181818] hover:border-[#555] transition-colors cursor-pointer overflow-hidden"
+              className="flex h-55 w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-[#333] bg-chinese-black hover:border-[#555] transition-colors cursor-pointer overflow-hidden"
             >
               {artworkSrc ? (
                 <img src={artworkSrc} alt="New artwork" className="h-full w-full object-cover" />
@@ -67,7 +67,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
                       <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
                     </svg>
                   </div>
-                  <span className="text-[13px] font-semibold text-white">Add new artwork</span>
+                  <span className="text-[13px] font-semibold text-white-smoke">Add new artwork</span>
                 </>
               )}
             </button>
@@ -76,7 +76,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
 
           {/* Primary genre */}
           <div>
-            <label className="mb-1 block text-[13px] font-semibold text-white">Primary genre</label>
+            <label className="mb-1 block text-[13px] font-semibold text-white-smoke">Primary genre</label>
             <button
               type="button"
               className="flex w-full items-center justify-between rounded-lg border border-[#2a2a2a] bg-transparent px-4 py-3 text-[13px] text-[#666] hover:border-[#444] transition-colors cursor-pointer"
@@ -88,20 +88,20 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
 
           {/* Tags */}
           <div>
-            <label className="mb-1 flex items-center gap-1 text-[13px] font-semibold text-white">
+            <label className="mb-1 flex items-center gap-1 text-[13px] font-semibold text-white-smoke">
               Tags <span className="ml-1 cursor-help text-[#888] text-[12px]">ⓘ</span>
             </label>
             <input
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="Add styles, moods, tempo."
-              className="w-full rounded-lg border border-[#2a2a2a] bg-transparent px-4 py-3 text-[13px] text-white outline-none focus:border-[#444] transition-colors placeholder:text-[#666]"
+              className="w-full rounded-lg border border-[#2a2a2a] bg-transparent px-4 py-3 text-[13px] text-white-smoke outline-none focus:border-[#444] transition-colors placeholder:text-[#666]"
             />
           </div>
 
           {/* Tracks privacy */}
           <div>
-            <p className="mb-2 text-[13px] font-semibold text-white">Tracks privacy</p>
+            <p className="mb-2 text-[13px] font-semibold text-white-smoke">Tracks privacy</p>
             <div className="flex items-center gap-0 rounded-lg border border-[#2a2a2a] overflow-hidden text-[12px] font-semibold">
               {([
                 { key: "dont-change",  label: "Don't Change" },
@@ -113,7 +113,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
                   type="button"
                   onClick={() => setPrivacy(key)}
                   className={`flex-1 py-2.5 transition-colors cursor-pointer ${
-                    privacy === key ? "bg-white text-black" : "bg-transparent text-[#888] hover:text-white"
+                    privacy === key ? "bg-white-smoke text-chinese-black" : "bg-transparent text-[#888] hover:text-white-smoke"
                   }`}
                 >
                   {label}
@@ -127,16 +127,16 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
             <button
               type="button"
               onClick={() => setAdvancedOpen((v) => !v)}
-              className="flex w-full items-center justify-between px-4 py-3.5 hover:bg-[#1a1a1a] transition-colors cursor-pointer"
+              className="flex w-full items-center justify-between px-4 py-3.5 hover:bg-upload-select transition-colors cursor-pointer"
             >
-              <span className="text-[14px] font-semibold text-white">Advanced settings</span>
+              <span className="text-[14px] font-semibold text-white-smoke">Advanced settings</span>
               <span className="text-[#888] text-[14px]">{advancedOpen ? "∧" : "∨"}</span>
             </button>
             {advancedOpen && (
               <div className="border-t border-[#2a2a2a] px-4 py-4 space-y-5">
                 {/* Enable direct downloads */}
                 <div>
-                  <p className="text-[13px] font-semibold text-white mb-2">Enable direct downloads</p>
+                  <p className="text-[13px] font-semibold text-white-smoke mb-2">Enable direct downloads</p>
                   <div className="flex items-center gap-0 rounded-lg border border-[#2a2a2a] overflow-hidden text-[12px] font-semibold">
                     {([
                       { key: "dont-change", label: "Don't Change" },
@@ -148,7 +148,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
                         type="button"
                         onClick={() => setDownloads(key)}
                         className={`flex-1 py-2 transition-colors cursor-pointer ${
-                          downloads === key ? "bg-white text-black" : "bg-transparent text-[#888] hover:text-white"
+                          downloads === key ? "bg-white-smoke text-chinese-black" : "bg-transparent text-[#888] hover:text-white-smoke"
                         }`}
                       >
                         {label}
@@ -163,7 +163,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
                   { label: "Show track stats to public",            value: showStats,     onChange: setShowStats     },
                 ].map(({ label, value, onChange }) => (
                   <div key={label} className="flex items-center justify-between">
-                    <span className="text-[13px] text-white">{label}</span>
+                    <span className="text-[13px] text-white-smoke">{label}</span>
                     <div className="flex items-center gap-2">
                       <RiLockFill className="text-[#555] text-[13px]" />
                       <Toggle value={value} onChange={onChange} />
@@ -176,10 +176,10 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
         </div>
 
         {/* Footer */}
-        <div className="flex justify-end border-t border-[#2a2a2a] px-6 py-4">
+        <div className="flex justify-end border-t border-[#2a2a2a] px-4 py-4 sm:px-6">
           <button
             type="button"
-            className="rounded-full bg-[#333] px-7 py-2.5 text-[13px] font-bold text-white hover:bg-[#444] transition-colors cursor-pointer"
+            className="rounded-full bg-chinese-black px-7 py-2.5 text-[13px] font-bold text-white-smoke hover:bg-upload-select transition-colors cursor-pointer"
           >
             Apply changes
           </button>

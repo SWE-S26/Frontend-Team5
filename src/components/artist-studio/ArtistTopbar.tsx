@@ -77,14 +77,14 @@ export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
   ];
 
   return (
-    <header className="fixed inset-x-0 top-0 z-200 flex h-13 items-center bg-[#111]">
+    <header className="fixed inset-x-0 top-0 z-200 flex h-13 items-center bg-chinese-black">
 
       {/* Right actions */}
       <div className={`flex flex-1 pt-5 pb-3 items-center justify-end ${isMobile ? "gap-1.5 px-2.5" : "gap-2 px-4"}`}>
         {/* Search */}
         <button
           type="button"
-          className={`flex items-center gap-2 rounded-full border border-[#444] bg-transparent text-[18px] text-white-smoke transition-colors hover:border-[#666] cursor-pointer ${
+          className={`flex items-center gap-2 rounded-full border border-white-smoke bg-transparent text-[18px] text-white-smoke transition-colors hover:border-[#666] cursor-pointer ${
             isMobile ? "px-2.5 py-1.5" : "px-4 py-1.5"
           }`}
           aria-label="Search"
@@ -97,7 +97,7 @@ export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
         <button
           type="button"
           onClick={() => router.push("/upload")}
-          className={`flex items-center gap-2 rounded-full border border-[#444] bg-transparent text-[18px] text-white-smoke transition-colors hover:border-[#666] cursor-pointer ${
+          className={`flex items-center gap-2 rounded-full border border-white-smoke bg-transparent text-[18px] text-white-smoke transition-colors hover:border-[#666] cursor-pointer ${
             isMobile ? "px-2.5 py-1.5" : "px-4 py-1.5"
           }`}
           aria-label="Upload"
@@ -110,7 +110,7 @@ export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
         <button
           type="button"
           onClick={() => router.push("/notifications")}
-          className={`rounded-full border border-[#444] bg-transparent text-[25px] text-white-smoke transition-colors hover:border-[#666] cursor-pointer ${
+          className={`rounded-full border border-white-smoke bg-transparent text-[25px] text-white-smoke transition-colors hover:border-[#666] cursor-pointer ${
             isMobile ? "px-2.5 py-1.5" : "px-3 py-1.5"
           }`}
           aria-label="Notifications"
@@ -122,7 +122,7 @@ export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
         <button
           type="button"
           onClick={() => router.push("/messages")}
-          className={`rounded-full border border-[#444] bg-transparent text-[25px] text-white-smoke transition-colors hover:border-[#666] cursor-pointer ${
+          className={`rounded-full border border-white-smoke bg-transparent text-[25px] text-white-smoke transition-colors hover:border-[#666] cursor-pointer ${
             isMobile ? "px-2.5 py-1.5" : "px-3 py-1.5"
           }`}
           aria-label="Messages"
@@ -135,7 +135,7 @@ export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
             <button
               type="button"
               onClick={toggleMenu}
-              className="h-10 w-10 mt-1 overflow-hidden rounded-full border border-[#444] bg-transparent transition-colors hover:border-[#666] cursor-pointer"
+              className="h-10 w-10 mt-1 overflow-hidden rounded-full border border-white-smoke bg-transparent transition-colors hover:border-[#666] cursor-pointer"
               aria-label="Open profile menu"
             >
               {
@@ -151,7 +151,7 @@ export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
           </button>
 
           {showUserMenu && (
-            <div className="absolute right-0 top-10 z-300 min-w-55 overflow-hidden rounded-lg border border-[#333] bg-[#1e1e1e] shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+            <div className="absolute right-0 top-10 z-300 min-w-55 overflow-hidden rounded-lg border border-[#333] bg-chinese-black shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
               {menuItems.map((item) => (
                 <div key={item.label}>
                   {item.dividerBefore && <div className="my-1 border-t border-[#2e2e2e]" />}

@@ -15,6 +15,7 @@ export default function PlayerController() {
   usePlayerPersistence();
   const dispatch = useDispatch();
   const listenTrackedForCurrentRef = useRef(false);
+  const historyTrackedForCurrentRef = useRef(false);
   const listenTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const { tracks, currentTrackId, currentTrackUrl, isPlaying, volume, loop } =
@@ -39,6 +40,7 @@ export default function PlayerController() {
 
   useEffect(() => {
     listenTrackedForCurrentRef.current = false;
+    historyTrackedForCurrentRef.current = false;
     if (listenTimerRef.current) {
       clearInterval(listenTimerRef.current);
       listenTimerRef.current = null;
@@ -66,6 +68,10 @@ export default function PlayerController() {
         listenTimerRef.current = null;
       }
 
+      if (!historyTrackedForCurrentRef.current) {
+        historyTrackedForCurrentRef.current = true;
+        void tracksService.addTrackToHistory(currentTrackId).catch(() => undefined);
+      }
       void tracksService.incrementPlayCount(currentTrackId).catch(() => undefined);
     }, 1000);
 

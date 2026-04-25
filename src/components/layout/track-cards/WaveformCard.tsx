@@ -24,6 +24,7 @@ import { IoIosMore, IoMdPlay, IoMdPause } from "react-icons/io";
 import { HiHeart, HiOutlinePaperAirplane } from "react-icons/hi";
 import { LuRepeat2, LuShare } from "react-icons/lu";
 import { TbCopy } from "react-icons/tb";
+import { MdOutlineDownloadForOffline } from "react-icons/md";
 import { ListStart } from "lucide-react";
 import { RiPlayListAddLine } from "react-icons/ri";
 import { BiStation } from "react-icons/bi";
@@ -42,6 +43,7 @@ type CardProps = {
   likeCount: number;
   repostCount: number;
   isLikedByUser?: boolean;
+  downloadUrl?: string;
   allTracks?: Track[];
 };
 
@@ -57,6 +59,7 @@ export default function WaveformCard({
   likeCount,
   repostCount,
   isLikedByUser,
+  downloadUrl,
   allTracks,
 }: CardProps) {
   const [showCommentBox, setShowCommentBox] = useState(false);
@@ -200,6 +203,11 @@ export default function WaveformCard({
 
   const transitionConfig: Transition = { duration: 0.25, ease: "easeOut" };
 
+  const handleDownload = () => {
+    if (!downloadUrl) return;
+    window.open(downloadUrl, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <div ref={ref} className="flex items-stretch">
       <div className="h-full overflow-hidden -m-1 -mb-1.75">
@@ -341,6 +349,14 @@ export default function WaveformCard({
               <Button
                 className="bg-off-black mr-4"
                 icon={<TbCopy className="text-xl" />}
+              />
+            </Tooltip>
+            <Tooltip label={downloadUrl ? "Download" : "Download unavailable"}>
+              <Button
+                onClick={handleDownload}
+                disabled={!downloadUrl}
+                className="bg-off-black mr-4 disabled:opacity-40 disabled:cursor-not-allowed"
+                icon={<MdOutlineDownloadForOffline className="text-xl" />}
               />
             </Tooltip>
             <MoreDropdown

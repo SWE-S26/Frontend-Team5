@@ -13,6 +13,8 @@ import {
 	incrementPlayCountResponse,
 	deleteTrackResponse,
 	GetUploadQuotaResponse,
+  GetLikedTracksResponse,
+  AddTrackToHistoryResponse,
 } from "@/types/tracks.types";
 
 export const tracksService = {
@@ -55,6 +57,8 @@ export const tracksService = {
     api.get<GetPostedTracksResponse>(`/api/tracks/v1/posted/${userId}`),
   getTrackById: (id: string) =>
     api.get<GetTrackByIdResponse>(`/api/tracks/v1/${id}`),
+  getLikedTracks: (userId: string) =>
+    api.get<GetLikedTracksResponse>(`/api/public/tracks/v1/liked/${userId}`),
 
   UpdateTrack: (data: UpdateTrackRequest) => {
     const formData = new FormData();
@@ -82,6 +86,8 @@ export const tracksService = {
 
   incrementPlayCount: (id: string) =>
     api.patch<incrementPlayCountResponse>(`/api/tracks/v1/listen/${id}`),
+  addTrackToHistory: (id: string) =>
+    api.post<AddTrackToHistoryResponse>(`/api/tracks/v1/played/${id}`),
 
 	deleteTrack: (id: string) =>
 		api.delete<deleteTrackResponse>(`/api/tracks/v1/${id}`),
