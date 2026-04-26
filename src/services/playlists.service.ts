@@ -3,12 +3,24 @@ import {
   CreatePlaylistRequest,
   CreatePlaylistResponse,
   GetPlaylistsResponse,
+  GetPublicPlaylistsResponse,
+  GetPublicPlaylistByIdResponse,
   GetMyPlaylistsResponse,
   GetPlaylistByIdResponse,
   UpdatePlaylistRequest,
   UpdatePlaylistResponse,
+  UpdatePlaylistImageRequest,
+  UpdatePlaylistImageResponse,
   DeletePlaylistResponse,
   AddTrackToPlaylistResponse,
+  ReorderPlaylistTracksRequest,
+  ReorderPlaylistTracksResponse,
+  GetPlaylistCreatorResponse,
+  GetRecommendedPlaylistsResponse,
+  GetArtistPlaylistsResponse,
+  GetArtistAlbumsResponse,
+  GetPlaylistByPermalinkResponse,
+  AddPlaylistToHistoryResponse,
 } from "@/types/playlists.types";
 
 export const playlistsService = {
@@ -86,5 +98,120 @@ export const playlistsService = {
   addTrackToPlaylist: (playlistId: string, trackId: string) =>
     api.patch<AddTrackToPlaylistResponse>(
       `/api/playlists/v1/${playlistId}/tracks/${trackId}`
+    ),
+
+  // Public (no auth required)
+
+  getPublicPlaylists: (limit?: number, offset?: number) => {
+    const params = new URLSearchParams();
+    if (limit !== undefined) params.append("limit", String(limit));
+    if (offset !== undefined) params.append("offset", String(offset));
+    const query = params.toString();
+    return api.get<GetPublicPlaylistsResponse>(
+      `/api/public/playlists/v1${query ? `?${query}` : ""}`
+    );
+  },
+
+  getPublicPlaylistById: (playlistId: string, limit?: number, offset?: number) => {
+    const params = new URLSearchParams();
+    if (limit !== undefined) params.append("limit", String(limit));
+    if (offset !== undefined) params.append("offset", String(offset));
+    const query = params.toString();
+    return api.get<GetPublicPlaylistByIdResponse>(
+      `/api/public/playlists/v1/${playlistId}${query ? `?${query}` : ""}`
+    );
+  },
+
+  getPublicArtistPlaylists: (artistId: string, limit?: number, offset?: number) => {
+    const params = new URLSearchParams();
+    if (limit !== undefined) params.append("limit", String(limit));
+    if (offset !== undefined) params.append("offset", String(offset));
+    const query = params.toString();
+    return api.get<GetArtistPlaylistsResponse>(
+      `/api/public/playlists/v1/playlists/${artistId}${query ? `?${query}` : ""}`
+    );
+  },
+
+  getPublicPlaylistCreator: (artistId: string) =>
+    api.get<GetPlaylistCreatorResponse>(
+      `/api/public/playlists/v1/creator/${artistId}`
+    ),
+
+  getPublicRecommendedPlaylists: (playlistId: string, artistId: string, limit?: number, offset?: number) => {
+    const params = new URLSearchParams();
+    if (limit !== undefined) params.append("limit", String(limit));
+    if (offset !== undefined) params.append("offset", String(offset));
+    const query = params.toString();
+    return api.get<GetRecommendedPlaylistsResponse>(
+      `/api/public/playlists/v1/${playlistId}/recommend/${artistId}${query ? `?${query}` : ""}`
+    );
+  },
+
+  getArtistAlbums: (artistId: string, limit?: number, offset?: number) => {
+    const params = new URLSearchParams();
+    if (limit !== undefined) params.append("limit", String(limit));
+    if (offset !== undefined) params.append("offset", String(offset));
+    const query = params.toString();
+    return api.get<GetArtistAlbumsResponse>(
+      `/api/public/playlists/v1/creator/${artistId}/albums${query ? `?${query}` : ""}`
+    );
+  },
+
+  getPlaylistByPermalink: (permalink: string, limit?: number, offset?: number) => {
+    const params = new URLSearchParams();
+    if (limit !== undefined) params.append("limit", String(limit));
+    if (offset !== undefined) params.append("offset", String(offset));
+    const query = params.toString();
+    return api.get<GetPlaylistByPermalinkResponse>(
+      `/api/public/playlists/v1/permalink/${permalink}${query ? `?${query}` : ""}`
+    );
+  },
+
+  // Auth required
+
+  getArtistPlaylists: (artistId: string, limit?: number, offset?: number) => {
+    const params = new URLSearchParams();
+    if (limit !== undefined) params.append("limit", String(limit));
+    if (offset !== undefined) params.append("offset", String(offset));
+    const query = params.toString();
+    return api.get<GetArtistPlaylistsResponse>(
+      `/api/playlists/v1/playlists/${artistId}${query ? `?${query}` : ""}`
+    );
+  },
+
+  getPlaylistCreator: (creatorId: string) =>
+    api.get<GetPlaylistCreatorResponse>(
+      `/api/playlists/v1/creator/${creatorId}`
+    ),
+
+  getRecommendedPlaylists: (playlistId: string, creatorId: string, limit?: number, offset?: number) => {
+    const params = new URLSearchParams();
+    if (limit !== undefined) params.append("limit", String(limit));
+    if (offset !== undefined) params.append("offset", String(offset));
+    const query = params.toString();
+    return api.get<GetRecommendedPlaylistsResponse>(
+      `/api/playlists/v1/${playlistId}/recommend/${creatorId}${query ? `?${query}` : ""}`
+    );
+  },
+
+  updatePlaylistImage: (playlistId: string, image: File) => {
+    const formData = new FormData();
+    formData.append("image", image);
+    return api.patch<UpdatePlaylistImageResponse>(
+      `/api/playlists/v1/${playlistId}/image`,
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } }
+    );
+  },
+
+  reorderPlaylistTracks: (playlistId: string, data: ReorderPlaylistTracksRequest) =>
+    api.patch<ReorderPlaylistTracksResponse>(
+      `/api/playlists/v1/${playlistId}/tracks`,
+      data
+    ),
+
+  addPlaylistToHistory: (playlistId: string) =>
+    api.post<AddPlaylistToHistoryResponse>(
+      `/api/v1/playlists/${playlistId}/history`
     ),
 };
