@@ -21,6 +21,8 @@ import { BsExclamationCircle } from "react-icons/bs";
 
 import SharePopup from "@/components/profile/SharePopUp"
 import ProfileEditForm from "@/components/profile/ProfileEditForm"
+import { EditTrackModal } from "@/components/artist-studio/ArtistStudioContent/EditTrackModal"
+import { AddToPlaylistPanel as ArtistStudioAddToPlaylistPanel } from "@/components/artist-studio/ArtistStudioContent/AddToPlaylistPanel"
 
 import TabsNavbar from "@/components/layout/navbar/TabsNavbar"
 import EmptyTab from "@/components/profile/profile-tabs/EmptyTab"
@@ -38,6 +40,7 @@ import { useBlockUser, useUnblockUser } from "@/hooks/useSocial"
 import { setProfile } from "@/store/slices/profileSlice"
 import { useGetLikedTracks, useGetPostedTracks} from "@/hooks/useTracks"
 import { Track } from "@/types/tracks.types"
+import type { ArtistTrackRow } from "@/components/artist-studio/ArtistStudioContent"
 
 interface Props {
   params: { username: string }
@@ -63,6 +66,8 @@ const ProfilePage = ({ params }: Props) => {
   const [openShare,   setOpenShare]   = useState(false)
   const [openMessage, setOpenMessage] = useState(false)
   const [openMoreMenu, setOpenMoreMenu] = useState(false)
+  const [openAddToPlaylist, setOpenAddToPlaylist] = useState(false)
+  const [editingTrack, setEditingTrack] = useState<ArtistTrackRow | null>(null)
   const[OpenReport, setIsOpenReport] = useState(false)
   const [isSpamOpen, setIsSpamOpen] = useState(false)
   const [OpenBlock, setOpenBlock] = useState(false)
@@ -134,7 +139,7 @@ const ProfilePage = ({ params }: Props) => {
     return 0
   }
 
-  const mapTrackToProfileItem = (track: Track, fallbackIndex: number) => {
+  const mapTrackToProfileItem = (track: Track, fallbackIndex: number, canEdit = false) => {
     const stableId = track.trackId ?? track._id ?? `track-${fallbackIndex}`
     return {
       id: stableId,
@@ -152,16 +157,50 @@ const ProfilePage = ({ params }: Props) => {
       isLikedByUser: track.isLikedByUser,
       numPlays: track.numPlays,
       releaseDate: track.releaseDate,
+      canEdit,
     }
   }
 
+  const buildEditTrackRow = (item: {
+    id?: string;
+    trackId?: string;
+    title: string;
+    artist: string;
+    img: string;
+    trackUrl?: string;
+    downloadUrl?: string;
+    duration?: number;
+    numLikes?: number;
+    numReposts?: number;
+    numPlays?: number;
+    releaseDate?: string;
+    canEdit?: boolean;
+  }): ArtistTrackRow => ({
+    id: item.id ?? item.trackId ?? "",
+    title: item.title,
+    label: item.artist,
+    duration: item.duration ? `${Math.floor(item.duration / 60)}:${String(item.duration % 60).padStart(2, "0")}` : "--",
+    date: item.releaseDate ? new Date(item.releaseDate).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" }) : "--",
+    plays: item.numPlays ?? 0,
+    likes: item.numLikes ?? 0,
+    comments: 0,
+    reposts: item.numReposts ?? 0,
+    hd: false,
+    cover: item.img,
+    url: item.trackUrl ?? "",
+    downloadUrl: item.downloadUrl,
+    isPrivate: false,
+    rawDate: item.releaseDate ?? "",
+    rawDuration: item.duration,
+  })
+
   const postedTrackItems = [...(postedTracks ?? [])]
     .sort((a, b) => getTrackSortTime(b) - getTrackSortTime(a))
-    .map((track, index) => mapTrackToProfileItem(track, index))
+    .map((track, index) => mapTrackToProfileItem(track, index, isOwn))
 
   const likedTrackItems = [...(likedTracks ?? [])]
     .sort((a, b) => getTrackSortTime(b) - getTrackSortTime(a))
-    .map((track, index) => mapTrackToProfileItem(track, index + 10000))
+    .map((track, index) => mapTrackToProfileItem(track, index + 10000, false))
 
   const popularTrackItems = useMemo(
     () => [...postedTrackItems].sort((a, b) => (b.numPlays ?? 0) - (a.numPlays ?? 0)),
@@ -182,6 +221,8 @@ const ProfilePage = ({ params }: Props) => {
       return bt - at
     })
   }, [postedTrackItems, likedTrackItems])
+
+  const repostedTrackItems: typeof postedTrackItems = []
 
   const trackCount = postedTrackItems.length
   const hasKnownNoTracks = !isLoading && profileTrackCount <= 0
@@ -361,11 +402,19 @@ const ProfilePage = ({ params }: Props) => {
             {activeTab === "all" && (
               allTabItems.length === 0
                 ? <EmptyTab />
-                : <All items={allTabItems} />
+                : <All
+                    items={allTabItems}
+                    onEditTrack={(item) => setEditingTrack(buildEditTrackRow(item))}
+                    onAddToPlaylist={() => setOpenAddToPlaylist(true)}
+                  />
             )}
 
             {activeTab === "popular-tracks" && (
-              popularTrackItems.length === 0 ? <EmptyTab /> : <PopularTracks items={popularTrackItems} />
+              popularTrackItems.length === 0 ? <EmptyTab /> : <PopularTracks
+                items={popularTrackItems}
+                onEditTrack={(item) => setEditingTrack(buildEditTrackRow(item))}
+                onAddToPlaylist={() => setOpenAddToPlaylist(true)}
+              />
             )}
 
             {activeTab === "tracks" && (
@@ -375,7 +424,11 @@ const ProfilePage = ({ params }: Props) => {
                   ? <Tracks items={[]} isLoading />
                   : postedTrackItems.length === 0
                   ? <EmptyTab />
-                  : <Tracks items={postedTrackItems} />
+                  : <Tracks
+                      items={postedTrackItems}
+                      onEditTrack={(item) => setEditingTrack(buildEditTrackRow(item))}
+                      onAddToPlaylist={() => setOpenAddToPlaylist(true)}
+                    />
             )}
 
             {activeTab === "albums" && (
@@ -393,9 +446,17 @@ const ProfilePage = ({ params }: Props) => {
             )}
 
             {activeTab === "reposts" && (
+              repostedTrackItems.length === 0 ? (
                 <h2 className="font-bold text-lg flex items-center justify-center text-center">
                   You haven't reposted any sounds.
                 </h2>
+              ) : (
+                <Reposts
+                  items={repostedTrackItems}
+                  onEditTrack={(item) => setEditingTrack(buildEditTrackRow(item))}
+                  onAddToPlaylist={() => setOpenAddToPlaylist(true)}
+                />
+              )
             )}
 
           </div>
@@ -405,6 +466,17 @@ const ProfilePage = ({ params }: Props) => {
           <ProfileSideBar />
         </div>
       </div>
+
+      {openAddToPlaylist && (
+        <ArtistStudioAddToPlaylistPanel onClose={() => setOpenAddToPlaylist(false)} />
+      )}
+
+      {editingTrack && (
+        <EditTrackModal
+          track={editingTrack}
+          onClose={() => setEditingTrack(null)}
+        />
+      )}
     </div>
   )
 }

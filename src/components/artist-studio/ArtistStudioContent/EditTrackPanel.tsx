@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { FiDownload } from "react-icons/fi";
 
 import { useGetTrackById, useUpdateTrack } from "@/hooks/useTracks";
+import { useAppSelector } from "@/store/hooks";
 import type { UpdateTrackRequest } from "@/types/tracks.types";
 import type { ArtistTrackRow } from "../ArtistStudioContent";
 
@@ -40,7 +41,7 @@ import { PermissionsSection }    from "@/components/upload/TrackInfoForm/Permiss
 import { LicensingSection }      from "@/components/upload/TrackInfoForm/LicensingSection";
 import { AudioClipSection }      from "@/components/upload/TrackInfoForm/AudioClipSection";
 
-interface EditTrackPanelProps {
+export interface EditTrackPanelProps {
   track: ArtistTrackRow;
   onClose: () => void;
   onSave?: (updated: Partial<ArtistTrackRow>) => void;
@@ -50,6 +51,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   // API hooks
   const { getTrackById, track: fullTrack, loading: loadingTrack } = useGetTrackById();
   const { updateTrack, loading: saving } = useUpdateTrack();
+  const profileLink = useAppSelector((state) => state.auth.profileLink);
 
   // Panel tab state
   const [activeTab, setActiveTab] = useState<"details" | "advanced">("details");
@@ -846,10 +848,10 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-100 bg-chinese-black/40" onClick={onClose} />
+          <div className="fixed inset-0 z-100 bg-chinese-black/40" onClick={onClose} />
 
-      {/* Drawer */}
-      <div className="fixed right-0 top-0 z-110 flex h-full w-full max-w-150 flex-col bg-chinese-black shadow-2xl">
+          {/* Drawer */}
+          <div className="fixed right-0 top-0 z-110 flex h-full w-full max-w-150 flex-col bg-chinese-black shadow-2xl">
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#2a2a2a] px-5 py-3.5">
@@ -863,7 +865,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
             </button>
             <h2 className="text-[15px] font-bold text-white-smoke">Edit Track</h2>
           </div>
-          <div className="flex items-center gap-2">
+          {/* <div className="flex items-center gap-2">
             <button
               type="button"
               className="flex items-center gap-1.5 rounded-md border border-[#333] px-3 py-1.5 text-[12px] text-white-smoke hover:border-[#555] transition-colors cursor-pointer"
@@ -876,7 +878,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
             >
               Replace file
             </button>
-          </div>
+          </div> */}
         </div>
 
         {/* Tabs */}
@@ -931,8 +933,9 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
                     setTrackTitle={setTrackTitle}
                     permalink={permalink}
                     setPermalink={setPermalink}
-                    showPermalink={false}
-                    permalinkReadOnly={true}
+                    permalinkProfileLink={profileLink}
+                    showPermalink={true}
+                    permalinkReadOnly={false}
                     artistName={artistName}
                     setArtistName={setArtistName}
                     genre={genre}
@@ -1102,6 +1105,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
           </div>
         </div>
       </div>
+      
 
       {/* Hidden audio element */}
       {audioUrl && (
