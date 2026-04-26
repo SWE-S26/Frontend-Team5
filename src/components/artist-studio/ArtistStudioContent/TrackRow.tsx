@@ -21,7 +21,6 @@ export function TrackRow({
   onAmplify,
   onContextMenu,
   isDeleting,
-  isArtistPro,
 }: {
   track: ArtistTrackRow;
   isMobile: boolean;
@@ -30,7 +29,6 @@ export function TrackRow({
   onAmplify: (id: string) => void;
   onContextMenu: (id: string, e: React.MouseEvent) => void;
   isDeleting: boolean;
-  isArtistPro: boolean;
 }) {
   const dispatch = useDispatch();
   const { currentTrackId, isPlaying } = useAppSelector((state: RootState) => state.player);
@@ -123,15 +121,13 @@ export function TrackRow({
         </div>
 
         <div className="mt-2.5 flex flex-wrap items-center gap-2">
-          {!isArtistPro && (
-            <button
-              type="button"
-              onClick={() => onAmplify(track.id)}
-              className="inline-flex items-center gap-1 rounded-full bg-linear-to-br from-[#7b4fff] to-[#5533ff] px-3 py-1 text-[11px] font-bold text-white-smoke"
-            >
-              <BsLightningChargeFill /> Amplify
-            </button>
-          )}
+          <button
+            type="button"
+            onClick={() => onAmplify(track.id)}
+            className="inline-flex items-center gap-1 rounded-full bg-linear-to-br from-[#7b4fff] to-[#5533ff] px-3 py-1 text-[11px] font-bold text-white-smoke"
+          >
+            <BsLightningChargeFill /> Amplify
+          </button>
         </div>
       </div>
     );
@@ -166,15 +162,13 @@ export function TrackRow({
       <div className="text-center text-[13px] font-semibold text-white-smoke">{track.plays}</div>
 
       <div className="flex justify-center">
-        {!isArtistPro && (
-          <button
-            type="button"
-            onClick={() => onAmplify(track.id)}
-            className="flex items-center gap-1 rounded-full bg-linear-to-br from-[#7b4fff] to-[#5533ff] px-3 py-1 text-[11px] font-bold text-white-smoke hover:opacity-90 transition-opacity cursor-pointer"
-          >
-            <BsLightningChargeFill /> Amplify
-          </button>
-        )}
+        <button
+          type="button"
+          onClick={() => onAmplify(track.id)}
+          className="flex items-center gap-1 rounded-full bg-linear-to-br from-[#7b4fff] to-[#5533ff] px-3 py-1 text-[11px] font-bold text-white-smoke hover:opacity-90 transition-opacity cursor-pointer"
+        >
+          <BsLightningChargeFill /> Amplify
+        </button>
       </div>
 
       <div className="flex justify-center">

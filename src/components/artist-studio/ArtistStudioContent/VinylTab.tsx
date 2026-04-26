@@ -39,13 +39,15 @@ export function VinylTab({ isArtistPro }: { isArtistPro: boolean }) {
             You and your fans can purchase just one record or a thousand. Either way, you get paid for every sale.
           </p>
           <div className="mt-4 flex flex-col gap-2.5 sm:flex-row sm:gap-3">
-            <button
-              type="button"
-              onClick={() => router.push(isArtistPro ? "/artist" : "/artistpro")}
-              className="rounded-full bg-white px-7 py-2.5 text-[14px] font-bold text-black hover:bg-[#eee] transition-colors"
-            >
-              {isArtistPro ? "Go to Artist Tools" : "Get Artist Pro"}
-            </button>
+            {!isArtistPro && (
+              <button
+                type="button"
+                onClick={() => router.push("/artistpro")}
+                className="rounded-full bg-white px-7 py-2.5 text-[14px] font-bold text-black hover:bg-[#eee] transition-colors"
+              >
+                Get Artist Pro
+              </button>
+            )}
             <button type="button" className="rounded-full border border-[#444] bg-transparent px-7 py-2.5 text-[14px] font-bold text-white-smoke hover:border-[#666] transition-colors">Learn More</button>
           </div>
         </div>

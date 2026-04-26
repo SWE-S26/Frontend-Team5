@@ -25,9 +25,11 @@ import { HiHeart, HiOutlinePaperAirplane } from "react-icons/hi";
 import { LuRepeat2, LuShare } from "react-icons/lu";
 import { TbCopy } from "react-icons/tb";
 import { MdOutlineDownloadForOffline } from "react-icons/md";
+import { FiPlusSquare } from "react-icons/fi";
 import { ListStart } from "lucide-react";
 import { RiPlayListAddLine } from "react-icons/ri";
 import { BiStation } from "react-icons/bi";
+import { PiPencilSimple } from "react-icons/pi";
 
 import { RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -44,6 +46,9 @@ type CardProps = {
   repostCount: number;
   isLikedByUser?: boolean;
   downloadUrl?: string;
+  canEdit?: boolean;
+  onEdit?: () => void;
+  onAddToPlaylist?: () => void;
   allTracks?: Track[];
 };
 
@@ -60,6 +65,9 @@ export default function WaveformCard({
   repostCount,
   isLikedByUser,
   downloadUrl,
+  canEdit = false,
+  onEdit,
+  onAddToPlaylist,
   allTracks,
 }: CardProps) {
   const [showCommentBox, setShowCommentBox] = useState(false);
@@ -351,14 +359,33 @@ export default function WaveformCard({
                 icon={<TbCopy className="text-xl" />}
               />
             </Tooltip>
-            <Tooltip label={downloadUrl ? "Download" : "Download unavailable"}>
-              <Button
-                onClick={handleDownload}
-                disabled={!downloadUrl}
-                className="bg-off-black mr-4 disabled:opacity-40 disabled:cursor-not-allowed"
-                icon={<MdOutlineDownloadForOffline className="text-xl" />}
-              />
-            </Tooltip>
+            {onAddToPlaylist && canEdit && (
+              <Tooltip label="Add to playlist">
+                <Button
+                  onClick={onAddToPlaylist}
+                  className="bg-off-black mr-4"
+                  icon={<FiPlusSquare className="text-xl" />}
+                />
+              </Tooltip>
+            )}
+            {onEdit && canEdit && (
+              <Tooltip label="Edit track">
+                <Button
+                  onClick={onEdit}
+                  className="bg-off-black mr-4"
+                  icon={<PiPencilSimple className="text-xl" />}
+                />
+              </Tooltip>
+            )}
+            {downloadUrl && (
+              <Tooltip label="Download">
+                <Button
+                  onClick={handleDownload}
+                  className="bg-off-black mr-4"
+                  icon={<MdOutlineDownloadForOffline className="text-xl" />}
+                />
+              </Tooltip>
+            )}
             <MoreDropdown
               trigger={
                 <Button

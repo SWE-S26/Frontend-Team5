@@ -34,6 +34,7 @@ interface BasicInfoFormProps {
 	setTrackTitle: (value: string) => void;
 	permalink: string;
 	setPermalink: (value: string) => void;
+	permalinkProfileLink?: string | null;
 	showPermalink?: boolean;
 	permalinkReadOnly?: boolean;
 	artistName: string;
@@ -76,6 +77,7 @@ export function BasicInfoForm({
 	setTrackTitle,
 	permalink,
 	setPermalink,
+	permalinkProfileLink,
 	showPermalink = true,
 	permalinkReadOnly = false,
 	artistName,
@@ -110,11 +112,23 @@ export function BasicInfoForm({
 		.replace(/^https?:\/\/beatza\.me\//i, "")
 		.replace(/^beatza\.me\//i, "")
 		.replace(/^\/+/, "");
+	const normalizedProvidedProfileLink = (permalinkProfileLink ?? "")
+		.trim()
+		.replace(/^https?:\/\/beatza\.me\//i, "")
+		.replace(/^beatza\.me\//i, "")
+		.replace(/^\/+|\/+$/g, "");
 	const [profileLinkPart, ...restParts] = strippedPermalink.split("/").filter(Boolean);
-	const permalinkPrefix = profileLinkPart
-		? `https://beatza.me/${profileLinkPart}/`
-		: "https://beatza.me/";
-	const permalinkSuffix = restParts.join("/");
+	const permalinkPrefix = normalizedProvidedProfileLink
+		? `https://beatza.me/${normalizedProvidedProfileLink}/`
+		: profileLinkPart
+			? `https://beatza.me/${profileLinkPart}/`
+			: "https://beatza.me/";
+
+	const permalinkSuffix = normalizedProvidedProfileLink
+		? strippedPermalink.toLowerCase().startsWith(`${normalizedProvidedProfileLink.toLowerCase()}/`)
+			? strippedPermalink.slice(normalizedProvidedProfileLink.length + 1)
+			: (strippedPermalink.split("/").filter(Boolean).pop() ?? "")
+		: restParts.join("/");
 
 	return (
 		<div className="space-y-6 lg:col-span-8">
