@@ -42,29 +42,19 @@ function TracksTableHeader({ onSelectAll, allSelected }: { onSelectAll: (v: bool
   );
 }
 
-function TracksActionBar({ onUpload, onDistribute, onMonetize, onMaster, isArtistPro }: {
+function TracksActionBar({ onUpload, onDistribute, onMonetize, onMaster }: {
   onUpload: () => void;
   onDistribute: () => void;
   onMonetize: () => void;
   onMaster: () => void;
-  isArtistPro: boolean;
 }) {
   const btnClass = "flex w-full items-center justify-center gap-2 rounded-md border border-[#3a3a3a] bg-transparent px-3 py-2 text-[13px] font-semibold text-white-smoke transition-colors hover:border-[#555] cursor-pointer sm:w-auto sm:justify-start sm:px-5 sm:py-3 sm:text-[15px] lg:text-[18px]";
   return (
     <div className="grid grid-cols-1 gap-2.5 sm:flex sm:flex-wrap sm:gap-3">
       <button type="button" onClick={onUpload}     className={btnClass}><span>+ Upload or drop tracks</span></button>
-      {!isArtistPro ? (
-        <>
-          <button type="button" onClick={onDistribute} className={btnClass}><IoIosGlobe /><span>Distribute tracks</span></button>
-          <button type="button" onClick={onMonetize}   className={btnClass}><RiMoneyDollarCircleLine /><span>Monetize tracks</span></button>
-          <button type="button" onClick={onMaster}     className={btnClass}><ImEqualizer2 /><span>Master track audio</span></button>
-        </>
-      ) : (
-        <div className="flex w-full items-center justify-between rounded-md border border-[#2a2a2a] bg-chinese-black px-4 py-3 text-[13px] font-semibold text-white-smoke sm:w-auto sm:justify-start sm:gap-3">
-          <span>Artist Pro active</span>
-          <span className="rounded-full bg-[#1db954] px-2.5 py-1 text-[11px] font-bold text-chinese-black">PRO</span>
-        </div>
-      )}
+      <button type="button" onClick={onDistribute} className={btnClass}><IoIosGlobe /><span>Distribute tracks</span></button>
+      <button type="button" onClick={onMonetize}   className={btnClass}><RiMoneyDollarCircleLine /><span>Monetize tracks</span></button>
+      <button type="button" onClick={onMaster}     className={btnClass}><ImEqualizer2 /><span>Master track audio</span></button>
     </div>
   );
 }
@@ -348,6 +338,12 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
     }
   };
 
+  const handleDownload = (id: string) => {
+    const row = rows.find((r) => r.id === id);
+    if (!row?.downloadUrl) return;
+    window.open(row.downloadUrl, "_blank", "noopener,noreferrer");
+  };
+
   return (
     <div className="space-y-4">
       <TracksActionBar
@@ -355,7 +351,6 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
         onDistribute={ () => router.push("/artistpro")}
         onMonetize={   () => router.push("/artistpro")}
         onMaster={     () => router.push("/upload")}
-        isArtistPro={isArtistPro}
       />
       <TracksFilterBar
         isMobile={isMobile}
@@ -428,10 +423,9 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
             isMobile={isMobile}
             isSelected={selectedIds.has(track.id)}
             onSelect={toggleSelect}
-            onAmplify={() => setAmplifyOpen(true)}
+            onAmplify={() => { if (!isArtistPro) setAmplifyOpen(true); }}
             onContextMenu={openContextMenu}
             isDeleting={deletingId === track.id}
-            isArtistPro={isArtistPro}
           />
         ))}
       </div>
@@ -439,15 +433,9 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
         <div className="px-3 py-2 text-[13px] text-red-400">{errorDelete}</div>
       )}
 
-      {isArtistPro ? (
-        <div className="mt-8 rounded-lg border border-[#2a2a2a] bg-chinese-black p-5 text-center text-[14px] font-semibold text-white-smoke">
-          Artist Pro active. Pro-only artist tools are already unlocked.
-        </div>
-      ) : (
-        <ArtistProBenefits />
-      )}
+      <ArtistProBenefits />
 
-      {amplifyOpen && (
+      {amplifyOpen && !isArtistPro && (
         <AmplifyModal onClose={() => setAmplifyOpen(false)} onUnlock={() => router.push("/artistpro")} />
       )}
       {contextMenu && (
@@ -457,6 +445,8 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
           onClose={() => setContextMenu(null)}
           onEdit={(id) => setEditTrackId(id)}
           onAddToPlaylist={() => setAddToPlaylistOpen(true)}
+          onDownload={handleDownload}
+          canDownload={Boolean(rows.find((r) => r.id === contextMenu.id)?.downloadUrl)}
           onDelete={(id) => { void handleDelete(id); }}
           isArtistPro={isArtistPro}
         />

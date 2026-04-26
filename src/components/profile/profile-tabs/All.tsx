@@ -9,10 +9,10 @@ import Button from "@/components/ui/Button";
 import WaveformCard from "@/components/layout/track-cards/WaveformCard"
 
 
-interface Item { id: string; trackId?: string; title: string; artist: string; img: string; trackUrl?: string; duration?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean }
-interface Props { items: Item[] }
+interface Item { id: string; trackId?: string; title: string; artist: string; img: string; trackUrl?: string; downloadUrl?: string; duration?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean }
+interface Props { items: Item[]; onEditTrack?: (item: Item) => void; onAddToPlaylist?: (item: Item) => void }
 
-export default function All({ items }: Props) {
+export default function All({ items, onEditTrack, onAddToPlaylist }: Props) {
   const router = useRouter()
   return (
     <>
@@ -26,10 +26,14 @@ export default function All({ items }: Props) {
           artist={item.artist}
           trackId={item.trackId ?? item.id}
           trackUrl={item.trackUrl}
+          downloadUrl={item.downloadUrl}
           duration={item.duration}
           likeCount={item.numLikes ?? 0}
           repostCount={item.numReposts ?? 0}
           isLikedByUser={item.isLikedByUser}
+          canEdit={item.canEdit}
+          onEdit={onEditTrack ? () => onEditTrack(item) : undefined}
+          onAddToPlaylist={onAddToPlaylist ? () => onAddToPlaylist(item) : undefined}
         />
       ))}
     </div>

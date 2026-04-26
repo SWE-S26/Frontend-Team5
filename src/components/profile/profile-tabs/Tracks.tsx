@@ -1,9 +1,9 @@
 import WaveformCard from "@/components/layout/track-cards/WaveformCard"
 
-interface Item { img: string; title: string; artist: string; trackId: string; trackUrl?: string; downloadUrl?: string; duration?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean }
-interface Props { items: Item[]; isLoading?: boolean }
+interface Item { img: string; title: string; artist: string; trackId: string; trackUrl?: string; downloadUrl?: string; duration?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean }
+interface Props { items: Item[]; isLoading?: boolean; onEditTrack?: (item: Item) => void; onAddToPlaylist?: (item: Item) => void }
 
-export default function Tracks({ items, isLoading = false }: Props) {
+export default function Tracks({ items, isLoading = false, onEditTrack, onAddToPlaylist }: Props) {
    const loadingRows = Array.from({ length: 4 })
 
    return (
@@ -38,6 +38,9 @@ export default function Tracks({ items, isLoading = false }: Props) {
                    likeCount={item.numLikes ?? 0}
                    repostCount={item.numReposts ?? 0}
                    isLikedByUser={item.isLikedByUser}
+                   canEdit={item.canEdit}
+                   onEdit={onEditTrack ? () => onEditTrack(item) : undefined}
+                   onAddToPlaylist={onAddToPlaylist ? () => onAddToPlaylist(item) : undefined}
                  />
                ))}
          </div>

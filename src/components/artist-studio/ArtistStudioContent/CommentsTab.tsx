@@ -26,13 +26,15 @@ export function CommentsTab({ isArtistPro }: { isArtistPro: boolean }) {
             With Artist Pro, you get access to Comments Hub which brings together every comment across all of your tracks,
             so you can easily see what fans are saying about you. Read, moderate and respond to your comments, all in one place.
           </p>
-          <button
-            type="button"
-            onClick={() => router.push(isArtistPro ? "/artist" : "/artistpro")}
-            className="mt-6 rounded-full bg-white-smoke px-7 py-2.5 text-[14px] font-bold text-chinese-black hover:bg-upload-select transition-colors"
-          >
-            {isArtistPro ? "Go to Artist Tools" : "Get Artist Pro"}
-          </button>
+          {!isArtistPro && (
+            <button
+              type="button"
+              onClick={() => router.push("/artistpro")}
+              className="mt-6 rounded-full bg-white-smoke px-7 py-2.5 text-[14px] font-bold text-chinese-black hover:bg-upload-select transition-colors"
+            >
+              Get Artist Pro
+            </button>
+          )}
         </div>
         <div className="relative flex w-full flex-col items-end gap-3 lg:h-56 lg:block">
           <CommentBubble text="Addicted 😍"           rightOffset={0}  topOffset={0} />

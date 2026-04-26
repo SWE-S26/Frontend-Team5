@@ -23,14 +23,6 @@ function DistributionHowItWorksStep({ num, title, body }: { num: string; title: 
 export function DistributionTab({ isArtistPro }: { isArtistPro: boolean }) {
   const router = useRouter();
 
-  if (isArtistPro) {
-    return (
-      <div className="rounded-lg border border-[#2a2a2a] bg-chinese-black p-5 text-center text-[14px] font-semibold text-white-smoke">
-        Artist Pro active. Distribution tools are already unlocked.
-      </div>
-    );
-  }
-
   return (
     <div className="space-y-8 sm:space-y-10">
       <div className="flex flex-col gap-6 border-b border-[#262626] pb-8 lg:flex-row lg:items-center lg:justify-between">
@@ -41,9 +33,11 @@ export function DistributionTab({ isArtistPro }: { isArtistPro: boolean }) {
           <p className="mt-3 text-[14px] leading-relaxed text-[#aaa]">
             As an Artist Pro subscriber, you get unlimited music distribution to all the major streaming platforms like Spotify, YouTube Music, Apple Music, TIDAL, and more all around the world.
           </p>
-          <button type="button" onClick={() => router.push("/artistpro")} className="mt-4 rounded-full bg-white-smoke px-7 py-2.5 text-[14px] font-bold text-chinese-black hover:bg-[#eee] transition-colors">
-            Get Artist Pro
-          </button>
+          {!isArtistPro && (
+            <button type="button" onClick={() => router.push("/artistpro")} className="mt-4 rounded-full bg-white-smoke px-7 py-2.5 text-[14px] font-bold text-chinese-black hover:bg-[#eee] transition-colors">
+              Get Artist Pro
+            </button>
+          )}
         </div>
         <div className="hidden lg:flex shrink-0">
           <div className="relative h-52 w-50">
