@@ -1,6 +1,6 @@
 import { Track } from "@/types/tracks.types";
 
-// ======================== Playlist Entity ========================
+// Playlist Entity
 
 export interface PlaylistImage {
   imgLink: string;
@@ -77,7 +77,7 @@ export interface PlaylistDetail extends Playlist {
   tracks: PlaylistTrack[];
 }
 
-// ======================== Request Types ========================
+// Request Types
 
 export interface CreatePlaylistRequest {
   playlistName: string;
@@ -104,7 +104,7 @@ export interface UpdatePlaylistRequest {
   image?: File;
 }
 
-// ======================== Response Types ========================
+// Response Types
 
 export interface ValidationError {
   field: string;
@@ -154,4 +154,107 @@ export interface DeletePlaylistResponse {
 
 export interface AddTrackToPlaylistResponse {
   message: string;
+}
+
+// Creator / Artist
+
+export interface PlaylistCreatorInfo {
+  displayName: string;
+  profileLink: string;
+  profileImage: {
+    imgLink: string;
+    publicId: string;
+  };
+  followersCount: number;
+  isFollowed: boolean;
+}
+
+export interface GetPlaylistCreatorResponse {
+  message: string;
+  data: {
+    artist: PlaylistCreatorInfo | PlaylistCreatorInfo[];
+  };
+}
+
+// Recommended Playlists
+
+export interface GetRecommendedPlaylistsResponse {
+  message: string;
+  data: {
+    playlists: Playlist[];
+  };
+}
+
+// Artist Playlists
+
+export interface GetArtistPlaylistsResponse {
+  message: string;
+  data: {
+    playlists: Playlist[];
+  };
+}
+
+// Albums
+
+export interface GetArtistAlbumsResponse {
+  message: string;
+  data: {
+    playlists: Playlist[];
+  };
+}
+
+// Permalink
+
+export interface GetPlaylistByPermalinkResponse {
+  message: string;
+  data: {
+    playlists: PlaylistDetail[];
+  };
+}
+
+// Update Image
+
+export interface UpdatePlaylistImageRequest {
+  image: File;
+}
+
+export interface UpdatePlaylistImageResponse {
+  message: string;
+  data: {
+    playlist: Playlist;
+  };
+}
+
+// Reorder Tracks
+
+export interface ReorderPlaylistTracksRequest {
+  trackId: string;
+  oldPosition: number;
+  newPosition: number;
+}
+
+export interface ReorderPlaylistTracksResponse {
+  message: string;
+}
+
+// History
+
+export interface AddPlaylistToHistoryResponse {
+  message: string;
+}
+
+// Public Playlists
+
+export interface GetPublicPlaylistsResponse {
+  message: string;
+  data: {
+    playlists: Playlist[];
+  };
+}
+
+export interface GetPublicPlaylistByIdResponse {
+  message: string;
+  data: {
+    playlist: PlaylistDetail[] | PlaylistDetail | null;
+  };
 }
