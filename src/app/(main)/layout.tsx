@@ -1,8 +1,22 @@
+"use client";
 import AuthGuard from "@/components/layout/AuthGuard";
 import Navbar from "@/components/layout/navbar/main-navbar/Navbar";
 import PlayerBar from "@/components/layout/player/PlayerBar";
+import NotificationToast from "@/components/notifications/NotificationToast";
+import { useSocket } from "@/hooks/useSocket";
+import { toastBus } from "@/lib/sockets/toastBus";
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
+
+  useSocket({
+    onNotification: (data) => {
+      toastBus.emit(data);
+    },
+    onMessage: (data) => {
+      console.log("💬 message received:", data);
+    },
+  });
+
   return (
     <div>
       <AuthGuard>
@@ -11,6 +25,7 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
           <div className="w-full max-w-302">{children}</div>
         </main>
         <PlayerBar />
+        <NotificationToast />
       </AuthGuard>
     </div>
   );

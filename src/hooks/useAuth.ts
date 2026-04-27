@@ -3,6 +3,7 @@ import { authService } from "@/services/auth.service"
 import { useAppDispatch } from "@/store/hooks"
 import { setAuth, clearAuth, setProfileImgLink, setBannerImgLink, setDisplayName } from "@/store/slices/authSlice"
 import { RefreshTokenResponse } from "@/types/auth.types"
+import { setSocketToken, disconnectSocket } from "@/lib/sockets/socket"
 
 type AuthUserShape = {
   id?: string
@@ -81,6 +82,12 @@ export function useLogin() {
     try {
       const res = await authService.login({ email, password })
       setSuccess(res.data.success ?? true)
+
+      //after a successful login open a socket connection
+      if (res.data.data?.accessToken) {
+        setSocketToken(res.data.data.accessToken)
+        sessionStorage.setItem("_bzt", res.data.data.accessToken);
+      }
 
       // sync whatever user data the login response includes
       syncAuthUser(extractAuthUser(res.data), dispatch)
@@ -209,6 +216,8 @@ export function useLogout() {
 
       // single dispatch clears everything — replaces the 4 separate authStore calls
       dispatch(clearAuth())
+      sessionStorage.removeItem("_bzt");
+      disconnectSocket()
 
       return res.data
     } catch (err: any) {

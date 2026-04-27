@@ -59,6 +59,8 @@ export interface RefreshTokenResponse {
           usedSeconds: number
         }
       }
+      accessToken:  string
+      refreshToken: string
     }
   }
 }
@@ -84,7 +86,9 @@ export interface LoginRequest {
 export interface LoginResponse {
   success: boolean;
   message: string;
-  data: {};
+  data: {
+    accessToken?: string;
+  };
 }
 
 /* (3) "/api/auth/v1/signup" */
