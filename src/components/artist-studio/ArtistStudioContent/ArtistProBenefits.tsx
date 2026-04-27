@@ -52,7 +52,7 @@ function BenefitCard({
   );
 }
 
-export function ArtistProBenefits() {
+export function ArtistProBenefits({ isArtistPro = false }: { isArtistPro?: boolean }) {
   return (
     <div className="mt-8 rounded-lg border border-[#2a2a2a] bg-chinese-black p-4 sm:p-5">
       <div className="mb-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
@@ -61,6 +61,11 @@ export function ArtistProBenefits() {
           <p className="mt-1 text-[13px] text-[#888]">
             Jump start your music career with Artist Pro and immediately unlock $100+ in premium music tools and services.
           </p>
+          {isArtistPro && (
+            <p className="mt-3 inline-flex w-fit rounded-full border border-[#2f6f4f] bg-[#0f2a1e] px-3 py-1 text-[11px] font-semibold text-[#8ad8a8]">
+              You're on Artist Pro
+            </p>
+          )}
         </div>
         <button type="button" className="w-full shrink-0 rounded-full border border-white px-5 py-2 text-[13px] font-bold text-white-smoke hover:bg-white hover:text-black transition-colors sm:w-auto">
           See all
