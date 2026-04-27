@@ -353,7 +353,7 @@ export function PrettyRadio({
       role="radio"
       aria-checked={checked}
       onClick={onSelect}
-      className="mt-0.5 flex h-4.5 w-4.5 items-center justify-center cursor-pointer"
+      className="relative mt-0.5 flex h-4.5 w-4.5 items-center justify-center cursor-pointer"
     >
       <Circle className={`h-4.5 w-4.5 ${checked ? "text-white-smoke" : "text-[#7a7a7a]"}`} strokeWidth={2.2} />
       {checked && <span className="absolute h-2 w-2 rounded-full bg-white-smoke" />}
