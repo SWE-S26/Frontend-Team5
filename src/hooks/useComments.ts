@@ -1,14 +1,5 @@
 import { useState } from "react";
-import { useAppDispatch, useAppSelector } from "@/store/hooks";
-import {
-  setLoading,
-  setError,
-  setComments,
-  appendComments,
-  addComment,
-  removeComment,
-  updateCommentLike,
-} from "@/store/slices/commentSlice";
+
 import {
   fetchTrackComments,
   fetchCommentReplies,
@@ -20,95 +11,7 @@ import {
 } from "@/services/comment.service";
 import { PostCommentPayload, TrackComment } from "@/types/comments.types";
 
-export const useComments = () => {
-  const dispatch = useAppDispatch();
-  const { comments, total, offset, limit, loading, error } = useAppSelector(
-    (s) => s.comments,
-  );
 
-  const loadComments = async (trackId: string, reset = true) => {
-    try {
-      dispatch(setLoading(true));
-      const currentOffset = reset ? 1 : offset;
-      const res = await fetchTrackComments(trackId, currentOffset, limit);
-      if (reset) {
-        dispatch(
-          setComments({
-            comments: res.comments,
-            total: res.total,
-            offset: res.offset,
-          }),
-        );
-      } else {
-        dispatch(
-          appendComments({
-            comments: res.comments,
-            total: res.total,
-            offset: res.offset,
-          }),
-        );
-      }
-    } catch (err: any) {
-      dispatch(setError(err.message));
-    } finally {
-      dispatch(setLoading(false));
-    }
-  };
-
-  const loadMore = (trackId: string) => {
-    loadComments(trackId, false);
-  };
-
-  const submitComment = async (
-    trackId: string,
-    payload: PostCommentPayload,
-  ) => {
-    try {
-      const comment = await postComment(trackId, payload);
-      dispatch(addComment(comment)); // ← fixed: was TrackComment
-      return comment;
-    } catch (err: any) {
-      dispatch(setError(err.message));
-    }
-  };
-
-  const toggleLike = async (commentId: string) => {
-    try {
-      const res = await likeComment(commentId);
-      dispatch(
-        updateCommentLike({
-          commentId,
-          liked: res.liked,
-          numLikes: res.numLikes,
-        }),
-      );
-    } catch (err: any) {
-      dispatch(setError(err.message));
-    }
-  };
-
-  const removeCommentById = async (commentId: string) => {
-    try {
-      await deleteComment(commentId);
-      dispatch(removeComment(commentId));
-    } catch (err: any) {
-      dispatch(setError(err.message));
-    }
-  };
-
-  return {
-    comments,
-    total,
-    loading,
-    error,
-    hasMore: comments.length < total,
-    loadComments,
-    loadMore,
-    submitComment,
-    toggleLike,
-    removeCommentById,
-  };
-};
 
 export const useStatelessComments = () => {
   const [comments, setComments] = useState<TrackComment[]>([]);
@@ -164,6 +67,21 @@ export const useStatelessComments = () => {
     }
   };
 
+  const toggleLike = async (commentId: string) => {
+    try {
+      const res = await likeComment(commentId);
+      setComments((prev) =>
+        prev.map((c) =>
+          c.commentId === commentId
+            ? { ...c, isLikedByUser: res.liked, numLikes: res.numLikes }
+            : c,
+        ),
+      );
+    } catch (err: any) {
+      setError(err.message);
+    }
+  };
+
   return {
     comments,
     total,
@@ -173,6 +91,7 @@ export const useStatelessComments = () => {
     loadComments,
     loadMore,
     submitComment,
+    toggleLike,
   };
 };
 
