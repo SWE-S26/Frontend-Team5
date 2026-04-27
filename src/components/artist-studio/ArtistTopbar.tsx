@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { HiOutlineMenuAlt2 } from "react-icons/hi";
 import { FiMail } from "react-icons/fi";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { LuSearch } from "react-icons/lu";
@@ -13,6 +14,7 @@ import { useAppSelector } from "@/store/hooks";
 
 type TopbarProps = {
   onMenuOpenChange?: (open: boolean) => void;
+  onSidebarToggle?: () => void;
 };
 
 type ProfileMenuItem = {
@@ -22,7 +24,7 @@ type ProfileMenuItem = {
   dividerBefore?: boolean;
 };
 
-export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
+export default function ArtistTopbar({ onMenuOpenChange, onSidebarToggle }: TopbarProps) {
   const router = useRouter();
   const { logout, success } = useLogout();
 
@@ -30,16 +32,8 @@ export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
 
   const [showUserMenu, setShowUserMenu] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
 
   const menuRef = useRef<HTMLDivElement>(null);
-
-  useEffect(() => {
-    const updateIsMobile = () => setIsMobile(window.innerWidth < 1024);
-    updateIsMobile();
-    window.addEventListener("resize", updateIsMobile);
-    return () => window.removeEventListener("resize", updateIsMobile);
-  }, []);
 
   useEffect(() => {
     if (success) router.push("/");
@@ -78,41 +72,44 @@ export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
 
   return (
     <header className="fixed inset-x-0 top-0 z-200 flex h-13 items-center bg-chinese-black">
+      <div className="flex flex-1 items-center justify-between gap-2 px-3 pt-4 pb-3 sm:px-4 lg:justify-end lg:gap-2 lg:px-4">
+        <button
+          type="button"
+          onClick={onSidebarToggle}
+          className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white-smoke bg-transparent text-[22px] text-white-smoke transition-colors hover:border-[#666] lg:hidden cursor-pointer"
+          aria-label="Open artist menu"
+        >
+          <HiOutlineMenuAlt2 />
+        </button>
 
-      {/* Right actions */}
-      <div className={`flex flex-1 pt-5 pb-3 items-center justify-end ${isMobile ? "gap-1.5 px-2.5" : "gap-2 px-4"}`}>
+        {/* Right actions */}
+        <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-2">
         {/* Search */}
         <button
           type="button"
-          className={`flex items-center gap-2 rounded-full border border-white-smoke bg-transparent text-[18px] text-white-smoke transition-colors hover:border-[#666] cursor-pointer ${
-            isMobile ? "px-2.5 py-1.5" : "px-4 py-1.5"
-          }`}
+          className="flex items-center gap-2 rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[18px] text-white-smoke transition-colors hover:border-[#666] sm:px-4 cursor-pointer"
           aria-label="Search"
         >
           <LuSearch className="text-[25px]" />
-          {!isMobile && <span>Search</span>}
+          <span className="hidden sm:inline">Search</span>
         </button>
 
         {/* Upload */}
         <button
           type="button"
           onClick={() => router.push("/upload")}
-          className={`flex items-center gap-2 rounded-full border border-white-smoke bg-transparent text-[18px] text-white-smoke transition-colors hover:border-[#666] cursor-pointer ${
-            isMobile ? "px-2.5 py-1.5" : "px-4 py-1.5"
-          }`}
+          className="flex items-center gap-2 rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[18px] text-white-smoke transition-colors hover:border-[#666] sm:px-4 cursor-pointer"
           aria-label="Upload"
         >
           <IoCloudUploadOutline className="text-[25px]" />
-          {!isMobile && <span>Upload</span>}
+          <span className="hidden sm:inline">Upload</span>
         </button>
 
         {/* Notifications */}
         <button
           type="button"
           onClick={() => router.push("/notifications")}
-          className={`rounded-full border border-white-smoke bg-transparent text-[25px] text-white-smoke transition-colors hover:border-[#666] cursor-pointer ${
-            isMobile ? "px-2.5 py-1.5" : "px-3 py-1.5"
-          }`}
+          className="rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[25px] text-white-smoke transition-colors hover:border-[#666] sm:px-3 cursor-pointer"
           aria-label="Notifications"
         >
           <SlBell />
@@ -122,9 +119,7 @@ export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
         <button
           type="button"
           onClick={() => router.push("/messages")}
-          className={`rounded-full border border-white-smoke bg-transparent text-[25px] text-white-smoke transition-colors hover:border-[#666] cursor-pointer ${
-            isMobile ? "px-2.5 py-1.5" : "px-3 py-1.5"
-          }`}
+          className="rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[25px] text-white-smoke transition-colors hover:border-[#666] sm:px-3 cursor-pointer"
           aria-label="Messages"
         >
           <FiMail />
@@ -132,14 +127,13 @@ export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
 
         {/* Profile menu */}
         <div ref={menuRef} className="relative">
-            <button
-              type="button"
-              onClick={toggleMenu}
-              className="h-10 w-10 mt-1 overflow-hidden rounded-full border border-white-smoke bg-transparent transition-colors hover:border-[#666] cursor-pointer"
-              aria-label="Open profile menu"
-            >
-              {
-              profileImgLink && (
+          <button
+            type="button"
+            onClick={toggleMenu}
+            className="mt-1 h-10 w-10 overflow-hidden rounded-full border border-white-smoke bg-transparent transition-colors hover:border-[#666] cursor-pointer"
+            aria-label="Open profile menu"
+          >
+            {profileImgLink && (
               <ProfileImage
                 src={profileImgLink}
                 alt="Profile"
@@ -147,7 +141,7 @@ export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
                 height={32}
                 className="h-10 w-10 object-cover"
               />
-          )}
+            )}
           </button>
 
           {showUserMenu && (
@@ -166,6 +160,7 @@ export default function ArtistTopbar({ onMenuOpenChange }: TopbarProps) {
               ))}
             </div>
           )}
+        </div>
         </div>
       </div>
     </header>

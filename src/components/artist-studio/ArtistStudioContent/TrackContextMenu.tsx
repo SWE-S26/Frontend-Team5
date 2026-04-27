@@ -40,7 +40,9 @@ export function TrackContextMenu({
     { icon: FiSliders,    label: "Master",          action: onClose },
     { icon: FiGlobe,      label: "Distribute",      action: onClose },
     { icon: FiBarChart2,  label: "Track insights",  action: onClose },
-    { icon: FiDownload,   label: "Download file",    action: () => { if (canDownload) onDownload(trackId); onClose(); }, disabled: !canDownload },
+    ...(isArtistPro
+      ? [{ icon: FiDownload, label: "Download file", action: () => { if (canDownload) onDownload(trackId); onClose(); }, disabled: !canDownload }]
+      : []),
     { icon: FiLink,       label: "Copy link",        action: onClose },
     { icon: FiTrash2,     label: "Delete track",     action: () => { onDelete(trackId); onClose(); }, danger: true },
   ];

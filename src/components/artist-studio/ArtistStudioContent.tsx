@@ -256,7 +256,7 @@ export default function ArtistStudioContent({ activeTab, onChangeTab }: ArtistSt
         usagePercent={usagePercent}
         isArtistPro={isArtistPro}
       />
-      <ArtistStudioHeader stats={stats} />
+      <ArtistStudioHeader stats={stats} isArtistPro={isArtistPro} />
       <TabBar activeTab={activeTab} onChangeTab={onChangeTab} />
       <div className="py-5">
         {activeTab === "tracks"       && <TracksTab isMobile={isMobile} isArtistPro={isArtistPro} />}

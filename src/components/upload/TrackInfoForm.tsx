@@ -985,7 +985,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         isPrivate: !isPublic,
       },
       permissions: {
-        enableDirectDownload: enableDownloads,
+        enableDirectDownload: isArtistPro ? enableDownloads : false,
         offlineListening,
         includeInRssFeed: includeRssFeed,
         displayedEmbedCode: displayEmbedCode,
