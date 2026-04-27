@@ -2,8 +2,8 @@
 import { useState } from "react"
 import { useFollowUser } from "@/hooks/useSocial"
 import { useUnfollowUser } from "@/hooks/useSocial"
-import { useAppDispatch } from '@/store/hooks'
-import {decrementFollowedCount, incrementFollowedCount } from '@/store/slices/profileSlice'
+import { useAppDispatch, useAppSelector } from '@/store/hooks'
+import { decrementFollowedCount, incrementFollowedCount } from '@/store/slices/profileSlice'
 
 interface FollowButtonProps {
     userId?:             string
@@ -17,6 +17,7 @@ const FollowButton = ({ userId, initialIsFollowing = false, onUnfollow }: Follow
     const { unfollowUser, loading: unfollowLoading } = useUnfollowUser()
     const isLoading = followLoading || unfollowLoading
     const dispatch = useAppDispatch()
+    const isOwnProfile = useAppSelector((state) => state.profile.isOwnProfile)
         return (
                 <button
                     onClick={async () => {
@@ -25,14 +26,18 @@ const FollowButton = ({ userId, initialIsFollowing = false, onUnfollow }: Follow
                         const res = await unfollowUser(userId)
                         if (res) {
                             setIsFollowing(false)
-                            dispatch(decrementFollowedCount())
+                            if (isOwnProfile) {
+                                dispatch(decrementFollowedCount())
+                            }
                             onUnfollow?.()
                         }
                     } else {
                         const res = await followUser(userId)
                         if (res) {
                             setIsFollowing(true)
-                            dispatch(incrementFollowedCount())
+                            if (isOwnProfile) {
+                                dispatch(incrementFollowedCount())
+                            }
                         }
                     }
             }}

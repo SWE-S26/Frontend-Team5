@@ -20,7 +20,12 @@
                 <div className='flex flex-col gap-1.5 min-w-0'>
                     <div className='flex gap-1.5 items-center pt-2 mt-1'>
                         <Link href={`/profile/${user.userId}`} >
-                            <p className='text-sm font-bold hover:text-silver whitespace-nowrap overflow-hidden'>{user.displayName}</p>
+                            <p
+                                className='text-sm font-bold hover:text-silver whitespace-nowrap overflow-hidden text-ellipsis max-w-30'
+                                title={user.displayName}
+                            >
+                                {user.displayName}
+                            </p>
                         </Link>
                     </div>
                     <div className='flex gap-2.5'>
