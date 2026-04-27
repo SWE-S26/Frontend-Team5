@@ -1,7 +1,7 @@
 'use client'
 import { useState } from 'react'
 import SendButton from '../SendButton'
-import { useSendMessage } from '@/hooks/messages/useSendMessages'
+import { useSendMessage } from '@/hooks/sockets/messages/useSendMessages'
 import { Message } from '@/types/message.types'
 import { send } from 'process'
 import Button from '@/components/ui/Button'

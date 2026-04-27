@@ -4,7 +4,7 @@ import Conversation from '@/components/messages/conversation/Conversation'
 import EmptyMessages from '@/components/messages/EmptyMessages'
 import MessageSidebar from '@/components/messages/messageSidebar/MessageSidebar'
 import NewMessagePopUP from '@/components/messages/NewMessagePopUP'
-import { useConversations } from '@/hooks/messages/useConversations'
+import { useConversations } from '@/hooks/sockets/messages/useConversations'
 import { useState , useEffect} from 'react'
 
 

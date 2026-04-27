@@ -3,7 +3,7 @@
 import { useState } from 'react'
 import Link from 'next/link'
 import Preview from '../preview'
-import { useConversations } from '@/hooks/messages/useConversations'
+import { useConversations } from '@/hooks/sockets/messages/useConversations'
 
 const ViewMessages = () => {
     const [selectedId, setSelectedId] = useState<string | null>(null)

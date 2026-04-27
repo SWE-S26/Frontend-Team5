@@ -2,7 +2,7 @@ import SendButton from "../SendButton"
 import ConversationHeader from "./ConversationHeader"
 import ConversationInput from "./ConversationInput"
 import MessageBubble from "./MessageBubble"
-import { useMessages } from '@/hooks/messages/useMessages'
+import { useMessages } from '@/hooks/sockets/messages/useMessages'
 
 interface ConversationProps {
     userId: string
