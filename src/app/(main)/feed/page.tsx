@@ -203,6 +203,7 @@ export default function Feed() {
                     artist={track.basicInfo?.mainArtists?.[0]}
                     trackId={track.trackId ?? ""}
                     trackUrl={track.audio?.audioLink}
+                    wfLink={track.audio?.waveformLink}
                     duration={track.durationInSeconds}
                     likeCount={track.numLikes}
                     repostCount={track.numReposts}

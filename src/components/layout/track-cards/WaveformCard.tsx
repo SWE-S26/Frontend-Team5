@@ -47,6 +47,7 @@ type CardProps = {
   isLikedByUser?: boolean;
   downloadUrl?: string;
   canEdit?: boolean;
+  wfLink?: string;
   onEdit?: () => void;
   onAddToPlaylist?: () => void;
   allTracks?: Track[];
@@ -66,6 +67,7 @@ export default function WaveformCard({
   isLikedByUser,
   downloadUrl,
   canEdit = false,
+  wfLink,
   onEdit,
   onAddToPlaylist,
   allTracks,
@@ -246,7 +248,7 @@ export default function WaveformCard({
         >
           <SausageWaveform
             trackId={trackId}
-            samplesUrl="/waveform.json"
+            samplesUrl={wfLink ?? "/waveform.json"}
             externalProgress={progress}
             onSeek={seekToPercentage}
             onPlay={handleWaveformPlay}
