@@ -39,7 +39,7 @@ var SoundCloudWaveform = {
       var rawVal = samples[sampleIndex];
 
       var val = (rawVal / maxVal) * maxHeight;
-      val = Math.max(val, 1);
+      val = Math.max(val, 10);
 
       this.drawBar(i * barWidth, val);
     }
@@ -203,8 +203,11 @@ var SoundCloudWaveform = {
 
     var dividerY = Math.floor(canvasHeight * 0.55);
 
-    var topH = Math.min(h * 0.7, dividerY);
-    var bottomH = Math.min(topH * 0.4, canvasHeight - dividerY);
+    var normalized = h / canvasHeight;
+    var curved = Math.pow(normalized, 1.2);
+
+    var topH = Math.min(curved * dividerY * 1, dividerY);
+    var bottomH = Math.min(topH * 0.35, canvasHeight - dividerY);
 
     var drawTop = this.settings.half !== "bottom";
     var drawBottom = this.settings.half !== "top";

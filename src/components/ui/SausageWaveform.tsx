@@ -294,7 +294,12 @@ export default function SausageWaveform({
       scwRef.current = mod.default;
       fetch(samplesUrl)
         .then((res) => res.json())
-        .then((samples: number[]) => generateAll(samples));
+        .then(generateAll)
+        .catch(() =>
+          fetch("/waveform.json")
+            .then((r) => r.json())
+            .then(generateAll),
+        );
     });
   }, [samplesUrl]);
 
