@@ -2,11 +2,11 @@
 import { PiInfo } from "react-icons/pi";
 import TabsNavbar from "@/components/layout/navbar/TabsNavbar"
 import { useEffect, useState } from "react";
-import { useAppSelector } from "@/store/hooks";
 import { Avatar, Popover } from "antd";
 import { BsFillPersonFill } from "react-icons/bs";
 import FollowButton from "../ui/FollowButton";
 import { useLikeTrack } from "@/hooks/useLikes";
+import { useTrackRepostsList } from "@/hooks/useReposts";
 import ProfilePopover from "../layout/track-cards/ProfilePopover";
 
 interface TrackSidebarProps {
@@ -14,14 +14,17 @@ interface TrackSidebarProps {
 }
 
 export default function TrackSidebar({ trackId }: TrackSidebarProps) {
-  const LikesCount   = useAppSelector((state) => state.track.likesCount)
-  const RepostsCount = useAppSelector((state) => state.track.repostsCount)
   const [activeTab, setActiveTab] = useState("top");
 
-  const { users, loadLikes } = useLikeTrack()
+  const { users, total: LikesCount, loadLikes } = useLikeTrack()
+  const { total: RepostsCount, loadReposts } = useTrackRepostsList(trackId)
 
   useEffect(() => {
     loadLikes(trackId)
+  }, [trackId])
+
+  useEffect(() => {
+    loadReposts()
   }, [trackId])
 
   const SideTabs = [

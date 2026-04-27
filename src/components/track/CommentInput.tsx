@@ -3,23 +3,23 @@ import { useState } from "react"
 import { Avatar } from "antd"
 import { LuSend } from "react-icons/lu"
 import { useAppSelector } from "@/store/hooks"
-import { useComments } from "@/hooks/useComments"
+import { PostCommentPayload } from "@/types/comments.types"
 import Image from "next/image"
 
 interface CommentInputProps {
   trackId: string
+  loading: boolean
+  submitComment: (trackId: string, payload: PostCommentPayload) => Promise<any>
 }
 
-export default function CommentInput({ trackId }: CommentInputProps) {
+export default function CommentInput({ trackId, submitComment, loading }: CommentInputProps) {
   const [comment, setComment] = useState("")
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
-  
-  const { submitComment, loading } = useComments()
 
   const handleSubmit = async () => {
     if (!comment.trim() || loading) return
     await submitComment(trackId, {
-      content:   comment,
+      content: comment,
       timestamp: 0,
     })
     setComment("")
@@ -37,9 +37,7 @@ export default function CommentInput({ trackId }: CommentInputProps) {
           size={36}
           style={{ flexShrink: 0 }}
         />
-       
 
-          
         <div className="flex-1 flex items-center bg-[#303030] border-none rounded-md h-10">
           <input
             type="text"
