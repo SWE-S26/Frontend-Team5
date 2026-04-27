@@ -116,7 +116,15 @@ export function PermissionsSection({
 											<p className="text-[15px] font-semibold text-white-smoke">{label}</p>
 											<p className="text-[13px] text-white/55">{desc}</p>
 										</div>
-										<Switch checked={val} onChange={set} className={SWITCH_CLS} />
+										{!isArtistPro && label === "Enable direct downloads" ? (
+											<ProLockTooltip text={TOOLTIP_TEXT.proSwitch} referenceClassName="inline-flex h-fit w-fit" placement="bottom-end">
+												<span className="inline-flex">
+													<Switch checked={val} onChange={set} disabled className={SWITCH_CLS} />
+												</span>
+											</ProLockTooltip>
+										) : (
+											<Switch checked={val} onChange={set} className={SWITCH_CLS} />
+										)}
 									</div>
 								))}
 							</div>

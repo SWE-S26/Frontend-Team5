@@ -1,6 +1,5 @@
 import { useState } from "react";
 import { InsightsIcon, CoinIcon, GoldenHeartIcon, PurpleHeartIcon } from "../ArtistStudioContent";
-import { useAppSelector } from "@/store/hooks";
 
 
 function StatItem({ label, value, hasBorder }: { label: string; value: string; hasBorder: boolean }) {
@@ -56,12 +55,10 @@ function IconItem({
   );
 }
 
-export function ArtistStudioHeader({ stats }: {
+export function ArtistStudioHeader({ stats, isArtistPro }: {
   stats: { plays: number; reposts: number; downloads: number; likes: number; comments: number };
+  isArtistPro: boolean;
 }) {
-  const role = useAppSelector((state) => state.auth.role);
-  const isArtistPro = role === "Pro";
-
   return (
     <div className="mb-6 w-full rounded-lg border border-[#2a2a2a] bg-chinese-black p-4 sm:p-5 lg:p-6">
       <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
@@ -72,15 +69,15 @@ export function ArtistStudioHeader({ stats }: {
         <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
           <StatItem label="SC plays"  value={String(stats.plays)}     hasBorder={false} />
           <StatItem label="Reposts"   value={String(stats.reposts)}   hasBorder={true} />
-          <StatItem label="Downloads" value={String(stats.downloads)} hasBorder={true} />
+          {isArtistPro && <StatItem label="Downloads" value={String(stats.downloads)} hasBorder={true} />}
           <StatItem label="Likes"     value={String(stats.likes)}     hasBorder={true} />
           <StatItem label="Comments"  value={String(stats.comments)}  hasBorder={true} />
         </div>
         <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-4 lg:gap-8">
           <IconItem label="Insights" tooltip="Limited"  tooltipColor="text-white-smoke"    icon={InsightsIcon} />
           <IconItem label="Earnings" tooltip=""          tooltipColor="text-white-smoke"    icon={CoinIcon} />
-          <IconItem label="Fans"     tooltip={isArtistPro ? "UNLOCKED" : "ARTIST PRO"} tooltipColor="text-[#cfb25d]" showStar={!isArtistPro} icon={GoldenHeartIcon} />
-          <IconItem label="Benefits" tooltip={isArtistPro ? "UNLOCKED" : "ARTIST PRO"} tooltipColor="text-[#7564f5]" showStar={!isArtistPro} icon={PurpleHeartIcon} />
+          <IconItem label="Fans"     tooltip={isArtistPro ? "Full Access" : "ARTIST PRO"} tooltipColor="text-[#cfb25d]" showStar={!isArtistPro} icon={GoldenHeartIcon} />
+          <IconItem label="Benefits" tooltip={isArtistPro ? "Full Access" : "ARTIST PRO"} tooltipColor="text-[#7564f5]" showStar={!isArtistPro} icon={PurpleHeartIcon} />
         </div>
       </div>
     </div>

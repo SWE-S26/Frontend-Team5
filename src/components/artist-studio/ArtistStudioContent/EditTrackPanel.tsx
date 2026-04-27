@@ -52,6 +52,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   const { getTrackById, track: fullTrack, loading: loadingTrack } = useGetTrackById();
   const { updateTrack, loading: saving } = useUpdateTrack();
   const profileLink = useAppSelector((state) => state.auth.profileLink);
+  const authRole = useAppSelector((state) => state.auth.role);
 
   // Panel tab state
   const [activeTab, setActiveTab] = useState<"details" | "advanced">("details");
@@ -161,7 +162,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   const [showProFeatureModal, setShowProFeatureModal] = useState(false);
 
   // isArtistPro
-  const isArtistPro = false;
+  const isArtistPro = authRole === "Pro";
 
   // Derived values
 
@@ -783,7 +784,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
         caption:"",
       },
       permissions: {
-        enableDirectDownload: enableDownloads,
+        enableDirectDownload: isArtistPro ? enableDownloads : false,
         offlineListening,
         includeInRssFeed: includeRssFeed,
         displayedEmbedCode: displayEmbedCode,
