@@ -24,10 +24,10 @@ const UserCard = ({ user }: UserCardProps) => {
             {user.displayName}
           </div>
         </Link>
-        <div className="flex items-center gap-1">
+        <Link href={`/profile/${user.userId}/followers`} className="flex items-center gap-1 hover:opacity-50 transition-opacity duration-100 ease-in-out">
           <FaUser className="w-4 h-4 fill-current text-silver" />
           <span className="text-xs text-silver">{user.followersCount} followers</span>
-        </div>
+        </Link>
         <div className="invisible group-hover/usercard:visible">
           <FollowButton userId={user.userId} initialIsFollowing={user.isFollowed ?? false} data-testid="UserCard-FollowButton" />
         </div>

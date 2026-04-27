@@ -1,6 +1,7 @@
 'use client'
 import React from 'react'
 import { useEffect } from 'react'
+import Link from 'next/link'
 import { Tabs } from 'antd'
 import type { TabsProps } from 'antd'
 import { useRouter, usePathname, useParams } from 'next/navigation'
@@ -49,10 +50,33 @@ useEffect(() => {
     return 'likes'
   }
 
-  const getTitle = () => {
-    if (pathname.endsWith('/following')) return `${displayName} is following`
-    if (pathname.endsWith('/followers')) return `Followers of ${displayName}`
-    return `Likes by ${displayName}`
+  const profileUserId = useAppSelector((state) => state.profile.userId)
+
+  const getTitleNode = () => {
+    if (pathname.endsWith('/following')) return (
+      <span>
+        <Link href={`/profile/${profileUserId}`} className="hover:text-silver transition-colors duration-100">
+          {displayName}
+        </Link>
+        {' is following'}
+      </span>
+    )
+    if (pathname.endsWith('/followers')) return (
+      <span>
+        {'Followers of '}
+        <Link href={`/profile/${profileUserId}`} className="hover:text-silver transition-colors duration-100">
+          {displayName}
+        </Link>
+      </span>
+    )
+    return (
+      <span>
+        {'Likes by '}
+        <Link href={`/profile/${profileUserId}`} className="hover:text-silver transition-colors duration-100">
+          {displayName}
+        </Link>
+      </span>
+    )
   }
 
   const items: TabsProps['items'] = [
@@ -75,7 +99,7 @@ useEffect(() => {
           alt="avatar" 
           className="w-20 h-20 rounded-full object-cover" 
         />
-        <h2 className="text-2xl font-bold">{getTitle()}</h2>
+        <h2 className="text-2xl font-bold">{getTitleNode()}</h2>
       </div>
 
       <style>{`

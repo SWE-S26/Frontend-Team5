@@ -4,7 +4,6 @@ import { useRouter, useSearchParams } from "next/navigation"
 
 import { useAppSelector, useAppDispatch } from "@/store/hooks"
 import { useFollowUser, useUnfollowUser } from "@/hooks/useSocial"
-import {decrementFollowedCount, incrementFollowedCount } from '@/store/slices/profileSlice'
 
 import ProfileHeader from "@/components/profile/profile-header/ProfileHeader"
 import ProfileSideBar from "@/components/profile/side-bar/ProfileSideBar"
@@ -277,12 +276,18 @@ const ProfilePage = ({ params }: Props) => {
                 
                    
                   <button data-testid="Follow-button"
-                    onClick={() => {
+                    onClick={async () => {
                       if (!profileUserId || followButtonLoading || amIBlocked) return
                       if (isFollowed) {
-                          unfollowUser(profileUserId)
+                          const res = await unfollowUser(profileUserId)
+                          if (res) {
+                            dispatch(setProfile({ isFollowed: false }))
+                          }
                       } else {
-                          followUser(profileUserId)
+                          const res = await followUser(profileUserId)
+                          if (res) {
+                            dispatch(setProfile({ isFollowed: true }))
+                          }
                       }
                   }}
                     disabled={followButtonLoading}

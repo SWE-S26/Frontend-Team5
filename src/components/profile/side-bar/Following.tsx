@@ -37,12 +37,12 @@ const Following = () => {
     <div className='mb-8'>
       <div className='flex justify-between mb-2 mt-5 cursor-pointer'>
         <Link
-          href={`/profile/${username}/following`} 
+          href={`/profile/${profileUserId}/following`} 
           className='font-bold text-sm text-white-smoke hover:text-silver'>
           {followedCount} Following
         </Link>
         <Link
-          href={`/profile/${username}/following`}
+          href={`/profile/${profileUserId}/following`}
           className='text-sm text-silver hover:underline'
         >
           View all

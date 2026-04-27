@@ -1,7 +1,5 @@
     import { useState, useCallback } from "react"
     import { socialService } from "@/services/social.service"
-    import { useAppDispatch } from "@/store/hooks"
-    import { setIsFollowed, setFollowersCount } from "@/store/slices/profileSlice"
     import {
     GetFollowersResponse,
     GetFollowingResponse,
@@ -12,11 +10,9 @@
 
     // ─────────────────────────────────────────────────────────────────────────────
     // (1) Follow a user
-    // On success: reads the updated followersCount from the response body
-    // and dispatches it to profileSlice
+    // On success: returns the API response so the caller can update local state
     // ─────────────────────────────────────────────────────────────────────────────
     export function useFollowUser() {
-    const dispatch = useAppDispatch()
     const [loading, setLoading] = useState(false)
     const [error,   setError]   = useState<string | null>(null)
     const [success, setSuccess] = useState<boolean | null>(null)
@@ -28,8 +24,6 @@
         try {
         const res = await socialService.followUser(userId)
         setSuccess(true)
-        dispatch(setIsFollowed(true))
-        dispatch(setFollowersCount(res.data.followersCount))
         return res.data
         } catch (err: any) {
         const message = err.response?.data?.message || "Something went wrong"
@@ -38,7 +32,7 @@
         } finally {
         setLoading(false)
         }
-    }, [dispatch])
+    }, [])
 
     return { followUser, loading, error, success }
     }
@@ -47,7 +41,6 @@
     // (2) Unfollow a user
     // ─────────────────────────────────────────────────────────────────────────────
     export function useUnfollowUser() {
-    const dispatch = useAppDispatch()
     const [loading, setLoading] = useState(false)
     const [error,   setError]   = useState<string | null>(null)
     const [success, setSuccess] = useState<boolean | null>(null)
@@ -59,8 +52,6 @@
         try {
         const res = await socialService.unfollowUser(userId)
         setSuccess(true)
-        dispatch(setIsFollowed(false))
-        dispatch(setFollowersCount(res.data.followersCount))
         return res.data
         } catch (err: any) {
         const message = err.response?.data?.message || "Something went wrong"
@@ -69,7 +60,7 @@
         } finally {
         setLoading(false)
         }
-    }, [dispatch])
+    }, [])
 
     return { unfollowUser, loading, error, success }
     }

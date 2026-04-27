@@ -1,13 +1,13 @@
     'use client'
     import { useEffect } from 'react'
-    import { Avatar, Popover } from 'antd'
-    import { BsFillPersonFill } from 'react-icons/bs'
+    import { Avatar } from 'antd'
     import Link from 'next/link'
     import { useSelector } from 'react-redux'
     import { RootState } from '@/store/store'
     import { useGetFollowers } from '@/hooks/useSocial'
-    import FollowButton from '@/components/ui/FollowButton'
     import { useParams } from 'next/navigation'
+    import ProfilePopover from '@/components/layout/track-cards/ProfilePopover'
+    import { PopoverProvider } from '@/components/layout/track-cards/PopoverContext'
 
     export default function FollowersList() {
     const profileUserId    = useSelector((state: RootState) => state.profile.userId)
@@ -24,15 +24,19 @@
 
     if (!loading && !followers?.length) return null
 
+    // Show only first 6 followers in one line with smaller avatars
+    const displayedFollowers = followers?.slice(0, 9) ?? []
+    const hasMore = (followers?.length ?? 0) > 6
+
     return (
         <section className="flex flex-col gap-3 mb-8 mt-5">
         <div className="flex items-center justify-between">
             <Link
-            href={`/profile/${username}/followers`} className="text-xs font-bold text-white-smoke">
+            href={`/profile/${profileUserId}/followers`} className="text-xs font-bold text-white-smoke">
             {followersCount} FOLLOWERS
             </Link>
             <Link
-            href={`/profile/${username}/followers`}
+            href={`/profile/${profileUserId}/followers`}
             className="text-xs text-silver hover:underline"
             >
             View all
@@ -41,49 +45,33 @@
 
         {loading && <p className="text-silver text-sm">Loading...</p>}
 
-        {!loading && followers && (
-            <Avatar.Group>
-            {followers.map(user => (
-                <Popover
-                key={user.userId}
-                trigger="hover"
-                placement="top"
-                styles={{
-                    root: { padding: 0 },
-                    content: {
-                    backgroundColor: "#111",
-                    borderRadius: "8px",
-                    boxShadow: "0 12px 40px rgba(0,0,0,0.6)",
-                    padding: 0,
-                    overflow: "hidden",
-                    },
-                }}
-                content={
-                    <div style={{ width: 200, textAlign: "center", color: "#fff", padding: "20px 16px 16px", backgroundColor: "#111" }}>
-                    <Avatar
-                        src={user.profileImgLink ?? undefined}
-                        size={110}
-                        style={{ marginBottom: 12 }}
-                    />
-                    <div style={{ fontWeight: 600, fontSize: 15 }}>
-                        {user.displayName}
-                    </div>
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, margin: "10px 0", fontSize: 13, color: "#aaa" }}>
-                        <BsFillPersonFill className="w-5 h-5" />
-                        <span>{user.followersCount} followers</span>
-                    </div>
-                    <FollowButton userId={user.userId} initialIsFollowing={user.isFollowed} />
-                    </div>
-                }
-                >
-                <Avatar
-                    src={user.profileImgLink ?? undefined}
-                    size={48}
-                    style={{ cursor: "pointer" }}
-                />
-                </Popover>
-            ))}
-            </Avatar.Group>
+        {!loading && displayedFollowers.length > 0 && (
+            <PopoverProvider>
+                <div className="w-full overflow-x-auto">
+                    <Avatar.Group
+                        max={{ count: 9 }}
+                        className="flex flex-nowrap gap-1"
+                    >
+                        {displayedFollowers.map(user => (
+                            <ProfilePopover
+                                key={user.userId}
+                                id={user.userId}
+                                artistName={user.displayName}
+                                followCount={user.followersCount}
+                                profileImgLink={user.profileImgLink ?? ''}
+                                profileHref={`/profile/${user.userId}`}
+                                followersHref={`/profile/${user.userId}/followers`}
+                            >
+                                <Avatar
+                                    src={user.profileImgLink ?? undefined}
+                                    size={40}
+                                    style={{ cursor: 'pointer' }}
+                                />
+                            </ProfilePopover>
+                        ))}
+                    </Avatar.Group>
+                </div>
+            </PopoverProvider>
         )}
         </section>
     )
