@@ -59,8 +59,10 @@ export function useAudioProgress() {
   // This is the only way to seek - it keeps UI state in sync
   const seekToPercentage = useCallback((percentage: number) => {
     playerEngine._seekPercentage(percentage);
-    const newTime = (percentage / 100) * playerEngine.getDuration();
-    setCurrentTime(newTime);
+    const dur = playerEngine.getDuration();
+    if (dur > 0) {
+      setCurrentTime((percentage / 100) * dur);
+    }
   }, []);
 
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;

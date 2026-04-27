@@ -215,6 +215,7 @@ export default function SausageWaveform({
   profileAvatarUrl,
   flashComment = null,
   reloadTrigger = 0,
+  enabled = false,
 }: {
   trackId?: string;
   samplesUrl: string;
@@ -231,6 +232,7 @@ export default function SausageWaveform({
   profileAvatarUrl?: string;
   flashComment?: string | null;
   reloadTrigger?: number;
+  enabled?: boolean;
 }) {
   const scwRef = useRef<any>(null);
   const containerRef = useRef<HTMLDivElement>(null);
@@ -274,8 +276,8 @@ export default function SausageWaveform({
 
   const { comments, loadComments } = useStatelessComments();
   useEffect(() => {
-    if (trackId) loadComments(trackId);
-  }, [trackId, reloadTrigger]);
+    if (trackId && enabled) loadComments(trackId);
+  }, [trackId, reloadTrigger, enabled]);
 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const atCurrentTime = isPlaying
@@ -292,7 +294,12 @@ export default function SausageWaveform({
       scwRef.current = mod.default;
       fetch(samplesUrl)
         .then((res) => res.json())
-        .then((samples: number[]) => generateAll(samples));
+        .then(generateAll)
+        .catch(() =>
+          fetch("/waveform.json")
+            .then((r) => r.json())
+            .then(generateAll),
+        );
     });
   }, [samplesUrl]);
 
@@ -383,9 +390,14 @@ export default function SausageWaveform({
         setIsDragging(true);
         setIsPreviewing(false);
         setPreviewPct(null);
-        onPlay?.(pct);
+        if (!isPlaying) {
+          onPlay?.(pct); // only start playback if not already playing
+        } else {
+          onSeek?.(pct); // if playing, just seek
+        }
+      } else {
+        onSeek?.(pct);
       }
-      onSeek?.(pct);
     };
     const handleGlobalMouseUp = (e: MouseEvent) => {
       const pct = getPct(e);
