@@ -11,7 +11,7 @@ interface PreviewProps {
 }
 const preview = ({id,username, avatarUrl, lastMessage, lastMessageAt, isUnread, isActive, onClick }: PreviewProps) => {
     return (
-        <div className='flex items-center px-4 py-3 rounded-lg w-full cursor-pointer'>
+        <div onClick={onClick} className='flex items-center px-4 py-3 rounded-lg w-full cursor-pointer'>
 
             <div className='relative shrink-0 mr-3'>
             <img src={avatarUrl} alt={username} className="rounded-full w-12 h-12" />

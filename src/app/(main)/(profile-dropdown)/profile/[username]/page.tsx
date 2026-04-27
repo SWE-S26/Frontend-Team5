@@ -85,6 +85,7 @@ const ProfilePage = ({ params }: Props) => {
   const isLoading = useAppSelector((state) => state.profile.isLoading)
   const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
   const displayName = useAppSelector((state) => state.profile.displayName)
+  const profileImgLink = useAppSelector((state) => state.profile.profileImgLink)
   const profileTrackCount = useAppSelector((state) => state.profile.trackCount)
   
   
@@ -332,7 +333,15 @@ const ProfilePage = ({ params }: Props) => {
                   >
                     <FaRegEnvelope className="w-4 h-4" />
                   </button>
-                  <NewMessagePopUP isOpen={openMessage} onClose={() => setOpenMessage(false)} />
+                  <NewMessagePopUP
+                    isOpen={openMessage}
+                    onClose={() => setOpenMessage(false)}
+                    prefilledUser={{
+                      userId:      profileUserId   ?? '',
+                      displayName: displayName     ?? '',
+                      photoUrl:    profileImgLink  ?? '',
+                    }}
+                  />
 
                   <div ref={moreMenuRef} className="relative">
                         <button data-testid="ThreeDots-button"

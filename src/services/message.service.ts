@@ -1,42 +1,35 @@
-import { Message, Conversation, SendMessagePayload } from '@/types/message.types'
+import api from "@/lib/api"
+import type {
+  GetChatsResponse,
+  GetChatMessagesResponse,
+  SendMessagePayload,
+  SendMessageResponse,
+} from "@/types/message.types"
 
-export async function getConversations(): Promise<Conversation[]> {
-  const res = await fetch('/api/message')
-  if (!res.ok) throw new Error('Failed to fetch conversations')
-  return res.json()
+export const messageService = {
+
+  // GET /api/messages/v1/chats
+  getChats: () =>
+    api.get<GetChatsResponse>("/api/messages/v1/chats"),
+
+  // GET /api/messages/v1/chat/message/{chatId}
+  getChatMessages: (chatId: string) =>
+    api.get<GetChatMessagesResponse>(`/api/messages/v1/chat/message/${chatId}`),
+
+  // PATCH /api/messages/v1/chat/read/ — body: { chatId }
+  markAsRead: (chatId: string) =>
+    api.patch("/api/messages/v1/chat/read/", { id: chatId }),
+
+  // PATCH /api/messages/v1/chat/unread/ — body: { chatId }
+  markAsUnread: (chatId: string) =>
+    api.patch("/api/messages/v1/chat/unread/", { id: chatId }),
+
+  // PATCH /api/messages/v1/archive — body: { chatId }
+  archiveConversation: (chatId: string) =>
+    api.patch("/api/messages/v1/archive", { chatId }),
+
+  // POST /api/messages/v1/send — body: { receiverId, content }
+  sendMessage: (payload: SendMessagePayload) =>
+    api.post<SendMessageResponse>("/api/messages/v1/send", payload),
+
 }
-
-export async function getConversation(userId: string): Promise<Message[]> {
-  const res = await fetch(`/api/message/conversation/${userId}`)
-  if (!res.ok) throw new Error('Failed to fetch conversation')
-  return res.json()
-}
-
-export async function sendMessage(payload: SendMessagePayload): Promise<Message> {
-  const res = await fetch('/api/message/send', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify(payload),
-  })
-  if (!res.ok) throw new Error('Failed to send message')
-  return res.json()
-}
-
-export async function markAsRead(messageId: string): Promise<void> {
-  const res = await fetch(`/api/message/${messageId}/read`, { method: 'PATCH' })
-  if (!res.ok) throw new Error('Failed to mark message as read')
-}
-
-export async function hasUnreadMessages(): Promise<boolean> {
-  const res = await fetch('/api/message/unread-count')
-  if (!res.ok) throw new Error('Failed to fetch unread status')
-  const data = await res.json()
-  return data.count > 0
-}
-
-export async function archiveConversation(userId: string): Promise<void> {
-  const res = await fetch(`/api/message/conversation/${userId}/archive`, { method: 'PATCH' })
-  if (!res.ok) throw new Error('Failed to archive conversation')
-}
-
-

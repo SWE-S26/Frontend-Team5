@@ -61,14 +61,19 @@ export function useSocket(events?: SocketEvents): Socket | null {
             if (!newSocket) return;
             socketRef.current = newSocket;
             if (events?.onNotification) newSocket.on("notification:receive", events.onNotification);
-            if (events?.onMessage) newSocket.on("receive-message", events.onMessage);
+            if (events?.onMessage)      newSocket.on("message:notify",       events.onMessage);
           }
         });
 
         socket.on("disconnect", (reason) => console.warn("⚠️ Socket disconnected:", reason));
 
+        // Global error listener — must be wired as soon as socket connects
+        socket.on("error", (err: { message: string }) => {
+          console.error("🔴 Socket operation error:", err.message);
+        });
+
         if (events?.onNotification) socket.on("notification:receive", events.onNotification);
-        if (events?.onMessage) socket.on("receive-message", events.onMessage);
+        if (events?.onMessage)      socket.on("message:notify",       events.onMessage); // was "receive-message"
 
       } catch (err) {
         console.warn("Socket init failed:", err);
