@@ -252,6 +252,7 @@ export default function WaveformCard({
             profileAvatarUrl={profileImgLink ?? undefined}
             flashComment={flashComment}
             reloadTrigger={reloadTrigger}
+            enabled={isVisible}
           />
         </div>
 

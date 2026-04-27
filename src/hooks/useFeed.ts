@@ -14,23 +14,23 @@ export function useGetFeed() {
     async (offset = 0, limit = 20, includeReposts = true) => {
       setLoading(true);
       setError(null);
+      if (offset === 0) {
+        setHasMore(true); // reset hasMore on fresh fetch
+      }
       try {
         const res = await feedService.getFeed(offset, limit, includeReposts);
         const incoming = res.data;
 
         setItems((prev) =>
           offset === 0
-            ? incoming
+            ? incoming // ← replace on reset
             : [
                 ...prev,
                 ...incoming.filter((i) => !prev.some((p) => p.id === i.id)),
               ],
         );
 
-        // If we got fewer items than the limit, there's nothing left to fetch
-        if (incoming.length < limit) setHasMore(false);
-        else setHasMore(true);
-
+        setHasMore(incoming.length >= limit);
         return incoming;
       } catch (err) {
         if (axios.isAxiosError<GetFeedErrorResponse>(err)) {
