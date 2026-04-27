@@ -4,20 +4,26 @@ import { Avatar } from "antd";
 import ProfilePopover from "./ProfilePopover";
 import { PopoverProvider } from "./PopoverContext";
 
+import { LuRepeat2 } from "react-icons/lu";
+
 type FeedHeaderProps = {
   artistName: string;
+  actorId: string;
   followCount: number;
   profileImgLink: string;
   location: string;
   releaseDate?: string;
+  isRepost: boolean;
 };
 
 export default function FeedHeader({
   artistName,
+  actorId,
   followCount,
   profileImgLink,
   location,
   releaseDate,
+  isRepost,
 }: FeedHeaderProps) {
   function timeAgo(dateStr: string): string {
     const seconds = Math.floor(
@@ -48,7 +54,7 @@ export default function FeedHeader({
     <PopoverProvider>
       <div className="flex items-center py-4">
         <ProfilePopover
-          id="avatar"
+          id={actorId}
           artistName={artistName}
           followCount={followCount}
           profileImgLink={profileImgLink}
@@ -57,19 +63,29 @@ export default function FeedHeader({
           <Avatar src={profileImgLink} />
         </ProfilePopover>
 
-        <div className="text-sm text-silver cursor-text pl-3">
+        <div className="flex items-center text-sm text-silver cursor-text pl-3">
           <ProfilePopover
-            id="name"
+            id="avatar"
             artistName={artistName}
             followCount={followCount}
             profileImgLink={profileImgLink}
             location={location}
           >
-            <a className="text-white-smoke hover:text-silver font-bold transition-colors duration-200 ease-in-out cursor-pointer">
+            <a className="text-white-smoke hover:text-silver font-bold transition-colors duration-200 ease-in-out cursor-pointer mr-1">
               {artistName}
             </a>
-          </ProfilePopover>{" "}
-          posted a track
+          </ProfilePopover>
+          <span className="inline-flex items-center gap-1">
+            {isRepost ? (
+              <>
+                {" "}
+                <LuRepeat2 className="text-[16px]" />
+                reposted
+              </>
+            ) : (
+              " posted"
+            )}
+          </span>
           {releaseDate && <span className="ml-1">{timeAgo(releaseDate)}</span>}
         </div>
       </div>

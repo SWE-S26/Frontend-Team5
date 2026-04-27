@@ -1,4 +1,6 @@
-import { Howl } from "howler";
+import { Howl, Howler } from "howler";
+
+Howler.html5PoolSize = 1;
 
 let sound: Howl | null = null;
 let pendingSeek: number | null = null;
@@ -7,7 +9,7 @@ let loopMode: "none" | "one" | "all" = "none";
 export const playerEngine = {
   load(src: string, onEnd?: () => void) {
     if (sound) {
-      sound.off(); // remove all event listeners first
+      sound.off();
       sound.stop();
       sound.unload();
       sound = null;

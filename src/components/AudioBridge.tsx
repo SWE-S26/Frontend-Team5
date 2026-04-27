@@ -7,9 +7,10 @@ import { playerEngine } from "@/lib/playerEngine";
 import { usePlayerPersistence } from "@/hooks/usePlayerPersistence";
 import { next } from "@/store/slices/playerSlice";
 import { tracksService } from "@/services/tracks.service";
+import { Howler } from "howler";
 
 const LISTEN_THRESHOLD_SECONDS = 15;
-
+Howler.html5PoolSize = 1;
 
 export default function PlayerController() {
   usePlayerPersistence();
@@ -48,7 +49,12 @@ export default function PlayerController() {
   }, [currentTrackId]);
 
   useEffect(() => {
-    if (!isPlaying || !currentTrackId || !trackUrl || listenTrackedForCurrentRef.current) {
+    if (
+      !isPlaying ||
+      !currentTrackId ||
+      !trackUrl ||
+      listenTrackedForCurrentRef.current
+    ) {
       if (listenTimerRef.current) {
         clearInterval(listenTimerRef.current);
         listenTimerRef.current = null;
@@ -58,7 +64,10 @@ export default function PlayerController() {
 
     listenTimerRef.current = setInterval(() => {
       const currentTime = playerEngine.getCurrentTime();
-      if (currentTime < LISTEN_THRESHOLD_SECONDS || listenTrackedForCurrentRef.current) {
+      if (
+        currentTime < LISTEN_THRESHOLD_SECONDS ||
+        listenTrackedForCurrentRef.current
+      ) {
         return;
       }
 
@@ -70,9 +79,13 @@ export default function PlayerController() {
 
       if (!historyTrackedForCurrentRef.current) {
         historyTrackedForCurrentRef.current = true;
-        void tracksService.addTrackToHistory(currentTrackId).catch(() => undefined);
+        void tracksService
+          .addTrackToHistory(currentTrackId)
+          .catch(() => undefined);
       }
-      void tracksService.incrementPlayCount(currentTrackId).catch(() => undefined);
+      void tracksService
+        .incrementPlayCount(currentTrackId)
+        .catch(() => undefined);
     }, 1000);
 
     return () => {
