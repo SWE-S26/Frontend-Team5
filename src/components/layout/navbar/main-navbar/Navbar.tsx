@@ -27,7 +27,7 @@ export default function Navbar({ className }: NavbarProps) {
     <div data-testid="Navbar" className={`flex justify-center w-full ${className}`}>
 
       {/* Desktop */}
-      <div className="hidden md:flex items-center pt-1 w-full max-w-302">
+      <div className="hidden md:flex items-center  w-full max-w-302">
         <div className="flex-none">
           <NavbarLeft isLoggedIn={isAuthenticated} />
         </div>

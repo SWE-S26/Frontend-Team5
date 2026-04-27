@@ -10,6 +10,8 @@ import MoreDropdown from "@/components/ui/MoreDropdown"
 import BlockPopUp from "@/components/messages/conversation/BlockPopUp"
 import ReportPopUp from "@/components/messages/conversation/ReportPopUp"
 import type { Notification } from "@/types/notification.types"
+import ProfileImage from "@/components/ui/ProfileImage"
+import { DEFAULT_PROFILE_IMAGE_URL } from "@/store/slices/authSlice"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -86,9 +88,15 @@ export default function NotificationItem({
         {/* Avatar with unread dot on top-left */}
         <div className="relative shrink-0 mt-0.5">
           <Link href={`/profile/${actor.userId}`}>
-            <img
-              src={actor.avatarUrl ?? "/profpic.jpg"}
+            <ProfileImage
+              src={
+                !actor.avatarUrl || actor.avatarUrl === DEFAULT_PROFILE_IMAGE_URL
+                  ? null
+                  : actor.avatarUrl
+              }
               alt={actor.displayName}
+              width={44}
+              height={44}
               className="w-11 h-11 rounded-full object-cover"
             />
           </Link>

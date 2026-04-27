@@ -22,8 +22,8 @@ export default function NavbarLeft({ isLoggedIn }: NavbarLeftProps) {
     <div className="flex items-center gap-2 text-sm mr-5">
 
       <div className="flex items-center">
-        <Link data-testid="navbar_logo" href={isLoggedIn ? "/home" : "/"}>
-          <Image src="/app-logo/beatza.png" alt="BeatZa" width={52} height={52} className="mr-3 mt-1" />
+        <Link data-testid="navbar_logo" href={isLoggedIn ? "/home" : "/"} className="mr-3 relative w-12 h-12 shrink-0">
+          <Image src="/app-logo/beatza.png" alt="BeatZa" fill sizes="48px" className="object-contain" />
         </Link>
         {!isLoggedIn && (
           <h1 className="text-white-smoke font-bold text-2xl mr-2">BEATZA</h1>

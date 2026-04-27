@@ -43,6 +43,8 @@ export interface DetailsValidationFormProps {
 export interface RefreshTokenResponse {
   message: string
   data: {
+    accessToken:  string
+    refreshToken: string
     user: {
       id:           string
       displayName:  string
@@ -59,8 +61,6 @@ export interface RefreshTokenResponse {
           usedSeconds: number
         }
       }
-      accessToken:  string
-      refreshToken: string
     }
   }
 }

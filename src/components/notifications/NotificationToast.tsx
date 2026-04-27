@@ -2,6 +2,8 @@
 import { useEffect, useState } from "react";
 import { MdClose } from "react-icons/md";
 import { toastBus } from "@/lib/sockets/toastBus";
+import ProfileImage from "@/components/ui/ProfileImage"
+import { DEFAULT_PROFILE_IMAGE_URL } from "@/store/slices/authSlice"
 import Link from "next/link";
 
 type NotificationPayload = {
@@ -56,11 +58,17 @@ export default function NotificationToast() {
             href={`/profile/${toast.actor.userId}`}
             className="no-underline hover:opacity-70 transition-opacity text-white"
             >
-                <img
-                    src={toast.actor.avatarUrl}
-                    alt={toast.actor.displayName}
-                    className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl object-cover shrink-0"
-                />
+              <ProfileImage
+                src={
+                  !toast.actor.avatarUrl || toast.actor.avatarUrl === DEFAULT_PROFILE_IMAGE_URL
+                    ? null
+                    : toast.actor.avatarUrl
+                }
+                alt={toast.actor.displayName}
+                width={36}
+                height={36}
+                className="w-9 h-9 sm:w-11 sm:h-11 rounded-full object-cover shrink-0"
+              />
             </Link>
 
           <div className="flex-1 min-w-0">

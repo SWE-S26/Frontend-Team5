@@ -2,7 +2,7 @@
 import { useState} from 'react'
 import NewMessagePopUP from '../NewMessagePopUP'
 import MessagePerview from './MessagePerview'
-import { useConversations } from '@/hooks/messages/useConversations'
+import { useConversations } from '@/hooks/sockets/messages/useConversations'
 import { Conversation } from '@/types/message.types'
 import Button from '@/components/ui/Button'
 

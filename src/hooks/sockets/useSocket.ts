@@ -13,6 +13,20 @@ function tryGetSocket(): Socket | null {
   try { return getSocket(); } catch { return null; }
 }
 
+async function getFreshToken(): Promise<string | null> {
+  try {
+    const res = await authService.refreshToken();
+    const token = res.data?.data?.accessToken;
+    if (token) {
+      sessionStorage.setItem("_bzt", token);
+      setSocketToken(token);
+    }
+    return token ?? null;
+  } catch {
+    return null;
+  }
+}
+
 export function useSocket(events?: SocketEvents): Socket | null {
   const socketRef = useRef<Socket | null>(null);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
@@ -23,19 +37,11 @@ export function useSocket(events?: SocketEvents): Socket | null {
 
     async function initSocket() {
       try {
-        // After login: token already in memory, connect directly
         let socket = tryGetSocket();
 
-        // After page reload: token wiped from memory, fetch a fresh one
         if (!socket) {
-          const res = await authService.refreshToken();
-          const token = res.data?.data?.user?.accessToken
-                     ?? sessionStorage.getItem("_bzt");
-
+          const token = await getFreshToken();
           if (!token) return;
-
-          setSocketToken(token);
-          sessionStorage.setItem("_bzt", token);
           socket = tryGetSocket();
           if (!socket) return;
         }
@@ -44,10 +50,18 @@ export function useSocket(events?: SocketEvents): Socket | null {
 
         socket.on("connect", () => console.log("✅ Socket connected:", socket!.id));
 
-        socket.on("connect_error", (err) => {
+        socket.on("connect_error", async (err) => {
           console.error("❌ Socket error:", err.message);
           if (err.message === "Unauthorized") {
             sessionStorage.removeItem("_bzt");
+            disconnectSocket();
+            const token = await getFreshToken();
+            if (!token) return;
+            const newSocket = tryGetSocket();
+            if (!newSocket) return;
+            socketRef.current = newSocket;
+            if (events?.onNotification) newSocket.on("notification:receive", events.onNotification);
+            if (events?.onMessage) newSocket.on("receive-message", events.onMessage);
           }
         });
 

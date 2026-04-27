@@ -124,7 +124,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
             items={profileItems}
           />
 
-          <NotificationBell notifications={[]} />
+          <NotificationBell/>
 
           <div className="relative" ref={messagesRef}>
             <button data-testid="messages" className={ICON_BTN_CLASS} onClick={() => setIsMessagesOpen((prev) => !prev)}>

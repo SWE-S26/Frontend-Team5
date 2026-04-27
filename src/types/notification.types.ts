@@ -1,90 +1,104 @@
+export type ActivityType =
+  | "track_liked"
+  | "track_commented"
+  | "track_reposted"
+  | "user_followed"
+  | "user_mentioned"
+  | "new_track"
 
+export type NotificationFilterType =
+  | "all"
+  | "likes"
+  | "reposts"
+  | "follows"
+  | "comments"
 
-    export type NotificationActivityType =
-    | "track_liked"
-    | "track_commented"
-    | "track_reposted"
-    | "user_followed"
-    | "new_track"
-    | "user_mentioned"
+export const FILTER_LABELS: Record<NotificationFilterType, string> = {
+  all:      "All activity",
+  likes:    "Likes",
+  reposts:  "Reposts",
+  follows:  "Follows",
+  comments: "Comments & mentions",
+}
 
-    export type NotificationFilterType =
-    | "all"
-    | "likes"
-    | "reposts"
-    | "follows"
-    | "comments"
+export const FILTER_TO_ACTIVITY: Record<NotificationFilterType, ActivityType[]> = {
+  all:      ["track_liked", "track_commented", "track_reposted", "user_followed", "user_mentioned", "new_track"],
+  likes:    ["track_liked"],
+  reposts:  ["track_reposted"],
+  follows:  ["user_followed"],
+  comments: ["track_commented", "user_mentioned"],
+}
 
-    // ─── Actor ───────────────────────────────────────────────────────────────────
+export const FILTER_EMPTY_MESSAGES: Record<NotificationFilterType, string> = {
+  all:      "You have no notifications yet",
+  likes:    "No likes yet",
+  reposts:  "No reposts yet",
+  follows:  "No new followers yet",
+  comments: "No comments or mentions yet",
+}
 
-    export interface NotificationActor {
-    userId: string
-    displayName: string
-    avatarUrl: string | null
-    }
+// ─── Target shapes ────────────────────────────────────────────────────────────
 
-    // ─── Target variants ──────────────────────────────────────────────────────────
+export interface TrackTarget {
+  targetType: "track"
+  targetId:   string
+  title:      string
+}
 
-    export interface TrackTarget {
-    targetType: "track"
-    targetId: string
-    title: string
-    }
+export interface CommentTarget {
+  targetType:               "comment"
+  targetId:                 string
+  trackId:                  string
+  commentText:              string
+  mentionedUserProfileLink?: string
+}
 
-    export interface CommentTarget {
-    targetType: "comment"
-    targetId: string
-    trackId: string
-    commentText: string
-    mentionedUserProfileLink?: string // only present on user_mentioned
-    }
+export interface UserTarget {
+  targetType: "user"
+  targetId:   string
+}
 
-    export interface UserTarget {
-    targetType: "user"
-    targetId: string
-    }
+export type NotificationTarget = TrackTarget | CommentTarget | UserTarget
 
-    export type NotificationTarget = TrackTarget | CommentTarget | UserTarget
+// ─── Actor ────────────────────────────────────────────────────────────────────
 
-    // ─── Notification ─────────────────────────────────────────────────────────────
+export interface NotificationActor {
+  userId:      string
+  displayName: string
+  avatarUrl?:  string
+}
 
-    export interface Notification {
-    notificationId: string
-    to: string
-    read: boolean
-    activityType: NotificationActivityType
-    actor: NotificationActor
-    target: NotificationTarget
-    createdAt: string // ISO string
-    }
+// ─── Notification ─────────────────────────────────────────────────────────────
 
-    // ─── Filter → activityType mapping ───────────────────────────────────────────
+export interface Notification {
+  notificationId: string
+  to:             string
+  read:           boolean
+  activityType:   ActivityType
+  actor:          NotificationActor
+  target:         NotificationTarget
+  createdAt:      string
+}
 
-    export const FILTER_TO_ACTIVITY: Record<
-    NotificationFilterType,
-    NotificationActivityType[] | null
-    > = {
-    all: null, // null = show everything
-    likes: ["track_liked"],
-    reposts: ["track_reposted"],
-    follows: ["user_followed"],
-    comments: ["track_commented", "user_mentioned"],
-    }
+// ─── API response shapes ──────────────────────────────────────────────────────
 
-    // ─── Display labels ───────────────────────────────────────────────────────────
+export interface GetNotificationsResponse {
+  total:         number
+  offset:        number
+  limit:         number
+  notifications: Notification[]
+}
 
-    export const FILTER_LABELS: Record<NotificationFilterType, string> = {
-    all: "All notifications",
-    likes: "Likes",
-    reposts: "Reposts",
-    follows: "Follows",
-    comments: "Comments",
-    }
+export interface UnreadCountResponse {
+  unreadCount: number
+}
 
-    export const FILTER_EMPTY_MESSAGES: Record<NotificationFilterType, string> = {
-    all: "You don't have any notifications",
-    likes: "You don't have any likes",
-    reposts: "You don't have any reposts",
-    follows: "You don't have any follows",
-    comments: "You don't have any comments",
-    }
+export interface MarkReadResponse {
+  notificationId: string
+  read:           true
+  unreadCount:    number
+}
+
+export interface MarkAllReadResponse {
+  unreadCount: number
+}
