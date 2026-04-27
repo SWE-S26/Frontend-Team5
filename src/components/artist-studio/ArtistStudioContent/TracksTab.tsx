@@ -43,6 +43,7 @@ function TracksTableHeader({ onSelectAll, allSelected }: { onSelectAll: (v: bool
 }
 
 function TracksActionBar({ isArtistPro, onUpload, onDistribute, onMonetize, onMaster }: {
+  isArtistPro: boolean;
   onUpload: () => void;
   onDistribute: () => void;
   onMonetize: () => void;
