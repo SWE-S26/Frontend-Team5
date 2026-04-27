@@ -2,14 +2,19 @@
 import { useEffect, useState, useMemo } from "react"
 import { Avatar } from "antd"
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai"
-import { useComments, useReplies } from "@/hooks/useComments"
-import { useAppSelector } from "@/store/hooks"
+import { useReplies } from "@/hooks/useComments"
 import { formatDistanceToNow } from "date-fns"
 import { TrackComment } from "@/types/comments.types"
 import SortDropdown, { SortOption } from "./SortDropdown"
 
 interface CommentListProps {
   trackId: string
+  comments: TrackComment[]
+  total: number
+  loading: boolean
+  loadComments: (trackId: string, reset?: boolean) => Promise<void>
+  loadMore: (trackId: string) => void
+  toggleLike: (commentId: string) => Promise<void>
 }
 
 const formatTimestamp = (seconds: number) => {
@@ -18,12 +23,8 @@ const formatTimestamp = (seconds: number) => {
   return `${m}:${s}`
 }
 
-export default function CommentList({ trackId }: CommentListProps) {
-  const { loadComments, loadMore, toggleLike } = useComments()
-  const comments = useAppSelector((s) => s.comments.comments)
-  const total    = useAppSelector((s) => s.comments.total)
-  const loading  = useAppSelector((s) => s.comments.loading)
-  const hasMore  = comments.length < total
+export default function CommentList({ trackId, comments, total, loading, loadComments, loadMore, toggleLike }: CommentListProps) {
+  const hasMore = comments.length < total
   const [sortBy, setSortBy] = useState<SortOption>("Newest")
 
   useEffect(() => {
@@ -46,7 +47,6 @@ export default function CommentList({ trackId }: CommentListProps) {
 
   return (
     <div className="flex flex-col w-full mt-4">
-      {/* Header */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-white font-bold text-lg">
           {total.toLocaleString()} comments
@@ -54,25 +54,16 @@ export default function CommentList({ trackId }: CommentListProps) {
         <SortDropdown value={sortBy} onChange={setSortBy} />
       </div>
 
-      {/* Comments */}
       <div className="flex flex-col divide-y divide-white/0">
         {sortedComments.map((comment) => (
           <div key={comment.commentId} className="flex gap-4 py-5">
-            {/* Avatar */}
-            <Avatar
-              src={comment.avatarUrl}
-              size={48}
-              style={{ flexShrink: 0 }}
-            />
+            <Avatar src={comment.avatarUrl} size={48} style={{ flexShrink: 0 }} />
 
-            {/* Content */}
             <div className="flex flex-col flex-1 gap-1">
               <div className="flex items-center gap-1 text-sm">
                 <span className="font-bold text-white">{comment.displayName}</span>
                 <span>at</span>
-                <span className="text-[#888888] font-bold">
-                  {formatTimestamp(comment.timestamp)}
-                </span>
+                <span className="text-[#888888] font-bold">{formatTimestamp(comment.timestamp)}</span>
                 <span className="text-[#888888]">·</span>
                 <span className="text-[#888888]">
                   {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
@@ -86,7 +77,6 @@ export default function CommentList({ trackId }: CommentListProps) {
               </button>
             </div>
 
-            {/* Like */}
             <div className="flex flex-col items-center gap-1 text-gray-400 text-sm">
               <button
                 onClick={() => toggleLike(comment.commentId)}
@@ -103,7 +93,6 @@ export default function CommentList({ trackId }: CommentListProps) {
         ))}
       </div>
 
-      {/* Load more */}
       {hasMore && (
         <button
           onClick={() => loadMore(trackId)}
