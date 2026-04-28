@@ -292,10 +292,10 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
       setIncludeRssFeed(p.includeInRssFeed ?? false);
       setDisplayEmbedCode(p.displayedEmbedCode ?? false);
       setEnableAppPlayback(p.enableAppPlayback ?? false);
-      setAllowComments(p.allowComments ?? true);
-      setShowTrackComments(p.showTrackComments ?? true);
-      setShowTrackInsights(p.showTrackInsights ?? true);
-      setGeoblockingOption(p.geoblocking ?? "worldwide");
+      // setAllowComments(p.allowComments ?? true);
+      // setShowTrackComments(p.showTrackComments ?? true);
+      // setShowTrackInsights(p.showTrackInsights ?? true);
+      // setGeoblockingOption(p.geoblocking ?? "worldwide");
     }
 
     // License
@@ -1052,11 +1052,6 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
                     PrettyRadio={PrettyRadio}
                     ProLockTooltip={ProLockTooltip}
                     TOOLTIP_TEXT={TOOLTIP_TEXT}
-                    regionMenuRef={regionMenuRef}
-                    regionMenuOpen={regionMenuOpen}
-                    setRegionMenuOpen={setRegionMenuOpen}
-                    regionSearch={regionSearch}
-                    setRegionSearch={setRegionSearch}
                   />
 
                   {/* Audio clip */}
