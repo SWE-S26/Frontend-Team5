@@ -64,9 +64,14 @@ export const paymentHandlers = [
   ),
 
   /* (4) */
-  http.post("/api/payment/v1/subscriptions", () =>
-    HttpResponse.json(mockCreateSubscriptionResponse, { status: 201 })
-  ),
+  http.post("/api/payment/v1/subscriptions", async ({ request }) => {
+      const body = await request.json() as { priceId: string, promoCode?: string }
+      return HttpResponse.json({
+          success: true,
+          message: "Subscription created successfully",
+          data: { subscriptionId: "sub_123456789" },
+      }, { status: 201 })
+  }),
 
   /* (5) */
   http.get("/api/payment/v1/subscriptions", () =>

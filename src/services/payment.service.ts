@@ -32,7 +32,10 @@ export const paymentService = {
 
     /* (4) */
     createSubscription: (data: CreateSubscriptionRequest) =>
-        api.post<CreateSubscriptionResponse>("/api/payment/v1/subscriptions", data),
+        api.post<CreateSubscriptionResponse>("/api/payment/v1/subscriptions", {
+            priceId: data.priceId,
+            ...(data.promoCode ? { promoCode: data.promoCode } : {}),
+        }),
 
     /* (5) */
     getSubscription: () =>

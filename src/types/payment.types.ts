@@ -33,6 +33,7 @@ export interface RegisterStripeCustomerResponse {
 /* (4) */
 export interface CreateSubscriptionRequest {
   priceId: string
+  promoCode?: string
 }
 
 export interface CreateSubscriptionResponse {
@@ -74,6 +75,7 @@ export interface Transaction {
   currency: string
   subscriptionType: string
   description: string
+  discountPercent?: number | null
   createdAt: string
   updatedAt: string
 }
