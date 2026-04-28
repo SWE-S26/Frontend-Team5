@@ -66,6 +66,8 @@ export interface NotificationActor {
   userId:      string
   displayName: string
   avatarUrl?:  string
+  isFollowingActor?: boolean
+  isBlockingActor?:  boolean
 }
 
 // ─── Notification ─────────────────────────────────────────────────────────────
