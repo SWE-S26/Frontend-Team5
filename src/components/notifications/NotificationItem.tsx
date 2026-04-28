@@ -73,7 +73,7 @@ export default function NotificationItem({
   const isFollow = activityType === "user_followed"
   const timeAgo  = formatDistanceToNow(new Date(createdAt), { addSuffix: true })
 
-  const [isBlocked,    setIsBlocked]    = useState(actor.isBlockingActor ?? false)
+  const [isBlocked, setIsBlocked] = useState(notification.isBlockingActor ?? false)
   const [isBlockOpen,  setIsBlockOpen]  = useState(false)
   const [isReportOpen, setIsReportOpen] = useState(false)
 
@@ -150,7 +150,7 @@ export default function NotificationItem({
           <div className="shrink-0 self-center">
             <FollowButton
               userId={actor.userId}
-              initialIsFollowing={actor.isFollowingActor ?? false}
+              initialIsFollowing={notification.isFollowingActor ?? false}
             />
           </div>
         )}
@@ -192,46 +192,56 @@ export default function NotificationItem({
 export const MOCK_NOTIFICATIONS: Notification[] = [
   {
     notificationId: "1",
+    isFollowingActor: false,
+    isBlockingActor: false,
     to: "me",
     read: false,
     activityType: "track_liked",
-    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1", isFollowingActor: false, isBlockingActor: false },
+    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1" },
     target: { targetType: "track", targetId: "t1", title: "test" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
   {
     notificationId: "2",
+    isFollowingActor: true,
+    isBlockingActor: false,
     to: "me",
     read: false,
     activityType: "track_commented",
-    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1", isFollowingActor: true, isBlockingActor: false },
+    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1" },
     target: { targetType: "comment", targetId: "c1", trackId: "t1", commentText: "oops" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
   {
     notificationId: "3",
+    isFollowingActor: false,
+    isBlockingActor: false,
     to: "me",
     read: true,
     activityType: "user_followed",
-    actor: { userId: "u2", displayName: "Guardian 2004930", avatarUrl: "https://i.pravatar.cc/48?img=5", isFollowingActor: false, isBlockingActor: false },
+    actor: { userId: "u2", displayName: "Guardian 2004930", avatarUrl: "https://i.pravatar.cc/48?img=5" },
     target: { targetType: "user", targetId: "me" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
   {
     notificationId: "4",
+    isFollowingActor: true,
+    isBlockingActor: false,
     to: "me",
     read: true,
     activityType: "track_reposted",
-    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1", isFollowingActor: true, isBlockingActor: false },
+    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1" },
     target: { targetType: "track", targetId: "t1", title: "test" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
   {
     notificationId: "5",
+    isFollowingActor: true,
+    isBlockingActor: false,
     to: "me",
     read: true,
     activityType: "new_track",
-    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1", isFollowingActor: true, isBlockingActor: false },
+    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1" },
     target: { targetType: "track", targetId: "t2", title: "New Track dsdsewfaeblhaewfbnolaef" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
