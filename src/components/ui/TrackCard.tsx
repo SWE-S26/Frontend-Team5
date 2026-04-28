@@ -1,5 +1,5 @@
 "use client";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 import { IoIosMore, IoMdPlay, IoMdPause } from "react-icons/io";
 import { RiPlayListAddLine } from "react-icons/ri";
@@ -12,7 +12,9 @@ import { useSelector, useDispatch } from "react-redux";
 import { RootState, store } from "@/store/store";
 import { play, pause, playAudio, playNext } from "@/store/slices/playerSlice";
 
-import { useLikeTrack } from "@/hooks/useLikes";
+import { useLikeTrackOptimistic } from "@/hooks/useLikes";
+
+import { Track } from "@/store/slices/playerSlice";
 
 type CardProps = {
   img?: string;
@@ -21,26 +23,38 @@ type CardProps = {
   trackId?: string;
   trackUrl?: string;
   duration?: number;
-  type?: "interactive" | "static";
+  isLikedByUser?: boolean;
+  appearance?: "interactive" | "static";
+  allTracks?: Track[];
 };
 
-export default function Card({
+export default function TrackCard({
   img,
   title,
   artist,
   trackId,
   trackUrl,
   duration,
-  type = "interactive",
+  isLikedByUser = false,
+  appearance = "interactive",
+  allTracks,
 }: CardProps) {
-  const { likeTrack, liked, loading } = useLikeTrack();
-  const [isLiked, setIsLiked] = useState<boolean>(false);
+  const { likeTrack } = useLikeTrackOptimistic(trackId ?? "");
+  const [isLiked, setIsLiked] = useState<boolean>(isLikedByUser);
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
 
   const dispatch = useDispatch();
 
   const { currentTrackId, isPlaying } = useSelector(
     (state: RootState) => state.player,
   );
+
+  useEffect(() => {
+    if (!isMoreOpen) return;
+    const handler = () => setIsMoreOpen(false);
+    document.addEventListener("click", handler);
+    return () => document.removeEventListener("click", handler);
+  }, [isMoreOpen]);
 
   const isThisCardPlaying = currentTrackId === trackId && isPlaying;
 
@@ -56,7 +70,9 @@ export default function Card({
 
     dispatch(
       playAudio({
-        tracks: [{ id: trackId, url: trackUrl, title, artist, img, duration }],
+        tracks: allTracks?.length
+          ? allTracks
+          : [{ id: trackId, url: trackUrl, title, artist, img, duration }],
         startId: trackId,
       }),
     );
@@ -68,6 +84,7 @@ export default function Card({
 
   function handleLikeClick(e: React.MouseEvent) {
     e.stopPropagation();
+    likeTrack();
     setIsLiked((l) => !l);
   }
 
@@ -85,12 +102,12 @@ export default function Card({
       }),
     );
 
-    // console.log(store.getState().player.tracks);
+    console.log(store.getState().player.tracks);
   }
 
   return (
     <>
-      {type === "interactive" ? (
+      {appearance === "interactive" ? (
         <div className="flex flex-col max-w-40">
           <div className="relative w-40 aspect-square rounded group cursor-pointer bg-off-black m-1 mb-1.75">
             <div className="absolute inset-0 rounded overflow-hidden">
@@ -136,7 +153,7 @@ export default function Card({
                 <HiHeart
                   className={
                     "text-[16px] font-bold opacity-0 group-hover:opacity-100 group-hover/tooltip:opacity-50 transition-all duration-200" +
-                    (isLiked ? " text-brilliant-orange" : " text-chinese-black")
+                    (isLiked ? " text-inferno" : " text-chinese-black")
                   }
                   onClick={handleLikeClick}
                 />
@@ -150,11 +167,18 @@ export default function Card({
 
             {/* More Button */}
             {img && (
-              <div className="absolute bottom-1.25 right-2.25 z-30">
+              <div
+                className="absolute bottom-1.25 right-2.25 z-30"
+                onClick={() => setIsMoreOpen((o) => !o)}
+              >
                 <MoreDropdown
                   trigger={
                     <div className="group/tooltip flex flex-col items-center w-10 cursor-pointer">
-                      <IoIosMore className="text-chinese-black text-[20px] font-bold opacity-0 group-hover:opacity-100 group-hover/tooltip:opacity-50 transition-all duration-200" />
+                      <IoIosMore
+                        className={`text-[20px] font-bold opacity-0 group-hover:opacity-100 transition-all duration-200 ${
+                          isMoreOpen ? "text-inferno" : "text-chinese-black"
+                        }`}
+                      />
                     </div>
                   }
                   tooltipLabel="More"
