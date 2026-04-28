@@ -45,6 +45,7 @@ export default function Track() {
       <div className="flex w-[80%] justify-between gap-8 mx-auto">
         <div className="flex-1">
           <CommentInput trackId={trackid} submitComment={submitComment} loading={commentsLoading} />
+          <CommentInput trackId={trackid} submitComment={submitComment} loading={commentsLoading} />
           {posterId && <Uploader posterId={posterId} />}
           <CommentListProps
             trackId={trackid}

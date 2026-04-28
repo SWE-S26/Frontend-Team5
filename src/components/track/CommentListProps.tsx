@@ -3,6 +3,7 @@ import { useEffect, useState, useMemo } from "react"
 import { Avatar } from "antd"
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai"
 import { useReplies } from "@/hooks/useComments"
+import { useReplies } from "@/hooks/useComments"
 import { formatDistanceToNow } from "date-fns"
 import { TrackComment } from "@/types/comments.types"
 import SortDropdown, { SortOption } from "./SortDropdown"
@@ -267,9 +268,7 @@ export default function CommentList({
                   {comment.isOwnComment ? "You" : comment.displayName}
                 </span>
                 <span>at</span>
-                <span className="text-[#888888] font-bold">
-                  {formatTimestamp(comment.timestamp)}
-                </span>
+                <span className="text-[#888888] font-bold">{formatTimestamp(comment.timestamp)}</span>
                 <span className="text-[#888888]">·</span>
                 <span className="text-[#888888]">
                   {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
