@@ -3,7 +3,7 @@ import { useEffect, useState, useMemo } from "react"
 import { Avatar } from "antd"
 import { AiOutlineHeart, AiFillHeart } from "react-icons/ai"
 import { useReplies } from "@/hooks/useComments"
-import { useReplies } from "@/hooks/useComments"
+
 import { formatDistanceToNow } from "date-fns"
 import { TrackComment } from "@/types/comments.types"
 import SortDropdown, { SortOption } from "./SortDropdown"
