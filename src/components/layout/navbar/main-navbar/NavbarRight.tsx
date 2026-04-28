@@ -14,6 +14,7 @@ import ProfileImage from "@/components/ui/ProfileImage"
 
 import { useLogout } from "@/hooks/useAuth"
 import { useAppSelector } from "@/store/hooks"
+import { useMessagesContext } from "@/components/messages/MessagesContext"
 
 import { MdOutlineExpandMore } from "react-icons/md"
 import { GrMailOption } from "react-icons/gr"
@@ -36,14 +37,15 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
   const router = useRouter()
   const { logout, loading, success } = useLogout()
 
-  // only pulling the two fields this component actually needs
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
-  const userId = useAppSelector((state) => state.auth.userId)
-  const role = useAppSelector((state) => state.auth.role)
+  const userId         = useAppSelector((state) => state.auth.userId)
+  const role           = useAppSelector((state) => state.auth.role)
+
+  const { unreadCount } = useMessagesContext()
 
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
   const [isShortcutsOpen, setIsShortcutsOpen] = useState(false)
-  const [isMessagesOpen, setIsMessagesOpen] = useState(false)
+  const [isMessagesOpen,  setIsMessagesOpen]  = useState(false)
 
   const messagesRef = useRef<HTMLDivElement>(null)
 
@@ -97,9 +99,9 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
       {isLoggedIn ? (
         <>
           {role !== 'Pro' && (
-              <Link data-testid="try_artist_pro" href="/artist" className="text-anger text-sm py-2 font-bold hover:text-white-smoke transition-all duration-300">
-                  Try Artist Pro
-              </Link>
+            <Link data-testid="try_artist_pro" href="/artist" className="text-anger text-sm py-2 font-bold hover:text-white-smoke transition-all duration-300">
+              Try Artist Pro
+            </Link>
           )}
           <Link data-testid="for_artists" href="/artists" className={NAV_LINK_CLASS}>
             Artist Studio
@@ -124,19 +126,30 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
             items={profileItems}
           />
 
-          <NotificationBell/>
+          <NotificationBell />
 
+          {/* Popup is now OUTSIDE the button — prevents click bubbling re-opening it */}
           <div className="relative" ref={messagesRef}>
-            <button data-testid="messages" className={ICON_BTN_CLASS} onClick={() => setIsMessagesOpen((prev) => !prev)}>
+            <button
+              data-testid="messages"
+              className={ICON_BTN_CLASS}
+              onClick={() => setIsMessagesOpen((prev) => !prev)}
+            >
               <div className="relative">
                 <GrMailOption />
-                {isMessagesOpen && (
-                  <div className="absolute right-0 top-8 z-15 w-100 h-20-">
-                    <ViewMessages />
-                  </div>
+                {unreadCount > 0 && (
+                  <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-0.5 flex items-center justify-center rounded-full bg-inferno text-white text-[9px] font-bold leading-none">
+                    {unreadCount > 99 ? "99+" : unreadCount}
+                  </span>
                 )}
               </div>
             </button>
+
+            {isMessagesOpen && (
+              <div className="absolute right-0 top-8 z-15 w-100">
+                <ViewMessages onClose={() => setIsMessagesOpen(false)} />
+              </div>
+            )}
           </div>
         </>
       ) : (

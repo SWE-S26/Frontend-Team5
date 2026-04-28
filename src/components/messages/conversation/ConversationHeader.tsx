@@ -1,97 +1,138 @@
 'use client'
 import Link from 'next/link'
-import { useState } from 'react'
-import NewMessagePopUP from '../NewMessagePopUP'
-import { FaRegTrashCan } from "react-icons/fa6";
+import { useState, useEffect } from 'react'
+import { FaRegTrashCan } from "react-icons/fa6"
 import Button from '@/components/ui/Button'
-import BlockPopUp from './BlockPopUp';
-import ReportPopUp from './ReportPopUp';
-import SpamPopUp from './SpamPopUp';
+import BlockPopUp from './BlockPopUp'
+import ReportPopUp from './ReportPopUp'
+import SpamPopUp from './SpamPopUp'
+import ArchivePopUp from './ArchivePopUp'
+import { useMessagesContext } from '@/components/messages/MessagesContext'
+import { useBlockUser, useUnblockUser } from '@/hooks/useSocial'
 
 interface ConversationHeaderProps {
-    username: string
-    userId: string
-    markAsUnread: (userId: string) => void
-    markAsRead: (userId: string) => void
+  displayName:      string
+  chatId:           string
+  receiverId:       string
+  isUnread:         boolean
+  initialIsBlocked: boolean
+  markAsUnread:     (chatId: string) => Promise<void>
+  markAsRead:       (chatId: string) => Promise<void>
 }
 
+const ConversationHeader = ({
+  displayName,
+  chatId,
+  receiverId,
+  isUnread,
+  initialIsBlocked,
+  markAsUnread,
+  markAsRead,
+}: ConversationHeaderProps) => {
+  const { archiveConversation }                  = useMessagesContext()
+  const { blockUser,   loading: blockLoading   } = useBlockUser()
+  const { unblockUser, loading: unblockLoading } = useUnblockUser()
 
-const ConversationHeader = ({ username, userId , markAsUnread, markAsRead }: ConversationHeaderProps) => {
-    const [OpenBlock, setOpenBlock] = useState(false)
-    const[OpenReport, setIsOpenReport] = useState(false)
-    const [isBlocked, setIsBlocked] = useState(false)
-    const [isSpamOpen, setIsSpamOpen] = useState(false)
-    const [isUnread, setIsUnread] = useState(false)
-    return (
-        <div className='flex justify-between mb-4'>
-            <div className='flex'>
-                <Link href={`/profile/${userId}`} className='text-md font-bold text-white-smoke px-2 py-2 hover:text-silver'>
-                    {username}
-                </Link>
+  const [isBlocked,   setIsBlocked]   = useState(initialIsBlocked)
+  const [openBlock,   setOpenBlock]   = useState(false)
+  const [openReport,  setOpenReport]  = useState(false)
+  const [isSpamOpen,  setIsSpamOpen]  = useState(false)
+  const [openArchive, setOpenArchive] = useState(false)
 
-                <Button
-                    onClick={() => {
-                        if (isBlocked) {
-                            setIsBlocked(false)
-                        } else {
-                            setOpenBlock(true)
-                        }
-                    }}
-                    className={isBlocked ? 'text-crusta bg-chinese-black' : 'bg-chinese-black'}
-                >
-                    {isBlocked ? 'Blocked' : 'Block'}
-                </Button>
+  useEffect(() => {
+    setIsBlocked(initialIsBlocked)
+  }, [initialIsBlocked])
 
-                <Button  onClick={() => setIsOpenReport(true)} className='bg-chinese-black' >
-                    Report
-                </Button>
-            </div>
+  const handleBlock = async () => {
+    await blockUser(receiverId)
+    setIsBlocked(true)
+    setOpenBlock(false)
+  }
 
+  const handleUnblock = async () => {
+    await unblockUser(receiverId)
+    setIsBlocked(false)
+  }
 
+  const handleArchiveConfirm = async () => {
+    setOpenArchive(false)
+    await archiveConversation(chatId)
+  }
 
-            <BlockPopUp isOpen={OpenBlock} onClose={() => setOpenBlock(false)} username={username} 
-                    onConfirm={() => {
-                    setIsBlocked(true)
-                    setOpenBlock(false)
-                }}/>
+  return (
+    <div className='flex justify-between mb-4'>
+      <div className='flex'>
+        <Link
+          href={`/profile/${receiverId}`}
+          className='text-md font-bold text-white-smoke px-2 py-2 hover:text-silver'
+        >
+          {displayName}
+        </Link>
 
-            <ReportPopUp 
-                    isOpen={OpenReport} 
-                    onClose={() => setIsOpenReport(false)} 
-                    onSpam={() => {
-                        setIsOpenReport(false)
-                        setIsSpamOpen(true)
-                    }}
-                />
-                <SpamPopUp 
-                    isOpen={isSpamOpen} 
-                    onClose={() => setIsSpamOpen(false)} 
-                    username={username} 
-                />
+        <Button
+          onClick={() => isBlocked ? handleUnblock() : setOpenBlock(true)}
+          disabled={blockLoading || unblockLoading}
+          className={isBlocked ? 'text-crusta bg-chinese-black' : 'bg-chinese-black'}
+        >
+          {isBlocked ? 'Blocked' : 'Block'}
+        </Button>
 
+        <Button onClick={() => setOpenReport(true)} className='bg-chinese-black'>
+          Report
+        </Button>
+      </div>
 
-            <div className='flex'>
-                <Button className='font-bold bg-off-black  mr-2 ' onClick={() => {
-                    if (isUnread) {
-                        markAsRead(userId)
-                    } else {
-                        markAsUnread(userId)
-                    }
-                    setIsUnread(prev => !prev)
-                }}>
+      <BlockPopUp
+        isOpen={openBlock}
+        onClose={() => setOpenBlock(false)}
+        username={displayName}
+        onConfirm={handleBlock}
+      />
+      <ReportPopUp
+        isOpen={openReport}
+        onClose={() => setOpenReport(false)}
+        onSpam={() => { setOpenReport(false); setIsSpamOpen(true) }}
+      />
+      <SpamPopUp
+        isOpen={isSpamOpen}
+        onClose={() => setIsSpamOpen(false)}
+        username={displayName}
+      />
 
-                    {isUnread ? 'Mark as read' : 'Mark as unread'}
-                </Button>
-                <button className='flex items-center justify-center bg-off-black rounded-md h-10 w-10 transition-colors relative group/delete '>
-                    <FaRegTrashCan size={14} className='text-white hover:text-silver cursor-pointer' />
-                    <div className='absolute bottom-[-2.2rem] left-1/2 -translate-x-1/2 bg-off-black text-white text-[8px] font-medium px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover/delete:opacity-100 transition-opacity pointer-events-none'>
-                        Archive this conversation
-                        <div className='absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-off-black rotate-45 ' />
-                    </div>
-                </button>
-            </div>
+      <div className='flex items-center gap-2'>
+        <Button
+          className='font-bold bg-off-black'
+          onClick={() => isUnread ? markAsRead(chatId) : markAsUnread(chatId)}
+        >
+          {isUnread ? 'Mark as read' : 'Mark as unread'}
+        </Button>
+
+        {/* Relative wrapper so ArchivePopUp positions itself under this button */}
+        <div className='relative'>
+          <button
+            className={`flex items-center justify-center bg-off-black rounded-md h-8 w-10 transition-colors relative group/delete ${
+              openArchive ? 'text-crusta' : 'text-white hover:text-silver'
+            }`}
+            onClick={() => setOpenArchive((prev) => !prev)}
+          >
+            <FaRegTrashCan size={14} className='cursor-pointer' />
+            {!openArchive && (
+              <div className='absolute bottom-[-2.2rem] left-1/2 -translate-x-1/2 bg-off-black text-white text-[8px] font-medium px-2 py-1 rounded whitespace-nowrap opacity-0 group-hover/delete:opacity-100 transition-opacity pointer-events-none'>
+                Archive this conversation
+                <div className='absolute -top-1 left-1/2 -translate-x-1/2 w-2 h-2 bg-off-black rotate-45' />
+              </div>
+            )}
+          </button>
+
+          <ArchivePopUp
+            isOpen={openArchive}
+            onClose={() => setOpenArchive(false)}
+            onConfirm={handleArchiveConfirm}
+          />
         </div>
-    )
+      </div>
+    </div>
+  )
 }
 
 export default ConversationHeader
