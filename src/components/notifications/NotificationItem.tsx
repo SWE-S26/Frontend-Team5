@@ -41,10 +41,10 @@ function getTargetHref(n: Notification): string | null {
     case "track_liked":
     case "track_reposted":
     case "new_track":
-      return `/tracks/${(target as any).targetId}`
+      return `/track/${(target as any).targetId}`
     case "track_commented":
     case "user_mentioned":
-      return `/tracks/${(target as any).trackId}`
+      return `/track/${(target as any).trackId}`
     case "user_followed":
       return `/profile/${(target as any).targetId}`
     default:
