@@ -83,19 +83,21 @@ export default function NotificationItem({
   const moreItems = [
     {
       label: isBlocked ? `Unblock ${actor.displayName}` : `Block ${actor.displayName}`,
-      onClick: () => setIsBlockOpen(true),
+      onClick: async () => {
+        if (isBlocked) {
+          await unblockUser(actor.userId)
+          setIsBlocked(false)
+        } else {
+          setIsBlockOpen(true)
+        }
+      },
     },
     { label: `Report ${actor.displayName}`, onClick: () => setIsReportOpen(true) },
   ]
 
   async function handleBlockConfirm() {
-    if (isBlocked) {
-      await unblockUser(actor.userId)
-      setIsBlocked(false)
-    } else {
-      await blockUser(actor.userId)
-      setIsBlocked(true)
-    }
+    await blockUser(actor.userId)
+    setIsBlocked(true)
     setIsBlockOpen(false)
   }
 
