@@ -21,6 +21,7 @@ import {
   GetArtistAlbumsResponse,
   GetPlaylistByPermalinkResponse,
   AddPlaylistToHistoryResponse,
+  Playlist,
 } from "@/types/playlists.types";
 
 export const playlistsService = {
@@ -214,4 +215,15 @@ export const playlistsService = {
     api.post<AddPlaylistToHistoryResponse>(
       `/api/v1/playlists/${playlistId}/history`
     ),
+
+    getTrackPlaylists: async (trackId: string) => {
+      const res = await api.get(`/api/tracks/v1/playlists/${trackId}`);
+      return res.data.data as Playlist[];
+    },
+
+    getTrackAlbums: async (trackId: string) => {
+      const res = await api.get(`/api/tracks/v1/albums/${trackId}`);
+      return res.data.data as Playlist[];
+    },
 };
+

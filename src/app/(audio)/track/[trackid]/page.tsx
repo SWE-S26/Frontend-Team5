@@ -12,12 +12,13 @@ import Uploader from "@/components/track/Uploader"
 
 import { useGetTrackById } from "@/hooks/useTracks"
 import { useStatelessComments } from "@/hooks/useComments"
+import { PopoverProvider } from "@/components/layout/track-cards/PopoverContext"
 
 export default function Track() {
   const { trackid } = useParams<{ trackid: string }>()
 
   const { getTrackById, track, loading, error } = useGetTrackById()
-  const { comments, total, loading: commentsLoading, loadComments, loadMore, submitComment, toggleLike } = useStatelessComments()
+  const { comments, total, loading: commentsLoading, loadComments, loadMore, submitComment, toggleLike, postReply, deleteCommentById } = useStatelessComments()
 
   const [posterId, setPosterId] = useState<string | null>(null)
 
@@ -53,11 +54,16 @@ export default function Track() {
             loadComments={loadComments}
             loadMore={loadMore}
             toggleLike={toggleLike}
+            submitComment={submitComment}
+            postReply={postReply}
+            deleteCommentById={deleteCommentById}
           />
         </div>
 
         <div className="w-[340px] shrink-0">
-          <TrackSidebar trackId={trackid} />
+          <PopoverProvider>
+            <TrackSidebar trackId={trackid} />
+          </PopoverProvider>
         </div>
       </div>
     </div>

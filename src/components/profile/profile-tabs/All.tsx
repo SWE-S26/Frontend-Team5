@@ -1,7 +1,7 @@
 "use client"
 
 import { useRouter } from "next/navigation"
-
+import { useAppSelector, useAppDispatch } from "@/store/hooks"
 
 
 
@@ -14,6 +14,7 @@ interface Props { items: Item[]; onEditTrack?: (item: Item) => void; onAddToPlay
 
 export default function All({ items, onEditTrack, onAddToPlaylist }: Props) {
   const router = useRouter()
+  const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
   return (
     <>
     <h1 className="text-2xl font-bold mb-4 ">Recent</h1>
@@ -46,13 +47,16 @@ export default function All({ items, onEditTrack, onAddToPlaylist }: Props) {
     </div>
     <p className="flex justify-center">More uploads means more listeners.</p>
     <div className="flex justify-center">
-          <Button
-            data-testid="upload more-button-All tab"
-            className="bg-white-smoke text-chinese-black cursor-pointer w-30"
-            onClick={() => router.push("/upload")}
-          >
-            Upload more
-          </Button>
+          (isOwn && (
+            <Button
+              data-testid="upload more-button-All tab"
+              className="bg-white-smoke text-chinese-black cursor-pointer w-30"
+              onClick={() => router.push("/upload")}
+            >
+              Upload more
+            </Button>
+          ))
+          
     </div>
     
     </div>

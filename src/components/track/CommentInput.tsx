@@ -4,23 +4,26 @@ import { Avatar } from "antd"
 import { LuSend } from "react-icons/lu"
 import { useAppSelector } from "@/store/hooks"
 import { PostCommentPayload } from "@/types/comments.types"
-import Image from "next/image"
 
 interface CommentInputProps {
   trackId: string
   loading: boolean
-  submitComment: (trackId: string, payload: PostCommentPayload) => Promise<any>
+  submitComment: (trackId: string, payload: PostCommentPayload, meta?: { displayName: string; avatarUrl: string }) => Promise<any>
 }
 
 export default function CommentInput({ trackId, submitComment, loading }: CommentInputProps) {
   const [comment, setComment] = useState("")
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
+  const displayName    = useAppSelector((state) => state.auth.displayName)
 
   const handleSubmit = async () => {
     if (!comment.trim() || loading) return
     await submitComment(trackId, {
-      content: comment,
+      content:   comment,
       timestamp: 0,
+    }, {
+      displayName: displayName ?? "",
+      avatarUrl:   profileImgLink ?? "",
     })
     setComment("")
   }
