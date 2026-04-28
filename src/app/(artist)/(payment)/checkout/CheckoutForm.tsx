@@ -89,7 +89,15 @@ const stripe = useStripe()
     const [selectedInterval,  setSelectedInterval]  = useState<BillingInterval>(intervalParam || 'yearly')
     const [showCoupon,        setShowCoupon]        = useState(false)
     const [couponCode,        setCouponCode]        = useState('')
+    const [discountPercent, setDiscountPercent] = useState<number | null>(null)
+    const [couponError, setCouponError] = useState<string | null>(null)
     const [showBillingAddress, setShowBillingAddress] = useState(false)
+
+    const PROMO_CODES: Record<string, number> = {
+        'JU1CY': 67,
+        'E1OZO': 70,
+        'C0CK5': 69,
+    }
 
     // ── Form state ───────────────────────────────────────────────
     const [cardHolderFirstName, setCardHolderFirstName] = useState('')
@@ -116,11 +124,25 @@ const stripe = useStripe()
         ? `${profileFirstName || ''} ${profileLastName || ''}`.trim()
         : displayName
     const isFormValid = cardHolderFirstName.trim() !== '' && cardHolderSurname.trim() !== ''
+    const discountedPrice = discountPercent
+    ? totalPrice * (1 - discountPercent / 100)
+    : totalPrice
 
     // ── Handlers ─────────────────────────────────────────────────
     const handleSignOut = () => {
         setIsDropdownOpen(false)
         logout()
+    }
+
+    const handleApplyCoupon = () => {
+    const discount = PROMO_CODES[couponCode.toUpperCase()]
+    if (discount) {
+        setDiscountPercent(discount)
+        setCouponError(null)
+    } else {
+        setDiscountPercent(null)
+        setCouponError('Invalid promo code')
+    }
     }
 
     const handleBuySubscription = async () => {
@@ -146,10 +168,10 @@ const stripe = useStripe()
             return
         }
 
-        const success = await checkout(paymentMethod.id, selectedPlan.priceId)
+        const success = await checkout(paymentMethod.id, selectedPlan.priceId, couponCode || undefined)
         if (success) {
             await refreshToken()
-            router.push(`/success?plan=${selectedInterval}&price=${totalPrice}&currency=${CURRENCY}&from=checkout`)
+            router.push(`/success?plan=${selectedInterval}&price=${discountedPrice.toFixed(2)}&currency=${CURRENCY}&from=checkout${discountPercent ? `&discount=${discountPercent}` : ''}`)
         }
     }
 
@@ -419,27 +441,56 @@ const stripe = useStripe()
                             </button>
 
                             {showCoupon && (
-                                <div className="flex gap-2 mb-6">
-                                    <FloatingInput
-                                        placeholder="Enter coupon code"
-                                        value={couponCode}
-                                        onChange={(e) => setCouponCode(e.target.value)}
-                                        className="flex-1"
-                                    />
-                                    <button className="bg-black text-white px-5 py-2 rounded-full font-semibold text-sm hover:bg-gray-800">
-                                        Apply
-                                    </button>
+                            <div className="space-y-2 mb-6">
+                                <div className="flex gap-2">
+                                <FloatingInput
+                                    placeholder="Enter coupon code"
+                                    value={couponCode}
+                                    onChange={(e) => {
+                                    setCouponCode(e.target.value)
+                                    setDiscountPercent(null)
+                                    setCouponError(null)
+                                    }}
+                                    className="flex-1"
+                                />
+                                <button
+                                    onClick={handleApplyCoupon}
+                                    className="bg-black text-white px-5 py-2 rounded-full font-semibold text-sm hover:bg-gray-800"
+                                >
+                                    Apply
+                                </button>
                                 </div>
+                                {couponError && <p className="text-red-500 text-xs">{couponError}</p>}
+                                {discountPercent && (
+                                <p className="text-green-600 text-xs font-semibold">
+                                    ✓ Promo code applied — {discountPercent}% off
+                                </p>
+                                )}
+                            </div>
                             )}
 
                             {/* Order summary */}
                             <div className="bg-gray-50 border border-gray-200 rounded-lg p-4 sm:p-6 mb-6">
                                 <div className="flex justify-between items-center mb-4">
                                     <span className="font-bold text-black">Total</span>
-                                    <span className="font-bold text-black text-lg">
-                                        {plansLoading ? '...' : `${CURRENCY} ${totalPrice.toFixed(2)}`}
-                                    </span>
+                                    <div className="text-right">
+                                        {discountPercent && (
+                                        <p className="text-xs text-gray-400 line-through">
+                                            {plansLoading ? '...' : `${CURRENCY} ${totalPrice.toFixed(2)}`}
+                                        </p>
+                                        )}
+                                        <span className="font-bold text-black text-lg">
+                                        {plansLoading ? '...' : `${CURRENCY} ${discountedPrice.toFixed(2)}`}
+                                        </span>
+                                    </div>
                                 </div>
+
+                                {discountPercent && (
+                                <div className="flex justify-between items-center mb-4">
+                                    <span className="text-sm text-green-600">Discount</span>
+                                    <span className="text-sm text-green-600 font-semibold">-{discountPercent}%</span>
+                                </div>
+                                )}
 
                                 <div className="flex justify-between items-center mb-6">
                                     <span className="font-semibold text-black text-sm">Billing cycle</span>

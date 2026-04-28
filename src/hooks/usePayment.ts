@@ -42,7 +42,7 @@ export const useCheckout = () => {
   const [error, setError] = useState<string | null>(null)
   const [subscriptionId, setSubscriptionId] = useState<string | null>(null)
 
-  const checkout = async (paymentMethodId: string, priceId: string) => {
+  const checkout = async (paymentMethodId: string, priceId: string, promoCode?: string) => {
     setLoading(true)
     setError(null)
     try {
@@ -57,7 +57,7 @@ export const useCheckout = () => {
       }
 
       // Step 2: Create subscription
-      const response = await paymentService.createSubscription({ priceId })
+      const response = await paymentService.createSubscription({ priceId, promoCode })
       setSubscriptionId(response.data.data?.subscriptionId ?? null)
 
       return true
