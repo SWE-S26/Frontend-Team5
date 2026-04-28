@@ -205,6 +205,8 @@ export default function Feed() {
                     trackUrl={track.audio?.audioLink}
                     wfLink={track.audio?.waveformLink}
                     duration={track.durationInSeconds}
+                    audioClipStart={track.audioClip?.start}
+                    audioClipEnd={track.audioClip?.end}
                     likeCount={track.numLikes}
                     repostCount={track.numReposts}
                     isLikedByUser={track.isLikedByUser}

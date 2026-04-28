@@ -6,6 +6,7 @@ import SausageWaveform from "@/components/ui/SausageWaveform";
 import Tooltip from "@/components/ui/Tooltip";
 import MoreDropdown from "@/components/ui/MoreDropdown";
 import AddToPlaylistModal from "@/components/playlists/AddToPlaylistModal";
+import PreviewTooltip from "@/components/layout/track-cards/PreviewTooltip";
 
 import { useState, useRef, useEffect } from "react";
 import { Avatar } from "antd";
@@ -19,6 +20,7 @@ import { useIsVisible } from "@/hooks/useIsVisible";
 import { useStatelessComments } from "@/hooks/useComments";
 import { useLikeTrackOptimistic } from "@/hooks/useLikes";
 import { useRepostTrack } from "@/hooks/useReposts";
+import { tracksService } from "@/services/tracks.service";
 
 import { UserOutlined } from "@ant-design/icons";
 import { IoIosMore, IoMdPlay, IoMdPause } from "react-icons/io";
@@ -43,6 +45,8 @@ type CardProps = {
   trackId: string;
   trackUrl?: string;
   duration?: number;
+  audioClipStart?: number;
+  audioClipEnd?: number;
   likeCount: number;
   repostCount: number;
   isLikedByUser?: boolean;
@@ -55,6 +59,8 @@ type CardProps = {
 };
 
 const FLASH_DURATION = 3000;
+const HOVER_PREVIEW_DELAY = 600;
+const clipBoundsCache = new Map<string, { start: number; end: number }>();
 
 export default function WaveformCard({
   img,
@@ -63,6 +69,8 @@ export default function WaveformCard({
   trackId,
   trackUrl,
   duration,
+  audioClipStart,
+  audioClipEnd,
   likeCount,
   repostCount,
   isLikedByUser,
@@ -86,6 +94,12 @@ export default function WaveformCard({
 
   const commentBoxRef = useRef<HTMLInputElement>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previewStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previewAudioRef = useRef<HTMLAudioElement | null>(null);
+  const previewingRef = useRef(false);
+  const previewTimeUpdateHandlerRef = useRef<((this: HTMLAudioElement, ev: Event) => any) | null>(null);
+  const fetchClipPromiseRef = useRef<Promise<{ start: number; end: number } | null> | null>(null);
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
   const authRole = useAppSelector((state) => state.auth.role);
@@ -110,11 +124,84 @@ export default function WaveformCard({
   );
   const isThisCardPlaying = currentTrackId === trackId && isPlaying;
 
+  const [showPreviewTooltip, setShowPreviewTooltip] = useState(false);
+  const [previewTooltipPos, setPreviewTooltipPos] = useState({ x: 0, y: 0 });
+  const [isFetchingClip, setIsFetchingClip] = useState(false);
+  const [fetchedClip, setFetchedClip] = useState<{ start: number; end: number } | null>(null);
+
   useEffect(() => {
     if (isThisCardPlaying) setShowCommentBox(true);
   }, [isThisCardPlaying]);
 
+  useEffect(() => {
+    const cached = clipBoundsCache.get(trackId);
+    setFetchedClip(cached ?? null);
+  }, [trackId]);
+
+  useEffect(() => {
+    if (isPlaying) stopPreview();
+  }, [isPlaying]);
+
+  useEffect(() => {
+    return () => {
+      if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+      if (previewStopTimerRef.current) clearTimeout(previewStopTimerRef.current);
+      if (previewAudioRef.current) {
+        if (previewTimeUpdateHandlerRef.current) {
+          previewAudioRef.current.removeEventListener("timeupdate", previewTimeUpdateHandlerRef.current);
+        }
+        previewAudioRef.current.pause();
+      }
+    };
+  }, []);
+
   const { submitComment } = useStatelessComments();
+
+  const parseClipBounds = (startRaw: unknown, endRaw: unknown) => {
+    const start = Number(startRaw);
+    const end = Number(endRaw);
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return null;
+    return { start, end };
+  };
+
+  const getClipBounds = (serverClip?: { start: number; end: number } | null) => {
+    if (serverClip) return serverClip;
+    const propClip = parseClipBounds(audioClipStart, audioClipEnd);
+    if (propClip) return propClip;
+    const start = 0;
+    const end = duration ? Math.min(duration, 20) : 20;
+    if (end <= start) return null;
+    return { start, end };
+  };
+
+  const ensureTrackClip = async () => {
+    const cached = clipBoundsCache.get(trackId);
+    if (cached) return cached;
+    if (fetchClipPromiseRef.current) return fetchClipPromiseRef.current;
+
+    setIsFetchingClip(true);
+    const promise = tracksService
+      .getTrackById(trackId)
+      .then((res) => {
+        const clip = parseClipBounds(
+          res.data.data.audioClip?.start,
+          res.data.data.audioClip?.end,
+        );
+        if (clip) {
+          clipBoundsCache.set(trackId, clip);
+          setFetchedClip(clip);
+        }
+        return clip;
+      })
+      .catch(() => null)
+      .finally(() => {
+        fetchClipPromiseRef.current = null;
+        setIsFetchingClip(false);
+      });
+
+    fetchClipPromiseRef.current = promise;
+    return promise;
+  };
 
   const handleInputChange = () => {
     if (!commentBoxRef.current) return;
@@ -184,6 +271,7 @@ export default function WaveformCard({
   function handlePlayClick(e: React.MouseEvent) {
     e.stopPropagation();
     if (!trackId || !trackUrl) return;
+    stopPreview();
     if (isThisCardPlaying) {
       dispatch(pause());
       return;
@@ -201,6 +289,7 @@ export default function WaveformCard({
 
   function handleWaveformPlay(seekPercentage?: number) {
     if (!trackId || !trackUrl || isThisCardPlaying) return;
+    stopPreview();
     dispatch(
       playAudio({
         tracks: allTracks?.length
@@ -226,10 +315,115 @@ export default function WaveformCard({
     setIsAddToPlaylistOpen(true);
   };
 
+  function stopPreview() {
+    if (hoverTimerRef.current) {
+      clearTimeout(hoverTimerRef.current);
+      hoverTimerRef.current = null;
+    }
+    if (previewStopTimerRef.current) {
+      clearTimeout(previewStopTimerRef.current);
+      previewStopTimerRef.current = null;
+    }
+    if (previewAudioRef.current) {
+      if (previewTimeUpdateHandlerRef.current) {
+        previewAudioRef.current.removeEventListener("timeupdate", previewTimeUpdateHandlerRef.current);
+        previewTimeUpdateHandlerRef.current = null;
+      }
+      previewAudioRef.current.pause();
+    }
+    previewingRef.current = false;
+    setShowPreviewTooltip(false);
+  }
+
+  async function startPreview() {
+    if (!trackUrl || isPlaying) return;
+    if (previewingRef.current) return;
+
+    const serverClip = await ensureTrackClip();
+    const clip = getClipBounds(serverClip);
+    if (!clip) return;
+    const clipStart = clip.start;
+    const clipEnd = clip.end;
+    if (clipEnd <= clipStart) return;
+
+    let audio = previewAudioRef.current;
+    if (!audio || audio.src !== trackUrl) {
+      audio = new Audio(trackUrl);
+      audio.preload = "metadata";
+      previewAudioRef.current = audio;
+    }
+
+    const playFrom = () => {
+      if (!audio) return;
+
+      const seekToClipStart = () => {
+        try {
+          audio.currentTime = Math.max(0, clipStart);
+        } catch {
+        }
+      };
+
+      seekToClipStart();
+      audio.play().catch(() => {
+        setShowPreviewTooltip(false);
+      });
+      window.setTimeout(seekToClipStart, 80);
+      window.setTimeout(seekToClipStart, 220);
+
+      previewingRef.current = true;
+      setShowPreviewTooltip(true);
+
+      if (previewTimeUpdateHandlerRef.current) {
+        audio.removeEventListener("timeupdate", previewTimeUpdateHandlerRef.current);
+      }
+      const onTimeUpdate = () => {
+        if (audio.currentTime >= clipEnd) {
+          stopPreview();
+        }
+      };
+      previewTimeUpdateHandlerRef.current = onTimeUpdate;
+      audio.addEventListener("timeupdate", onTimeUpdate);
+
+      const playMs = Math.max(0, clipEnd - clipStart) * 1000;
+      if (previewStopTimerRef.current) clearTimeout(previewStopTimerRef.current);
+      previewStopTimerRef.current = setTimeout(stopPreview, playMs + 200);
+    };
+
+    if (audio.readyState >= 1) {
+      playFrom();
+    } else {
+      audio.addEventListener("loadedmetadata", playFrom, { once: true });
+      audio.load();
+    }
+  }
+
+  function handleHoverStart(e: React.MouseEvent) {
+    if (isThisCardPlaying || isPlaying) return;
+    setPreviewTooltipPos({ x: e.clientX, y: e.clientY });
+    void ensureTrackClip();
+    if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
+    hoverTimerRef.current = setTimeout(() => {
+      void startPreview();
+    }, HOVER_PREVIEW_DELAY);
+  }
+
+  function handleHoverMove(e: React.MouseEvent) {
+    setPreviewTooltipPos({ x: e.clientX, y: e.clientY });
+  }
+
+  function handleHoverEnd() {
+    stopPreview();
+  }
+
   return (
     <>
-    <div ref={ref} className="flex items-stretch">
-      <div className="h-full overflow-hidden -m-1 -mb-1.75">
+    <div className="flex items-stretch">
+      <div className="h-full overflow-hidden -m-1 -mb-1.75"
+        ref={ref}
+        onMouseEnter={handleHoverStart}
+        onMouseMove={handleHoverMove}
+        onMouseLeave={handleHoverEnd}
+      >
         <Card type="static" img={img} />
       </div>
 
@@ -416,6 +610,16 @@ export default function WaveformCard({
         </motion.div>
       </div>
     </div>
+    {showPreviewTooltip && (
+      <PreviewTooltip
+        x={previewTooltipPos.x}
+        y={previewTooltipPos.y}
+        img={img}
+        title={title}
+        artist={artist}
+        isPreviewActive={showPreviewTooltip}
+      />
+    )}
     <AddToPlaylistModal
       isOpen={isAddToPlaylistOpen}
       onClose={() => setIsAddToPlaylistOpen(false)}
