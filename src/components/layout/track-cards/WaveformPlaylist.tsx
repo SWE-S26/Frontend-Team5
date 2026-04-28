@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
+import Card from "@/components/ui/TrackCard";
 import SausageWaveform from "@/components/ui/SausageWaveform";
 import Tooltip from "@/components/ui/Tooltip";
 import MoreDropdown from "@/components/ui/MoreDropdown";
