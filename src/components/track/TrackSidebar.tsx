@@ -2,9 +2,7 @@
 import { PiInfo } from "react-icons/pi";
 import TabsNavbar from "@/components/layout/navbar/TabsNavbar"
 import { useEffect, useState } from "react";
-import { Avatar, Popover } from "antd";
-import { BsFillPersonFill } from "react-icons/bs";
-import FollowButton from "../ui/FollowButton";
+import { Avatar } from "antd";
 import { useLikeTrack } from "@/hooks/useLikes";
 import { useTrackRepostsList } from "@/hooks/useReposts";
 import ProfilePopover from "../layout/track-cards/ProfilePopover";
@@ -17,7 +15,7 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
   const [activeTab, setActiveTab] = useState("top");
 
   const { users, total: LikesCount, loadLikes } = useLikeTrack()
-  const { total: RepostsCount, loadReposts } = useTrackRepostsList(trackId)
+  const { users: repostUsers, total: RepostsCount, loadReposts } = useTrackRepostsList(trackId)
 
   useEffect(() => {
     loadLikes(trackId)
@@ -122,36 +120,15 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
 
         <Avatar.Group className="w-100">
           {users.map((user, index) => (
-            <Popover
-              key={index}
-              trigger="hover"
-              placement="top"
-              styles={{
-                root: { padding: 0 },
-                content: {
-                  backgroundColor: "#111",
-                  borderRadius: "8px",
-                  boxShadow: "0 12px 40px rgba(0,0,0,0.6)",
-                  padding: 0,
-                  overflow: "hidden",
-                },
-              }}
-              content={
-                <div style={{ width: 200, textAlign: "center", color: "#fff", padding: "20px 16px 16px", backgroundColor: "#111" }}>
-                  <Avatar src={user.avatarUrl} size={110} style={{ marginBottom: 12 }} />
-                  <div style={{ fontWeight: 600, fontSize: 15 }}>{user.displayName}</div>
-
-                  <div style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, margin: "10px 0", fontSize: 13, color: "#aaa" }}>
-                    <BsFillPersonFill className="w-5 h-5" />
-                    <span>{user.followersCount} followers</span>
-                  </div>
-
-                  <FollowButton userId={user.userId} />
-                </div>
-              }
+            <ProfilePopover
+              key={user.userId}
+              id={`like-${user.userId}`}
+              artistName={user.displayName}
+              followCount={user.followersCount}
+              profileImgLink={user.avatarUrl}
             >
               <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
-            </Popover>
+            </ProfilePopover>
           ))}
         </Avatar.Group>
       </section>
@@ -162,6 +139,20 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
           <h2 className="text-sm font-bold uppercase text-white">{RepostsCount} Reposts</h2>
           <button className="text-xs text-gray-500 hover:text-white cursor-pointer">View all</button>
         </div>
+
+        <Avatar.Group className="w-100">
+          {repostUsers.map((user, index) => (
+            <ProfilePopover
+              key={user.userId}
+              id={`repost-${user.userId}`}
+              artistName={user.displayName}
+              followCount={user.followersCount}
+              profileImgLink={user.avatarUrl}
+            >
+              <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
+            </ProfilePopover>
+          ))}
+        </Avatar.Group>
       </section>
 
     </aside>
