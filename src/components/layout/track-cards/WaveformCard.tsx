@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
+import Card from "@/components/ui/TrackCard";
 import SausageWaveform from "@/components/ui/SausageWaveform";
 import Tooltip from "@/components/ui/Tooltip";
 import MoreDropdown from "@/components/ui/MoreDropdown";
@@ -81,6 +81,17 @@ export default function WaveformCard({
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const [isLiked, setIsLiked] = useState(isLikedByUser ?? false);
   const [likeCountState, setLikeCountState] = useState(likeCount);
+
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isMoreOpen) return;
+    const handler = () => setIsMoreOpen(false);
+    setTimeout(() => {
+      document.addEventListener("click", handler);
+    }, 0);
+    return () => document.removeEventListener("click", handler);
+  }, [isMoreOpen]);
 
   const commentBoxRef = useRef<HTMLInputElement>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -223,7 +234,7 @@ export default function WaveformCard({
   return (
     <div ref={ref} className="flex items-stretch">
       <div className="h-full overflow-hidden -m-1 -mb-1.75">
-        <Card type="static" img={img} />
+        <Card appearance="static" img={img} />
       </div>
 
       <div className="flex flex-col flex-1 ml-6">
@@ -395,7 +406,12 @@ export default function WaveformCard({
               trigger={
                 <Button
                   className="bg-off-black"
-                  icon={<IoIosMore className="text-xl" />}
+                  onClick={() => setIsMoreOpen((o) => !o)}
+                  icon={
+                    <IoIosMore
+                      className={`text-xl transition-colors ${isMoreOpen ? "text-inferno" : ""}`}
+                    />
+                  }
                 />
               }
               tooltipLabel="More"
