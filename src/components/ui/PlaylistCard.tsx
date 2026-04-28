@@ -4,11 +4,14 @@ import { IoMdPlay, IoMdPause } from "react-icons/io";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
 import { play, pause, playAudio } from "@/store/slices/playerSlice";
+import { useGetPlaylistById } from "@/hooks/usePlaylists";
+import { useState } from "react";
 
 type Props = {
   img?: string;
   title?: string;
   artist?: string;
+  playlistId?: string;
   tracks?: {
     id: string;
     url: string;
@@ -19,22 +22,61 @@ type Props = {
   }[];
 };
 
-export default function PlaylistCard({ img, title, artist, tracks }: Props) {
+export default function PlaylistCard({
+  img,
+  title,
+  artist,
+  playlistId,
+}: Props) {
   const dispatch = useDispatch();
   const { currentTrackId, isPlaying } = useSelector(
     (state: RootState) => state.player,
   );
+  const { getPlaylistById, loading } = useGetPlaylistById();
+
+  const [cachedTracks, setCachedTracks] = useState<
+    {
+      id: string;
+      url: string;
+      title?: string;
+      artist?: string;
+      img?: string;
+      duration?: number;
+    }[]
+  >([]);
 
   const isThisPlaying =
-    isPlaying && tracks?.some((t) => t.id === currentTrackId);
+    isPlaying &&
+    cachedTracks.length > 0 &&
+    cachedTracks.some((t) => t.id === currentTrackId);
 
-  function handlePlayClick(e: React.MouseEvent) {
+  async function handlePlayClick(e: React.MouseEvent) {
     e.stopPropagation();
-    if (!tracks?.length) return;
+    if (!playlistId) return;
 
     if (isThisPlaying) {
       dispatch(pause());
       return;
+    }
+
+    let tracks = cachedTracks;
+
+    if (!tracks.length) {
+      const res = await getPlaylistById(playlistId);
+      const playlist = res?.data?.playlist;
+      const detail = Array.isArray(playlist) ? playlist[0] : playlist;
+      if (!detail?.tracks?.length) return;
+
+      tracks = detail.tracks.map((t) => ({
+        id: t._id,
+        url: t.audio.audioLink,
+        title: t.basicInfo.title,
+        artist: t.basicInfo.mainArtists[0],
+        img: t.image.imgLink,
+        duration: t.durationInSeconds,
+      }));
+
+      setCachedTracks(tracks);
     }
 
     dispatch(playAudio({ tracks, startId: tracks[0].id }));
@@ -74,11 +116,11 @@ export default function PlaylistCard({ img, title, artist, tracks }: Props) {
 
       <a
         href="#"
-        className="text-white-smoke no-underline hover:text-gray-300 text-[14px] font-bold tracking-tight pl-1 animate-fade-in"
+        className="text-white-smoke no-underline hover:text-gray-300 text-[14px] font-bold tracking-tight pl-1 animate-fade-in truncate"
       >
         {title}
       </a>
-      <p className="text-silver text-[14px] font-bold pl-1 animate-fade-in">
+      <p className="text-silver text-[14px] font-bold pl-1 animate-fade-in truncate">
         {artist}
       </p>
     </div>
