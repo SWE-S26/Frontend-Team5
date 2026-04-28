@@ -1,11 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react"
 import { messageService } from "@/services/message.service"
-import { getSocket } from "@/lib/sockets/socket"
 import { useAppSelector } from "@/store/hooks"
 import { messageToastBus } from "@/lib/sockets/messageToastBus"
-import { useSocketContext } from "@/lib/sockets/SocketContext"
-import { Socket } from "socket.io-client"
-
 import type {
   Conversation,
   Message,
@@ -16,11 +12,10 @@ import type {
 // ─── Normalize helpers ─────────────────────────────────────────────────────────
 
 function normalizeConversation(raw: ChatConversation, currentUserId: string): Conversation {
-  // receiverId is the participant whose _id is NOT the current user
   const receiverParticipant = raw.participants.find((p) => p._id !== currentUserId)
 
   return {
-    chatId:        raw.chat,                        // backend field is "chat" not "chatId"
+    chatId:        raw.chat,
     receiverId:    receiverParticipant?._id ?? "",
     displayName:   raw.receiver.displayName,
     photoUrl:      raw.receiver.photoUrl,
@@ -102,10 +97,13 @@ export function useConversations() {
     }
   }, [])
 
+  // Called by SocketInitializer when message:notify fires
+  // Real socket payload uses "chat" field not "_id" — handle both
   const updateFromSocket = useCallback((data: SocketConversationUpdate) => {
+    const incomingChatId = data._id ?? (data as any).chat
     setConversations((prev) =>
       prev.map((c) =>
-        c.chatId === data._id
+        c.chatId === incomingChatId
           ? {
               ...c,
               lastMessage:   data.lastMessage.content,
@@ -149,11 +147,15 @@ export function useMessages(chatId: string | null) {
   }, [chatId])
 
   const addMessage = useCallback((raw: {
-    _id: string; chatId: string; senderId: string
-    content: string; seenBy: string[]; createdAt: string
-  }) => {
-    setMessages((prev) => [...prev, normalizeMessage(raw)])
-  }, [])
+      _id: string; chatId: string; senderId: string
+      content: string; seenBy: string[]; createdAt: string
+    }) => {
+      setMessages((prev) => {
+        // Prevent duplicate — check if message with same _id already exists
+        if (prev.some((m) => m.id === raw._id)) return prev
+        return [...prev, normalizeMessage(raw)]
+      })
+    }, [])
 
   return { messages, isReceiverBlocked, loading, addMessage }
 }
@@ -167,98 +169,32 @@ export function useSendMessage(onSuccess?: (raw: {
   const [isSending, setIsSending] = useState(false)
 
   const send = useCallback(async (receiverId: string, content: string) => {
-  if (!content.trim()) return
-  setIsSending(true)
-  try {
-    const res  = await messageService.sendMessage({ receiverId, content })
-    const last = res.data.data.lastMessage
-    onSuccess?.({
-      _id:       last._id,
-      chatId:    res.data.data.chat,
-      senderId:  last.senderId,
-      content:   last.content,
-      seenBy:    last.seenBy,
-      createdAt: last.createdAt,
-    })
-  } catch (err: any) {
-    // 403 means the receiver has blocked the current user
-    if (err?.response?.status === 403) {
-      messageToastBus.emit({
-        type:    'error',
-        message: 'Unable to send message to this user.',
+    if (!content.trim()) return
+    setIsSending(true)
+    try {
+      const res  = await messageService.sendMessage({ receiverId, content })
+      const last = res.data.data.lastMessage
+      onSuccess?.({
+        _id:       last._id,
+        chatId:    res.data.data.chat,
+        senderId:  last.senderId,
+        content:   last.content,
+        seenBy:    last.seenBy,
+        createdAt: last.createdAt,
       })
-    } else {
-      console.error("Failed to send message:", err)
-    }
-  } finally {
-    setIsSending(false)
-  }
-}, [onSuccess])
-  return { send, isSending }
-}
-
-// ─── useChatSocket ─────────────────────────────────────────────────────────────
-
-export function useChatSocket(
-  chatId: string | null,
-  onIncomingMessage: (raw: {
-    _id: string; chatId: string; senderId: string
-    content: string; seenBy: string[]; createdAt: string
-  }) => void
-) {
-  const onIncomingMessageRef = useRef(onIncomingMessage)
-  useEffect(() => {
-    onIncomingMessageRef.current = onIncomingMessage
-  }, [onIncomingMessage])
-
-  // Use context socket instead of getSocket() — avoids race condition
-  const { socketRef } = useSocketContext()
-
-  useEffect(() => {
-    if (!chatId) return
-
-    const handler = (data: any) => {
-      onIncomingMessageRef.current({
-        _id:       data.lastMessage._id,
-        chatId:    chatId,
-        senderId:  data.lastMessage.senderId,
-        content:   data.lastMessage.content,
-        seenBy:    data.lastMessage.seenBy,
-        createdAt: data.lastMessage.createdAt,
-      })
-    }
-
-    const joinAndListen = (socket: Socket) => {
-  console.log("🟢 Joining chat room:", chatId)
-  socket.emit("chat:join", { chatId }, (response: any) => {
-    console.log("✅ chat:join acknowledged:", response)
-  })
-  socket.off("message:send")
-  socket.on("message:send", (data: any) => {
-    console.log("📨 message:send received:", data)
-    handler(data)
-  })
-  // Also listen to message:notify to see which one fires
-  socket.on("message:notify", (data: any) => {
-    console.log("🔔 message:notify received instead of message:send:", data)
-  })
-}
-
-    return () => {
-      if (socketRef.current) {
-        socketRef.current.emit("chat:leave", { chatId })
-        socketRef.current.off("message:send", handler)
+    } catch (err: any) {
+      if (err?.response?.status === 403) {
+        messageToastBus.emit({
+          type:    'error',
+          message: 'Unable to send message to this user.',
+        })
+      } else {
+        console.error("Failed to send message:", err)
       }
+    } finally {
+      setIsSending(false)
     }
-  }, [chatId, socketRef.current]) // re-runs when socket becomes available
+  }, [onSuccess])
 
-  const sendViaSocket = useCallback((content: string) => {
-    if (!chatId || !content.trim()) return
-    const socket = socketRef.current
-    if (socket?.connected) {
-      socket.emit("message:send", { chatId, content })
-    }
-  }, [chatId])
-
-  return { sendViaSocket }
+  return { send, isSending }
 }
