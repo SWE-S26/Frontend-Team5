@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react"
 import Link from "next/link"
 import { FaUser } from "react-icons/fa"
@@ -9,9 +8,10 @@ import FollowButton from "@/components/ui/FollowButton"
 import MoreDropdown from "@/components/ui/MoreDropdown"
 import BlockPopUp from "@/components/messages/conversation/BlockPopUp"
 import ReportPopUp from "@/components/messages/conversation/ReportPopUp"
-import type { Notification } from "@/types/notification.types"
 import ProfileImage from "@/components/ui/ProfileImage"
 import { DEFAULT_PROFILE_IMAGE_URL } from "@/store/slices/authSlice"
+import { useBlockUser, useUnblockUser } from "@/hooks/useSocial"
+import type { Notification } from "@/types/notification.types"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -41,10 +41,10 @@ function getTargetHref(n: Notification): string | null {
     case "track_liked":
     case "track_reposted":
     case "new_track":
-      return `/track/${(target as any).targetId}`
+      return `/tracks/${(target as any).targetId}`
     case "track_commented":
     case "user_mentioned":
-      return `/track/${(target as any).trackId}`
+      return `/tracks/${(target as any).trackId}`
     case "user_followed":
       return `/profile/${(target as any).targetId}`
     default:
@@ -73,13 +73,31 @@ export default function NotificationItem({
   const isFollow = activityType === "user_followed"
   const timeAgo  = formatDistanceToNow(new Date(createdAt), { addSuffix: true })
 
+  const [isBlocked,    setIsBlocked]    = useState(actor.isBlockingActor ?? false)
   const [isBlockOpen,  setIsBlockOpen]  = useState(false)
   const [isReportOpen, setIsReportOpen] = useState(false)
 
+  const { blockUser }   = useBlockUser()
+  const { unblockUser } = useUnblockUser()
+
   const moreItems = [
-    { label: `Block ${actor.displayName}`,  onClick: () => setIsBlockOpen(true)  },
+    {
+      label: isBlocked ? `Unblock ${actor.displayName}` : `Block ${actor.displayName}`,
+      onClick: () => setIsBlockOpen(true),
+    },
     { label: `Report ${actor.displayName}`, onClick: () => setIsReportOpen(true) },
   ]
+
+  async function handleBlockConfirm() {
+    if (isBlocked) {
+      await unblockUser(actor.userId)
+      setIsBlocked(false)
+    } else {
+      await blockUser(actor.userId)
+      setIsBlocked(true)
+    }
+    setIsBlockOpen(false)
+  }
 
   return (
     <>
@@ -127,10 +145,13 @@ export default function NotificationItem({
           </div>
         </div>
 
-        {/* Follow back */}
+        {/* Follow back — uses isFollowingActor to show correct initial state */}
         {isFollow && showFollowBack && (
           <div className="shrink-0 self-center">
-            <FollowButton userId={actor.userId} initialIsFollowing={false} />
+            <FollowButton
+              userId={actor.userId}
+              initialIsFollowing={actor.isFollowingActor ?? false}
+            />
           </div>
         )}
 
@@ -155,7 +176,7 @@ export default function NotificationItem({
         isOpen={isBlockOpen}
         onClose={() => setIsBlockOpen(false)}
         username={actor.displayName}
-        onConfirm={() => { setIsBlockOpen(false) }}
+        onConfirm={handleBlockConfirm}
       />
       <ReportPopUp
         isOpen={isReportOpen}
@@ -174,7 +195,7 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     to: "me",
     read: false,
     activityType: "track_liked",
-    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1" },
+    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1", isFollowingActor: false, isBlockingActor: false },
     target: { targetType: "track", targetId: "t1", title: "test" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
@@ -183,7 +204,7 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     to: "me",
     read: false,
     activityType: "track_commented",
-    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1" },
+    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1", isFollowingActor: true, isBlockingActor: false },
     target: { targetType: "comment", targetId: "c1", trackId: "t1", commentText: "oops" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
@@ -192,7 +213,7 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     to: "me",
     read: true,
     activityType: "user_followed",
-    actor: { userId: "u2", displayName: "Guardian 2004930", avatarUrl: "https://i.pravatar.cc/48?img=5" },
+    actor: { userId: "u2", displayName: "Guardian 2004930", avatarUrl: "https://i.pravatar.cc/48?img=5", isFollowingActor: false, isBlockingActor: false },
     target: { targetType: "user", targetId: "me" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
@@ -201,7 +222,7 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     to: "me",
     read: true,
     activityType: "track_reposted",
-    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1" },
+    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1", isFollowingActor: true, isBlockingActor: false },
     target: { targetType: "track", targetId: "t1", title: "test" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
@@ -210,7 +231,7 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     to: "me",
     read: true,
     activityType: "new_track",
-    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1" },
+    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1", isFollowingActor: true, isBlockingActor: false },
     target: { targetType: "track", targetId: "t2", title: "New Track dsdsewfaeblhaewfbnolaef" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
