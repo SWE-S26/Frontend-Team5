@@ -38,7 +38,7 @@ export default function Track() {
 
   return (
     <div>
-      <Navbar />
+      
 
       <TrackHeader trackId={trackid} />
 
