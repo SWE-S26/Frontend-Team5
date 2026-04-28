@@ -1,5 +1,5 @@
 "use client"
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { useFollowUser } from "@/hooks/useSocial"
 import { useUnfollowUser } from "@/hooks/useSocial"
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
@@ -18,7 +18,12 @@ const FollowButton = ({ userId, initialIsFollowing = false, onUnfollow }: Follow
     const isLoading = followLoading || unfollowLoading
     const dispatch = useAppDispatch()
     const isOwnProfile = useAppSelector((state) => state.profile.isOwnProfile)
-        return (
+    
+    useEffect(() => {
+        setIsFollowing(initialIsFollowing)
+    }, [initialIsFollowing])
+    
+    return (
                 <button
                     onClick={async () => {
                 if (!userId || isLoading) return

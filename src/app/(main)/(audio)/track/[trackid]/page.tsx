@@ -40,9 +40,9 @@ export default function Track() {
     <div>
       
 
-      <TrackHeader trackId={trackid} />
+      <TrackHeader  trackId={trackid} />
 
-      <div className="flex w-[80%] justify-between gap-8 mx-auto">
+      <div className="flex w-full justify-between gap-8 mx-auto">
         <div className="flex-1">
           <CommentInput trackId={trackid} submitComment={submitComment} loading={commentsLoading} />
           
