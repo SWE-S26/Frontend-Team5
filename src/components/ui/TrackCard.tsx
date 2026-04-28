@@ -204,13 +204,13 @@ export default function TrackCard({
           {/* Title */}
           <a
             href="#"
-            className="text-white-smoke no-underline hover:text-gray-300 text-[14px] font-bold tracking-tight pl-1 animate-fade-in"
+            className="text-white-smoke no-underline hover:text-gray-300 text-[14px] font-bold tracking-tight pl-1 animate-fade-in truncate"
           >
             {title}
           </a>
 
           {/* Artist */}
-          <p className="text-silver text-[14px] font-bold pl-1 animate-fade-in">
+          <p className="text-silver text-[14px] font-bold pl-1 animate-fade-i truncate">
             {artist}
           </p>
         </div>

@@ -68,7 +68,7 @@ export default function MediaCardCarousel({
     }, 200);
   }
 
-  const allTracks = tracks?.map((track) => ({
+  const tracksToPlaylist = tracks?.map((track) => ({
     id: track.trackId ?? "",
     url: track.audio?.audioLink ?? "",
     title: track.basicInfo?.title,
@@ -82,7 +82,7 @@ export default function MediaCardCarousel({
   const skeletonCards = Array.from({ length: 6 });
 
   return (
-    <div className="sm:w-1/5 md:w-full max-w-6xl py-8">
+    <div className="sm:w-1/5 md:w-full max-w-6xl mb-10">
       <h2 className="text-[22px] font-bold pb-4 text-white-smoke">{title}</h2>
       <div className="relative group/carousel">
         <div
@@ -120,7 +120,7 @@ export default function MediaCardCarousel({
                         trackUrl={track.audio?.audioLink}
                         duration={track.durationInSeconds}
                         isLikedByUser={track.isLikedByUser}
-                        allTracks={allTracks}
+                        allTracks={tracksToPlaylist}
                       />
                     </div>
                   ))
@@ -130,6 +130,7 @@ export default function MediaCardCarousel({
                         img={playlist.image?.imgLink || undefined}
                         title={playlist.title}
                         artist={playlist.description}
+                        playlistId={playlist._id}
                       />
                     </div>
                   ))}
