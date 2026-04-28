@@ -86,6 +86,8 @@ export default function WaveformCard({
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
+  const authRole = useAppSelector((state) => state.auth.role);
+  const isArtistPro = authRole === "Pro";
 
   const { ref, isVisible } = useIsVisible("200px");
 
@@ -214,7 +216,7 @@ export default function WaveformCard({
   const transitionConfig: Transition = { duration: 0.25, ease: "easeOut" };
 
   const handleDownload = () => {
-    if (!downloadUrl) return;
+    if (!isArtistPro || !downloadUrl) return;
     window.open(downloadUrl, "_blank", "noopener,noreferrer");
   };
 
@@ -380,7 +382,7 @@ export default function WaveformCard({
                 />
               </Tooltip>
             )}
-            {downloadUrl && (
+            {isArtistPro && downloadUrl && (
               <Tooltip label="Download">
                 <Button
                   onClick={handleDownload}

@@ -11,6 +11,7 @@ export default function SuccessContent() {
     const plan = searchParams.get('plan') || 'yearly'
     const price = searchParams.get('price') || '0'
     const currency = searchParams.get('currency') || 'EGP'
+    const discount = searchParams.get('discount')
 
     const [mounted, setMounted] = useState(false)
     const [receiptNumber] = useState(() => `RCP-${Date.now().toString().slice(-8)}`)
@@ -42,6 +43,7 @@ Plan:           Artist Pro
 Billing:        ${plan === 'yearly' ? 'Yearly' : 'Monthly'}
 Amount Paid:    ${currency} ${parseFloat(price).toFixed(2)}
 ${plan === 'yearly' ? `Per Month:      ${currency} ${(parseFloat(price) / 12).toFixed(2)}` : ''}
+${discount ? `Discount:       ${discount}% off\n` : ''}
 
 ----------------------------------------
 STATUS:         PAYMENT SUCCESSFUL
@@ -111,6 +113,12 @@ For support, visit: beatza.me/need-help
                                     {currency} {(parseFloat(price) / 12).toFixed(2)}
                                 </span>
                             </div>
+                        )}
+                        {discount && (
+                        <div className="flex justify-between text-sm">
+                            <span className="text-gray-500">Discount applied</span>
+                            <span className="text-green-600 font-medium">-{discount}%</span>
+                        </div>
                         )}
                     </div>
 

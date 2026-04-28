@@ -1,5 +1,4 @@
 "use client"
-
 import { useState } from "react"
 import Link from "next/link"
 import { FaUser } from "react-icons/fa"
@@ -9,9 +8,11 @@ import FollowButton from "@/components/ui/FollowButton"
 import MoreDropdown from "@/components/ui/MoreDropdown"
 import BlockPopUp from "@/components/messages/conversation/BlockPopUp"
 import ReportPopUp from "@/components/messages/conversation/ReportPopUp"
-import type { Notification } from "@/types/notification.types"
 import ProfileImage from "@/components/ui/ProfileImage"
 import { DEFAULT_PROFILE_IMAGE_URL } from "@/store/slices/authSlice"
+import { useBlockUser, useUnblockUser } from "@/hooks/useSocial"
+import type { Notification } from "@/types/notification.types"
+import { Ban } from "lucide-react"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -73,13 +74,34 @@ export default function NotificationItem({
   const isFollow = activityType === "user_followed"
   const timeAgo  = formatDistanceToNow(new Date(createdAt), { addSuffix: true })
 
+  const [isBlocked, setIsBlocked] = useState(notification.isBlockingActor ?? false)
   const [isBlockOpen,  setIsBlockOpen]  = useState(false)
   const [isReportOpen, setIsReportOpen] = useState(false)
 
+  const { blockUser }   = useBlockUser()
+  const { unblockUser } = useUnblockUser()
+
   const moreItems = [
-    { label: `Block ${actor.displayName}`,  onClick: () => setIsBlockOpen(true)  },
+    {
+      label: isBlocked ? `Unblock ${actor.displayName}` : `Block ${actor.displayName}`,
+      icon: isBlocked ? <Ban className="w-4 h-4" /> : undefined,
+      onClick: async () => {
+        if (isBlocked) {
+          await unblockUser(actor.userId)
+          setIsBlocked(false)
+        } else {
+          setIsBlockOpen(true)
+        }
+      },
+    },
     { label: `Report ${actor.displayName}`, onClick: () => setIsReportOpen(true) },
   ]
+
+  async function handleBlockConfirm() {
+    await blockUser(actor.userId)
+    setIsBlocked(true)
+    setIsBlockOpen(false)
+  }
 
   return (
     <>
@@ -127,10 +149,13 @@ export default function NotificationItem({
           </div>
         </div>
 
-        {/* Follow back */}
+        {/* Follow back — uses isFollowingActor to show correct initial state */}
         {isFollow && showFollowBack && (
           <div className="shrink-0 self-center">
-            <FollowButton userId={actor.userId} initialIsFollowing={false} />
+            <FollowButton
+              userId={actor.userId}
+              initialIsFollowing={notification.isFollowingActor ?? false}
+            />
           </div>
         )}
 
@@ -155,7 +180,7 @@ export default function NotificationItem({
         isOpen={isBlockOpen}
         onClose={() => setIsBlockOpen(false)}
         username={actor.displayName}
-        onConfirm={() => { setIsBlockOpen(false) }}
+        onConfirm={handleBlockConfirm}
       />
       <ReportPopUp
         isOpen={isReportOpen}
@@ -171,6 +196,8 @@ export default function NotificationItem({
 export const MOCK_NOTIFICATIONS: Notification[] = [
   {
     notificationId: "1",
+    isFollowingActor: false,
+    isBlockingActor: false,
     to: "me",
     read: false,
     activityType: "track_liked",
@@ -180,6 +207,8 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
   },
   {
     notificationId: "2",
+    isFollowingActor: true,
+    isBlockingActor: false,
     to: "me",
     read: false,
     activityType: "track_commented",
@@ -189,6 +218,8 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
   },
   {
     notificationId: "3",
+    isFollowingActor: false,
+    isBlockingActor: false,
     to: "me",
     read: true,
     activityType: "user_followed",
@@ -198,6 +229,8 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
   },
   {
     notificationId: "4",
+    isFollowingActor: true,
+    isBlockingActor: false,
     to: "me",
     read: true,
     activityType: "track_reposted",
@@ -207,6 +240,8 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
   },
   {
     notificationId: "5",
+    isFollowingActor: true,
+    isBlockingActor: false,
     to: "me",
     read: true,
     activityType: "new_track",
