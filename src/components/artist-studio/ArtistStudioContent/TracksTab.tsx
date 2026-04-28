@@ -42,7 +42,8 @@ function TracksTableHeader({ onSelectAll, allSelected }: { onSelectAll: (v: bool
   );
 }
 
-function TracksActionBar({ onUpload, onDistribute, onMonetize, onMaster }: {
+function TracksActionBar({ isArtistPro, onUpload, onDistribute, onMonetize, onMaster }: {
+  isArtistPro: boolean;
   onUpload: () => void;
   onDistribute: () => void;
   onMonetize: () => void;
@@ -52,9 +53,13 @@ function TracksActionBar({ onUpload, onDistribute, onMonetize, onMaster }: {
   return (
     <div className="grid grid-cols-1 gap-2.5 sm:flex sm:flex-wrap sm:gap-3">
       <button type="button" onClick={onUpload}     className={btnClass}><span>+ Upload or drop tracks</span></button>
-      <button type="button" onClick={onDistribute} className={btnClass}><IoIosGlobe /><span>Distribute tracks</span></button>
-      <button type="button" onClick={onMonetize}   className={btnClass}><RiMoneyDollarCircleLine /><span>Monetize tracks</span></button>
-      <button type="button" onClick={onMaster}     className={btnClass}><ImEqualizer2 /><span>Master track audio</span></button>
+      {!isArtistPro && (
+        <>
+          <button type="button" onClick={onDistribute} className={btnClass}><IoIosGlobe /><span>Distribute tracks</span></button>
+          <button type="button" onClick={onMonetize}   className={btnClass}><RiMoneyDollarCircleLine /><span>Monetize tracks</span></button>
+          <button type="button" onClick={onMaster}     className={btnClass}><ImEqualizer2 /><span>Master track audio</span></button>
+        </>
+      )}
     </div>
   );
 }
@@ -347,6 +352,7 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
   return (
     <div className="space-y-4">
       <TracksActionBar
+        isArtistPro={isArtistPro}
         onUpload={     () => router.push("/upload")}
         onDistribute={ () => router.push("/artistpro")}
         onMonetize={   () => router.push("/artistpro")}
@@ -421,6 +427,7 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
             key={track.id}
             track={{ ...track, duration: durationById[track.id] || track.duration }}
             isMobile={isMobile}
+            isArtistPro={isArtistPro}
             isSelected={selectedIds.has(track.id)}
             onSelect={toggleSelect}
             onAmplify={() => { if (!isArtistPro) setAmplifyOpen(true); }}
@@ -433,7 +440,7 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
         <div className="px-3 py-2 text-[13px] text-red-400">{errorDelete}</div>
       )}
 
-      <ArtistProBenefits />
+      {!isArtistPro && <ArtistProBenefits isArtistPro={isArtistPro} />}
 
       {amplifyOpen && !isArtistPro && (
         <AmplifyModal onClose={() => setAmplifyOpen(false)} onUnlock={() => router.push("/artistpro")} />
@@ -446,7 +453,7 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
           onEdit={(id) => setEditTrackId(id)}
           onAddToPlaylist={() => setAddToPlaylistOpen(true)}
           onDownload={handleDownload}
-          canDownload={Boolean(rows.find((r) => r.id === contextMenu.id)?.downloadUrl)}
+          canDownload={isArtistPro && Boolean(rows.find((r) => r.id === contextMenu.id)?.downloadUrl)}
           onDelete={(id) => { void handleDelete(id); }}
           isArtistPro={isArtistPro}
         />
@@ -461,7 +468,7 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
         />
       )}
       {bulkEditOpen && <BulkEditPanel selectedIds={selectedIds} tracks={rows} onClose={() => setBulkEditOpen(false)} />}
-      {addToPlaylistOpen && <AddToPlaylistPanel onClose={() => setAddToPlaylistOpen(false)} />}
+      {addToPlaylistOpen && <AddToPlaylistPanel selectedTrackIds={selectedIds} onClose={() => setAddToPlaylistOpen(false)} />}
     </div>
   );
 }

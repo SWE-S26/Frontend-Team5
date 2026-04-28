@@ -249,7 +249,7 @@ export function BasicInfoForm({
 											key={item}
 											type="button"
 											onClick={() => { setGenre(item); setGenreSearch(""); setGenreMenuOpen(false); }}
-											className="block w-full px-4 py-2 text-left text-[13px] bg-[#1e1e1e] text-white-smoke hover:bg-[#3a3b3f]"
+											className="block w-full px-4 py-2 text-left text-[13px] bg-off-black text-white-smoke hover:bg-[#3a3b3f]"
 										>
 											{item}
 										</button>

@@ -78,6 +78,8 @@ export interface Notification {
   actor:          NotificationActor
   target:         NotificationTarget
   createdAt:      string
+  isFollowingActor?: boolean
+  isBlockingActor?:  boolean
 }
 
 // ─── API response shapes ──────────────────────────────────────────────────────

@@ -21,12 +21,30 @@ export function CommentsTab({ isArtistPro }: { isArtistPro: boolean }) {
           <div className="mb-3 flex items-center gap-2">
             <span className="rounded bg-chinese-black px-2 py-0.5 text-[10px] font-bold text-yellow-400">★ ARTIST PRO</span>
           </div>
-          <h2 className="mb-5 text-[26px] font-bold text-white-smoke sm:mb-6 sm:text-[32px]">Every comment in one place</h2>
-          <p className="max-w-xl text-[14px] leading-relaxed text-[#aaa]">
-            With Artist Pro, you get access to Comments Hub which brings together every comment across all of your tracks,
-            so you can easily see what fans are saying about you. Read, moderate and respond to your comments, all in one place.
-          </p>
-          {!isArtistPro && (
+          {!isArtistPro ? (
+            <>
+              <h2 className="mb-5 text-[26px] font-bold text-white-smoke sm:mb-6 sm:text-[32px]">
+                Every comment in one place
+              </h2>
+              <p className="max-w-xl text-[14px] leading-relaxed text-[#aaa]">
+                With Artist Pro, you get access to Comments Hub which brings together every comment across all of your tracks,
+                so you can easily see what fans are saying about you. Read, moderate and respond to your comments, all in one place.
+              </p>
+            </>
+          ) : (
+            <>
+              <h2 className="mb-5 text-[26px] font-bold text-white-smoke sm:mb-6 sm:text-[32px]">
+                Silence is just a blank canvas.
+              </h2>
+              <p className="max-w-xl text-[14px] leading-relaxed text-[#aaa]">
+                Every great track starts a dialogue, and yours is no different. If you're waiting for that first comment, try taking the lead:
+                start by commenting on your own work—tell us the story behind the lyrics or the gear you used, share your track to your Stories
+                with a specific question for your fans, or reach out to fellow creators via DM to trade feedback. Once the conversation starts here,
+                you'll be able to manage it all in one place.
+              </p>
+            </>
+          )}
+          {!isArtistPro ? (
             <button
               type="button"
               onClick={() => router.push("/artistpro")}
@@ -34,6 +52,10 @@ export function CommentsTab({ isArtistPro }: { isArtistPro: boolean }) {
             >
               Get Artist Pro
             </button>
+          ) : (
+            <p className="mt-6 inline-flex w-fit rounded-full border border-[#2f6f4f] bg-[#0f2a1e] px-4 py-1.5 text-[12px] font-semibold text-[#8ad8a8]">
+              You're on Artist Pro
+            </p>
           )}
         </div>
         <div className="relative flex w-full flex-col items-end gap-3 lg:h-56 lg:block">

@@ -67,7 +67,6 @@ export interface CreateTrackResponse {
     id?: string;
   };
 }
-/* (1) "/api/public/tracks/v1/?page=1&limit=10" */
 export interface GetTracksResponse {
   message: string;
   data: {
@@ -97,7 +96,6 @@ export interface GetPostedTracksResponse {
 
 export interface Track {
   trackId?: string;
-  _id?: string;
 
   basicInfo: {
     title: string;
@@ -111,10 +109,7 @@ export interface Track {
   };
 
   posterId: string;
-
   durationInSeconds?: number;
-
-  isLikedByUser: boolean;
 
   audio: {
     audioLink: string;
@@ -129,16 +124,23 @@ export interface Track {
     publicId: string;
   };
 
+  numLikes: number;
+  numPlays: number;
+  numReposts: number;
+  numComments: number;
+  releaseDate: string;
+  isLikedByUser: boolean;
+
   permissions?: {
     enableDirectDownload?: boolean;
     offlineListening?: boolean;
     includeInRssFeed?: boolean;
     displayedEmbedCode?: boolean;
     enableAppPlayback?: boolean;
-    allowComments?: boolean;
-    showTrackComments?: boolean;
-    showTrackInsights?: boolean;
-    geoblocking?: string;
+    // allowComments?: boolean;
+    // showTrackComments?: boolean;
+    // showTrackInsights?: boolean;
+    // geoblocking?: string;
   };
 
   license?: {
@@ -149,27 +151,25 @@ export interface Track {
     shareAlike?: boolean;
   };
 
-  advanced?: {
-    buyLink?: string;
-    recordLabel?: string;
-    releaseDate?: string;
-    publisher?: string;
-    ISRC?: string;
-    explicitContent?: boolean;
-    pLine?: string;
-    audioClipStart?: number;
-    audioClipEnd?: number;
-    composer?: string;
-    ISWC?: string;
-    albumTitle?: string;
+  audioClip?: {
+    start: number;
+    end: number;
   };
 
-  numLikes: number;
-  numPlays: number;
-  numReposts: number;
-  numComments: number;
-
-  releaseDate: string;
+  // advanced?: {
+  //   buyLink?: string;
+  //   recordLabel?: string;
+  //   releaseDate?: string;
+  //   publisher?: string;
+  //   ISRC?: string;
+  //   explicitContent?: boolean;
+  //   pLine?: string;
+  //   audioClipStart?: number;
+  //   audioClipEnd?: number;
+  //   composer?: string;
+  //   ISWC?: string;
+  //   albumTitle?: string;
+  // };
 }
 
 export interface GetTrackByIdResponse {

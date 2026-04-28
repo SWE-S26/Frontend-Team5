@@ -117,6 +117,9 @@ function TransactionCard({ transaction, index }: TransactionCardProps) {
             <div className="space-y-1 text-xs sm:text-sm text-silver">
                 <p>{transaction.description}</p>
                 <p>Amount: {amount}</p>
+                {transaction.discountPercent != null && (
+                    <p className="text-green-400">Discount: {transaction.discountPercent}% off</p>
+                )}
                 <p>Date: {date}</p>
                 <p>Plan: {transaction.subscriptionType === 'pro_monthly' ? 'Monthly' : 'Yearly'}</p>
             </div>
