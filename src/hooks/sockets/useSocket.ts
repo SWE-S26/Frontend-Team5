@@ -6,7 +6,7 @@ import { authService } from "@/services/auth.service";
 
 type SocketEvents = {
   onNotification?: (data: any) => void;
-  onMessage?: (data: any) => void;
+  onMessage?:      (data: any) => void;
 };
 
 function tryGetSocket(): Socket | null {
@@ -28,9 +28,9 @@ async function getFreshToken(): Promise<string | null> {
 }
 
 export function useSocket(events?: SocketEvents): Socket | null {
-  const socketRef = useRef<Socket | null>(null);
+  const socketRef       = useRef<Socket | null>(null);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
-  const hasHydrated = useAppSelector((state) => state.auth.hasHydrated);
+  const hasHydrated     = useAppSelector((state) => state.auth.hasHydrated);
 
   useEffect(() => {
     if (!isAuthenticated || !hasHydrated) return;
@@ -67,13 +67,12 @@ export function useSocket(events?: SocketEvents): Socket | null {
 
         socket.on("disconnect", (reason) => console.warn("⚠️ Socket disconnected:", reason));
 
-        // Global error listener — must be wired as soon as socket connects
         socket.on("error", (err: { message: string }) => {
           console.error("🔴 Socket operation error:", err.message);
         });
 
         if (events?.onNotification) socket.on("notification:receive", events.onNotification);
-        if (events?.onMessage)      socket.on("message:notify",       events.onMessage); // was "receive-message"
+        if (events?.onMessage)      socket.on("message:notify",       events.onMessage);
 
       } catch (err) {
         console.warn("Socket init failed:", err);
@@ -86,4 +85,75 @@ export function useSocket(events?: SocketEvents): Socket | null {
   }, [isAuthenticated, hasHydrated]);
 
   return socketRef.current;
+}
+
+// ─── useChatRoom ───────────────────────────────────────────────────────────────
+// Separate hook called inside Conversation — uses getSocket() with a retry
+// because by the time Conversation mounts the socket is already initialized
+// by useSocket in the layout.
+
+export function useChatRoom(
+  chatId: string | null,
+  onIncomingMessage: (raw: {
+    _id: string; chatId: string; senderId: string
+    content: string; seenBy: string[]; createdAt: string
+  }) => void
+) {
+  const callbackRef = useRef(onIncomingMessage)
+  useEffect(() => { callbackRef.current = onIncomingMessage }, [onIncomingMessage])
+
+  useEffect(() => {
+    if (!chatId) return
+
+    let socket: Socket | null = null
+    let retries = 0
+    const MAX_RETRIES = 20  // 20 × 300ms = 6 seconds max wait
+
+    const handler = (data: any) => {
+      console.log("📨 message:send received:", data)
+      callbackRef.current({
+        _id:       data.lastMessage._id,
+        chatId:    chatId,
+        senderId:  data.lastMessage.senderId,
+        content:   data.lastMessage.content,
+        seenBy:    data.lastMessage.seenBy,
+        createdAt: data.lastMessage.createdAt,
+      })
+    }
+
+    const joinRoom = (s: Socket) => {
+      console.log("🟢 Joining chat room:", chatId)
+      s.emit("chat:join", { chatId })
+      s.off("message:send")
+      s.on("message:send", handler)
+    }
+
+    const tryJoin = () => {
+      try {
+        socket = getSocket()
+      } catch {
+        if (retries < MAX_RETRIES) {
+          retries++
+          setTimeout(tryJoin, 300)
+        }
+        return
+      }
+
+      if (socket.connected) {
+        joinRoom(socket)
+      } else {
+        socket.once("connect", () => joinRoom(socket!))
+      }
+    }
+
+    tryJoin()
+
+    return () => {
+      if (socket) {
+        console.log("🔴 Leaving chat room:", chatId)
+        socket.emit("chat:leave", { chatId })
+        socket.off("message:send", handler)
+      }
+    }
+  }, [chatId])
 }

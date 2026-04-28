@@ -11,6 +11,7 @@ import { useMessagesContext } from "@/components/messages/MessagesContext";
 import { useSocket } from "@/hooks/sockets/useSocket";
 import { toastBus } from "@/lib/sockets/toastBus";
 import { messageToastBus } from "@/lib/sockets/messageToastBus";
+import { SocketProvider } from "@/lib/sockets/SocketContext";
 
 function SocketInitializer() {
   const { incrementUnread, addIncoming } = useNotificationsContext();
@@ -39,6 +40,7 @@ function SocketInitializer() {
 
 export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
+    <SocketProvider>
     <NotificationsProvider>
       <MessagesProvider>
         <SocketInitializer />
@@ -53,5 +55,6 @@ export default function MainLayout({ children }: { children: React.ReactNode }) 
         </AuthGuard>
       </MessagesProvider>
     </NotificationsProvider>
+    </SocketProvider>
   );
 }
