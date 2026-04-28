@@ -3,6 +3,9 @@ import { messageService } from "@/services/message.service"
 import { getSocket } from "@/lib/sockets/socket"
 import { useAppSelector } from "@/store/hooks"
 import { messageToastBus } from "@/lib/sockets/messageToastBus"
+import { useSocketContext } from "@/lib/sockets/SocketContext"
+import { Socket } from "socket.io-client"
+
 import type {
   Conversation,
   Message,
@@ -203,55 +206,57 @@ export function useChatSocket(
     content: string; seenBy: string[]; createdAt: string
   }) => void
 ) {
-  const listenerAttached = useRef(false)
+  const onIncomingMessageRef = useRef(onIncomingMessage)
+  useEffect(() => {
+    onIncomingMessageRef.current = onIncomingMessage
+  }, [onIncomingMessage])
+
+  // Use context socket instead of getSocket() — avoids race condition
+  const { socketRef } = useSocketContext()
 
   useEffect(() => {
     if (!chatId) return
 
-    let socket: ReturnType<typeof getSocket> | null = null
-    try {
-      socket = getSocket()
-    } catch {
-      console.warn("Socket not ready yet")
-      return
-    }
-
-    socket.emit("chat:join", { chatId })
-
-    if (!listenerAttached.current) {
-      socket.on("message:send", (data: {
-        _id: string
-        lastMessage: {
-          _id: string; senderId: string; content: string
-          seenBy: string[]; createdAt: string
-        }
-      }) => {
-        onIncomingMessage({
-          _id:       data.lastMessage._id,
-          chatId:    chatId,
-          senderId:  data.lastMessage.senderId,
-          content:   data.lastMessage.content,
-          seenBy:    data.lastMessage.seenBy,
-          createdAt: data.lastMessage.createdAt,
-        })
+    const handler = (data: any) => {
+      onIncomingMessageRef.current({
+        _id:       data.lastMessage._id,
+        chatId:    chatId,
+        senderId:  data.lastMessage.senderId,
+        content:   data.lastMessage.content,
+        seenBy:    data.lastMessage.seenBy,
+        createdAt: data.lastMessage.createdAt,
       })
-      listenerAttached.current = true
     }
+
+    const joinAndListen = (socket: Socket) => {
+  console.log("🟢 Joining chat room:", chatId)
+  socket.emit("chat:join", { chatId }, (response: any) => {
+    console.log("✅ chat:join acknowledged:", response)
+  })
+  socket.off("message:send")
+  socket.on("message:send", (data: any) => {
+    console.log("📨 message:send received:", data)
+    handler(data)
+  })
+  // Also listen to message:notify to see which one fires
+  socket.on("message:notify", (data: any) => {
+    console.log("🔔 message:notify received instead of message:send:", data)
+  })
+}
 
     return () => {
-      socket!.emit("chat:leave", { chatId })
-      socket!.off("message:send")
-      listenerAttached.current = false
+      if (socketRef.current) {
+        socketRef.current.emit("chat:leave", { chatId })
+        socketRef.current.off("message:send", handler)
+      }
     }
-  }, [chatId])
+  }, [chatId, socketRef.current]) // re-runs when socket becomes available
 
   const sendViaSocket = useCallback((content: string) => {
     if (!chatId || !content.trim()) return
-    try {
-      const socket = getSocket()
+    const socket = socketRef.current
+    if (socket?.connected) {
       socket.emit("message:send", { chatId, content })
-    } catch {
-      console.warn("Socket not available, relying on REST only")
     }
   }, [chatId])
 

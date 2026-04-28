@@ -2,7 +2,8 @@ import { useEffect, useRef } from 'react'
 import ConversationHeader from "./ConversationHeader"
 import ConversationInput from "./ConversationInput"
 import MessageBubble from "./MessageBubble"
-import { useMessages, useSendMessage, useChatSocket } from '@/hooks/sockets/useMessaging'
+import { useMessages, useSendMessage } from '@/hooks/sockets/useMessaging'
+import { useChatRoom } from '@/hooks/sockets/useSocket'
 import { useAppSelector } from '@/store/hooks'
 
 interface ConversationProps {
@@ -22,7 +23,9 @@ const Conversation = ({ chatId, receiverId, displayName, photoUrl, isUnread, mar
 
   const { messages, isReceiverBlocked, addMessage } = useMessages(chatId)
   const { send, isSending }                         = useSendMessage(addMessage)
-  useChatSocket(chatId, addMessage)
+
+  // useChatRoom handles join/leave/message:send — lives in useSocket.ts
+  useChatRoom(chatId, addMessage)
 
   const sortedMessages = [...messages].sort(
     (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
@@ -39,7 +42,7 @@ const Conversation = ({ chatId, receiverId, displayName, photoUrl, isUnread, mar
         chatId={chatId}
         receiverId={receiverId}
         isUnread={isUnread}
-        initialIsBlocked={isReceiverBlocked}   // ← persists blocked state across navigation
+        initialIsBlocked={isReceiverBlocked}
         markAsUnread={markAsUnread}
         markAsRead={markAsRead}
       />
