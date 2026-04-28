@@ -8,6 +8,7 @@ import {
 	CreateTrackRequest,
 	CreateTrackResponse,
 	GetTrackByIdResponse,
+  GetTrackDetailedResponse,
 	UpdateTrackRequest,
 	UpdateTrackResponse,
 	incrementPlayCountResponse,
@@ -57,8 +58,12 @@ export const tracksService = {
     api.get<GetPostedTracksResponse>(`/api/tracks/v1/posted/${userId}`),
   getTrackById: (id: string) =>
     api.get<GetTrackByIdResponse>(`/api/tracks/v1/${id}`),
-  getLikedTracks: (userId: string) =>
+  getTrackDetailed: (id: string) =>
+    api.get<GetTrackDetailedResponse>(`/api/tracks/v1/detailed/${id}`),
+  getPublicLikedTracks: (userId: string) =>
     api.get<GetLikedTracksResponse>(`/api/public/tracks/v1/liked/${userId}`),
+  getLikedTracks: (userId: string) =>
+    api.get<GetLikedTracksResponse>(`/api/tracks/v1/liked/${userId}`),
 
   UpdateTrack: (data: UpdateTrackRequest) => {
     const formData = new FormData();

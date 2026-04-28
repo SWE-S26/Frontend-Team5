@@ -1,8 +1,10 @@
 "use client";
 
 import { useRef, useState, useEffect } from "react";
-import { useCreatePlaylist, useGetMyPlaylists, useAddTrackToPlaylist, useUpdatePlaylist, useUpdatePlaylistImage } from "@/hooks/usePlaylists";
+import { IoClose } from "react-icons/io5";
+import { useCreatePlaylistWithImage, useGetMyPlaylists, useAddTrackToPlaylist } from "@/hooks/usePlaylists";
 import { ArtworkPanel } from "@/components/upload/TrackInfoForm/ArtworkPanel";
+import { createZoomCroppedArtworkFile } from "@/components/upload/TrackInfoForm";
 import { Spin } from "antd";
 
 interface CreatePlaylistFormState {
@@ -23,9 +25,7 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
   const artworkPanStartRef = useRef<{ clientX: number; clientY: number; startX: number; startY: number } | null>(null);
 
   const { getMyPlaylists, playlists, loading: playlistsLoading } = useGetMyPlaylists();
-  const { createPlaylist, loading: createLoading } = useCreatePlaylist();
-  const { updatePlaylist } = useUpdatePlaylist();
-  const { updatePlaylistImage } = useUpdatePlaylistImage();
+  const { createPlaylistWithImage, loading: createLoading } = useCreatePlaylistWithImage();
   const { addTrackToPlaylist, loading: addLoading } = useAddTrackToPlaylist();
 
   const [addingToPlaylistId, setAddingToPlaylistId] = useState<string | null>(null);
@@ -53,26 +53,17 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
     try {
       setErrorMessage(null);
       setSuccessMessage(null);
-      const result = await createPlaylist({
-        playlistName: formData.title,
-        tracks: trackIds,
+      const zoomCroppedArtwork = artworkFile
+        ? await createZoomCroppedArtworkFile(artworkFile, artworkZoom, artworkPosition)
+        : undefined;
+
+      await createPlaylistWithImage({
+        title: formData.title.trim(),
+        description: formData.description.trim() || undefined,
         isPrivate: formData.isPrivate,
+        listOfTracks: trackIds,
+        image: zoomCroppedArtwork,
       });
-      const createdPlaylistId = result?.data?.playlists?.[0]?._id ?? null;
-      if (createdPlaylistId) {
-        if (formData.description.trim()) {
-          try {
-            await updatePlaylist(createdPlaylistId, {
-              description: formData.description.trim(),
-            });
-          } catch {}
-        }
-        if (artworkFile) {
-          try {
-            await updatePlaylistImage(createdPlaylistId, artworkFile);
-          } catch {}
-        }
-      }
       setFormData({ title: "", description: "", isPrivate: false });
       setArtworkFile(null);
       setArtworkUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
@@ -229,7 +220,7 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
             onClick={onClose}
             className="rounded-full bg-red-500 px-8 py-2 text-[12px] font-semibold text-chinese-black hover:bg-white-smoke/80 transition-colors disabled:opacity-50 cursor-pointer"
           >
-            ✕
+            <IoClose size={16} />
           </button>
           <h2 className="text-[15px] font-semibold text-white-smoke cursor-pointer">
             Add {trackCount} track{trackCount !== 1 ? "s" : ""} to playlist
@@ -365,7 +356,7 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
 
               {playlistsLoading ? (
                 <div className="flex justify-center py-10">
-                  <Spin />
+                  <Spin className="text-white-smoke"/>
                 </div>
               ) : !playlists || playlists.length === 0 ? (
                 <p className="text-[13px] text-white-smoke/30 py-4 px-1">No playlists yet. Create one to get started!</p>

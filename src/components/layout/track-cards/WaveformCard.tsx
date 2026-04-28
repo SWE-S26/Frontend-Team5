@@ -5,6 +5,7 @@ import Card from "@/components/ui/Card";
 import SausageWaveform from "@/components/ui/SausageWaveform";
 import Tooltip from "@/components/ui/Tooltip";
 import MoreDropdown from "@/components/ui/MoreDropdown";
+import AddToPlaylistModal from "@/components/playlists/AddToPlaylistModal";
 
 import { useState, useRef, useEffect } from "react";
 import { Avatar } from "antd";
@@ -81,6 +82,7 @@ export default function WaveformCard({
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const [isLiked, setIsLiked] = useState(isLikedByUser ?? false);
   const [likeCountState, setLikeCountState] = useState(likeCount);
+  const [isAddToPlaylistOpen, setIsAddToPlaylistOpen] = useState(false);
 
   const commentBoxRef = useRef<HTMLInputElement>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
@@ -220,7 +222,12 @@ export default function WaveformCard({
     window.open(downloadUrl, "_blank", "noopener,noreferrer");
   };
 
+  const handleOpenAddToPlaylistModal = () => {
+    setIsAddToPlaylistOpen(true);
+  };
+
   return (
+    <>
     <div ref={ref} className="flex items-stretch">
       <div className="h-full overflow-hidden -m-1 -mb-1.75">
         <Card type="static" img={img} />
@@ -364,15 +371,6 @@ export default function WaveformCard({
                 icon={<TbCopy className="text-xl" />}
               />
             </Tooltip>
-            {onAddToPlaylist && canEdit && (
-              <Tooltip label="Add to playlist">
-                <Button
-                  onClick={onAddToPlaylist}
-                  className="bg-off-black mr-4"
-                  icon={<FiPlusSquare className="text-xl" />}
-                />
-              </Tooltip>
-            )}
             {onEdit && canEdit && (
               <Tooltip label="Edit track">
                 <Button
@@ -409,6 +407,7 @@ export default function WaveformCard({
                   icon: (
                     <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
                   ),
+                  onClick: handleOpenAddToPlaylistModal,
                 },
                 { label: "Station", icon: <BiStation className="text-lg" /> },
               ]}
@@ -417,5 +416,14 @@ export default function WaveformCard({
         </motion.div>
       </div>
     </div>
+    <AddToPlaylistModal
+      isOpen={isAddToPlaylistOpen}
+      onClose={() => setIsAddToPlaylistOpen(false)}
+      trackId={trackId}
+      trackTitle={title}
+      artistName={artist}
+      trackImage={img}
+    />
+    </>
   );
 }

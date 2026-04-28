@@ -3,6 +3,7 @@ import { playlistsService } from "@/services/playlists.service";
 import { useCallback, useState } from "react";
 import {
   CreatePlaylistRequest,
+  CreatePlaylistWithImageRequest,
   GetPlaylistsResponse,
   GetPublicPlaylistsResponse,
   GetPublicPlaylistByIdResponse,
@@ -543,4 +544,34 @@ export function useAddPlaylistToHistory() {
   }, []);
 
   return { addPlaylistToHistory, loading, error, success };
+}
+
+export function useCreatePlaylistWithImage() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+
+  const createPlaylistWithImage = useCallback(
+    async (data: CreatePlaylistWithImageRequest) => {
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+      try {
+        const res = await playlistsService.createPlaylistWithImage(data);
+        setSuccess(true);
+        return res.data;
+      } catch (err: any) {
+        const message =
+          err.response?.data?.message || "Failed to create playlist";
+        setError(message);
+        setSuccess(false);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  return { createPlaylistWithImage, loading, error, success };
 }

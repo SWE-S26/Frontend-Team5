@@ -1,3 +1,5 @@
+import { IoClose } from "react-icons/io5";
+
 export function AmplifyModal({ onClose, onUnlock }: { onClose: () => void; onUnlock: () => void }) {
   return (
     <div className="fixed inset-0 z-200 flex items-center justify-center bg-chinese-black/70" onClick={onClose}>
@@ -10,7 +12,7 @@ export function AmplifyModal({ onClose, onUnlock }: { onClose: () => void; onUnl
           onClick={onClose}
           className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-chinese-black text-[#aaa] hover:text-white-smoke transition-colors"
         >
-          ✕
+          <IoClose size={16} />
         </button>
 
         <div className="flex flex-col gap-6 lg:flex-row lg:items-start lg:gap-8">

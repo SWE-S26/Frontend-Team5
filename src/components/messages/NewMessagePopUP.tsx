@@ -1,6 +1,7 @@
 "use client"
 import { useState } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
+import { IoClose } from "react-icons/io5";
 import { useSendMessage } from '@/hooks/sockets/useMessaging'
 import { messageToastBus } from '@/lib/sockets/messageToastBus'
 import Button from '@/components/ui/Button'
