@@ -9,6 +9,7 @@ import {
   GetTracksResponse,
   GetLikedTracksResponse,
   UpdateTrackRequest,
+  GetTrackDetailedResponse,
 } from "@/types/tracks.types";
 import { GetTrackByIdResponse } from "@/types/tracks.types";
 
@@ -217,6 +218,43 @@ export function useGetTrackById() {
 
   return {
     getTrackById,
+    loading,
+    error,
+    track,
+  };
+}
+
+export function useGetTrackDetailed() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [track, setTrack] = useState<GetTrackDetailedResponse["data"] | null>(null);
+
+  const getTrackDetailed = useCallback(async (id: string) => {
+    if (!id) return;
+
+    setLoading(true);
+    setError(null);
+    setTrack(null);
+
+    try {
+      const res = await tracksService.getTrackDetailed(id);
+      setTrack(res.data.data);
+      return res.data;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        const message =
+          err.response?.data?.message || "Failed to fetch track";
+        setError(message);
+      } else {
+        setError("Something went wrong");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return {
+    getTrackDetailed,
     loading,
     error,
     track,

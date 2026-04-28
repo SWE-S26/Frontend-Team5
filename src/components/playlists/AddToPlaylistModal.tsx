@@ -34,6 +34,8 @@ export default function AddToPlaylistModal({
   artistName,
   trackImage,
 }: Props) {
+  const [shouldRender, setShouldRender] = useState(false);
+  const [animate, setAnimate] = useState(false);
   const [activeTab, setActiveTab] = useState<"add" | "create">("add");
   const [search, setSearch] = useState("");
   const [newPlaylistTitle, setNewPlaylistTitle] = useState("");
@@ -46,6 +48,20 @@ export default function AddToPlaylistModal({
     useGetMyPlaylists();
   const { addTrackToPlaylist, loading: addingTrack } = useAddTrackToPlaylist();
   const { createPlaylist, loading: creatingPlaylist } = useCreatePlaylist();
+
+  const getPlaylistTitle = (playlist: Playlist & { playlistName?: string; name?: string }) =>
+    playlist.title ?? playlist.playlistName ?? playlist.name ?? "";
+
+  useEffect(() => {
+    if (isOpen) {
+      setShouldRender(true);
+      const timer = setTimeout(() => setAnimate(true), 20);
+      return () => clearTimeout(timer);
+    }
+    setAnimate(false);
+    const timer = setTimeout(() => setShouldRender(false), 300);
+    return () => clearTimeout(timer);
+  }, [isOpen]);
 
   useEffect(() => {
     if (!isOpen) return;
@@ -69,11 +85,11 @@ export default function AddToPlaylistModal({
     const q = search.trim().toLowerCase();
     if (!q) return playlists;
     return playlists.filter((playlist) =>
-      playlist.title.toLowerCase().includes(q)
+      getPlaylistTitle(playlist).toLowerCase().includes(q)
     );
   }, [playlists, search]);
 
-  if (!isOpen) return null;
+  if (!shouldRender) return null;
 
   const handleAddTrack = async (playlistId: string) => {
     try {
@@ -109,20 +125,33 @@ export default function AddToPlaylistModal({
       await getMyPlaylists(20, 1);
       broadcastPlaylistUpdate();
     } catch {
-      // Hook handles error state.
     }
   };
 
   return (
     <>
-      {/* Backdrop */}
       <div
-        className="fixed inset-0 z-200 bg-black/60"
-        onClick={onClose}
-      />
+        className={`fixed inset-0 z-1001 flex items-start sm:items-center justify-center overflow-y-auto p-4 sm:p-0 bg-login transition-opacity duration-500 ease-in-out ${
+          animate ? "opacity-100" : "opacity-0"
+        }`}
+      >
+        <button
+          type="button"
+          onClick={onClose}
+          className={`fixed top-6 right-6 z-1010 w-10 h-10 rounded-full flex items-center justify-center text-white-smoke hover:text-gray-400 bg-chinese-black transition-all duration-500 cursor-pointer ${
+            animate ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-10"
+          }`}
+          aria-label="Close modal"
+        >
+          <X size={28} />
+        </button>
 
-      {/* Modal */}
-      <div className="fixed left-1/2 top-1/2 z-210 w-140 -translate-x-1/2 -translate-y-1/2 bg-[#0d0d0d] text-white shadow-2xl">
+        {/* Modal */}
+        <div
+          className={`relative mt-6 sm:mt-0 w-full max-w-140 max-h-[95vh] overflow-y-auto bg-chinese-black text-white-smoke shadow-2xl transform transition-transform duration-500 ${
+            animate ? "translate-y-0" : "-translate-y-[150vh]"
+          }`}
+        >
         {/* Tab header */}
         <div className="flex items-end border-b border-[#2c2c2c] px-6 pt-5">
           <button
@@ -130,8 +159,8 @@ export default function AddToPlaylistModal({
             onClick={() => setActiveTab("add")}
             className={`mr-6 pb-3 text-[22px] font-bold leading-none transition-colors cursor-pointer ${
               activeTab === "add"
-                ? "text-white border-b-2 border-white"
-                : "text-white/50 hover:text-white/80"
+                ? "text-white-smoke border-b-2 border-white"
+                : "text-white-smoke/50 hover:text-white-smoke/80"
             }`}
           >
             Add to playlist
@@ -141,8 +170,8 @@ export default function AddToPlaylistModal({
             onClick={() => setActiveTab("create")}
             className={`pb-3 text-[22px] font-bold leading-none transition-colors cursor-pointer ${
               activeTab === "create"
-                ? "text-white border-b-2 border-white"
-                : "text-white/50 hover:text-white/80"
+                ? "text-white-smoke border-b-2 border-white"
+                : "text-white-smoke/50 hover:text-white=smoke/80"
             }`}
           >
             Create a playlist
@@ -157,16 +186,16 @@ export default function AddToPlaylistModal({
               value={search}
               onChange={(e) => setSearch(e.target.value)}
               placeholder="Filter playlists"
-              className="w-full bg-[#1a1a1a] border border-[#3a3a3a] rounded-sm px-4 py-2.5 text-sm text-white placeholder-white/40 outline-none focus:border-white/50 mb-4"
+              className="w-full bg-chinese-black border border-white-smoke rounded-sm px-4 py-2.5 text-sm text-white-smoke placeholder-white-smoke/40 outline-none focus:border-white/50 mb-4"
             />
 
             {/* Playlist rows */}
             <div className="space-y-1 max-h-80 overflow-y-auto">
               {loadingPlaylists && (
-                <p className="text-white/50 text-sm py-4">Loading playlists...</p>
+                <p className="text-white-smoke/50 text-sm py-4">Loading playlists...</p>
               )}
               {!loadingPlaylists && filteredPlaylists.length === 0 && (
-                <p className="text-white/50 text-sm py-4">No playlists found.</p>
+                <p className="text-white-smoke/50 text-sm py-4">No playlists found.</p>
               )}
 
               {filteredPlaylists.map((playlist) => (
@@ -190,17 +219,17 @@ export default function AddToPlaylistModal({
 
                   {/* Info */}
                   <div className="flex-1 min-w-0">
-                    <p className="text-sm font-semibold text-white truncate">
-                      {playlist.title}
+                    <p className="text-sm font-semibold text-white-smoke truncate">
+                      {getPlaylistTitle(playlist)}
                     </p>
-                    <p className="text-xs text-white/50">
+                    <p className="text-xs text-white-smoke/50">
                       {playlist.listOfTracks?.length ?? 0}
                     </p>
                   </div>
 
                   {/* Private badge */}
                   {playlist.isPrivate && (
-                    <span className="text-xs text-white/60 font-semibold tracking-widest uppercase shrink-0">
+                    <span className="text-xs text-white-smoke/60 font-semibold tracking-widest uppercase shrink-0">
                       PRIVATE
                     </span>
                   )}
@@ -211,8 +240,8 @@ export default function AddToPlaylistModal({
                     disabled={addingTrack && busyPlaylistId === playlist._id}
                     className={`shrink-0 px-4 py-1.5 text-sm font-semibold rounded-sm border transition cursor-pointer disabled:opacity-60 ${
                       addedPlaylistIds.has(playlist._id)
-                        ? "bg-[#222] text-[#ff5500] border-[#333] hover:bg-[#2a2a2a]"
-                        : "bg-[#222] text-white border-[#333] hover:bg-[#2a2a2a]"
+                        ? "bg-chinese-black text-[#ff5500] border-[#333] hover:bg-[#2a2a2a]"
+                        : "bg-chinese-black text-white-smoke border-[#333] hover:bg-[#2a2a2a]"
                     }`}
                   >
                     {busyPlaylistId === playlist._id
@@ -238,19 +267,19 @@ export default function AddToPlaylistModal({
             <input
               value={newPlaylistTitle}
               onChange={(e) => setNewPlaylistTitle(e.target.value)}
-              className="w-full bg-[#1a1a1a] border border-[#3a3a3a] rounded-sm px-3 py-2.5 text-sm text-white outline-none focus:border-white/50 mb-4"
+              className="w-full bg-chinese-black border border-[#3a3a3a] rounded-sm px-3 py-2.5 text-sm text-white-smoke outline-none focus:border-white/50 mb-4"
             />
 
             {/* Privacy + Save row */}
             <div className="flex items-center gap-6 mb-5">
-              <span className="text-sm font-semibold text-white">Privacy:</span>
+              <span className="text-sm font-semibold text-white-smoke">Privacy:</span>
               <label className="flex items-center gap-2 text-sm cursor-pointer">
                 <input
                   type="radio"
                   name="privacy"
                   checked={!isPrivate}
                   onChange={() => setIsPrivate(false)}
-                  className="accent-white"
+                  className="accent-white-smoke"
                 />
                 Public
               </label>
@@ -260,7 +289,7 @@ export default function AddToPlaylistModal({
                   name="privacy"
                   checked={isPrivate}
                   onChange={() => setIsPrivate(true)}
-                  className="accent-white"
+                  className="accent-white-smoke"
                 />
                 Private
               </label>
@@ -268,7 +297,7 @@ export default function AddToPlaylistModal({
               <button
                 onClick={() => void handleCreatePlaylist()}
                 disabled={creatingPlaylist || !newPlaylistTitle.trim()}
-                className="ml-auto px-5 py-1.5 text-sm font-semibold bg-white text-black rounded-sm hover:bg-white/90 disabled:opacity-50 transition cursor-pointer"
+                className="ml-auto px-5 py-1.5 text-sm font-semibold bg-white-smoke text-chinese-black rounded-sm hover:bg-white/90 disabled:opacity-50 transition cursor-pointer"
               >
                 {creatingPlaylist ? "Saving..." : "Save"}
               </button>
@@ -292,11 +321,11 @@ export default function AddToPlaylistModal({
                 <p className="text-sm text-white/60 truncate">
                   {artistName ?? "Unknown artist"}
                 </p>
-                <p className="text-sm font-semibold text-white truncate">
+                <p className="text-sm font-semibold text-white-smoke truncate">
                   {trackTitle ?? "Untitled track"}
                 </p>
               </div>
-              <button className="text-white/40 hover:text-white shrink-0">
+              <button className="text-white/40 hover:text-white-smoke shrink-0">
                 <X className="w-4 h-4" />
               </button>
             </div>
@@ -304,7 +333,7 @@ export default function AddToPlaylistModal({
             {/* "Looking for more tracks" section — existing playlists */}
             {!createdPlaylist && filteredPlaylists.length > 0 && (
               <>
-                <p className="text-sm text-white/70 mt-4 mb-3">
+                <p className="text-sm text-white-smoke/70 mt-4 mb-3">
                   Looking for more tracks? Add some of your own.
                 </p>
                 <div className="space-y-1 max-h-50 overflow-y-auto">
@@ -329,14 +358,14 @@ export default function AddToPlaylistModal({
                         <p className="text-sm text-white/60 truncate">
                           {playlist.artistId}
                         </p>
-                        <p className="text-sm font-semibold text-white truncate">
-                          {playlist.title}
+                        <p className="text-sm font-semibold text-white-smoke truncate">
+                          {getPlaylistTitle(playlist)}
                         </p>
                       </div>
                       <button
                         onClick={() => void handleAddTrack(playlist._id)}
                         disabled={addingTrack && busyPlaylistId === playlist._id}
-                        className="shrink-0 px-4 py-1.5 text-sm font-semibold bg-[#222] text-white border border-[#444] rounded-sm hover:bg-[#2a2a2a] disabled:opacity-60 transition cursor-pointer"
+                        className="shrink-0 px-4 py-1.5 text-sm font-semibold bg-chinese-black text-white-smoke border border-[#444] rounded-sm hover:bg-[#2a2a2a] disabled:opacity-60 transition cursor-pointer"
                       >
                         {addingTrack && busyPlaylistId === playlist._id
                           ? "Adding..."
@@ -367,7 +396,7 @@ export default function AddToPlaylistModal({
                   <p className="text-sm text-white/60 truncate">
                     {createdPlaylist.artistId}
                   </p>
-                  <p className="text-sm font-semibold text-white truncate">
+                  <p className="text-sm font-semibold text-white-smoke truncate">
                     {createdPlaylist.title}
                   </p>
                 </div>
@@ -384,6 +413,7 @@ export default function AddToPlaylistModal({
             )}
           </div>
         )}
+      </div>
       </div>
     </>
   );

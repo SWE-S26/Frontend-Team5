@@ -1,6 +1,7 @@
 "use client"
 import SendButton from './SendButton'
 import { motion, AnimatePresence } from 'framer-motion'
+import { IoClose } from "react-icons/io5";
 
 interface NewMessagePopUPProps {
     isOpen: boolean
@@ -16,7 +17,7 @@ const NewMessagePopUP = ({ isOpen, onClose }: NewMessagePopUPProps) => {
                         className='fixed top-4 right-4 text-white-smoke text-2xl font-bold bg-off-black rounded-full w-11 h-11 flex items-center justify-center hover:text-silver cursor-pointer z-1002' 
                         onClick={onClose}
                     >
-                        ✕
+                        <IoClose size={16} />
                     </button>
                     <motion.div
                         initial={{ opacity: 0, y: -60 }}

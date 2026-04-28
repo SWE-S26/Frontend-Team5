@@ -13,6 +13,7 @@ import { FaFacebook } from "react-icons/fa";
 import { FaTumblr } from "react-icons/fa";
 import { FaPinterest } from "react-icons/fa";
 import { HiOutlineMail } from "react-icons/hi";
+import { IoClose } from "react-icons/io5";
 
 interface SharePopupProps {
   isOpen: boolean
@@ -101,7 +102,7 @@ const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
               className="absolute -top-8 -right-65 text-white text-2xl font-bold bg-off-black rounded-full w-11 h-11 flex items-center justify-center z-[1001] hover:text-silver cursor-pointer"
               onClick={onClose}
             >
-              ✕
+              <IoClose size={16} />
             </button>
 
             <div className="flex gap-6 mb-8">

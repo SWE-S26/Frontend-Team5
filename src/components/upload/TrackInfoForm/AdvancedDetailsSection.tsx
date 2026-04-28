@@ -118,7 +118,7 @@ export function AdvancedDetailsSection({
 
 							<div>
 								<label className={LABEL_CLS}>Release date</label>
-								<small className="flex pb-2 text-[12px] text-white/55">
+								<small className="flex pb-2 text-[12px] text-white-smoke/55">
 									If your track has a specific release date, you can add that here.
 								</small>
 								<div className="relative" ref={releaseCalendarRef}>
@@ -213,7 +213,7 @@ export function AdvancedDetailsSection({
 							].map(({ label, value, setter, placeholder, info }) => (
 								<div key={label}>
 									<label className={LABEL_CLS}>{label}</label>
-									<small className="flex pb-2 text-[12px] text-white/55">{info}</small>
+									<small className="flex pb-2 text-[12px] text-white-smoke/55">{info}</small>
 									<input
 										type="text"
 										value={value}
@@ -226,7 +226,7 @@ export function AdvancedDetailsSection({
 
 							<div>
 								<label className={LABEL_CLS}>Contains explicit content</label>
-								<small className="flex pb-2 text-[12px] text-white/55">
+								<small className="flex pb-2 text-[12px] text-white-smoke/55">
 									Please check this if your track contains explicit content. The badge will be displayed next to your track title.
 								</small>
 								<label className="flex items-center gap-2">
@@ -239,7 +239,7 @@ export function AdvancedDetailsSection({
 
 							<div>
 								<label className={LABEL_CLS}>P line</label>
-								<small className="text-[12px] flex pb-2 text-white/55">
+								<small className="text-[12px] flex pb-2 text-white-smoke/55">
 									P line notice identify the owner of the rights in the original sound recording (the masters) at the time the CD/carrier/file is manufactured.
 								</small>
 								<input

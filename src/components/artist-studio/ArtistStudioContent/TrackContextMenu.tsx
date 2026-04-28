@@ -36,10 +36,6 @@ export function TrackContextMenu({
   const menuItems = [
     { icon: PiPencilSimple,      label: "Edit",            action: () => { onEdit(trackId); onClose(); } },
     { icon: FiPlusSquare, label: "Add to playlist", action: () => { onAddToPlaylist(trackId); onClose(); } },
-    { icon: FiDollarSign, label: "Monetize",        action: onClose },
-    { icon: FiSliders,    label: "Master",          action: onClose },
-    { icon: FiGlobe,      label: "Distribute",      action: onClose },
-    { icon: FiBarChart2,  label: "Track insights",  action: onClose },
     ...(isArtistPro
       ? [{ icon: FiDownload, label: "Download file", action: () => { if (canDownload) onDownload(trackId); onClose(); }, disabled: !canDownload }]
       : []),
