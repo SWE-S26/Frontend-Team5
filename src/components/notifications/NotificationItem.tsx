@@ -12,6 +12,7 @@ import ProfileImage from "@/components/ui/ProfileImage"
 import { DEFAULT_PROFILE_IMAGE_URL } from "@/store/slices/authSlice"
 import { useBlockUser, useUnblockUser } from "@/hooks/useSocial"
 import type { Notification } from "@/types/notification.types"
+import { Ban } from "lucide-react"
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
@@ -83,6 +84,7 @@ export default function NotificationItem({
   const moreItems = [
     {
       label: isBlocked ? `Unblock ${actor.displayName}` : `Block ${actor.displayName}`,
+      icon: isBlocked ? <Ban className="w-4 h-4" /> : undefined,
       onClick: async () => {
         if (isBlocked) {
           await unblockUser(actor.userId)
