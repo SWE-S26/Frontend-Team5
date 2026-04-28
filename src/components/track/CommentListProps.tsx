@@ -301,7 +301,7 @@ export default function CommentList({
         ))}
       </div>
 
-      {hasMore && (
+      {/* {hasMore && (
         <button
           onClick={() => loadMore(trackId)}
           disabled={loading}
@@ -309,7 +309,7 @@ export default function CommentList({
         >
           {loading ? "Loading..." : "Load more comments"}
         </button>
-      )}
+      )} */}
     </div>
   )
 }

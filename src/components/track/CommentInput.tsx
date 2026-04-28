@@ -11,7 +11,7 @@ interface CommentInputProps {
   submitComment: (trackId: string, payload: PostCommentPayload, meta?: { displayName: string; avatarUrl: string }) => Promise<any>
 }
 
-export default function CommentInput({ trackId, submitComment, loading }: CommentInputProps) {
+
 export default function CommentInput({ trackId, submitComment, loading }: CommentInputProps) {
   const [comment, setComment] = useState("")
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)

@@ -20,6 +20,7 @@ export default function TrackUploader({ posterId, onUnfollow }: Props) {
   const hasHydrated = useAppSelector((state) => state.auth.hasHydrated)
   const authUserId  = useAppSelector((state) => state.auth.userId)
   const profile     = useAppSelector((s) => s.profile)
+  const isFollowing = useAppSelector((state) => state.profile.isFollowed) ?? false
 
   useEffect(() => {
     if (!hasHydrated || !posterId) return
@@ -93,8 +94,7 @@ export default function TrackUploader({ posterId, onUnfollow }: Props) {
       {/* Follow Button */}
       <FollowButton
         userId={profile.userId ?? undefined}
-        initialIsFollowing={profile.isFollowed ?? false}
-        onUnfollow={() => onUnfollow?.(profile.userId!)}
+        initialIsFollowing={isFollowing}
       />
 
       {/* Report */}
