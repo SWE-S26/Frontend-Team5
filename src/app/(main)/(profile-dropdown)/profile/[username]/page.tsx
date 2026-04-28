@@ -140,7 +140,7 @@ const ProfilePage = ({ params }: Props) => {
   }
 
   const mapTrackToProfileItem = (track: Track, fallbackIndex: number, canEdit = false) => {
-    const stableId = track.trackId ?? track._id ?? `track-${fallbackIndex}`
+    const stableId = track.trackId ?? `track-${fallbackIndex}`
     return {
       id: stableId,
       trackId: stableId,
