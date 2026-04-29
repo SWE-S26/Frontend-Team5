@@ -9,10 +9,10 @@ import NewMessagePopUP from '@/components/messages/NewMessagePopUP'
 import { useMessagesContext } from '@/components/messages/MessagesContext'
 
 const Page = () => {
-  const searchParams                = useSearchParams()
-  const [isOpen, setIsOpen]         = useState(false)
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
-  const { conversations, markAsRead, markAsUnread } = useMessagesContext()
+  const searchParams                                    = useSearchParams()
+  const [isOpen, setIsOpen]                             = useState(false)
+  const [selectedChatId, setSelectedChatId]             = useState<string | null>(null)
+  const { conversations, markAsRead, markAsUnread }     = useMessagesContext()
 
   const selectedConversation = conversations.find((c) => c.chatId === selectedChatId)
 
@@ -34,6 +34,15 @@ const Page = () => {
       markAsRead(first.chatId)
     }
   }, [conversations.length, searchParams])
+
+  // If updateFromSocket stamps the active conversation as unread (because a new message
+  // arrived while the chat is already open), immediately clear it.
+  // markAsRead is now optimistic so this flips isUnread: false in the same render cycle.
+  useEffect(() => {
+    if (selectedChatId && selectedConversation?.isUnread) {
+      markAsRead(selectedChatId)
+    }
+  }, [selectedConversation?.isUnread, selectedChatId])
 
   return (
     <div className='flex justify-between'>

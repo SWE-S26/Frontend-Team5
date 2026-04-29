@@ -66,12 +66,14 @@ export function useConversations() {
     }
   }, [currentUserId])
 
+  // Optimistic update — flip isUnread: false immediately before the API call
+  // so the UI clears instantly and wins the race against updateFromSocket
   const markAsRead = useCallback(async (chatId: string) => {
+    setConversations((prev) =>
+      prev.map((c) => (c.chatId === chatId ? { ...c, isUnread: false } : c))
+    )
     try {
       await messageService.markAsRead(chatId)
-      setConversations((prev) =>
-        prev.map((c) => c.chatId === chatId ? { ...c, isUnread: false } : c)
-      )
     } catch (err) {
       console.error("Failed to mark as read:", err)
     }

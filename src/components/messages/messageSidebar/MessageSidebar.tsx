@@ -6,10 +6,10 @@ import Button from '@/components/ui/Button'
 import type { Conversation } from '@/types/message.types'
 
 interface MessageSidebarProps {
-  onSelect:      (chatId: string) => void
+  onSelect:       (chatId: string) => void
   selectedChatId: string | null
-  conversations: Conversation[]
-  markAsRead:    (chatId: string) => Promise<void>
+  conversations:  Conversation[]
+  markAsRead:     (chatId: string) => Promise<void>
 }
 
 const MessageSidebar = ({ onSelect, selectedChatId, conversations, markAsRead }: MessageSidebarProps) => {
@@ -19,6 +19,10 @@ const MessageSidebar = ({ onSelect, selectedChatId, conversations, markAsRead }:
     markAsRead(chatId)
     onSelect(chatId)
   }
+
+  const sortedConversations = [...conversations].sort(
+    (a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
+  )
 
   return (
     <>
@@ -32,7 +36,7 @@ const MessageSidebar = ({ onSelect, selectedChatId, conversations, markAsRead }:
 
         <NewMessagePopUP isOpen={isOpen} onClose={() => setIsOpen(false)} />
 
-        {conversations.map((conversation) => (
+        {sortedConversations.map((conversation) => (
           <MessagePerview
             key={conversation.chatId}
             chatId={conversation.chatId}
