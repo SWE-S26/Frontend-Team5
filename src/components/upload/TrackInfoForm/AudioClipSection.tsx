@@ -77,6 +77,7 @@ export function AudioClipSection({
 		<>
 			<button
 				onClick={onToggle}
+				data-testid="upload-clip-toggle"
 				className="flex w-full items-center justify-between py-4 text-left border-b border-[#222] cursor-pointer"
 			>
 				<div className="flex items-start gap-3">
@@ -154,6 +155,7 @@ export function AudioClipSection({
 													<button
 														type="button"
 														onClick={(e) => { e.stopPropagation(); void handleClipPlayPause(); }}
+														data-testid="upload-clip-play-toggle"
 														data-clip-control="true"
 														className="absolute left-1/2 top-1/2 z-20 flex h-10 w-10 -translate-x-1/2 -translate-y-1/2 items-center justify-center rounded-full bg-white-smoke text-chinese-black shadow-lg cursor-pointer"
 														aria-label={isClipPlaying ? "Pause clip preview" : "Play clip preview"}
@@ -175,6 +177,7 @@ export function AudioClipSection({
 											onChange={(e) => setAudioClipStartDraft(e.target.value)}
 											onBlur={() => void applyTypedClipTime("start")}
 											onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void applyTypedClipTime("start"); } }}
+											data-testid="upload-clip-start"
 											className="w-14 bg-transparent text-[16px] font-semibold leading-none text-white-smoke outline-none sm:w-18 sm:text-[22px]"
 											aria-label="Audio clip start time"
 										/>
@@ -186,6 +189,7 @@ export function AudioClipSection({
 											<button
 												type="button"
 												onClick={handleClipReset}
+												data-testid="upload-clip-reset"
 												className="rounded border border-white-smoke/30 px-2 py-0.5 text-[11px] font-semibold uppercase tracking-wide text-white-smoke hover:border-white-smoke hover:bg-white-smoke/10 cursor-pointer"
 											>
 												Reset
@@ -201,6 +205,7 @@ export function AudioClipSection({
 											onChange={(e) => setAudioClipEndDraft(e.target.value)}
 											onBlur={() => void applyTypedClipTime("end")}
 											onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); void applyTypedClipTime("end"); } }}
+											data-testid="upload-clip-end"
 											className="w-14 bg-transparent text-right text-[16px] font-semibold leading-none text-white-smoke outline-none sm:w-18 sm:text-[22px]"
 											aria-label="Audio clip end time"
 										/>

@@ -38,11 +38,11 @@ export function BulkSelectionHeader({
           {selectedCount} SELECTED
         </span>
 
-        <button onClick={onEditSelected}>
+        <button onClick={onEditSelected} data-testid="artist-bulk-edit-selected">
           <PiPencilSimple className="text-[15px] text-white-smoke cursor-pointer" />
         </button>
 
-        <button onClick={onAddSelectedToPlaylist}>
+        <button onClick={onAddSelectedToPlaylist} data-testid="artist-bulk-add-to-playlist">
           <FiPlusSquare className="text-[15px] text-white-smoke cursor-pointer" />
         </button>
       </div>

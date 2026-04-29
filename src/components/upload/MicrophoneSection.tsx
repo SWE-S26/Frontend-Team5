@@ -95,6 +95,7 @@ export function MicrophoneSection({
           setMicOpen(!micOpen);
           if (!micOpen) getMicrophones();
         }}
+        data-testid="upload-mic-toggle"
         className="flex w-full flex-wrap items-start justify-between gap-3 px-4 py-4 sm:items-center sm:px-5 cursor-pointer"
       >
         {/* Left: mic icon + dropdown */}
@@ -121,6 +122,7 @@ export function MicrophoneSection({
             ? "animate-pulse border-red-500 text-red-400"
             : "border-[#5b5c64] text-[#f2f2f2] hover:border-[#8b8c94]"
         }`}
+            data-testid="upload-mic-dropdown-toggle"
             aria-label="Select microphone"
             aria-expanded={micDropdownOpen}
           >
@@ -161,6 +163,7 @@ export function MicrophoneSection({
                     ? "text-[#f2f2f2] bg-[#2b2c31]"
                     : "text-[#ceced0] hover:bg-[#25262b] hover:text-[#f2f2f2]"
                 }`}
+                    data-testid={`upload-mic-option-${mic.deviceId}`}
                   >
                     <div className="flex items-center justify-between">
                       <span className="truncate">{mic.label}</span>
@@ -204,6 +207,7 @@ export function MicrophoneSection({
             }
           }}
           className="order-2 ml-auto flex items-center justify-center rounded text-[14px] text-[#d0d0d4] transition-all duration-200 hover:text-[#f2f2f2] focus:outline-none sm:order-3 sm:ml-0 cursor-pointer"
+          data-testid="upload-mic-collapse"
           aria-label={
             micOpen ? "Collapse recording options" : "Expand recording options"
           }
@@ -238,6 +242,7 @@ export function MicrophoneSection({
                     <button
                       type="button"
                       onClick={handleBackToRecording}
+                      data-testid="upload-mic-back"
                       className="flex h-9 w-9 items-center justify-center rounded text-[#f2f2f2] hover:bg-[#2b2c31] transition-colors cursor-pointer"
                       aria-label="Back"
                       title="Back to recording"
@@ -260,6 +265,7 @@ export function MicrophoneSection({
                     <button
                       type="button"
                       onClick={togglePlayPause}
+                      data-testid="upload-mic-play-toggle"
                       className="flex h-9 w-9 items-center justify-center rounded text-[#f2f2f2] hover:bg-[#2b2c31] transition-colors cursor-pointer"
                       aria-label={isPlaying ? "Pause" : "Play"}
                     >
@@ -309,6 +315,7 @@ export function MicrophoneSection({
                       type="button"
                       onClick={handleCheckmark}
                       disabled={!canConfirm}
+                      data-testid="upload-mic-confirm"
                       className={`flex h-9 w-9 items-center justify-center rounded transition-all 
                         ${
                           canConfirm
@@ -323,6 +330,7 @@ export function MicrophoneSection({
                       type="button"
                       onClick={handleUndo}
                       disabled={!canUndo}
+                      data-testid="upload-mic-undo"
                       className={`flex h-9 w-9 items-center justify-center rounded transition-all
                          ${
                            canUndo
@@ -337,6 +345,7 @@ export function MicrophoneSection({
                       type="button"
                       onClick={handleRedo}
                       disabled={!canRedo}
+                      data-testid="upload-mic-redo"
                       className={`flex h-9 w-9 items-center justify-center rounded transition-all
                          ${
                            canRedo
@@ -351,6 +360,7 @@ export function MicrophoneSection({
                       type="button"
                       onClick={handleDeleteRecording}
                       disabled={!canDelete}
+                      data-testid="upload-mic-delete"
                       className={`flex h-9 w-9 items-center justify-center rounded transition-all
                         ${
                           canDelete
@@ -370,6 +380,7 @@ export function MicrophoneSection({
                 {isPreviewMode ? (
                   <button
                     onClick={handleUpload}
+                    data-testid="upload-mic-upload"
                     className="flex items-center gap-2 rounded-full bg-[#3a3b40] px-8 py-2.5 text-[14px] font-semibold text-[#f2f2f2] transition-opacity hover:opacity-90 cursor-pointer"
                     type="button"
                   >
@@ -378,6 +389,7 @@ export function MicrophoneSection({
                 ) : isPaused ? (
                   <button
                     onClick={resumeRecording}
+                    data-testid="upload-mic-resume"
                     className="flex items-center gap-2 rounded-full bg-[#3a3b40] px-5 py-2.5 text-[14px] font-semibold text-[#f2f2f2] transition-opacity hover:opacity-90 cursor-pointer"
                     type="button"
                   >
@@ -389,6 +401,7 @@ export function MicrophoneSection({
                 ) : !isRecording && !isPaused ? (
                   <button
                     onClick={startRecording}
+                    data-testid="upload-mic-start"
                     className="flex items-center gap-2 rounded-full bg-[#3a3b40] px-5 py-2.5 text-[14px] font-semibold text-[#f2f2f2] transition-opacity hover:opacity-90 cursor-pointer"
                     type="button"
                   >
@@ -400,6 +413,7 @@ export function MicrophoneSection({
                 ) : (
                   <button
                     onClick={togglePauseResume}
+                    data-testid="upload-mic-pause"
                     className="flex items-center gap-2 rounded-full bg-[#3a3b40] px-5 py-2.5 text-[14px] font-semibold text-[#f2f2f2] transition-opacity hover:opacity-90 cursor-pointer"
                     type="button"
                   >

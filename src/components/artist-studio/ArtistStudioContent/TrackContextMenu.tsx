@@ -51,7 +51,7 @@ export function TrackContextMenu({
   return (
     <div
       ref={ref}
-      className="fixed z-150 w-52 rounded-xl border border-[#2a2a2a] bg-chinese-black py-1.5 shadow-2xl"
+      className="fixed z-1100 w-52 rounded-xl border border-[#2a2a2a] bg-chinese-black py-1.5 shadow-2xl"
       style={{ top: adjustedY, left: adjustedX }}
     >
       {menuItems.map(({ icon: Icon, label, action, danger, disabled }) => (
@@ -60,6 +60,7 @@ export function TrackContextMenu({
           type="button"
           onClick={action}
           disabled={disabled}
+          data-testid={`artist-track-menu-${label.toLowerCase().replace(/\s+/g, "-")}`}
           className={`flex w-full items-center gap-3 px-4 py-2.5 text-[13px] transition-colors hover:bg-chinese-black cursor-pointer ${
             disabled
               ? "cursor-not-allowed text-[#555]"

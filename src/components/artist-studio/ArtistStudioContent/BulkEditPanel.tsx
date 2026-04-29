@@ -25,10 +25,11 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
     setArtworkSrc(URL.createObjectURL(file));
   };
 
-  const Toggle = ({ value, onChange }: { value: boolean; onChange: (v: boolean) => void }) => (
+  const Toggle = ({ value, onChange, testId }: { value: boolean; onChange: (v: boolean) => void; testId: string }) => (
     <button
       type="button"
       onClick={() => onChange(!value)}
+      data-testid={testId}
       className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors ${value ? "bg-[#1db954]" : "bg-[#444]"}`}
     >
       <span className={`inline-block h-4 w-4 transform rounded-full bg-white-smoke shadow transition-transform ${value ? "translate-x-4" : "translate-x-0.5"}`} />
@@ -43,7 +44,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#2a2a2a] px-4 py-3.5 sm:px-5">
           <div className="flex items-center gap-3">
-            <button type="button" onClick={onClose} className="text-white-smoke hover:text-[#aaa] transition-colors text-[20px] leading-none cursor-pointer">✕</button>
+            <button type="button" onClick={onClose} data-testid="artist-bulk-edit-close" className="text-white-smoke hover:text-[#aaa] transition-colors text-[20px] leading-none cursor-pointer">✕</button>
             <h2 className="text-[15px] font-bold text-white-smoke">Edit {count} tracks</h2>
           </div>
         </div>
@@ -56,6 +57,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
             <button
               type="button"
               onClick={() => artworkInputRef.current?.click()}
+              data-testid="artist-bulk-edit-artwork-button"
               className="flex h-55 w-full flex-col items-center justify-center gap-3 rounded-lg border-2 border-dashed border-[#333] bg-chinese-black hover:border-[#555] transition-colors cursor-pointer overflow-hidden"
             >
               {artworkSrc ? (
@@ -71,7 +73,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
                 </>
               )}
             </button>
-            <input ref={artworkInputRef} type="file" accept="image/*" className="hidden" onChange={handleArtworkChange} />
+            <input ref={artworkInputRef} type="file" accept="image/*" className="hidden" onChange={handleArtworkChange} data-testid="artist-bulk-edit-artwork-input" />
           </div>
 
           {/* Primary genre */}
@@ -79,6 +81,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
             <label className="mb-1 block text-[13px] font-semibold text-white-smoke">Primary genre</label>
             <button
               type="button"
+              data-testid="artist-bulk-edit-genre"
               className="flex w-full items-center justify-between rounded-lg border border-[#2a2a2a] bg-transparent px-4 py-3 text-[13px] text-[#666] hover:border-[#444] transition-colors cursor-pointer"
             >
               <span>{genre || "Add or search for a genre"}</span>
@@ -95,6 +98,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
               value={tags}
               onChange={(e) => setTags(e.target.value)}
               placeholder="Add styles, moods, tempo."
+              data-testid="artist-bulk-edit-tags"
               className="w-full rounded-lg border border-[#2a2a2a] bg-transparent px-4 py-3 text-[13px] text-white-smoke outline-none focus:border-[#444] transition-colors placeholder:text-[#666]"
             />
           </div>
@@ -112,6 +116,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
                   key={key}
                   type="button"
                   onClick={() => setPrivacy(key)}
+                  data-testid={`artist-bulk-edit-privacy-${key}`}
                   className={`flex-1 py-2.5 transition-colors cursor-pointer ${
                     privacy === key ? "bg-white-smoke text-chinese-black" : "bg-transparent text-[#888] hover:text-white-smoke"
                   }`}
@@ -127,6 +132,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
             <button
               type="button"
               onClick={() => setAdvancedOpen((v) => !v)}
+              data-testid="artist-bulk-edit-advanced-toggle"
               className="flex w-full items-center justify-between px-4 py-3.5 hover:bg-upload-select transition-colors cursor-pointer"
             >
               <span className="text-[14px] font-semibold text-white-smoke">Advanced settings</span>
@@ -147,6 +153,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
                         key={key}
                         type="button"
                         onClick={() => setDownloads(key)}
+                        data-testid={`artist-bulk-edit-downloads-${key}`}
                         className={`flex-1 py-2 transition-colors cursor-pointer ${
                           downloads === key ? "bg-white-smoke text-chinese-black" : "bg-transparent text-[#888] hover:text-white-smoke"
                         }`}
@@ -166,7 +173,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
                     <span className="text-[13px] text-white-smoke">{label}</span>
                     <div className="flex items-center gap-2">
                       <RiLockFill className="text-[#555] text-[13px]" />
-                      <Toggle value={value} onChange={onChange} />
+                      <Toggle value={value} onChange={onChange} testId={`artist-bulk-edit-toggle-${label.toLowerCase().replace(/\s+/g, "-")}`} />
                     </div>
                   </div>
                 ))}
@@ -179,6 +186,7 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
         <div className="flex justify-end border-t border-[#2a2a2a] px-4 py-4 sm:px-6">
           <button
             type="button"
+            data-testid="artist-bulk-edit-apply"
             className="rounded-full bg-chinese-black px-7 py-2.5 text-[13px] font-bold text-white-smoke hover:bg-upload-select transition-colors cursor-pointer"
           >
             Apply changes

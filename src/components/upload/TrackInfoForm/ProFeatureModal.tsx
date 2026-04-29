@@ -17,6 +17,7 @@ export function ProFeatureModal({ showProFeatureModal, onClose, onUpgrade }: Pro
 				<button
 					type="button"
 					onClick={onClose}
+					data-testid="upload-profeature-close"
 					className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#2b2c31] text-[#ccc] transition-colors hover:bg-[#38383d] cursor-pointer"
 					aria-label="Close pro feature modal"
 				>
@@ -30,6 +31,7 @@ export function ProFeatureModal({ showProFeatureModal, onClose, onUpgrade }: Pro
 					<button
 						type="button"
 						onClick={onClose}
+						data-testid="upload-profeature-maybe-later"
 						className="px-4 py-2 text-[13px] font-semibold text-white-smoke rounded transition-colors hover:bg-[#2b2c31] cursor-pointer"
 					>
 						Maybe later
@@ -37,6 +39,7 @@ export function ProFeatureModal({ showProFeatureModal, onClose, onUpgrade }: Pro
 					<button
 						type="button"
 						onClick={onUpgrade}
+						data-testid="upload-profeature-upgrade"
 						className="rounded-full bg-[#f5a623] px-5 py-2 text-[13px] font-semibold text-chinese-black transition-colors hover:bg-[#ffc55a] cursor-pointer"
 					>
 						Upgrade to Pro

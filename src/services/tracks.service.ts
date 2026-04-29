@@ -9,7 +9,9 @@ import {
 	CreateTrackRequest,
 	CreateTrackResponse,
 	GetTrackByIdResponse,
+  GetTrackPermalinkResponse,
   GetTrackDetailedResponse,
+	CheckTrackPermalinkResponse,
 	UpdateTrackRequest,
 	UpdateTrackResponse,
 	incrementPlayCountResponse,
@@ -19,76 +21,109 @@ import {
   AddTrackToHistoryResponse,
 } from "@/types/tracks.types";
 
+const appendTrackMetadata = (
+  formData: FormData,
+  data: {
+    basicInfo: CreateTrackRequest["basicInfo"] | UpdateTrackRequest["basicInfo"];
+    permissions?: CreateTrackRequest["permissions"] | UpdateTrackRequest["permissions"];
+    license?: CreateTrackRequest["license"] | UpdateTrackRequest["license"];
+    advanced?: CreateTrackRequest["advanced"] | UpdateTrackRequest["advanced"];
+  },
+) => {
+  formData.append("basicInfo", JSON.stringify(data.basicInfo));
+  if (data.permissions) {
+    formData.append("permissions", JSON.stringify(data.permissions));
+  }
+  if (data.license) {
+    formData.append("license", JSON.stringify(data.license));
+  }
+  if (data.advanced) {
+    formData.append("advanced", JSON.stringify(data.advanced));
+  }
+};
+
+const buildQuery = (page?: number, limit?: number) => {
+  const params = new URLSearchParams();
+  if (page !== undefined) params.append("page", String(page));
+  if (limit !== undefined) params.append("limit", String(limit));
+  const query = params.toString();
+  return query ? `?${query}` : "";
+};
+
+const submitCreateTrack = (
+  data: CreateTrackRequest,
+  onUploadProgress?: (progress: number) => void,
+) => {
+  const formData = new FormData();
+
+  formData.append("audio", data.audio);
+  if (data.image) {
+    formData.append("image", data.image);
+  }
+
+  appendTrackMetadata(formData, data);
+
+  return api.post<CreateTrackResponse>("/api/tracks/v2", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+    onUploadProgress: onUploadProgress
+      ? (event) => {
+          if (!event.total) return;
+          const percent = Math.round((event.loaded / event.total) * 100);
+          onUploadProgress(percent);
+        }
+      : undefined,
+  });
+};
+
+const submitUpdateTrack = (data: UpdateTrackRequest) => {
+  const formData = new FormData();
+
+  formData.append("id", data.id);
+  if (data.image) {
+    formData.append("image", data.image);
+  }
+
+  appendTrackMetadata(formData, data);
+
+  return api.patch<UpdateTrackResponse>("/api/tracks/v2", formData, {
+    headers: { "Content-Type": "multipart/form-data" },
+  });
+};
+
 export const tracksService = {
   createTrack: (
     data: CreateTrackRequest,
     onUploadProgress?: (progress: number) => void,
   ) => {
-    const formData = new FormData();
-
-    formData.append("audio", data.audio);
-    if (data.image) {
-      formData.append("image", data.image);
-    }
-
-    formData.append("basicInfo", JSON.stringify(data.basicInfo));
-    if (data.permissions) {
-      formData.append("permissions", JSON.stringify(data.permissions));
-    }
-    if (data.license) {
-      formData.append("license", JSON.stringify(data.license));
-    }
-    if (data.advanced) {
-      formData.append("advanced", JSON.stringify(data.advanced));
-    }
-
-    return api.post<CreateTrackResponse>("/api/tracks/v1", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-      onUploadProgress: onUploadProgress
-        ? (event) => {
-            if (!event.total) return;
-            const percent = Math.round((event.loaded / event.total) * 100);
-            onUploadProgress(percent);
-          }
-        : undefined,
-    });
+    return submitCreateTrack(data, onUploadProgress);
   },
   getTracks: (page: number, limit: number) =>
-    api.get<GetTracksResponse>(`/api/tracks/v1/?page=${page}&limit=${limit}`),
+    api.get<GetTracksResponse>(`/api/tracks/v2/${buildQuery(page, limit)}`),
+  getPublicTracks: (page: number, limit: number) =>
+    api.get<GetTracksResponse>(`/api/public/tracks/v2/${buildQuery(page, limit)}`),
   getPostedTracks: (userId: string) =>
-    api.get<GetPostedTracksResponse>(`/api/tracks/v1/posted/${userId}`),
+    api.get<GetPostedTracksResponse>(`/api/tracks/v2/posted/${userId}`),
+  getPublicPostedTracks: (userId: string) =>
+    api.get<GetPostedTracksResponse>(`/api/public/tracks/v2/posted/${userId}`),
   getTrackById: (id: string) =>
-    api.get<GetTrackByIdResponse>(`/api/tracks/v1/${id}`),
+    api.get<GetTrackByIdResponse>(`/api/tracks/v2/${id}`),
+  getPublicTrackById: (id: string) =>
+    api.get<GetTrackByIdResponse>(`/api/public/tracks/v2/${id}`),
+  getTrackByPermalink: (profileLink: string, permalink: string) =>
+    api.get<GetTrackPermalinkResponse>(`/api/tracks/v2/permalink/${profileLink}/${permalink}`),
+  getPublicTrackByPermalink: (profileLink: string, permalink: string) =>
+    api.get<GetTrackPermalinkResponse>(`/api/public/tracks/v2/permalink/${profileLink}/${permalink}`),
   getTrackDetailed: (id: string) =>
-    api.get<GetTrackDetailedResponse>(`/api/tracks/v1/detailed/${id}`),
+    api.get<GetTrackDetailedResponse>(`/api/tracks/v2/detailed/${id}`),
   getPublicLikedTracks: (userId: string) =>
-    api.get<GetLikedTracksResponse>(`/api/public/tracks/v1/liked/${userId}`),
+    api.get<GetLikedTracksResponse>(`/api/public/tracks/v2/liked/${userId}`),
   getLikedTracks: (userId: string) =>
-    api.get<GetLikedTracksResponse>(`/api/tracks/v1/liked/${userId}`),
+    api.get<GetLikedTracksResponse>(`/api/tracks/v2/liked/${userId}`),
 
   UpdateTrack: (data: UpdateTrackRequest) => {
-    const formData = new FormData();
-
-    formData.append("id", data.id);
-    if (data.image) {
-      formData.append("image", data.image);
-    }
-
-    formData.append("basicInfo", JSON.stringify(data.basicInfo));
-    if (data.permissions) {
-      formData.append("permissions", JSON.stringify(data.permissions));
-    }
-    if (data.license) {
-      formData.append("license", JSON.stringify(data.license));
-    }
-    if (data.advanced) {
-      formData.append("advanced", JSON.stringify(data.advanced));
-    }
-
-    return api.patch<UpdateTrackResponse>("/api/tracks/v1", formData, {
-      headers: { "Content-Type": "multipart/form-data" },
-    });
+    return submitUpdateTrack(data);
   },
+  updateTrack: (data: UpdateTrackRequest) => submitUpdateTrack(data),
 
   incrementPlayCount: (id: string) =>
     api.patch<incrementPlayCountResponse>(`/api/tracks/v1/listen/${id}`),
@@ -99,12 +134,20 @@ export const tracksService = {
 		api.delete<deleteTrackResponse>(`/api/tracks/v1/${id}`),
 	getUploadQuota: () =>
 		api.get<GetUploadQuotaResponse>("/api/tracks/v1/quota"),
+  checkTrackPermalinkValidity: (permalink: string) =>
+    api.get<CheckTrackPermalinkResponse>(`/api/tracks/v1/permalink/valid/${permalink}`),
 
   getTrackPlaylists: (trackId: string) =>
-  api.get<GetTrackPlaylistsResponse>(`/api/tracks/v1/playlists/${trackId}`),
+  api.get<GetTrackPlaylistsResponse>(`/api/tracks/v2/playlists/${trackId}`),
   
   getPublicTrackPlaylists: (trackId: string) =>
   api.get<GetTrackPlaylistsResponse>(`/api/public/tracks/v1/playlists/${trackId}`),
+
+  getTrackAlbums: (trackId: string) =>
+    api.get<GetTrackPlaylistsResponse>(`/api/tracks/v2/albums/${trackId}`),
+
+  getPublicTrackAlbums: (trackId: string) =>
+    api.get<GetTrackPlaylistsResponse>(`/api/public/tracks/v1/albums/${trackId}`),
 };
 
 

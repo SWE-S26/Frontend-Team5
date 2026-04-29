@@ -65,10 +65,10 @@ export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
     { label: "Stations",       icon: <HiMiniSignal />,           href: "/library/stations"  },
     { label: "Following",      icon: <FaUserCheck />,            href: "/library/following" },
     { label: "Who to follow",  icon: <FaUserPlus />,             href: null                 },
-    { label: "Try Artist Pro", icon: <FaStar />,                 href: "/artistpro"         },
+    { label: "Try Artist Pro", icon: <FaStar />,                 href: "/artist"            },
     { label: "Tracks",         icon: <PiWaveformBold />,         href: "/artists"           },
     { label: "Insights",       icon: <ImStatsBars />,            href: null                 },
-    { label: "Distribute",     icon: <BsArrowsExpandVertical />, href: "/artistpro"         },
+    { label: "Distribute",     icon: <BsArrowsExpandVertical />, href: "/artist"            },
   ];
 
   const closeMenu = () => {

@@ -59,6 +59,7 @@ export default function UploadUsageBar({
             className="w-full rounded-full border border-silver/30 bg-chinese-black px-5 py-1.5 text-[13px] font-semibold text-white-smoke transition-colors hover:opacity-90 cursor-pointer sm:w-fit"
             type="button"
             onClick={onUpgradeClick}
+            data-testid="upload-usage-upgrade"
           >
             Get unlimited uploads
           </button>

@@ -211,6 +211,7 @@ export default function Feed() {
                     repostCount={track.numReposts}
                     isLikedByUser={track.isLikedByUser}
                     allTracks={reduxTracks}
+                    enableDirectDownload={track.permissions?.enableDirectDownload ?? false}
                   />
                 </div>
               );

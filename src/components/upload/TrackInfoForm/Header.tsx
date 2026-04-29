@@ -47,11 +47,13 @@ export function Header({
 					accept="audio/*,.wav,.flac,.aiff,.aif,.alac,.m4a,.mp3"
 					className="hidden"
 					onChange={handleReplaceTrackChange}
+					data-testid="upload-header-replace-input"
 				/>
 
 				<div className="flex items-center gap-3">
 					<button
 						onClick={onGoHome}
+						data-testid="upload-header-home"
 						className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-[#1b1c20] cursor-pointer"
 					>
 						<Image src="/app-logo/whitelogo.png" alt="BeatZa" width={52} height={52} className="object-contain logo-dark" priority />
@@ -86,6 +88,7 @@ export function Header({
 							{uploadedFileUrl && (
 								<button
 									onClick={togglePlayPause}
+									data-testid="upload-header-play-toggle"
 									className="flex h-7 w-7 items-center justify-center text-white-smoke hover:text-[#f2f2f2] transition-colors cursor-pointer"
 									aria-label={isPlaying ? "Pause" : "Play"}
 								>
@@ -100,12 +103,13 @@ export function Header({
 						<span className="text-[11px] font-semibold text-white/85">Drop audio file to upload</span>
 					)}
 					{showReplaceTrack && (
-						<button onClick={handleReplaceTrack} className="text-[12px] font-semibold text-white-smoke hover:underline cursor-pointer">
+						<button onClick={handleReplaceTrack} data-testid="upload-header-replace-track" className="text-[12px] font-semibold text-white-smoke hover:underline cursor-pointer">
 							Replace track
 						</button>
 					)}
 					<button
 						onClick={onShowQuitModal}
+						data-testid="upload-header-quit"
 						className="flex h-9 w-9 items-center justify-center rounded-full bg-[#222] text-[#ccc] transition-colors hover:bg-[#333] cursor-pointer"
 					>
 						<CloseOutlined className="text-[14px]" />

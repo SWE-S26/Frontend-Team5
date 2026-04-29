@@ -51,6 +51,7 @@ export function TrackRow({
     <button
       type="button"
       onClick={togglePlay}
+      data-testid={`artist-track-row-play-${track.id}`}
       className="relative h-12 w-12 shrink-0 overflow-hidden rounded bg-chinese-black cursor-pointer"
       aria-label={rowIsPlaying ? "Pause track" : "Play track"}
     >
@@ -105,6 +106,7 @@ export function TrackRow({
           <button
             type="button"
             onClick={(e) => onContextMenu(track.id, e)}
+            data-testid={`artist-track-row-menu-${track.id}`}
             className="text-[18px] text-[#666] hover:text-[#aaa] transition-colors cursor-pointer"
             aria-label="Track actions"
           >
@@ -126,6 +128,7 @@ export function TrackRow({
           <button
             type="button"
             onClick={() => onAmplify(track.id)}
+            data-testid={`artist-track-row-amplify-${track.id}`}
             className="inline-flex items-center gap-1 rounded-full bg-linear-to-br from-[#7b4fff] to-[#5533ff] px-3 py-1 text-[11px] font-bold text-white-smoke"
           >
             <BsLightningChargeFill /> Amplify
@@ -167,6 +170,7 @@ export function TrackRow({
         <button
           type="button"
           onClick={() => onAmplify(track.id)}
+          data-testid={`artist-track-row-amplify-${track.id}`}
           className="flex items-center gap-1 rounded-full bg-linear-to-br from-[#7b4fff] to-[#5533ff] px-3 py-1 text-[11px] font-bold text-white-smoke hover:opacity-90 transition-opacity cursor-pointer"
         >
           <BsLightningChargeFill /> Amplify
@@ -177,6 +181,7 @@ export function TrackRow({
         <button
           type="button"
           onClick={(e) => onContextMenu(track.id, e)}
+          data-testid={`artist-track-row-menu-${track.id}`}
           className="text-[18px] text-[#666] hover:text-[#aaa] transition-colors cursor-pointer"
           aria-label="Track actions"
         >

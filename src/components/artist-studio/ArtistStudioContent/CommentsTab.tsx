@@ -19,7 +19,7 @@ export function CommentsTab({ isArtistPro }: { isArtistPro: boolean }) {
       <div className="grid items-start gap-8 lg:grid-cols-[1.1fr_0.9fr]">
         <div>
           <div className="mb-3 flex items-center gap-2">
-            <span className="rounded bg-chinese-black px-2 py-0.5 text-[10px] font-bold text-yellow-400">★ ARTIST PRO</span>
+            <span className="rounded bg-chinese-black px-2 py-0.5 text-[10px] font-bold text-yellow-400">ARTIST PRO</span>
           </div>
           {!isArtistPro ? (
             <>
@@ -47,7 +47,8 @@ export function CommentsTab({ isArtistPro }: { isArtistPro: boolean }) {
           {!isArtistPro ? (
             <button
               type="button"
-              onClick={() => router.push("/artistpro")}
+              onClick={() => router.push("/artist")}
+              data-testid="artist-comments-upgrade"
               className="mt-6 rounded-full bg-white-smoke px-7 py-2.5 text-[14px] font-bold text-chinese-black hover:bg-upload-select transition-colors"
             >
               Get Artist Pro

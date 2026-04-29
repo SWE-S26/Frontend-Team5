@@ -1,6 +1,7 @@
 import axios from "axios";
 import { tracksService } from "@/services/tracks.service";
 import { useCallback, useRef, useState } from "react";
+import { useAppSelector } from "@/store/hooks";
 import { CreateTrackRequest } from "@/types/tracks.types";
 import {
   GetPostedTracksResponse,
@@ -14,6 +15,16 @@ import {
   GetTrackPlaylistsResponse,
 } from "@/types/tracks.types";
 import { GetTrackByIdResponse } from "@/types/tracks.types";
+
+const useTrackAuthState = () =>
+  useAppSelector((state) => state.auth.isAuthenticated && state.auth.hasHydrated);
+
+const getTrackErrorMessage = (err: unknown, fallback: string) => {
+  if (axios.isAxiosError(err)) {
+    return err.response?.data?.message || fallback;
+  }
+  return fallback;
+};
 
 
 export function useCreateTrack() {
@@ -64,6 +75,7 @@ export function useGetTracks() {
   const [paginationInfo, setPaginationInfo] = useState<
     GetTracksResponse["data"]["paginationInfo"] | null
   >(null);
+  const isAuthenticated = useTrackAuthState();
 
   const getTracks = useCallback(async (page: number, limit: number) => {
     setLoading(true);
@@ -72,7 +84,10 @@ export function useGetTracks() {
     setTracks(null);
     setPaginationInfo(null);
     try {
-      const res = await tracksService.getTracks(page, limit);
+      const request = isAuthenticated
+        ? tracksService.getTracks(page, limit)
+        : tracksService.getPublicTracks(page, limit);
+      const res = await request;
       setTracks(res.data.data.tracks);
       setPaginationInfo(res.data.data.paginationInfo);
       return res.data;
@@ -87,7 +102,7 @@ export function useGetTracks() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   return {
     getTracks,
@@ -109,6 +124,7 @@ export function useGetPostedTracks() {
     null,
   );
   const lastSnapshotRef = useRef<string>("");
+  const isAuthenticated = useTrackAuthState();
 
   const getPostedTracks = useCallback(async (userId: string, options?: { silent?: boolean }) => {
     if (!userId) return;
@@ -117,7 +133,10 @@ export function useGetPostedTracks() {
     setError(null);
     setValidationErrors(null);
     try {
-      const res = await tracksService.getPostedTracks(userId);
+      const request = isAuthenticated
+        ? tracksService.getPostedTracks(userId)
+        : tracksService.getPublicPostedTracks(userId);
+      const res = await request;
       const snapshot = JSON.stringify(res.data.data ?? []);
       if (snapshot !== lastSnapshotRef.current) {
         lastSnapshotRef.current = snapshot;
@@ -135,7 +154,7 @@ export function useGetPostedTracks() {
     } finally {
       if (!silent) setLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   return {
     getPostedTracks,
@@ -155,6 +174,7 @@ export function useGetLikedTracks() {
   const [tracks, setTracks] = useState<GetLikedTracksResponse["data"] | null>(
     null,
   );
+  const isAuthenticated = useTrackAuthState();
 
   const getLikedTracks = useCallback(async (userId: string) => {
     if (!userId) return;
@@ -163,7 +183,10 @@ export function useGetLikedTracks() {
     setValidationErrors(null);
     setTracks(null);
     try {
-      const res = await tracksService.getLikedTracks(userId);
+      const request = isAuthenticated
+        ? tracksService.getLikedTracks(userId)
+        : tracksService.getPublicLikedTracks(userId);
+      const res = await request;
       setTracks(res.data.data);
       return res.data;
     } catch (err) {
@@ -177,7 +200,7 @@ export function useGetLikedTracks() {
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   return {
     getLikedTracks,
@@ -193,6 +216,7 @@ export function useGetTrackById() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [track, setTrack] = useState<GetTrackByIdResponse["data"] | null>(null);
+  const isAuthenticated = useTrackAuthState();
 
   const getTrackById = useCallback(async (id: string) => {
     if (!id) return;
@@ -202,21 +226,18 @@ export function useGetTrackById() {
     setTrack(null);
 
     try {
-      const res = await tracksService.getTrackById(id);
+      const request = isAuthenticated
+        ? tracksService.getTrackById(id)
+        : tracksService.getPublicTrackById(id);
+      const res = await request;
       setTrack(res.data.data);
       return res.data;
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        const message =
-          err.response?.data?.message || "Failed to fetch track";
-        setError(message);
-      } else {
-        setError("Something went wrong");
-      }
+      setError(getTrackErrorMessage(err, "Something went wrong"));
     } finally {
       setLoading(false);
     }
-  }, []);
+  }, [isAuthenticated]);
 
   return {
     getTrackById,
@@ -385,27 +406,55 @@ export function useGetTrackPlaylists() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
   const [playlists, setPlaylists] = useState<TrackPlaylist[]>([])
+  const isAuthenticated = useTrackAuthState()
 
   const getTrackPlaylists = useCallback(async (trackId: string) => {
     if (!trackId) return
     setLoading(true)
     setError(null)
     try {
-      const res = await tracksService.getTrackPlaylists(trackId)
+      const request = isAuthenticated
+        ? tracksService.getTrackPlaylists(trackId)
+        : tracksService.getPublicTrackPlaylists(trackId)
+      const res = await request
       setPlaylists(res.data.data)
       return res.data
     } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || "Failed to fetch playlists")
-      } else {
-        setError("Something went wrong")
-      }
+      setError(getTrackErrorMessage(err, "Something went wrong"))
     } finally {
       setLoading(false)
     }
-  }, [])
+  }, [isAuthenticated])
 
   return { getTrackPlaylists, loading, error, playlists }
+}
+
+
+export function useGetTrackAlbums() {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [albums, setAlbums] = useState<TrackPlaylist[]>([])
+  const isAuthenticated = useTrackAuthState()
+
+  const getTrackAlbums = useCallback(async (trackId: string) => {
+    if (!trackId) return
+    setLoading(true)
+    setError(null)
+    try {
+      const request = isAuthenticated
+        ? tracksService.getTrackAlbums(trackId)
+        : tracksService.getPublicTrackAlbums(trackId)
+      const res = await request
+      setAlbums(res.data.data)
+      return res.data
+    } catch (err) {
+      setError(getTrackErrorMessage(err, "Something went wrong"))
+    } finally {
+      setLoading(false)
+    }
+  }, [isAuthenticated])
+
+  return { getTrackAlbums, loading, error, albums }
 }
 
 
@@ -434,4 +483,62 @@ export function useGetPublicTrackPlaylists() {
   }, [])
 
   return { getPublicTrackPlaylists, loading, error, playlists }
+}
+
+
+export function useGetTrackByPermalink() {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [track, setTrack] = useState<GetTrackByIdResponse["data"] | null>(null)
+  const isAuthenticated = useTrackAuthState()
+
+  const getTrackByPermalink = useCallback(async (profileLink: string, permalink: string) => {
+    if (!profileLink || !permalink) return
+
+    setLoading(true)
+    setError(null)
+    setTrack(null)
+
+    try {
+      const request = isAuthenticated
+        ? tracksService.getTrackByPermalink(profileLink, permalink)
+        : tracksService.getPublicTrackByPermalink(profileLink, permalink)
+      const res = await request
+      setTrack(res.data.data)
+      return res.data
+    } catch (err) {
+      setError(getTrackErrorMessage(err, "Something went wrong"))
+    } finally {
+      setLoading(false)
+    }
+  }, [isAuthenticated])
+
+  return { getTrackByPermalink, loading, error, track }
+}
+
+
+export function useCheckTrackPermalinkValidity() {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [isFound, setIsFound] = useState<boolean | null>(null)
+
+  const checkTrackPermalinkValidity = useCallback(async (permalink: string) => {
+    if (!permalink) return
+
+    setLoading(true)
+    setError(null)
+    setIsFound(null)
+
+    try {
+      const res = await tracksService.checkTrackPermalinkValidity(permalink)
+      setIsFound(res.data.data.isFound)
+      return res.data
+    } catch (err) {
+      setError(getTrackErrorMessage(err, "Something went wrong"))
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  return { checkTrackPermalinkValidity, loading, error, isFound }
 }
