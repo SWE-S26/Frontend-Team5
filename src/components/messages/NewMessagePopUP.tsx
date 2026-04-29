@@ -1,5 +1,5 @@
 "use client"
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { motion, AnimatePresence } from 'framer-motion'
 import { IoClose } from "react-icons/io5";
 import { useSendMessage } from '@/hooks/sockets/useMessaging'
@@ -22,8 +22,15 @@ const NewMessagePopUP = ({ isOpen, onClose, prefilledUser }: NewMessagePopUPProp
   const [content,   setContent]   = useState('')
   const [recipient, setRecipient] = useState<PrefilledUser | null>(prefilledUser ?? null)
 
+  // Sync recipient every time the popup opens — handles reopen after send
+  useEffect(() => {
+    if (isOpen) {
+      setRecipient(prefilledUser ?? null)
+      setContent('')
+    }
+  }, [isOpen, prefilledUser?.userId])
+
   const { send, isSending } = useSendMessage(() => {
-    // Show sent toast
     if (recipient) {
       messageToastBus.emit({
         type:           'sent',

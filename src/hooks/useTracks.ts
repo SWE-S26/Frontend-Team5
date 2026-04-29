@@ -10,6 +10,8 @@ import {
   GetLikedTracksResponse,
   UpdateTrackRequest,
   GetTrackDetailedResponse,
+  TrackPlaylist,
+  GetTrackPlaylistsResponse,
 } from "@/types/tracks.types";
 import { GetTrackByIdResponse } from "@/types/tracks.types";
 
@@ -377,4 +379,59 @@ export function useGetUploadQuota() {
   }, []);
 
   return { getUploadQuota, loading, error, quota };
+}
+
+export function useGetTrackPlaylists() {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [playlists, setPlaylists] = useState<TrackPlaylist[]>([])
+
+  const getTrackPlaylists = useCallback(async (trackId: string) => {
+    if (!trackId) return
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await tracksService.getTrackPlaylists(trackId)
+      setPlaylists(res.data.data)
+      return res.data
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Failed to fetch playlists")
+      } else {
+        setError("Something went wrong")
+      }
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  return { getTrackPlaylists, loading, error, playlists }
+}
+
+
+export function useGetPublicTrackPlaylists() {
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState<string | null>(null)
+  const [playlists, setPlaylists] = useState<TrackPlaylist[]>([])
+
+  const getPublicTrackPlaylists = useCallback(async (trackId: string) => {
+    if (!trackId) return
+    setLoading(true)
+    setError(null)
+    try {
+      const res = await tracksService.getPublicTrackPlaylists(trackId)
+      setPlaylists(res.data.data)
+      return res.data
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Failed to fetch playlists")
+      } else {
+        setError("Something went wrong")
+      }
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  return { getPublicTrackPlaylists, loading, error, playlists }
 }

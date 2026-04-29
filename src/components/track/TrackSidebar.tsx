@@ -7,6 +7,12 @@ import { useLikeTrack } from "@/hooks/useLikes";
 import { useTrackRepostsList } from "@/hooks/useReposts";
 import ProfilePopover from "../layout/track-cards/ProfilePopover";
 
+import { useGetTrackPlaylists, useGetPublicTrackPlaylists } from "@/hooks/useTracks"
+import PlaylistCard from "@/components/track/PlaylistCard";
+import { useAppSelector } from "@/store/hooks"
+
+
+
 interface TrackSidebarProps {
   trackId: string
 }
@@ -16,6 +22,21 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
 
   const { users, total: LikesCount, loadLikes } = useLikeTrack()
   const { users: repostUsers, total: RepostsCount, loadReposts } = useTrackRepostsList(trackId)
+
+
+  const { playlists: trackPlaylists, getTrackPlaylists } = useGetTrackPlaylists()
+  const { playlists: publicTrackPlaylists, getPublicTrackPlaylists } = useGetPublicTrackPlaylists()
+
+
+  const isLoggedIn = useAppSelector((state) => state.auth.isAuthenticated)
+
+  useEffect(() => {
+    getPublicTrackPlaylists(trackId)
+  }, [trackId])
+
+  useEffect(() => {
+    getTrackPlaylists(trackId)
+  }, [trackId])
 
   useEffect(() => {
     loadLikes(trackId)
@@ -100,14 +121,24 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
       </section>
 
       {/* PLAYLISTS */}
+      
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase text-white">In Playlists</h2>
           <button className="text-xs text-gray-500 hover:text-white cursor-pointer">View all</button>
         </div>
+
         <div className="flex flex-col gap-3">
-          <div className="h-10 bg-white/5 rounded animate-pulse" />
-          <div className="h-10 bg-white/5 rounded animate-pulse" />
+          {(() => {
+            const playlists = isLoggedIn ? trackPlaylists : publicTrackPlaylists
+            return playlists.length === 0 ? (
+              <p className="text-xs text-gray-500">Not in any playlists</p>
+            ) : (
+              playlists.map((playlist) => (
+                <PlaylistCard key={playlist._id} playlist={playlist} />
+              ))
+            )
+          })()}
         </div>
       </section>
 
