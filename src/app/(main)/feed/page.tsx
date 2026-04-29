@@ -5,13 +5,16 @@ import { ConfigProvider, Switch, Spin } from "antd";
 import { LoadingOutlined } from "@ant-design/icons";
 
 import WaveformCard from "@/components/layout/track-cards/WaveformCard";
+import PlaylistWaveformCard from "@/components/layout/track-cards/WaveformPlaylist";
 import FeedHeader from "@/components/layout/track-cards/FeedHeader";
 import { PopoverProvider } from "@/components/layout/track-cards/PopoverContext";
 import FeedGuard from "./FeedGuard";
 
 import { useGetFeed } from "@/hooks/useFeed";
 import { tracksService } from "@/services/tracks.service";
+import { playlistsService } from "@/services/playlists.service";
 import { Track as ApiTrack } from "@/types/tracks.types";
+import { PlaylistDetail } from "@/types/playlists.types";
 import { Track } from "@/store/slices/playerSlice";
 
 const PAGE_SIZE = 10;
@@ -20,11 +23,14 @@ export default function Feed() {
   const { getFeed, items, loading: feedLoading, hasMore } = useGetFeed();
 
   const [allTracks, setAllTracks] = useState<ApiTrack[]>([]);
-  const [resolving, setResolving] = useState(false);
+  const [allPlaylists, setAllPlaylists] = useState<PlaylistDetail[]>([]);
+  const [resolving, setResolving] = useState(true);
+  const [hasFetched, setHasFetched] = useState(false);
   const [includeReposts, setIncludeReposts] = useState(true);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const seenIds = useRef<Set<string>>(new Set());
+  const seenPlaylistIds = useRef<Set<string>>(new Set());
   const offsetRef = useRef(0);
   const isFetchingRef = useRef(false);
 
@@ -35,41 +41,89 @@ export default function Feed() {
       await getFeed(offsetRef.current, PAGE_SIZE, currentIncludeReposts);
       offsetRef.current += PAGE_SIZE;
       isFetchingRef.current = false;
+      setHasFetched(true);
     },
     [getFeed],
   );
 
   useEffect(() => {
     seenIds.current.clear();
+    seenPlaylistIds.current.clear();
     setAllTracks([]);
+    setAllPlaylists([]);
+    setHasFetched(false);
+    setResolving(true);
     offsetRef.current = 0;
     isFetchingRef.current = false;
     loadNextPage(includeReposts);
   }, [includeReposts]);
 
   useEffect(() => {
-    if (!items.length) return;
+    if (!items.length) {
+      setResolving(false);
+      return;
+    }
 
-    const freshIds = items
+    const freshTrackIds = items
       .filter((item) => item.type === "track" && !seenIds.current.has(item.id))
       .map((item) => item.id);
 
-    if (!freshIds.length) return;
+    const freshPlaylistIds = items
+      .filter(
+        (item) =>
+          item.type === "playlist" && !seenPlaylistIds.current.has(item.id),
+      )
+      .map((item) => item.id);
+
+    if (!freshTrackIds.length && !freshPlaylistIds.length) {
+      setResolving(false);
+      return;
+    }
 
     const resolve = async () => {
       setResolving(true);
       try {
-        const settled = await Promise.allSettled(
-          freshIds.map((id) => tracksService.getTrackById(id)),
-        );
-        const resolved: ApiTrack[] = [];
-        settled.forEach((result, i) => {
+        const [trackResults, playlistResults] = await Promise.all([
+          freshTrackIds.length
+            ? Promise.allSettled(
+                freshTrackIds.map((id) => tracksService.getTrackById(id)),
+              )
+            : Promise.resolve([]),
+          freshPlaylistIds.length
+            ? Promise.allSettled(
+                freshPlaylistIds.map((id) =>
+                  playlistsService.getPlaylistById(id),
+                ),
+              )
+            : Promise.resolve([]),
+        ]);
+
+        const resolvedTracks: ApiTrack[] = [];
+        (trackResults as PromiseSettledResult<any>[]).forEach((result, i) => {
           if (result.status === "fulfilled") {
-            resolved.push(result.value.data.data);
-            seenIds.current.add(freshIds[i]);
+            resolvedTracks.push(result.value.data.data);
+            seenIds.current.add(freshTrackIds[i]);
           }
         });
-        setAllTracks((prev) => [...prev, ...resolved]);
+
+        const resolvedPlaylists: PlaylistDetail[] = [];
+        (playlistResults as PromiseSettledResult<any>[]).forEach(
+          (result, i) => {
+            if (result.status === "fulfilled") {
+              const pl = result.value.data?.data?.playlist;
+              const detail = Array.isArray(pl) ? pl[0] : pl;
+              if (detail) {
+                resolvedPlaylists.push(detail);
+                seenPlaylistIds.current.add(freshPlaylistIds[i]);
+              }
+            }
+          },
+        );
+
+        if (resolvedTracks.length)
+          setAllTracks((prev) => [...prev, ...resolvedTracks]);
+        if (resolvedPlaylists.length)
+          setAllPlaylists((prev) => [...prev, ...resolvedPlaylists]);
       } finally {
         setResolving(false);
       }
@@ -78,7 +132,6 @@ export default function Feed() {
     resolve();
   }, [items]);
 
-  // Single stable observer — reads latest state via refs, never re-attaches
   const hasMoreRef = useRef(hasMore);
   const resolvingRef = useRef(resolving);
   const includeRepostsRef = useRef(includeReposts);
@@ -112,9 +165,8 @@ export default function Feed() {
 
     observer.observe(sentinelRef.current);
     return () => observer.disconnect();
-  }, []); // intentionally empty — observer is set up once and reads via refs
+  }, []);
 
-  // Shared playlist across all cards
   const reduxTracks: Track[] = useMemo(
     () =>
       allTracks
@@ -130,24 +182,36 @@ export default function Feed() {
     [allTracks],
   );
 
-  const orderedTracks = useMemo(() => {
+  const orderedItems = useMemo(() => {
     const seen = new Set<string>();
-    const idOrder = items
-      .filter((item) => item.type === "track")
-      .map((item) => item.id);
-
-    return idOrder
-      .filter((id) => {
-        if (seen.has(id)) return false;
-        seen.add(id);
+    return items
+      .filter((item) => item.type === "track" || item.type === "playlist")
+      .filter((item) => {
+        if (seen.has(item.id)) return false;
+        seen.add(item.id);
         return true;
       })
-      .map((id) => allTracks.find((t) => t.trackId === id))
-      .filter(Boolean) as ApiTrack[];
-  }, [allTracks, items]);
+      .map((item) => {
+        if (item.type === "track") {
+          const track = allTracks.find((t) => t.trackId === item.id);
+          return track
+            ? { type: "track" as const, data: track, feedItem: item }
+            : null;
+        } else {
+          const playlist = allPlaylists.find((p) => p._id === item.id);
+          return playlist
+            ? { type: "playlist" as const, data: playlist, feedItem: item }
+            : null;
+        }
+      })
+      .filter(Boolean) as {
+      type: "track" | "playlist";
+      data: any;
+      feedItem: any;
+    }[];
+  }, [allTracks, allPlaylists, items]);
 
   const isLoading = feedLoading || resolving;
-  const hasFetched = offsetRef.current > 0 || !isLoading;
 
   return (
     <FeedGuard>
@@ -183,51 +247,67 @@ export default function Feed() {
           </div>
 
           <div>
-            {orderedTracks.map((track) => {
-              const feedItem = items.find((i) => i.id === track.trackId);
-              return (
-                <div key={track.trackId} className="flex-none mb-4">
-                  <PopoverProvider>
-                    <FeedHeader
-                      artistName={
-                        track.basicInfo?.mainArtists?.[0] || "Unknown Artist"
-                      }
-                      actorId={feedItem?.actorId || "unknown"}
-                      followCount={Math.floor(Math.random() * 10000)}
-                      profileImgLink={
-                        feedItem?.imgLink ||
-                        "https://xsgames.co/randomusers/avatar.php?g=pixel&f=male"
-                      }
-                      location="United States"
-                      releaseDate={track.releaseDate}
-                      isRepost={feedItem?.isRepost ?? false}
-                    />
-                  </PopoverProvider>
+            {orderedItems.map((item) => (
+              <div key={item.feedItem.id} className="flex-none mb-4">
+                <PopoverProvider>
+                  <FeedHeader
+                    artistName={item.feedItem?.displayName || "Unknown Artist"}
+                    actorId={item.feedItem?.actorId || "unknown"}
+                    followCount={Math.floor(Math.random() * 10000)}
+                    profileImgLink={
+                      item.feedItem?.imgLink ||
+                      "https://xsgames.co/randomusers/avatar.php?g=pixel&f=male"
+                    }
+                    location="United States"
+                    releaseDate={
+                      item.type === "track"
+                        ? item.data.releaseDate
+                        : item.data.createdAt
+                    }
+                    isRepost={item.feedItem?.isRepost ?? false}
+                  />
+                </PopoverProvider>
+
+                {item.type === "track" ? (
                   <WaveformCard
-                    img={track.image?.imgLink}
-                    title={track.basicInfo?.title}
-                    artist={track.basicInfo?.mainArtists?.[0]}
-                    trackId={track.trackId ?? ""}
-                    trackUrl={track.audio?.audioLink}
-                    wfLink={track.audio?.waveformLink}
-                    duration={track.durationInSeconds}
-                    tag={track.basicInfo?.tags?.[0]}
-                    audioClipStart={track.audioClip?.start}
-                    audioClipEnd={track.audioClip?.end}
-                    likeCount={track.numLikes}
-                    repostCount={track.numReposts}
-                    playsCount={track.numPlays}
-                    commentsCount={track.numComments}
-                    isLikedByUser={track.isLikedByUser}
-                    isRepostedByUser={track.isRepostedByUser}
+                    img={item.data.image?.imgLink}
+                    title={item.data.basicInfo?.title}
+                    artist={item.data.basicInfo?.mainArtists?.[0]}
+                    trackId={item.data.trackId ?? ""}
+                    trackUrl={item.data.audio?.audioLink}
+                    wfLink={item.data.audio?.waveformLink}
+                    duration={item.data.durationInSeconds}
+                    tag={item.data.basicInfo?.tags?.[0]}
+                    audioClipStart={item.data.audioClip?.start}
+                    audioClipEnd={item.data.audioClip?.end}
+                    likeCount={item.data.numLikes}
+                    repostCount={item.data.numReposts}
+                    playsCount={item.data.numPlays}
+                    commentsCount={item.data.numComments}
+                    isLikedByUser={item.data.isLikedByUser}
+                    isRepostedByUser={item.data.isRepostedByUser}
                     allTracks={reduxTracks}
                     enableDirectDownload={
-                      track.permissions?.enableDirectDownload ?? false
+                      item.data.permissions?.enableDirectDownload ?? false
                     }
                   />
-                </div>
-              );
-            })}
+                ) : (
+                  <PlaylistWaveformCard
+                    img={item.data.image?.imgLink}
+                    title={item.data.title}
+                    artist={item.data.description}
+                    playlistId={item.data._id}
+                    tag={item.data.genre}
+                    likeCount={item.data.numOfLikes}
+                    repostCount={item.data.numOfReposts}
+                    isLikedByUser={item.data.isLiked}
+                    isRepostedByUser={item.data.isReposted}
+                    preloadedTracks={item.data.tracks}
+                    totalTracks={item.data.totalTracks}
+                  />
+                )}
+              </div>
+            ))}
           </div>
 
           <div ref={sentinelRef} />
@@ -245,13 +325,13 @@ export default function Feed() {
             </div>
           )}
 
-          {!isLoading && hasFetched && orderedTracks.length === 0 && (
+          {!isLoading && hasFetched && orderedItems.length === 0 && (
             <p className="text-center text-silver text-sm py-8">
               Nothing to show here yet — follow some artists to see their posts.
             </p>
           )}
 
-          {!hasMore && !isLoading && orderedTracks.length > 0 && (
+          {!hasMore && !isLoading && orderedItems.length > 0 && (
             <p className="text-center text-silver text-sm py-8">
               You're all caught up
             </p>
