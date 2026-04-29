@@ -1,6 +1,7 @@
 import api from "@/lib/api";
 import {
   GetPostedTracksResponse,
+  GetTrackPlaylistsResponse,
   GetTracksResponse,
 } from "@/types/tracks.types";
 
@@ -93,4 +94,12 @@ export const tracksService = {
 		api.delete<deleteTrackResponse>(`/api/tracks/v1/${id}`),
 	getUploadQuota: () =>
 		api.get<GetUploadQuotaResponse>("/api/tracks/v1/quota"),
+
+  getTrackPlaylists: (trackId: string) =>
+  api.get<GetTrackPlaylistsResponse>(`/api/tracks/v1/playlists/${trackId}`),
+  
+  getPublicTrackPlaylists: (trackId: string) =>
+  api.get<GetTrackPlaylistsResponse>(`/api/public/tracks/v1/playlists/${trackId}`),
 };
+
+

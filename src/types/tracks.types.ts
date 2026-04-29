@@ -216,3 +216,33 @@ export interface GetLikedTracksResponse {
 export interface AddTrackToHistoryResponse {
   message: string;
 }
+
+
+export interface TrackPlaylist {
+  _id: string
+  artistId: {
+    _id: string
+    displayName: string
+    profileLink: string
+    profileImg: { imgLink: string; publicId: string }
+  }
+  title: string
+  permaLink: string
+  description: string
+  genre: string
+  listOfTracks: string[]
+  additionalTags: string[]
+  isPrivate: boolean
+  numOfLikes: number
+  numOfReposts: number
+  playlistType: "playlist" | "album" | string
+  playlistLengthInSeconds: number
+  image: { imgLink: string; publicId: string }
+  createdAt: string
+  updatedAt: string
+}
+
+export interface GetTrackPlaylistsResponse {
+  message: string
+  data: TrackPlaylist[]
+}

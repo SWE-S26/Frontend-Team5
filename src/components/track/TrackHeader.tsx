@@ -112,7 +112,7 @@ export default function TrackHeader({ trackId }: Props) {
 
   return (
     <div
-      className="w-[80%] mx-auto h-100 p-13 flex gap-12 shadow-lg"
+      className="w-full mx-auto h-100 p-13 flex gap-12 shadow-lg"
       style={{ background: gradient }}
     >
       {/* LEFT */}
@@ -132,7 +132,7 @@ export default function TrackHeader({ trackId }: Props) {
 
           <div className="flex flex-col">
             <div className="flex items-center gap-25">
-              <h1 className="text-3xl font-bold text-white bg-black px-3 py-2 w-120">
+              <h1 className="text-3xl font-bold text-white bg-black px-3 py-2  w-auto">
                 {track.title}
               </h1>
 
