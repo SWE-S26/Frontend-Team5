@@ -156,3 +156,33 @@ export function useLikeTrackOptimistic(trackId: string) {
     error,
   };
 }
+
+export function useLikePlaylistOptimistic(playlistId: string) {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const likePlaylistOptimistic = useCallback(async () => {
+    if (!playlistId || loading) return;
+
+    setLoading(true);
+    setError(null);
+
+    try {
+      await likeService.likePlaylist(playlistId);
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Something went wrong");
+      } else {
+        setError("Something went wrong");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, [playlistId, loading]);
+
+  return {
+    likePlaylist: likePlaylistOptimistic,
+    loading,
+    error,
+  };
+}

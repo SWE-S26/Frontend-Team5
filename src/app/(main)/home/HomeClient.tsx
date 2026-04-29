@@ -4,11 +4,12 @@ import MediaCardCarousel from "@/components/layout/track-cards/MediaCardCarousel
 import SuggestedWrapper from "@/components/social-graph/SuggestedWrapper";
 import { useEffect } from "react";
 import { useGetTracks } from "@/hooks/useTracks";
-import { useGetPlaylists } from "@/hooks/usePlaylists";
+import { useGetPlaylists, useGetPlaylistById } from "@/hooks/usePlaylists";
 
 import { useGetFollowing } from "@/hooks/useSocial";
 
 import { useAppSelector } from "@/store/hooks";
+import PlaylistWaveformCard from "@/components/layout/track-cards/WaveformPlaylist";
 
 export default function HomeClient() {
   const userId = useAppSelector((state) => state.auth.userId);
@@ -34,11 +35,14 @@ export default function HomeClient() {
     following,
   } = useGetFollowing();
 
+  const { getPlaylistById, error, playlist, hasFetched } = useGetPlaylistById();
+
   useEffect(() => {
     getTracks(1, 100);
     getPlaylists();
     getFollowing(userId ?? "");
-  }, [getTracks, getPlaylists, getFollowing]);
+    getPlaylistById("69f079f8841eeaca1786f763");
+  }, [getTracks, getPlaylists, getFollowing, getPlaylistById]);
 
   return (
     <div className="flex justify-between">
@@ -48,6 +52,27 @@ export default function HomeClient() {
           type="tracks"
           tracks={newTracks ?? undefined}
           loading={newTracksLoading}
+        />
+
+        <MediaCardCarousel
+          title="Discover our newest playlists!"
+          type="playlists"
+          playlists={newPlaylists ?? undefined}
+          loading={newPlaylistsLoading}
+        />
+
+        <PlaylistWaveformCard
+          img={playlist?.image.imgLink}
+          title={playlist?.title}
+          artist={playlist?.description}
+          playlistId={playlist?._id}
+          tag={playlist?.genre}
+          likeCount={playlist?.numOfLikes}
+          repostCount={playlist?.numOfReposts}
+          isLikedByUser={playlist?.isLiked}
+          isRepostedByUser={playlist?.isReposted}
+          totalTracks={playlist?.totalTracks ?? playlist?.tracks?.length ?? 0}
+          preloadedTracks={playlist?.tracks}
         />
 
         <MediaCardCarousel

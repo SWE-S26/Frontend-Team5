@@ -19,6 +19,7 @@ type PlaylistItem = {
   title: string;
   description: string;
   image: { imgLink: string };
+  isLiked?: boolean;
 };
 
 type Props = {
@@ -131,6 +132,7 @@ export default function MediaCardCarousel({
                         title={playlist.title}
                         artist={playlist.description}
                         playlistId={playlist._id}
+                        isLikedByUser={playlist.isLiked}
                       />
                     </div>
                   ))}

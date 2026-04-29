@@ -33,6 +33,7 @@ import { ListStart } from "lucide-react";
 import { RiPlayListAddLine } from "react-icons/ri";
 import { BiStation } from "react-icons/bi";
 import { PiPencilSimple } from "react-icons/pi";
+import { BiSolidCommentDetail } from "react-icons/bi";
 
 import { RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -45,11 +46,15 @@ type CardProps = {
   trackId: string;
   trackUrl?: string;
   duration?: number;
+  tag?: string;
   audioClipStart?: number;
   audioClipEnd?: number;
   likeCount: number;
   repostCount: number;
+  commentsCount: number;
+  playsCount: number;
   isLikedByUser?: boolean;
+  isRepostedByUser?: boolean;
   enableDirectDownload?: boolean;
   downloadUrl?: string;
   canEdit?: boolean;
@@ -70,11 +75,15 @@ export default function WaveformCard({
   trackId,
   trackUrl,
   duration,
+  tag,
   audioClipStart,
   audioClipEnd,
   likeCount,
   repostCount,
+  commentsCount,
+  playsCount,
   isLikedByUser,
+  isRepostedByUser,
   enableDirectDownload = false,
   downloadUrl,
   canEdit = false,
@@ -91,7 +100,9 @@ export default function WaveformCard({
   const [flashComment, setFlashComment] = useState<string | null>(null);
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const [isLiked, setIsLiked] = useState(isLikedByUser ?? false);
+  const [isReposted, setIsReposted] = useState(isRepostedByUser ?? false);
   const [likeCountState, setLikeCountState] = useState(likeCount);
+  const [repostCountState, setRepostCountState] = useState(repostCount);
   const [isAddToPlaylistOpen, setIsAddToPlaylistOpen] = useState(false);
 
   const [isMoreOpen, setIsMoreOpen] = useState(false);
@@ -322,6 +333,16 @@ export default function WaveformCard({
     }
   }
 
+  function handleRepostClick() {
+    repostTrack();
+    setIsReposted((r) => !r);
+    if (isReposted) {
+      setRepostCountState((c) => c - 1);
+    } else {
+      setRepostCountState((c) => c + 1);
+    }
+  }
+
   function handlePlayClick(e: React.MouseEvent) {
     e.stopPropagation();
     if (!trackId || !trackUrl) return;
@@ -512,7 +533,7 @@ export default function WaveformCard({
         </div>
 
         <div className="flex flex-col flex-1 ml-6">
-          <div className="flex items-center mb-4">
+          <div className="flex items-center mb-4 relative">
             <div
               className="w-10 h-10 bg-white-smoke rounded-full flex items-center justify-center cursor-pointer"
               onClick={handlePlayClick}
@@ -527,6 +548,14 @@ export default function WaveformCard({
               <p className="text-sm font-bold text-silver ml-3">{artist}</p>
               <p className="text-sm font-bold text-white-smoke ml-3">{title}</p>
             </div>
+
+            {tag && (
+              <a className="absolute top-0 right-0 cursor-pointer no-underline group">
+                <span className="text-[13px] text-white-smoke bg-off-black px-2 py-1 rounded-full group-hover:text-white-smoke/50 transition-colors">
+                  # {tag}
+                </span>
+              </a>
+            )}
           </div>
 
           <div
@@ -620,20 +649,20 @@ export default function WaveformCard({
               </Tooltip>
               <Tooltip label="Repost">
                 <Button
-                  onClick={() => repostTrack()}
+                  onClick={handleRepostClick}
                   className="bg-off-black mr-4"
                   icon={
                     <LuRepeat2
-                      className={`text-[16px] transition-colors ${reposted ? "text-inferno" : ""}`}
+                      className={`text-[16px] transition-colors ${isReposted ? "text-inferno" : ""}`}
                     />
                   }
                 >
                   <span
-                    className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${reposted ? "text-inferno" : ""} ${
+                    className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${isReposted ? "text-inferno" : ""} ${
                       repostLoading ? "opacity-50" : "opacity-100"
                     }`}
                   >
-                    {numOfReposts}
+                    {repostCountState}
                   </span>
                 </Button>
               </Tooltip>
@@ -695,6 +724,17 @@ export default function WaveformCard({
                   { label: "Station", icon: <BiStation className="text-lg" /> },
                 ]}
               />
+              <div className="ml-auto flex items-center gap-4">
+                <div className="flex items-center gap-1 text-silver">
+                  <IoMdPlay className="text-silver text-[12px]" />
+                  <span className="text-[12px]">{playsCount}</span>
+                </div>
+
+                <a className="flex items-center gap-1 cursor-pointer hover:opacity-50 transition-opacity no-underline text-silver">
+                  <BiSolidCommentDetail className="text-silver" />
+                  <span className="text-[12px]">{commentsCount}</span>
+                </a>
+              </div>
             </div>
           </motion.div>
         </div>
