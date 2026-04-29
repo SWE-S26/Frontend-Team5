@@ -177,6 +177,34 @@ export interface GetTrackByIdResponse {
   data: Track;
 }
 
+export interface TrackDetailedAdvanced {
+  buyLink?: string;
+  recordLabel?: string;
+  releaseDate?: string;
+  publisher?: string;
+  ISRC?: string;
+  explicitContent?: boolean;
+  pLine?: string;
+  audioClipStart?: number;
+  audioClipEnd?: number;
+  composer?: string;
+  ISWC?: string;
+  albumTitle?: string;
+}
+
+export interface TrackDetailed {
+  id: string;
+  basicInfo: Track["basicInfo"];
+  permissions?: Track["permissions"];
+  license?: Track["license"];
+  advanced?: TrackDetailedAdvanced;
+}
+
+export interface GetTrackDetailedResponse {
+  message: string;
+  data: TrackDetailed;
+}
+
 export interface UpdateTrackRequest {
   id: string;
   image?: File;

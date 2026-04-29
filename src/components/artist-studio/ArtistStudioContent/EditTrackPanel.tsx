@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { FiDownload } from "react-icons/fi";
-
-import { useGetTrackById, useUpdateTrack } from "@/hooks/useTracks";
+import { IoClose } from "react-icons/io5";
+import { useGetTrackDetailed, useUpdateTrack } from "@/hooks/useTracks";
 import { useAppSelector } from "@/store/hooks";
 import type { UpdateTrackRequest } from "@/types/tracks.types";
 import type { ArtistTrackRow } from "../ArtistStudioContent";
@@ -49,7 +49,7 @@ export interface EditTrackPanelProps {
 
 export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) {
   // API hooks
-  const { getTrackById, track: fullTrack, loading: loadingTrack } = useGetTrackById();
+  const { getTrackDetailed, track: fullTrack, loading: loadingTrack } = useGetTrackDetailed();
   const { updateTrack, loading: saving } = useUpdateTrack();
   const profileLink = useAppSelector((state) => state.auth.profileLink);
   const authRole = useAppSelector((state) => state.auth.role);
@@ -98,6 +98,9 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   const [showTrackComments, setShowTrackComments] = useState(true);
   const [showTrackInsights, setShowTrackInsights] = useState(true);
   const [geoblockingOption, setGeoblockingOption] = useState("worldwide");
+  const [geoblockingRegions, setGeoblockingRegions] = useState<string[]>([]);
+  const [regionMenuOpen, setRegionMenuOpen] = useState(false);
+  const [regionSearch, setRegionSearch] = useState("");
 
   // Licensing
   const [licenseType, setLicenseType] =
@@ -120,6 +123,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   // Genre / privacy menus
   const genreMenuRef   = useRef<HTMLDivElement | null>(null);
   const privacyMenuRef = useRef<HTMLDivElement | null>(null);
+  const regionMenuRef = useRef<HTMLDivElement | null>(null);
   const [genreMenuOpen, setGenreMenuOpen]     = useState(false);
   const [genreSearch, setGenreSearch]         = useState("");
   const [privacyMenuOpen, setPrivacyMenuOpen] = useState(false);
@@ -143,6 +147,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   const clipDragRafRef           = useRef<number | null>(null);
   const clipPendingRangeRef      = useRef<{ start: number; end: number } | null>(null);
   const clipVisualRangeRef       = useRef<{ start: number; end: number } | null>(null);
+  const clipSeededFromApiRef      = useRef(false);
 
   // Audio clip state
   const [audioUrl, setAudioUrl]                         = useState<string | null>(null);
@@ -264,7 +269,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
 
   // Fetch track on mount
 
-  useEffect(() => { void getTrackById(track.id); }, [track.id]);
+  useEffect(() => { void getTrackDetailed(track.id); }, [track.id, getTrackDetailed]);
 
   useEffect(() => {
     if (!fullTrack) return;
@@ -287,10 +292,10 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
       setIncludeRssFeed(p.includeInRssFeed ?? false);
       setDisplayEmbedCode(p.displayedEmbedCode ?? false);
       setEnableAppPlayback(p.enableAppPlayback ?? false);
-      setAllowComments(p.allowComments ?? true);
-      setShowTrackComments(p.showTrackComments ?? true);
-      setShowTrackInsights(p.showTrackInsights ?? true);
-      setGeoblockingOption(p.geoblocking ?? "worldwide");
+      // setAllowComments(p.allowComments ?? true);
+      // setShowTrackComments(p.showTrackComments ?? true);
+      // setShowTrackInsights(p.showTrackInsights ?? true);
+      // setGeoblockingOption(p.geoblocking ?? "worldwide");
     }
 
     // License
@@ -310,18 +315,25 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
       setIsrc(a.ISRC ?? "");
       setExplicitContent(a.explicitContent ?? false);
       setPline(a.pLine ?? "");
+
+      if (Number.isFinite(a.audioClipStart) && Number.isFinite(a.audioClipEnd)) {
+        clipSeededFromApiRef.current = true;
+        setAudioClipStartInput(String(a.audioClipStart));
+        setAudioClipEndInput(String(a.audioClipEnd));
+        setAudioClipStartDraft(formatTimeLabel(a.audioClipStart ?? 0));
+        setAudioClipEndDraft(formatTimeLabel(a.audioClipEnd ?? AUDIO_PREVIEW_SECONDS));
+      }
     }
 
-    if (fullTrack.image?.imgLink) {
-      artworkCdnUrlRef.current = fullTrack.image.imgLink;
-      setArtworkUrl(fullTrack.image.imgLink);
+    if (track.cover) {
+      artworkCdnUrlRef.current = null;
+      setArtworkUrl(track.cover);
       setArtworkZoom(1);
       setArtworkPosition({ x: 0, y: 0 });
     }
 
-    if (fullTrack.audio?.audioLink)
-      setAudioUrl(fullTrack.audio.audioLink);
-  }, [fullTrack]);
+    setAudioUrl(track.url ?? null);
+  }, [fullTrack, track.cover, track.url]);
 
   // Sync effects
 
@@ -359,12 +371,19 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
       setAudioClipEndDraft("0:20");
       setClipPlaybackSeconds(0);
       setIsClipPlaying(false);
+      clipSeededFromApiRef.current = false;
       return;
     }
     const ca = clipAudioRef.current;
     if (ca) { ca.pause(); ca.currentTime = 0; }
     setClipPlaybackSeconds(0);
     setIsClipPlaying(false);
+    if (!clipSeededFromApiRef.current) {
+      setAudioClipStartInput("0");
+      setAudioClipEndInput(String(AUDIO_PREVIEW_SECONDS));
+      setAudioClipStartDraft("0:00");
+      setAudioClipEndDraft("0:20");
+    }
   }, [audioUrl]);
 
   useEffect(() => {
@@ -849,10 +868,10 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   return (
     <>
       {/* Backdrop */}
-          <div className="fixed inset-0 z-100 bg-chinese-black/40" onClick={onClose} />
+          <div className="fixed inset-0 z-1001 bg-chinese-black/40" onClick={onClose} />
 
           {/* Drawer */}
-          <div className="fixed right-0 top-0 z-110 flex h-full w-full max-w-150 flex-col bg-chinese-black shadow-2xl">
+          <div className="fixed right-0 top-0 z-1010 flex h-full w-full max-w-150 flex-col bg-chinese-black shadow-2xl">
 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#2a2a2a] px-5 py-3.5">
@@ -862,7 +881,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
               onClick={onClose}
               className="text-[#aaa] hover:text-white-smoke transition-colors text-[20px] leading-none cursor-pointer"
             >
-              ✕
+              <IoClose size={16} />
             </button>
             <h2 className="text-[15px] font-bold text-white-smoke">Edit Track</h2>
           </div>
@@ -1028,6 +1047,8 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
                     setShowTrackInsights={setShowTrackInsights}
                     geoblockingOption={geoblockingOption}
                     setGeoblockingOption={setGeoblockingOption}
+                    geoblockingRegions={geoblockingRegions}
+                    setGeoblockingRegions={setGeoblockingRegions}
                     PrettyRadio={PrettyRadio}
                     ProLockTooltip={ProLockTooltip}
                     TOOLTIP_TEXT={TOOLTIP_TEXT}

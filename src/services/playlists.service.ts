@@ -1,6 +1,7 @@
 import api from "@/lib/api";
 import {
   CreatePlaylistRequest,
+  CreatePlaylistWithImageRequest,
   CreatePlaylistResponse,
   GetPlaylistsResponse,
   GetPublicPlaylistsResponse,
@@ -27,6 +28,28 @@ import {
 export const playlistsService = {
   createPlaylist: (data: CreatePlaylistRequest) =>
     api.post<CreatePlaylistResponse>("/api/playlists/v1", data),
+
+  createPlaylistWithImage: (data: CreatePlaylistWithImageRequest) => {
+    const formData = new FormData();
+    formData.append(
+      "data",
+      JSON.stringify({
+        title: data.title,
+        description: data.description ?? "",
+        isPrivate: data.isPrivate,
+        listOfTracks: data.listOfTracks,
+        buyLink: data.buyLink,
+        recordLabel: data.recordLabel,
+      }),
+    );
+    if (data.image) formData.append("image", data.image);
+
+    return api.post<CreatePlaylistResponse>(
+      "/api/playlists/v1/with-image",
+      formData,
+      { headers: { "Content-Type": "multipart/form-data" } },
+    );
+  },
 
   getPlaylists: (limit?: number, offset?: number) => {
     const params = new URLSearchParams();

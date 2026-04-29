@@ -85,6 +85,16 @@ export interface CreatePlaylistRequest {
   isPrivate: boolean;
 }
 
+export interface CreatePlaylistWithImageRequest {
+  title: string;
+  description?: string;
+  isPrivate: boolean;
+  listOfTracks: string[];
+  buyLink?: string;
+  recordLabel?: string;
+  image?: File;
+}
+
 export interface UpdatePlaylistRequest {
   title?: string;
   permalink?: string;

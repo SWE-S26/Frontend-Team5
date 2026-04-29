@@ -530,6 +530,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   const [clipDragDisplayRange, setClipDragDisplayRange] = useState<{ start: number; end: number } | null>(null);
   const [isArtworkDragActive, setIsArtworkDragActive]   = useState(false);
   const [isTrackDragActive, setIsTrackDragActive]       = useState(false);
+  const [geoblockingRegions, setGeoblockingRegions]     = useState<string[]>([]);
 
   // API
   const { createTrack, error: createTrackError } = useCreateTrack();
@@ -1351,6 +1352,8 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
             setShowTrackInsights={setShowTrackInsights}
             geoblockingOption={geoblockingOption}
             setGeoblockingOption={setGeoblockingOption}
+            geoblockingRegions={geoblockingRegions}
+            setGeoblockingRegions={setGeoblockingRegions}
             PrettyRadio={PrettyRadio}
             ProLockTooltip={ProLockTooltip}
             TOOLTIP_TEXT={TOOLTIP_TEXT}
