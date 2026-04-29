@@ -49,7 +49,7 @@ export function DistributionTab({ isArtistPro }: { isArtistPro: boolean }) {
             </>
           )}
           {!isArtistPro ? (
-            <button type="button" onClick={() => router.push("/artistpro")} className="mt-4 rounded-full bg-white-smoke px-7 py-2.5 text-[14px] font-bold text-chinese-black hover:bg-[#eee] transition-colors">
+            <button type="button" onClick={() => router.push("/artist")} data-testid="artist-distribution-upgrade" className="mt-4 rounded-full bg-white-smoke px-7 py-2.5 text-[14px] font-bold text-chinese-black hover:bg-[#eee] transition-colors">
               Get Artist Pro
             </button>
           ) : (

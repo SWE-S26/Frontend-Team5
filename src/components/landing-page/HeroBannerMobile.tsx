@@ -19,7 +19,7 @@ const slides = [
     title: "Ascending Artist",
     heading: ["It all starts with", "an upload."],
     description: "BeatZa is where you define what's next in music. Just hit upload.",
-    buttons: [{ label: "Upload", href: "/upload" }, { label: "Artist Pro", href: "/artistpro" }],
+    buttons: [{ label: "Upload", href: "/upload" }, { label: "Artist Pro", href: "/artist" }],
   },
   {
     image: "/landing-page/hero-banner/placeholder3.jpeg",

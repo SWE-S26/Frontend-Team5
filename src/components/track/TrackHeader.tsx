@@ -64,7 +64,7 @@ export default function TrackHeader({ trackId }: Props) {
     };
 
     fetchTrack();
-  }, [trackId]);
+  }, [trackId, getTrackById]);
 
   useEffect(() => {
     if (!track.imageLink) return;

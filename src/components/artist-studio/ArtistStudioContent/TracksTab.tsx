@@ -19,6 +19,7 @@ import { EditTrackPanel } from "./EditTrackPanel";
 import { BulkEditPanel } from "./BulkEditPanel";
 import { AddToPlaylistPanel } from "./AddToPlaylistPanel";
 import { TrackContextMenu } from "./TrackContextMenu";
+import { DeleteTrackModal } from "./DeleteTrackModal";
 
 
 function TracksTableHeader({ onSelectAll, allSelected }: { onSelectAll: (v: boolean) => void; allSelected: boolean }) {
@@ -52,12 +53,12 @@ function TracksActionBar({ isArtistPro, onUpload, onDistribute, onMonetize, onMa
   const btnClass = "flex w-full items-center justify-center gap-2 rounded-md border border-[#3a3a3a] bg-transparent px-3 py-2 text-[13px] font-semibold text-white-smoke transition-colors hover:border-[#555] cursor-pointer sm:w-auto sm:justify-start sm:px-5 sm:py-3 sm:text-[15px] lg:text-[18px]";
   return (
     <div className="grid grid-cols-1 gap-2.5 sm:flex sm:flex-wrap sm:gap-3">
-      <button type="button" onClick={onUpload}     className={btnClass}><span>+ Upload or drop tracks</span></button>
+      <button type="button" onClick={onUpload}     data-testid="artist-tracks-upload" className={btnClass}><span>+ Upload or drop tracks</span></button>
       {!isArtistPro && (
         <>
-          <button type="button" onClick={onDistribute} className={btnClass}><IoIosGlobe /><span>Distribute tracks</span></button>
-          <button type="button" onClick={onMonetize}   className={btnClass}><RiMoneyDollarCircleLine /><span>Monetize tracks</span></button>
-          <button type="button" onClick={onMaster}     className={btnClass}><ImEqualizer2 /><span>Master track audio</span></button>
+          <button type="button" onClick={onDistribute} data-testid="artist-tracks-distribute" className={btnClass}><IoIosGlobe /><span>Distribute tracks</span></button>
+          <button type="button" onClick={onMonetize}   data-testid="artist-tracks-monetize" className={btnClass}><RiMoneyDollarCircleLine /><span>Monetize tracks</span></button>
+          <button type="button" onClick={onMaster}     data-testid="artist-tracks-master" className={btnClass}><ImEqualizer2 /><span>Master track audio</span></button>
         </>
       )}
     </div>
@@ -103,6 +104,7 @@ function SortDropdown({ sortField, sortDir, onSortField, onSortDir }: {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
+        data-testid="artist-tracks-sort-toggle"
         className="flex items-center gap-1.5 px-3 py-1.5 text-[13px] text-white-smoke transition-colors cursor-pointer"
       >
         <BsSortDown className="text-sm" />
@@ -117,6 +119,7 @@ function SortDropdown({ sortField, sortDir, onSortField, onSortDir }: {
               key={opt.value}
               type="button"
               onClick={() => handleSelect(opt.value)}
+              data-testid={`artist-tracks-sort-${opt.value}`}
               className="flex w-full items-center justify-between px-4 py-2.5 text-[13px] hover:bg-upload-select transition-colors cursor-pointer"
             >
               <span className={sortField === opt.value ? "font-bold text-white-smoke" : "font-normal text-white-smoke"}>{opt.label}</span>
@@ -157,12 +160,13 @@ function TracksFilterBar({ isMobile, search, onSearch, filter, onFilter, count, 
         <input
           value={search}
           onChange={(e) => onSearch(e.target.value)}
+          data-testid="artist-tracks-search"
           placeholder="Search tracks"
           className="w-full rounded-full border border-[#333] bg-transparent py-1.5 pl-9 pr-3 text-[13px] text-white-smoke outline-none placeholder:text-[#666] focus:border-[#555]"
         />
       </div>
-      <button type="button" onClick={() => onFilter("public")}  className={pillClass(filter === "public")}>Public</button>
-      <button type="button" onClick={() => onFilter("private")} className={pillClass(filter === "private")}>Private</button>
+      <button type="button" onClick={() => onFilter("public")}  data-testid="artist-tracks-filter-public" className={pillClass(filter === "public")}>Public</button>
+      <button type="button" onClick={() => onFilter("private")} data-testid="artist-tracks-filter-private" className={pillClass(filter === "private")}>Private</button>
       <div className={`flex items-center gap-2 text-[13px] ${isMobile ? "w-full justify-between" : "ml-auto"}`}>
         <span className="font-semibold text-white-smoke">{count} tracks</span>
         <SortDropdown sortField={sortField} onSortField={onSortField} sortDir={sortDir} onSortDir={onSortDir} />
@@ -197,6 +201,7 @@ function MobileSelectionBar({
         <button
           type="button"
           onClick={onEditSelected}
+          data-testid="artist-tracks-mobile-edit"
           className="rounded-md border border-[#3a3a3a] px-3 py-1.5 text-[12px] font-semibold text-white-smoke"
         >
           Edit
@@ -204,6 +209,7 @@ function MobileSelectionBar({
         <button
           type="button"
           onClick={onAddSelectedToPlaylist}
+          data-testid="artist-tracks-mobile-add-to-playlist"
           className="rounded-md border border-[#3a3a3a] px-3 py-1.5 text-[12px] font-semibold text-white-smoke"
         >
           Add to playlist
@@ -240,6 +246,7 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
   const [bulkEditOpen, setBulkEditOpen]           = useState(false);
   const [addToPlaylistOpen, setAddToPlaylistOpen] = useState(false);
   const [contextMenu, setContextMenu]             = useState<{ id: string; x: number; y: number } | null>(null);
+  const [pendingDeleteTrackId, setPendingDeleteTrackId] = useState<string | null>(null);
 
   const openContextMenu = (id: string, e: React.MouseEvent) => {
     e.stopPropagation();
@@ -343,6 +350,11 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
     }
   };
 
+  const pendingDeleteTrackTitle = useMemo(() => {
+    if (!pendingDeleteTrackId) return undefined;
+    return rows.find((r) => r.id === pendingDeleteTrackId)?.title;
+  }, [pendingDeleteTrackId, rows]);
+
   const handleDownload = (id: string) => {
     const row = rows.find((r) => r.id === id);
     if (!row?.downloadUrl) return;
@@ -354,8 +366,8 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
       <TracksActionBar
         isArtistPro={isArtistPro}
         onUpload={     () => router.push("/upload")}
-        onDistribute={ () => router.push("/artistpro")}
-        onMonetize={   () => router.push("/artistpro")}
+        onDistribute={ () => router.push("/artist")}
+        onMonetize={   () => router.push("/artist")}
         onMaster={     () => router.push("/upload")}
       />
       <TracksFilterBar
@@ -443,7 +455,7 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
       {!isArtistPro && <ArtistProBenefits isArtistPro={isArtistPro} />}
 
       {amplifyOpen && !isArtistPro && (
-        <AmplifyModal onClose={() => setAmplifyOpen(false)} onUnlock={() => router.push("/artistpro")} />
+        <AmplifyModal onClose={() => setAmplifyOpen(false)} onUnlock={() => router.push("/artist")} />
       )}
       {contextMenu && (
         <TrackContextMenu
@@ -454,10 +466,24 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
           onAddToPlaylist={() => setAddToPlaylistOpen(true)}
           onDownload={handleDownload}
           canDownload={isArtistPro && Boolean(rows.find((r) => r.id === contextMenu.id)?.downloadUrl)}
-          onDelete={(id) => { void handleDelete(id); }}
+          onDelete={(id) => {
+            setPendingDeleteTrackId(id);
+            setContextMenu(null);
+          }}
           isArtistPro={isArtistPro}
         />
       )}
+      <DeleteTrackModal
+        isOpen={Boolean(pendingDeleteTrackId)}
+        trackTitle={pendingDeleteTrackTitle}
+        isLoading={loadingDelete}
+        error={errorDelete}
+        onClose={() => setPendingDeleteTrackId(null)}
+        onConfirm={() => {
+          if (!pendingDeleteTrackId) return;
+          void handleDelete(pendingDeleteTrackId).finally(() => setPendingDeleteTrackId(null));
+        }}
+      />
       {editTrack && (
         <EditTrackPanel
           track={editTrack}

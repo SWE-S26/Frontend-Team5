@@ -145,6 +145,7 @@ export function BasicInfoForm({
 					value={trackTitle}
 					onChange={(e) => setTrackTitle(e.target.value)}
 					placeholder="Enter track title"
+					data-testid="upload-track-title"
 					className={FIELD_CLS}
 				/>
 			</div>
@@ -164,6 +165,7 @@ export function BasicInfoForm({
 							readOnly={permalinkReadOnly}
 							disabled={permalinkReadOnly}
 							placeholder="track-slug"
+							data-testid="upload-track-link"
 							className={`min-w-0 flex-1 bg-transparent text-[13px] text-white-smoke placeholder-[#555] focus:outline-none ${permalinkReadOnly ? "cursor-not-allowed" : ""}`}
 						/>
 					</div>
@@ -177,6 +179,7 @@ export function BasicInfoForm({
 					value={artistName}
 					onChange={(e) => setArtistName(e.target.value)}
 					placeholder="Your artist name"
+					data-testid="upload-track-artist"
 					className={FIELD_CLS}
 				/>
 				<p className="mt-1.5 text-[11px] text-white-smoke">Tip: Use commas to add multiple artist names.</p>
@@ -201,6 +204,7 @@ export function BasicInfoForm({
 								}
 							}}
 							placeholder="Add or search for genre"
+							data-testid="upload-track-genre"
 							className="w-full bg-transparent text-[13px] text-white-smoke placeholder-[#555] focus:outline-none"
 						/>
 						<span className="flex items-center gap-3 text-white-smoke">
@@ -216,6 +220,7 @@ export function BasicInfoForm({
 									if (!genreMenuOpen) { setGenreSearch(genre); } else { commitGenreSearch(); setGenreSearch(""); }
 									setGenreMenuOpen((prev) => !prev);
 								}}
+								data-testid="upload-track-genre-toggle"
 								className="cursor-pointer"
 								aria-label={genreMenuOpen ? "Close genre menu" : "Open genre menu"}
 							>
@@ -234,6 +239,7 @@ export function BasicInfoForm({
 											key={item}
 											type="button"
 											onClick={() => { setGenre(item); setGenreSearch(""); setGenreMenuOpen(false); }}
+											data-testid={`upload-track-genre-${item.toLowerCase().replace(/\s+/g, "-")}`}
 											className="block w-full px-4 py-2 text-left text-[13px] bg-off-black text-white-smoke hover:bg-[#3a3b3f]"
 										>
 											{item}
@@ -249,6 +255,7 @@ export function BasicInfoForm({
 											key={item}
 											type="button"
 											onClick={() => { setGenre(item); setGenreSearch(""); setGenreMenuOpen(false); }}
+											data-testid={`upload-track-genre-${item.toLowerCase().replace(/\s+/g, "-")}`}
 											className="block w-full px-4 py-2 text-left text-[13px] bg-off-black text-white-smoke hover:bg-[#3a3b3f]"
 										>
 											{item}
@@ -260,6 +267,7 @@ export function BasicInfoForm({
 								<button
 									type="button"
 									onClick={() => { setGenre(genreSearch.trim()); setGenreSearch(""); setGenreMenuOpen(false); }}
+									data-testid="upload-track-genre-add-custom"
 									className="block w-full border-t border-[#2a2b30] px-4 py-3 text-left text-[13px] font-semibold text-white-smoke hover:bg-[#3a3b3f]"
 								>
 									Add &quot;{genreSearch.trim()}&quot;
@@ -277,6 +285,7 @@ export function BasicInfoForm({
 					value={tags}
 					onChange={(e) => setTags(e.target.value)}
 					placeholder="Add styles, moods, tempo"
+					data-testid="upload-track-tags"
 					className={FIELD_CLS}
 				/>
 			</div>
@@ -288,6 +297,7 @@ export function BasicInfoForm({
 					onChange={(e) => setDescription(e.target.value)}
 					placeholder="Tracks with descriptions tend to get more plays and engagements."
 					rows={1}
+					data-testid="upload-track-description"
 					className={`${FIELD_CLS} resize-none`}
 				/>
 			</div>
@@ -297,6 +307,7 @@ export function BasicInfoForm({
 					<button
 						type="button"
 						onClick={() => setPrivacyMenuOpen((prev) => !prev)}
+						data-testid="upload-track-privacy-toggle"
 						className="grid w-full cursor-pointer grid-cols-[2rem_1fr_auto] items-start gap-x-3 text-left"
 						aria-expanded={privacyMenuOpen}
 						aria-label="Toggle privacy options"
@@ -357,6 +368,7 @@ export function BasicInfoForm({
 										<button
 											type="button"
 											onClick={() => setShowProFeatureModal(true)}
+											data-testid="upload-track-privacy-follower-exclusive"
 											className={`grid w-full cursor-not-allowed grid-cols-[2rem_1fr] items-start gap-x-3 px-3 py-3 text-left ${
 												visibilityOption === item.value ? "bg-upload-select" : "bg-chinese-black hover:bg-upload-schedular"
 											}`}
@@ -376,6 +388,7 @@ export function BasicInfoForm({
 										key={item.value}
 										type="button"
 										onClick={() => { setVisibilityOption(item.value); setPrivacyMenuOpen(false); }}
+										data-testid={`upload-track-privacy-${item.value}`}
 										className={`grid w-full cursor-pointer grid-cols-[2rem_1fr] items-start gap-x-3 px-3 py-3 text-left ${
 											visibilityOption === item.value ? "bg-upload-select" : "bg-chinese-black hover:bg-upload-schedular"
 										}`}
@@ -409,7 +422,7 @@ export function BasicInfoForm({
 								</p>
 								<p className="text-[11px] text-[#666]">Track will be made public at specific date and time.</p>
 							</div>
-							<Switch checked={scheduleRelease} onChange={setScheduleRelease} disabled={!isArtistPro} className={SWITCH_CLS} />
+								<Switch checked={scheduleRelease} onChange={setScheduleRelease} disabled={!isArtistPro} data-testid="upload-track-schedule-release" className={SWITCH_CLS} />
 						</div>
 					) : (
 						<ProLockTooltip text={TOOLTIP_TEXT.proScheduleRelease} referenceClassName="w-full" placement="bottom">
@@ -424,7 +437,7 @@ export function BasicInfoForm({
 									<p className="text-[11px] text-[#666]">Track will be made public at specific date and time.</p>
 								</div>
 								<span className="inline-flex">
-									<Switch checked={scheduleRelease} onChange={setScheduleRelease} disabled={!isArtistPro} className={SWITCH_CLS} />
+									<Switch checked={scheduleRelease} onChange={setScheduleRelease} disabled={!isArtistPro} data-testid="upload-track-schedule-release" className={SWITCH_CLS} />
 								</span>
 							</div>
 						</ProLockTooltip>

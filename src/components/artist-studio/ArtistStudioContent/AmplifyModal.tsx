@@ -10,6 +10,7 @@ export function AmplifyModal({ onClose, onUnlock }: { onClose: () => void; onUnl
         <button
           type="button"
           onClick={onClose}
+          data-testid="artist-amplify-close"
           className="absolute right-4 top-4 flex h-8 w-8 items-center justify-center rounded-full bg-chinese-black text-[#aaa] hover:text-white-smoke transition-colors"
         >
           <IoClose size={16} />
@@ -48,11 +49,12 @@ export function AmplifyModal({ onClose, onUnlock }: { onClose: () => void; onUnl
               <button
                 type="button"
                 onClick={onUnlock}
+                data-testid="artist-amplify-unlock"
                 className="rounded-full bg-[#7b4fff] px-6 py-2.5 text-[14px] font-bold text-white-smoke hover:bg-[#6a3eee] transition-colors"
               >
                 Unlock with Artist Pro
               </button>
-              <button type="button" onClick={onClose} className="text-[14px] text-[#888] hover:text-white-smoke transition-colors">
+              <button type="button" onClick={onClose} data-testid="artist-amplify-maybe-later" className="text-[14px] text-[#888] hover:text-white-smoke transition-colors">
                 Maybe later
               </button>
             </div>

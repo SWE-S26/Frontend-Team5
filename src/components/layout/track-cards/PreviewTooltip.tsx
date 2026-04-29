@@ -1,5 +1,7 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import { createPortal } from "react-dom";
 import { IoMdPause, IoMdPlay } from "react-icons/io";
 
 export default function PreviewTooltip({
@@ -17,9 +19,18 @@ export default function PreviewTooltip({
   artist?: string;
   isPreviewActive: boolean;
 }) {
-  return (
+  const [mounted, setMounted] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+    return () => setMounted(false);
+  }, []);
+
+  if (!mounted) return null;
+
+  return createPortal(
     <div
-      className="fixed z-50 rounded-lg border border-[#2f3035] bg-chinese-black p-2 text-white-smoke shadow-xl pointer-events-none"
+      className="fixed z-9999 rounded-lg border border-[#2f3035] bg-chinese-black p-2 text-white-smoke shadow-xl pointer-events-none"
       style={{ left: `${x + 12}px`, top: `${y + 12}px` }}
     >
       <div className="flex items-center gap-3">
@@ -48,6 +59,7 @@ export default function PreviewTooltip({
           </div>
         </div>
       </div>
-    </div>
+    </div>,
+    document.body,
   );
 }

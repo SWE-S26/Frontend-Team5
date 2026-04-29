@@ -61,6 +61,7 @@ export default function ArtistSidebar({ open = false, onClose }: ArtistSidebarPr
           open ? "opacity-100" : "pointer-events-none opacity-0"
         }`}
         onClick={onClose}
+        data-testid="artist-sidebar-overlay"
         aria-hidden="true"
       />
 
@@ -70,27 +71,27 @@ export default function ArtistSidebar({ open = false, onClose }: ArtistSidebarPr
         } lg:translate-x-0`}
       >
         <div className="flex w-full flex-col items-stretch gap-1 px-3 lg:w-full lg:items-center lg:px-0">
-          <button onClick={() => navigate("/home")} type="button" className="mb-1 flex h-11 w-full items-center justify-center cursor-pointer" aria-label="Beatza">
+          <button onClick={() => navigate("/home")} type="button" data-testid="artist-sidebar-logo" className="mb-1 flex h-11 w-full items-center justify-center cursor-pointer" aria-label="Beatza">
             <Image src="/app-logo/whitelogo.png" alt="Beatza" width={26} height={26} className="h-12 w-12 logo-dark object-contain" />
             <Image src="/app-logo/blacklogo.png" alt="Beatza" width={26} height={26} className="h-12 w-12 logo-light object-contain" />
           </button>
 
-          <button onClick={() => navigate("/home")} type="button" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors hover:bg-white/5 cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Home">
+          <button onClick={() => navigate("/home")} type="button" data-testid="artist-sidebar-home" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors hover:bg-white/5 cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Home">
             <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1"><GoHome /></span>
             <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">Home</span>
           </button>
 
-          <button onClick={() => navigate("/feed")} type="button" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors hover:bg-white/5 cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Feed">
+          <button onClick={() => navigate("/feed")} type="button" data-testid="artist-sidebar-feed" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors hover:bg-white/5 cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Feed">
             <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1"><BiCollection /></span>
             <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">Feed</span>
           </button>
 
-          <button onClick={() => navigate("/library")} type="button" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors hover:bg-white/5 cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Library">
+          <button onClick={() => navigate("/library")} type="button" data-testid="artist-sidebar-library" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors hover:bg-white/5 cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Library">
             <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1"><LuLibraryBig /></span>
             <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">Library</span>
           </button>
 
-          <button onClick={() => navigate("/artist")} type="button" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors hover:bg-white/5 cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="For Artist">
+          <button onClick={() => navigate("/artist")} type="button" data-testid="artist-sidebar-for-artist" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors hover:bg-white/5 cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="For Artist">
             <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1"><PiShootingStar /></span>
             <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">For Artist</span>
           </button>
@@ -101,6 +102,7 @@ export default function ArtistSidebar({ open = false, onClose }: ArtistSidebarPr
             <div className="relative flex flex-col items-center group">
               <button
                 type="button"
+                data-testid="artist-sidebar-more-apps"
                 className="flex h-10 mb-2 items-center justify-center text-[20px] text-white-smoke transition-colors hover:text-[#8a8a8a] cursor-pointer"
                 aria-label="more-apps"
               >

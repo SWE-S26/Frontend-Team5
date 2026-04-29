@@ -25,6 +25,7 @@ export function LicensingSection({
 		<>
 			<button
 				onClick={onToggle}
+				data-testid="upload-licensing-toggle"
 				className="flex w-full items-center justify-between py-4 text-left border-b border-[#222] cursor-pointer"
 			>
 				<div className="flex items-start gap-3">
@@ -57,7 +58,7 @@ export function LicensingSection({
 									desc:  "With Creative Commons licenses, creators have the choice to give up certain exclusive rights normally associated with copyright, while retaining others.",
 								},
 							].map(({ value, title, desc }) => (
-								<label key={value} className="flex cursor-pointer items-start gap-3">
+								<label key={value} data-testid={`upload-licensing-${value}`} className="flex cursor-pointer items-start gap-3">
 									<PrettyRadio
 										checked={licenseType === value}
 										onSelect={() => setLicenseType(value as "all-rights" | "creative-commons")}

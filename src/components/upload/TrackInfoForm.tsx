@@ -333,6 +333,7 @@ export function PrettyCheckbox({
       role="checkbox"
       aria-checked={checked}
       onClick={() => onChange(!checked)}
+      data-testid="Pretty-checkbox-button"
       className={`mt-0.5 flex h-4.5 w-4.5 items-center justify-center rounded border transition-colors cursor-pointer ${checked ? "border-white-smoke bg-white-smoke" : "border-[#7a7a7a] bg-transparent"}`}
     >
       {checked && <Check className="h-3.5 w-3.5 text-chinese-black" strokeWidth={3} />}
@@ -405,7 +406,7 @@ export function ProLockTooltip({
             <p className="mt-2 text-[11px] leading-5 text-white-smoke">{text.description}</p>
             <button
               type="button"
-              onClick={() => router.push("/artistpro")}
+              onClick={() => router.push("/artist")}
               className="mt-4 rounded-full bg-white-smoke px-4 py-2 text-[12px] font-bold text-chinese-black transition-colors hover:bg-white-smoke cursor-pointer"
             >
               Unlock with Artist Pro
@@ -1229,7 +1230,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
       <ProFeatureModal
         showProFeatureModal={showProFeatureModal}
         onClose={() => setShowProFeatureModal(false)}
-        onUpgrade={() => router.push("/artistpro")}
+        onUpgrade={() => router.push("/artist")}
       />
 
       <div className="mx-auto max-w-7xl px-4 py-8 pb-36 sm:px-5">

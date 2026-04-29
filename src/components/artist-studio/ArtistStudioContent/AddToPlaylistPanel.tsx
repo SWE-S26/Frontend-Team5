@@ -208,16 +208,17 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
   return (
     <>
       {/* Backdrop */}
-      <div className="fixed inset-0 z-400 bg-chinese-black/60" onClick={onClose} />
+      <div className="fixed inset-0 z-1000 bg-chinese-black/60" onClick={onClose} />
 
       {/* Panel */}
-      <div className="fixed right-0 top-0 z-410 flex h-full w-full max-w-140 flex-col bg-chinese-black">
+      <div className="fixed right-0 top-0 z-1010 flex h-full w-full max-w-140 flex-col bg-chinese-black">
 
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-white-smoke/10 px-6 py-5">
           <button
             type="button"
             onClick={onClose}
+            data-testid="artist-add-to-playlist-panel-close"
             className="rounded-full bg-red-500 px-8 py-2 text-[12px] font-semibold text-chinese-black hover:bg-white-smoke/80 transition-colors disabled:opacity-50 cursor-pointer"
           >
             <IoClose size={16} />
@@ -274,6 +275,7 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
                   type="text"
                   value={formData.title}
                   onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+                  data-testid="artist-add-to-playlist-panel-title"
                   className="w-full bg-transparent border-b border-white-smoke/20 py-1.5 text-[13px] text-white-smoke placeholder:text-white-smoke/20 focus:outline-none focus:border-white-smoke/50 transition-colors"
                   placeholder=""
                 />
@@ -287,6 +289,7 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
                   placeholder="Describe your playlist."
                   value={formData.description}
                   onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                  data-testid="artist-add-to-playlist-panel-description"
                   className="w-full bg-transparent border-b border-white-smoke/20 text-[13px] leading-tight text-white-smoke placeholder:text-white-smoke/20 focus:outline-none focus:border-white-smoke/50 transition-colors resize-none"
                   rows={2}
                 />
@@ -300,6 +303,7 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, isPrivate: false })}
+                    data-testid="artist-add-to-playlist-panel-privacy-public"
                     className={`flex-1 py-2 text-[12px] font-semibold transition-colors cursor-pointer ${
                       !formData.isPrivate
                         ? "bg-white-smoke text-chinese-black"
@@ -311,6 +315,7 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
                   <button
                     type="button"
                     onClick={() => setFormData({ ...formData, isPrivate: true })}
+                    data-testid="artist-add-to-playlist-panel-privacy-private"
                     className={`flex-1 py-2 text-[12px] font-semibold transition-colors cursor-pointer ${
                       formData.isPrivate
                         ? "bg-white-smoke text-chinese-black"
@@ -326,6 +331,7 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
                 <button
                   type="button"
                   onClick={() => setIsCreating(false)}
+                  data-testid="artist-add-to-playlist-panel-cancel-create"
                   className="rounded-full bg-red-500 px-8 py-2 text-[12px] font-semibold text-chinese-black hover:bg-white-smoke/80 transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   Cancel
@@ -334,6 +340,7 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
                   type="button"
                   onClick={handleCreatePlaylist}
                   disabled={createLoading}
+                  data-testid="artist-add-to-playlist-panel-save-create"
                   className="rounded-full bg-white-smoke px-8 py-2 text-[12px] font-semibold text-chinese-black hover:bg-white-smoke/80 transition-colors disabled:opacity-50 cursor-pointer"
                 >
                   {createLoading ? "Saving..." : "Save"}
@@ -346,6 +353,7 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
               <button
                 type="button"
                 onClick={() => setIsCreating(true)}
+                data-testid="artist-add-to-playlist-panel-create-button"
                 className="flex items-center gap-4 w-full rounded-lg bg-chinese-black hover:bg-white-smoke/5 transition-colors px-4 py-3 cursor-pointer"
               >
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-md bg-white-smoke/10 border border-white-smoke/15">
@@ -393,6 +401,7 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
                         type="button"
                         onClick={() => handleAddTracksToPlaylist(playlist._id)}
                         disabled={addingToPlaylistId === playlist._id || addLoading}
+                        data-testid={`artist-add-to-playlist-panel-add-btn-${playlist._id}`}
                         className="ml-3 shrink-0 rounded-full border border-white-smoke/30 px-5 py-1.5 text-[12px] font-semibold text-white-smoke hover:border-white-smoke/70 hover:bg-white-smoke/5 transition-colors disabled:opacity-40 cursor-pointer"
                       >
                         {addingToPlaylistId === playlist._id ? (

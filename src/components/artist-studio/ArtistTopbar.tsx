@@ -60,11 +60,11 @@ export default function ArtistTopbar({ onMenuOpenChange, onSidebarToggle }: Topb
     { label: "Profile", action: () => router.push(userId ? `/profile/${userId}` : "/home") },
     { label: "Tracks", action: () => router.push(userId ? `/profile/${userId}?tab=tracks` : "/artists") },
     { label: "Insights", action: () => router.push("/artists") },
-    { label: "Distribute music", action: () => router.push("/artistpro") },
-    { label: "Artist Membership", action: () => router.push("/artistpro"), dividerBefore: true },
-    { label: "Subscriptions", action: () => router.push("/artistpro") },
-    { label: "Listen ad-free", action: () => router.push("/artistpro") },
-    { label: "Unlimited uploads", action: () => router.push("/artistpro") },
+    { label: "Distribute music", action: () => router.push("/artist") },
+    { label: "Artist Membership", action: () => router.push("/artist"), dividerBefore: true },
+    { label: "Subscriptions", action: () => router.push("/artist") },
+    { label: "Listen ad-free", action: () => router.push("/artist") },
+    { label: "Unlimited uploads", action: () => router.push("/artist") },
     { label: "Settings", action: () => router.push("/settings"), dividerBefore: true },
     { label: "Support", action: () => router.push("/need-help") },
     { label: "Sign out", action: () => logout(), dividerBefore: true },
@@ -76,6 +76,7 @@ export default function ArtistTopbar({ onMenuOpenChange, onSidebarToggle }: Topb
         <button
           type="button"
           onClick={onSidebarToggle}
+          data-testid="artist-topbar-sidebar-toggle"
           className="inline-flex h-10 w-10 items-center justify-center rounded-full border border-white-smoke bg-transparent text-[22px] text-white-smoke transition-colors hover:border-[#666] lg:hidden cursor-pointer"
           aria-label="Open artist menu"
         >
@@ -87,6 +88,7 @@ export default function ArtistTopbar({ onMenuOpenChange, onSidebarToggle }: Topb
         {/* Search */}
         <button
           type="button"
+          data-testid="artist-topbar-search"
           className="flex items-center gap-2 rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[18px] text-white-smoke transition-colors hover:border-[#666] sm:px-4 cursor-pointer"
           aria-label="Search"
         >
@@ -98,6 +100,7 @@ export default function ArtistTopbar({ onMenuOpenChange, onSidebarToggle }: Topb
         <button
           type="button"
           onClick={() => router.push("/upload")}
+          data-testid="artist-topbar-upload"
           className="flex items-center gap-2 rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[18px] text-white-smoke transition-colors hover:border-[#666] sm:px-4 cursor-pointer"
           aria-label="Upload"
         >
@@ -109,6 +112,7 @@ export default function ArtistTopbar({ onMenuOpenChange, onSidebarToggle }: Topb
         <button
           type="button"
           onClick={() => router.push("/notifications")}
+          data-testid="artist-topbar-notifications"
           className="rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[25px] text-white-smoke transition-colors hover:border-[#666] sm:px-3 cursor-pointer"
           aria-label="Notifications"
         >
@@ -119,6 +123,7 @@ export default function ArtistTopbar({ onMenuOpenChange, onSidebarToggle }: Topb
         <button
           type="button"
           onClick={() => router.push("/messages")}
+          data-testid="artist-topbar-messages"
           className="rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[25px] text-white-smoke transition-colors hover:border-[#666] sm:px-3 cursor-pointer"
           aria-label="Messages"
         >
@@ -130,6 +135,7 @@ export default function ArtistTopbar({ onMenuOpenChange, onSidebarToggle }: Topb
           <button
             type="button"
             onClick={toggleMenu}
+            data-testid="artist-topbar-profile-menu"
             className="mt-1 h-10 w-10 overflow-hidden rounded-full border border-white-smoke bg-transparent transition-colors hover:border-[#666] cursor-pointer"
             aria-label="Open profile menu"
           >
@@ -152,6 +158,7 @@ export default function ArtistTopbar({ onMenuOpenChange, onSidebarToggle }: Topb
                   <button
                     type="button"
                     onClick={item.action}
+                    data-testid={`artist-topbar-menu-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
                     className="w-full bg-transparent px-4 py-2.5 text-left text-[13px] text-white-smoke transition-colors hover:bg-[#2a2a2a] cursor-pointer"
                   >
                     {item.label}

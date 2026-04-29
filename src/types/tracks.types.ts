@@ -130,6 +130,13 @@ export interface Track {
   numComments: number;
   releaseDate: string;
   isLikedByUser: boolean;
+  isRepostedByUser?: boolean;
+  isAvailableForUser?: boolean;
+  geoBlocking?: {
+    mode: "worldwide" | "exclusive" | "blocked";
+    regions: string[];
+    countries: string[];
+  };
 
   permissions?: {
     enableDirectDownload?: boolean;
@@ -175,6 +182,18 @@ export interface Track {
 export interface GetTrackByIdResponse {
   message: string;
   data: Track;
+}
+
+export interface GetTrackPermalinkResponse {
+  message: string;
+  data: Track;
+}
+
+export interface CheckTrackPermalinkResponse {
+  message: string;
+  data: {
+    isFound: boolean;
+  };
 }
 
 export interface TrackDetailedAdvanced {

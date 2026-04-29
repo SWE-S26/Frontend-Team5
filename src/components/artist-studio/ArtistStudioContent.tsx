@@ -204,11 +204,11 @@ function TabBar({ activeTab, onChangeTab }: { activeTab: ArtistTab; onChangeTab:
     }`;
   return (
     <div className="sticky top-13 z-100 flex overflow-x-auto overflow-y-hidden border-b border-[#222] bg-chinese-black [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <button type="button" onClick={() => onChangeTab("tracks")}       className={tabClass("tracks")}>BeatZa Tracks</button>
-      <button type="button" onClick={() => onChangeTab("distribution")} className={tabClass("distribution")}>Distribution</button>
-      <button type="button" onClick={() => onChangeTab("vinyl")}        className={tabClass("vinyl")}>Vinyl Records</button>
-      <button type="button" onClick={() => onChangeTab("comments")}     className={tabClass("comments")}>Comments</button>
-      <button type="button" onClick={() => onChangeTab("promotions")}   className={tabClass("promotions")}>Promotions</button>
+      <button type="button" onClick={() => onChangeTab("tracks")}       data-testid="artist-tab-tracks" className={tabClass("tracks")}>BeatZa Tracks</button>
+      <button type="button" onClick={() => onChangeTab("distribution")} data-testid="artist-tab-distribution" className={tabClass("distribution")}>Distribution</button>
+      <button type="button" onClick={() => onChangeTab("vinyl")}        data-testid="artist-tab-vinyl" className={tabClass("vinyl")}>Vinyl Records</button>
+      <button type="button" onClick={() => onChangeTab("comments")}     data-testid="artist-tab-comments" className={tabClass("comments")}>Comments</button>
+      <button type="button" onClick={() => onChangeTab("promotions")}   data-testid="artist-tab-promotions" className={tabClass("promotions")}>Promotions</button>
     </div>
   );
 }

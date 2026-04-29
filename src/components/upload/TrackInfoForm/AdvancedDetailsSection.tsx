@@ -74,6 +74,7 @@ export function AdvancedDetailsSection({
 		<>
 			<button
 				onClick={onToggle}
+				data-testid="upload-advanced-toggle"
 				className="flex w-full items-center justify-between py-4 text-left border-b border-[#222] cursor-pointer"
 			>
 				<div>
@@ -111,6 +112,7 @@ export function AdvancedDetailsSection({
 										value={value}
 										onChange={(e) => setter(e.target.value)}
 										placeholder={placeholder}
+										data-testid={`upload-advanced-${label.toLowerCase().replace(/\s+/g, "-")}`}
 										className={ADV_FIELD_CLS}
 									/>
 								</div>
@@ -129,11 +131,13 @@ export function AdvancedDetailsSection({
 											readOnly
 											onClick={openReleaseCalendar}
 											placeholder="MM/DD/YYYY"
+											data-testid="upload-advanced-release-date"
 											className={`${ADV_FIELD_CLS} pr-9 w-full cursor-pointer`}
 										/>
 										<button
 											type="button"
 											onClick={() => setReleaseCalendarOpen((prev) => !prev)}
+											data-testid="upload-advanced-release-calendar-toggle"
 											className="absolute right-2 top-1/2 -translate-y-1/2 text-white-smoke/85 hover:text-white-smoke cursor-pointer"
 											aria-label="Open release date calendar"
 										>
@@ -147,6 +151,7 @@ export function AdvancedDetailsSection({
 												<button
 													type="button"
 													onClick={() => shiftReleaseCalendarMonth(-1)}
+													data-testid="upload-advanced-release-prev"
 													className="rounded px-2 py-1 text-white-smoke/80 hover:bg-[#2a2b31] hover:text-white-smoke"
 													aria-label="Previous month"
 												>
@@ -158,6 +163,7 @@ export function AdvancedDetailsSection({
 												<button
 													type="button"
 													onClick={() => shiftReleaseCalendarMonth(1)}
+													data-testid="upload-advanced-release-next"
 													className="rounded px-2 py-1 text-white-smoke/80 hover:bg-[#2a2b31] hover:text-white-smoke"
 													aria-label="Next month"
 												>
@@ -219,6 +225,7 @@ export function AdvancedDetailsSection({
 										value={value}
 										onChange={(e) => setter(e.target.value)}
 										placeholder={placeholder}
+										data-testid={`upload-advanced-${label.toLowerCase().replace(/\s+/g, "-")}`}
 										className={ADV_FIELD_CLS}
 									/>
 								</div>
@@ -247,6 +254,7 @@ export function AdvancedDetailsSection({
 									value={pline}
 									onChange={(e) => setPline(e.target.value)}
 									placeholder=""
+									data-testid="upload-advanced-p-line"
 									className={ADV_FIELD_CLS}
 								/>
 							</div>

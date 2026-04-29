@@ -138,6 +138,7 @@ export default function AddToPlaylistModal({
         <button
           type="button"
           onClick={onClose}
+          data-testid="add-to-playlist-modal-close"
           className={`fixed top-6 right-6 z-1010 w-10 h-10 rounded-full flex items-center justify-center text-white-smoke hover:text-gray-400 bg-chinese-black transition-all duration-500 cursor-pointer ${
             animate ? "opacity-100 translate-y-0" : "opacity-0 -translate-y-10"
           }`}
@@ -157,6 +158,7 @@ export default function AddToPlaylistModal({
           <button
             type="button"
             onClick={() => setActiveTab("add")}
+            data-testid="add-to-playlist-modal-tab-add"
             className={`mr-6 pb-3 text-[22px] font-bold leading-none transition-colors cursor-pointer ${
               activeTab === "add"
                 ? "text-white-smoke border-b-2 border-white"
@@ -168,6 +170,7 @@ export default function AddToPlaylistModal({
           <button
             type="button"
             onClick={() => setActiveTab("create")}
+            data-testid="add-to-playlist-modal-tab-create"
             className={`pb-3 text-[22px] font-bold leading-none transition-colors cursor-pointer ${
               activeTab === "create"
                 ? "text-white-smoke border-b-2 border-white"
@@ -185,6 +188,7 @@ export default function AddToPlaylistModal({
             <input
               value={search}
               onChange={(e) => setSearch(e.target.value)}
+              data-testid="add-to-playlist-modal-filter-input"
               placeholder="Filter playlists"
               className="w-full bg-chinese-black border border-white-smoke rounded-sm px-4 py-2.5 text-sm text-white-smoke placeholder-white-smoke/40 outline-none focus:border-white/50 mb-4"
             />
@@ -238,6 +242,7 @@ export default function AddToPlaylistModal({
                   <button
                     onClick={() => void handleAddTrack(playlist._id)}
                     disabled={addingTrack && busyPlaylistId === playlist._id}
+                    data-testid={`add-to-playlist-modal-add-btn-${playlist._id}`}
                     className={`shrink-0 px-4 py-1.5 text-sm font-semibold rounded-sm border transition cursor-pointer disabled:opacity-60 ${
                       addedPlaylistIds.has(playlist._id)
                         ? "bg-chinese-black text-[#ff5500] border-[#333] hover:bg-[#2a2a2a]"
@@ -267,6 +272,7 @@ export default function AddToPlaylistModal({
             <input
               value={newPlaylistTitle}
               onChange={(e) => setNewPlaylistTitle(e.target.value)}
+              data-testid="add-to-playlist-modal-create-title"
               className="w-full bg-chinese-black border border-[#3a3a3a] rounded-sm px-3 py-2.5 text-sm text-white-smoke outline-none focus:border-white/50 mb-4"
             />
 
@@ -279,6 +285,7 @@ export default function AddToPlaylistModal({
                   name="privacy"
                   checked={!isPrivate}
                   onChange={() => setIsPrivate(false)}
+                  data-testid="add-to-playlist-modal-create-privacy-public"
                   className="accent-white-smoke"
                 />
                 Public
@@ -289,6 +296,7 @@ export default function AddToPlaylistModal({
                   name="privacy"
                   checked={isPrivate}
                   onChange={() => setIsPrivate(true)}
+                  data-testid="add-to-playlist-modal-create-privacy-private"
                   className="accent-white-smoke"
                 />
                 Private
@@ -297,6 +305,7 @@ export default function AddToPlaylistModal({
               <button
                 onClick={() => void handleCreatePlaylist()}
                 disabled={creatingPlaylist || !newPlaylistTitle.trim()}
+                data-testid="add-to-playlist-modal-create-save"
                 className="ml-auto px-5 py-1.5 text-sm font-semibold bg-white-smoke text-chinese-black rounded-sm hover:bg-white/90 disabled:opacity-50 transition cursor-pointer"
               >
                 {creatingPlaylist ? "Saving..." : "Save"}
@@ -365,6 +374,7 @@ export default function AddToPlaylistModal({
                       <button
                         onClick={() => void handleAddTrack(playlist._id)}
                         disabled={addingTrack && busyPlaylistId === playlist._id}
+                        data-testid={`add-to-playlist-modal-more-add-btn-${playlist._id}`}
                         className="shrink-0 px-4 py-1.5 text-sm font-semibold bg-chinese-black text-white-smoke border border-[#444] rounded-sm hover:bg-[#2a2a2a] disabled:opacity-60 transition cursor-pointer"
                       >
                         {addingTrack && busyPlaylistId === playlist._id

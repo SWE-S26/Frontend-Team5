@@ -45,7 +45,7 @@ export function ArtworkPanel({
 	return (
 		<div className="lg:col-span-4">
 			<div className="mx-auto w-full max-w-md lg:mx-0 lg:max-w-90">
-				<input ref={artworkInputRef} type="file" accept="image/*" className="hidden" onChange={handleArtworkChange} />
+				<input ref={artworkInputRef} type="file" accept="image/*" className="hidden" onChange={handleArtworkChange} data-testid="upload-artwork-input" />
 
 				<div
 					ref={artworkFrameRef}
@@ -88,7 +88,7 @@ export function ArtworkPanel({
 							unoptimized
 						/>
 					) : (
-						<button type="button" onClick={handleArtworkPick} className="flex h-full w-full flex-col items-center justify-center gap-3 p-6 cursor-pointer">
+						<button type="button" onClick={handleArtworkPick} data-testid="upload-artwork-add" className="flex h-full w-full flex-col items-center justify-center gap-3 p-6 cursor-pointer">
 							<PictureOutlined className="text-[100px] text-white-smoke transition-colors" />
 							<span className="text-[15px] font-semibold text-white-smoke transition-colors">Add new artwork</span>
 						</button>
@@ -112,6 +112,7 @@ export function ArtworkPanel({
 								type="button"
 								title="Replace Image"
 								onClick={handleArtworkPick}
+								data-testid="upload-artwork-replace"
 								className="flex h-10 w-10 items-center justify-center rounded-full bg-chinese-black text-white-smoke transition-colors hover:bg-[#2a2b31] cursor-pointer"
 								aria-label="Replace artwork"
 							>
@@ -121,6 +122,7 @@ export function ArtworkPanel({
 								type="button"
 								title="Remove Image"
 								onClick={handleDeleteArtwork}
+								data-testid="upload-artwork-delete"
 								className="flex h-10 w-10 items-center justify-center rounded-full bg-chinese-black text-white-smoke transition-colors hover:bg-[#2a2b31] cursor-pointer"
 								aria-label="Delete artwork"
 							>
@@ -135,6 +137,7 @@ export function ArtworkPanel({
 						<button
 							type="button"
 							onClick={() => setArtworkZoom((z) => Math.max(1, Number((z - 0.1).toFixed(2))))}
+							data-testid="upload-artwork-zoom-out"
 							className="text-white-smoke/90 hover:text-white"
 							aria-label="Zoom out"
 						>
@@ -145,12 +148,14 @@ export function ArtworkPanel({
 							min={1} max={3} step={0.01}
 							value={artworkZoom}
 							onChange={(e) => setArtworkZoom(Number(e.target.value))}
+							data-testid="upload-artwork-zoom-range"
 							className="w-full accent-white-smoke"
 							aria-label="Artwork zoom"
 						/>
 						<button
 							type="button"
 							onClick={() => setArtworkZoom((z) => Math.min(3, Number((z + 0.1).toFixed(2))))}
+							data-testid="upload-artwork-zoom-in"
 							className="text-white-smoke/90 hover:text-white"
 							aria-label="Zoom in"
 						>

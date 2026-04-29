@@ -28,7 +28,7 @@ export function VinylTab({ isArtistPro }: { isArtistPro: boolean }) {
       <div className="flex flex-col gap-6 border-b border-[#262626] pb-8 lg:flex-row lg:items-center lg:justify-between">
         <div className="max-w-2xl">
           <div className="mb-3 flex items-center gap-2">
-            <span className="rounded bg-chinese-black px-2 py-0.5 text-[10px] font-bold text-yellow-400">★ ARTIST PRO</span>
+            <span className="rounded bg-chinese-black px-2 py-0.5 text-[10px] font-bold text-yellow-400">ARTIST PRO</span>
           </div>
           <h2 className="text-[24px] font-bold leading-tight text-white-smoke sm:text-[28px]">Your music. On vinyl. On demand</h2>
           <p className="mt-3 text-[14px] leading-relaxed text-[#aaa]">
@@ -42,7 +42,8 @@ export function VinylTab({ isArtistPro }: { isArtistPro: boolean }) {
             {!isArtistPro ? (
               <button
                 type="button"
-                onClick={() => router.push("/artistpro")}
+                onClick={() => router.push("/artist")}
+                data-testid="artist-vinyl-upgrade"
                 className="rounded-full bg-white px-7 py-2.5 text-[14px] font-bold text-black hover:bg-[#eee] transition-colors"
               >
                 Get Artist Pro
@@ -52,7 +53,7 @@ export function VinylTab({ isArtistPro }: { isArtistPro: boolean }) {
                 You're on Artist Pro
               </p>
             )}
-            <button type="button" className="rounded-full border border-[#444] bg-transparent px-7 py-2.5 text-[14px] font-bold text-white-smoke hover:border-[#666] transition-colors">Learn More</button>
+            <button type="button" data-testid="artist-vinyl-learn-more" className="rounded-full border border-[#444] bg-transparent px-7 py-2.5 text-[14px] font-bold text-white-smoke hover:border-[#666] transition-colors">Learn More</button>
           </div>
         </div>
         <div className="hidden lg:flex shrink-0 items-center justify-center">

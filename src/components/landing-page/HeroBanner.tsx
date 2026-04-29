@@ -20,7 +20,7 @@ const slides = [
     title: "Ascending Artist",
     heading: ["It all starts with", "an upload."],
     description: "From bedrooms and broom closets to studios and stadiums, BeatZa is where you define what's next in music. Just hit upload.",
-    buttons: [{ label: "Upload", href: "/upload" }, { label: "Explore Artist Pro", href: "/artistpro" }],
+    buttons: [{ label: "Upload", href: "/upload" }, { label: "Explore Artist Pro", href: "/artist" }],
   },
   {
     image: "/landing-page/hero-banner/placeholder3.jpeg",
@@ -56,7 +56,7 @@ export default function HeroBanner() {
   }, [])
 
   return (
-    <div className="relative w-full rounded-2xl overflow-hidden h-[420px] sm:h-111.5">
+    <div className="relative w-full rounded-2xl overflow-hidden h-105 sm:h-111.5">
 
       {/* sliding track */}
       <div

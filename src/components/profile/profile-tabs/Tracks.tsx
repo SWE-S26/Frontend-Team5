@@ -1,6 +1,6 @@
 import WaveformCard from "@/components/layout/track-cards/WaveformCard"
 
-interface Item { img: string; title: string; artist: string; trackId: string; trackUrl?: string; downloadUrl?: string; duration?: number; audioClipStart?: number; audioClipEnd?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean }
+interface Item { img: string; title: string; artist: string; trackId: string; trackUrl?: string; downloadUrl?: string; enableDirectDownload?: boolean; duration?: number; audioClipStart?: number; audioClipEnd?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean }
 interface Props { items: Item[]; isLoading?: boolean; onEditTrack?: (item: Item) => void; onAddToPlaylist?: (item: Item) => void }
 
 export default function Tracks({ items, isLoading = false, onEditTrack, onAddToPlaylist }: Props) {
@@ -26,7 +26,7 @@ export default function Tracks({ items, isLoading = false, onEditTrack, onAddToP
                  </div>
                ))
              : items.map((item, index) => (
-                 <WaveformCard
+                  <WaveformCard
                    key={`${item.trackId || "track"}-${item.title || "untitled"}-${index}`}
                    img={item.img}
                    title={item.title}
@@ -34,6 +34,7 @@ export default function Tracks({ items, isLoading = false, onEditTrack, onAddToP
                    trackId={item.trackId}
                    trackUrl={item.trackUrl}
                    downloadUrl={item.downloadUrl}
+                   enableDirectDownload={item.enableDirectDownload}
                    duration={item.duration}
                    audioClipStart={item.audioClipStart}
                    audioClipEnd={item.audioClipEnd}

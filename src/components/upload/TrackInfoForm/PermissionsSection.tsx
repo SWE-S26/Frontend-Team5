@@ -237,12 +237,14 @@ export function PermissionsSection({
 						setRegionSearch(e.target.value);
 						setRegionMenuOpen(true);
 					}}
+					data-testid="upload-geoblocking-search"
 					className="w-full bg-transparent text-[13px] text-white-smoke placeholder-[#555] focus:outline-none"
 				/>
 				<span className="flex items-center gap-3 text-white-smoke">
 					{selectedRegions.length > 0 && (
 						<CloseOutlined
 							onMouseDown={(e) => { e.preventDefault(); setGeoblockingRegions([]); }}
+							data-testid="upload-geoblocking-clear"
 							className="cursor-pointer text-[12px]"
 						/>
 					)}
@@ -252,6 +254,7 @@ export function PermissionsSection({
 							e.preventDefault();
 							setRegionMenuOpen((prev) => !prev);
 						}}
+						data-testid="upload-geoblocking-toggle"
 						className="cursor-pointer"
 					>
 						{regionMenuOpen
@@ -280,6 +283,7 @@ export function PermissionsSection({
 												e.preventDefault();
 												if (!isDisabled) toggleRegion(country, group.continent);
 											}}
+											data-testid={`upload-geoblocking-region-${country.toLowerCase().replace(/\s+/g, "-")}`}
 											className={`block w-full px-4 py-2 text-left text-[13px] text-white-smoke transition-opacity ${
 												isDisabled
 													? "opacity-30 cursor-not-allowed"
@@ -312,6 +316,7 @@ export function PermissionsSection({
 							<button
 								type="button"
 								onClick={() => removeRegion(r)}
+										data-testid={`upload-geoblocking-remove-${r.toLowerCase().replace(/\s+/g, "-")}`}
 								className="ml-0.5 text-white-smoke/60 hover:text-white-smoke"
 							>
 								<CloseOutlined className="text-[10px]" />
@@ -327,6 +332,7 @@ export function PermissionsSection({
 		<>
 			<button
 				onClick={onToggle}
+				data-testid="upload-permissions-toggle"
 				className="flex w-full items-center justify-between py-4 text-left border-b border-[#222] cursor-pointer"
 			>
 				<div className="flex items-start gap-3">
@@ -358,23 +364,26 @@ export function PermissionsSection({
 									{ label: "Include in RSS feed",      desc: 'Choose whether you want this track to show up in the "Feed" tab.',                           val: includeRssFeed,   set: setIncludeRssFeed   },
 									{ label: "Display embed code",       desc: "Choose whether you want this track's embedded player code to be displayed publicly.",        val: displayEmbedCode,  set: setDisplayEmbedCode  },
 									{ label: "Enable app playback",      desc: "Choose whether you want this track to be playable outside the app.",                        val: enableAppPlayback, set: setEnableAppPlayback },
-								].map(({ label, desc, val, set }) => (
-									<div key={label} className="flex items-center justify-between gap-4 border-b border-[#2a2a2a] pb-4 last:border-b-0 last:pb-0">
-										<div>
-											<p className="text-[15px] font-semibold text-white-smoke">{label}</p>
-											<p className="text-[13px] text-white-smoke/55">{desc}</p>
-										</div>
-										{!isArtistPro && label === "Enable direct downloads" ? (
-											<ProLockTooltip text={TOOLTIP_TEXT.proSwitch} referenceClassName="inline-flex h-fit w-fit" placement="bottom-end">
-												<span className="inline-flex">
-													<Switch checked={val} onChange={set} disabled className={SWITCH_CLS} />
+								].map(({ label, desc, val, set }) => {
+									const testId = label.toLowerCase().replace(/\s+/g, "-");
+									return (
+										<div key={label} className="flex items-center justify-between gap-4 border-b border-[#2a2a2a] pb-4 last:border-b-0 last:pb-0">
+											<div>
+												<p className="text-[15px] font-semibold text-white-smoke">{label}</p>
+												<p className="text-[13px] text-white-smoke/55">{desc}</p>
+											</div>
+											{!isArtistPro && label === "Enable direct downloads" ? (
+												<ProLockTooltip text={TOOLTIP_TEXT.proSwitch} referenceClassName="inline-flex h-fit w-fit" placement="bottom-end">
+													<span className="inline-flex">
+														<Switch checked={val} onChange={set} disabled data-testid={`upload-permissions-${testId}`} className={SWITCH_CLS} />
 												</span>
-											</ProLockTooltip>
-										) : (
-											<Switch checked={val} onChange={set} className={SWITCH_CLS} />
-										)}
-									</div>
-								))}
+												</ProLockTooltip>
+											) : (
+												<Switch checked={val} onChange={set} data-testid={`upload-permissions-${testId}`} className={SWITCH_CLS} />
+											)}
+										</div>
+									);
+								})}
 							</div>
 
 							<div className="space-y-4 pb-4 border-b border-[#1e1e1e]">
@@ -383,11 +392,12 @@ export function PermissionsSection({
 									{ label: "Allow people to comment on your track", val: allowComments,     set: setAllowComments     },
 									{ label: "Show track comments to public",          val: showTrackComments, set: setShowTrackComments  },
 									{ label: "Show track insights to public",          val: showTrackInsights, set: setShowTrackInsights  },
-								].map(({ label, val, set }) =>
-									isArtistPro ? (
+								].map(({ label, val, set }) => {
+									const testId = label.toLowerCase().replace(/\s+/g, "-");
+									return isArtistPro ? (
 										<div key={label} className="flex items-center justify-between gap-4 border-b border-[#2a2a2a] pb-4 last:border-b-0 last:pb-0">
 											<p className="text-[15px] font-semibold text-white-smoke">{label}</p>
-											<Switch checked={val} onChange={set} disabled={!isArtistPro} className={SWITCH_CLS} />
+											<Switch checked={val} onChange={set} disabled={!isArtistPro} data-testid={`upload-permissions-${testId}`} className={SWITCH_CLS} />
 										</div>
 									) : (
 										<div key={label} className="flex items-center justify-between gap-4 border-b border-[#2a2a2a] pb-4 opacity-70 last:border-b-0 last:pb-0">
@@ -396,13 +406,13 @@ export function PermissionsSection({
 												<RiLockFill className="text-[20px] text-white-smoke" />
 												<ProLockTooltip text={TOOLTIP_TEXT.proSwitch} referenceClassName="inline-flex h-fit w-fit" placement="bottom-end">
 													<span className="inline-flex">
-														<Switch checked={val} onChange={set} disabled={!isArtistPro} className={SWITCH_CLS} />
+														<Switch checked={val} onChange={set} disabled={!isArtistPro} data-testid={`upload-permissions-${testId}`} className={SWITCH_CLS} />
 													</span>
 												</ProLockTooltip>
 											</div>
 										</div>
-									)
-								)}
+									);
+								})}
 							</div>
 
 							{isArtistPro ? (
@@ -413,9 +423,9 @@ export function PermissionsSection({
 									<p className="mb-3 text-[14px] text-white-smoke">Customize what countries your track will be available in.</p>
 
 									<div role="radiogroup" className="space-y-2">
-										{geoblockingRadios.map(({ opt, label, desc }) => (
+											{geoblockingRadios.map(({ opt, label, desc }) => (
 											<div key={opt}>
-												<label className="flex cursor-pointer items-center gap-2">
+													<label className="flex cursor-pointer items-center gap-2" data-testid={`upload-geoblocking-${opt}`}>
 													<PrettyRadio
 														checked={geoblockingOption === opt}
 														onSelect={() => setGeoblockingOption(opt)}
@@ -456,7 +466,7 @@ export function PermissionsSection({
 										</div>
 										<div role="radiogroup" className="space-y-2">
 											{geoblockingRadios.map(({ opt, label }) => (
-												<label key={opt} className="flex cursor-not-allowed items-center gap-2 opacity-60">
+												<label key={opt} data-testid={`upload-geoblocking-${opt}`} className="flex cursor-not-allowed items-center gap-2 opacity-60">
 													<PrettyRadio
 														checked={geoblockingOption === opt}
 														onSelect={() => { /* locked */ }}

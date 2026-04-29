@@ -17,6 +17,7 @@ export function QuitModal({ showQuitModal, onClose, onQuit }: QuitModalProps) {
 				<button
 					type="button"
 					onClick={onClose}
+					data-testid="upload-quit-close"
 					className="absolute top-4 right-4 flex h-9 w-9 items-center justify-center rounded-full bg-[#2b2c31] text-[#ccc] transition-colors hover:bg-[#38383d] cursor-pointer"
 					aria-label="Cancel quit"
 				>
@@ -28,6 +29,7 @@ export function QuitModal({ showQuitModal, onClose, onQuit }: QuitModalProps) {
 					<button
 						type="button"
 						onClick={onClose}
+						data-testid="upload-quit-back"
 						className="px-4 py-2 text-[13px] font-semibold text-white-smoke rounded transition-colors hover:bg-[#2b2c31] cursor-pointer"
 					>
 						Back to upload
@@ -35,6 +37,7 @@ export function QuitModal({ showQuitModal, onClose, onQuit }: QuitModalProps) {
 					<button
 						type="button"
 						onClick={onQuit}
+						data-testid="upload-quit-confirm"
 						className="rounded-full bg-[#f25870] px-5 py-2 text-[13px] font-semibold text-white transition-colors hover:bg-[#ff6b81] cursor-pointer"
 					>
 						Quit upload

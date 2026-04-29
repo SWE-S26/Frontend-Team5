@@ -50,6 +50,7 @@ type CardProps = {
   likeCount: number;
   repostCount: number;
   isLikedByUser?: boolean;
+  enableDirectDownload?: boolean;
   downloadUrl?: string;
   canEdit?: boolean;
   wfLink?: string;
@@ -74,6 +75,7 @@ export default function WaveformCard({
   likeCount,
   repostCount,
   isLikedByUser,
+  enableDirectDownload = false,
   downloadUrl,
   canEdit = false,
   wfLink,
@@ -98,12 +100,17 @@ export default function WaveformCard({
   const previewStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
   const previewingRef = useRef(false);
+  const previewStartingRef = useRef(false);
+  const previewRequestIdRef = useRef(0);
+  const isHoveringRef = useRef(false);
   const previewTimeUpdateHandlerRef = useRef<((this: HTMLAudioElement, ev: Event) => any) | null>(null);
   const fetchClipPromiseRef = useRef<Promise<{ start: number; end: number } | null> | null>(null);
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
   const authRole = useAppSelector((state) => state.auth.role);
+  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated && state.auth.hasHydrated);
   const isArtistPro = authRole === "Pro";
+  const allowDownload = isArtistPro || !!enableDirectDownload;
 
   const { ref, isVisible } = useIsVisible("200px");
 
@@ -164,8 +171,16 @@ export default function WaveformCard({
     return { start, end };
   };
 
+  const isDisabledClip = (startRaw: unknown, endRaw: unknown) => {
+    return Number(startRaw) === 0 && Number(endRaw) === 0;
+  };
+
   const getClipBounds = (serverClip?: { start: number; end: number } | null) => {
-    if (serverClip) return serverClip;
+    if (serverClip) {
+      if (isDisabledClip(serverClip.start, serverClip.end)) return null;
+      return serverClip;
+    }
+    if (isDisabledClip(audioClipStart, audioClipEnd)) return null;
     const propClip = parseClipBounds(audioClipStart, audioClipEnd);
     if (propClip) return propClip;
     const start = 0;
@@ -180,12 +195,24 @@ export default function WaveformCard({
     if (fetchClipPromiseRef.current) return fetchClipPromiseRef.current;
 
     setIsFetchingClip(true);
-    const promise = tracksService
-      .getTrackById(trackId)
+    const request = isAuthenticated
+      ? tracksService.getTrackById(trackId)
+      : tracksService.getPublicTrackById(trackId)
+
+    const promise = request
       .then((res) => {
+        const rawStart = res.data.data.audioClip?.start;
+        const rawEnd = res.data.data.audioClip?.end;
+        if (isDisabledClip(rawStart, rawEnd)) {
+          const disabledClip = { start: 0, end: 0 };
+          clipBoundsCache.set(trackId, disabledClip);
+          setFetchedClip(disabledClip);
+          return disabledClip;
+        }
+
         const clip = parseClipBounds(
-          res.data.data.audioClip?.start,
-          res.data.data.audioClip?.end,
+          rawStart,
+          rawEnd,
         );
         if (clip) {
           clipBoundsCache.set(trackId, clip);
@@ -307,7 +334,7 @@ export default function WaveformCard({
   const transitionConfig: Transition = { duration: 0.25, ease: "easeOut" };
 
   const handleDownload = () => {
-    if (!isArtistPro || !downloadUrl) return;
+    if (!allowDownload || !downloadUrl) return;
     window.open(downloadUrl, "_blank", "noopener,noreferrer");
   };
 
@@ -316,6 +343,7 @@ export default function WaveformCard({
   };
 
   function stopPreview() {
+    previewStartingRef.current = false;
     if (hoverTimerRef.current) {
       clearTimeout(hoverTimerRef.current);
       hoverTimerRef.current = null;
@@ -335,16 +363,30 @@ export default function WaveformCard({
     setShowPreviewTooltip(false);
   }
 
-  async function startPreview() {
+  async function startPreview(requestId: number) {
     if (!trackUrl || isPlaying) return;
-    if (previewingRef.current) return;
+    if (previewingRef.current || previewStartingRef.current) return;
+
+    previewStartingRef.current = true;
 
     const serverClip = await ensureTrackClip();
+    if (requestId !== previewRequestIdRef.current || !isHoveringRef.current) {
+      previewStartingRef.current = false;
+      return;
+    }
+
     const clip = getClipBounds(serverClip);
-    if (!clip) return;
+    if (!clip) {
+      previewStartingRef.current = false;
+      return;
+    }
+
     const clipStart = clip.start;
     const clipEnd = clip.end;
-    if (clipEnd <= clipStart) return;
+    if (clipEnd <= clipStart) {
+      previewStartingRef.current = false;
+      return;
+    }
 
     let audio = previewAudioRef.current;
     if (!audio || audio.src !== trackUrl) {
@@ -354,22 +396,22 @@ export default function WaveformCard({
     }
 
     const playFrom = () => {
-      if (!audio) return;
+      if (!audio || requestId !== previewRequestIdRef.current || !isHoveringRef.current) {
+        previewStartingRef.current = false;
+        return;
+      }
 
-      const seekToClipStart = () => {
-        try {
-          audio.currentTime = Math.max(0, clipStart);
-        } catch {
-        }
-      };
+      try {
+        audio.currentTime = Math.max(0, clipStart);
+      } catch {
+      }
 
-      seekToClipStart();
       audio.play().catch(() => {
+        previewStartingRef.current = false;
         setShowPreviewTooltip(false);
       });
-      window.setTimeout(seekToClipStart, 80);
-      window.setTimeout(seekToClipStart, 220);
 
+      previewStartingRef.current = false;
       previewingRef.current = true;
       setShowPreviewTooltip(true);
 
@@ -399,11 +441,13 @@ export default function WaveformCard({
 
   function handleHoverStart(e: React.MouseEvent) {
     if (isThisCardPlaying || isPlaying) return;
+    isHoveringRef.current = true;
+    const requestId = ++previewRequestIdRef.current;
     setPreviewTooltipPos({ x: e.clientX, y: e.clientY });
     void ensureTrackClip();
     if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
     hoverTimerRef.current = setTimeout(() => {
-      void startPreview();
+      void startPreview(requestId);
     }, HOVER_PREVIEW_DELAY);
   }
 
@@ -412,6 +456,8 @@ export default function WaveformCard({
   }
 
   function handleHoverEnd() {
+    isHoveringRef.current = false;
+    previewRequestIdRef.current += 1;
     stopPreview();
   }
 
@@ -574,7 +620,7 @@ export default function WaveformCard({
                 />
               </Tooltip>
             )}
-            {isArtistPro && downloadUrl && (
+            {allowDownload && downloadUrl && (
               <Tooltip label="Download">
                 <Button
                   onClick={handleDownload}

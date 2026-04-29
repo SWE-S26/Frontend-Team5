@@ -7,9 +7,8 @@ import { useLikeTrack } from "@/hooks/useLikes";
 import { useTrackRepostsList } from "@/hooks/useReposts";
 import ProfilePopover from "../layout/track-cards/ProfilePopover";
 
-import { useGetTrackPlaylists, useGetPublicTrackPlaylists } from "@/hooks/useTracks"
+import { useGetTrackAlbums, useGetTrackPlaylists } from "@/hooks/useTracks"
 import PlaylistCard from "@/components/track/PlaylistCard";
-import { useAppSelector } from "@/store/hooks"
 
 
 
@@ -25,18 +24,15 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
 
 
   const { playlists: trackPlaylists, getTrackPlaylists } = useGetTrackPlaylists()
-  const { playlists: publicTrackPlaylists, getPublicTrackPlaylists } = useGetPublicTrackPlaylists()
-
-
-  const isLoggedIn = useAppSelector((state) => state.auth.isAuthenticated)
+  const { albums: trackAlbums, getTrackAlbums } = useGetTrackAlbums()
 
   useEffect(() => {
-    getPublicTrackPlaylists(trackId)
-  }, [trackId])
+    void getTrackPlaylists(trackId)
+  }, [trackId, getTrackPlaylists])
 
   useEffect(() => {
-    getTrackPlaylists(trackId)
-  }, [trackId])
+    void getTrackAlbums(trackId)
+  }, [trackId, getTrackAlbums])
 
   useEffect(() => {
     loadLikes(trackId)
@@ -115,8 +111,13 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
           <button className="text-xs text-gray-500 hover:text-white cursor-pointer">View all</button>
         </div>
         <div className="flex flex-col gap-3">
-          <div className="h-10 bg-white/5 rounded animate-pulse" />
-          <div className="h-10 bg-white/5 rounded animate-pulse" />
+          {trackAlbums.length === 0 ? (
+            <p className="text-xs text-gray-500">Not in any albums</p>
+          ) : (
+            trackAlbums.map((album) => (
+              <PlaylistCard key={album._id} playlist={album} />
+            ))
+          )}
         </div>
       </section>
 
@@ -129,16 +130,13 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
         </div>
 
         <div className="flex flex-col gap-3">
-          {(() => {
-            const playlists = isLoggedIn ? trackPlaylists : publicTrackPlaylists
-            return playlists.length === 0 ? (
-              <p className="text-xs text-gray-500">Not in any playlists</p>
-            ) : (
-              playlists.map((playlist) => (
-                <PlaylistCard key={playlist._id} playlist={playlist} />
-              ))
-            )
-          })()}
+          {trackPlaylists.length === 0 ? (
+            <p className="text-xs text-gray-500">Not in any playlists</p>
+          ) : (
+            trackPlaylists.map((playlist) => (
+              <PlaylistCard key={playlist._id} playlist={playlist} />
+            ))
+          )}
         </div>
       </section>
 

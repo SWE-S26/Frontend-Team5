@@ -768,6 +768,7 @@ export default function UploadPage() {
           <div className="flex items-center gap-3">
             <button
               onClick={() => router.push("/home")}
+              data-testid="upload-nav-home"
               className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full transition-opacity hover:opacity-90 cursor-pointer"
               aria-label="Go to home"
             >
@@ -779,6 +780,7 @@ export default function UploadPage() {
 
           <button
             onClick={() => router.push("/artists")}
+            data-testid="upload-nav-close"
             className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2b2b2f] text-[14px] text-[#ceced0] transition-colors hover:bg-[#38383d] cursor-pointer"
             aria-label="Close upload"
           >
@@ -792,14 +794,14 @@ export default function UploadPage() {
           totalTracks={totalTrackQuota}
           usagePercent={usagePercent}
           isArtistPro={isArtistPro}
-          onUpgradeClick={() => router.push("/artistpro")}
+          onUpgradeClick={() => router.push("/artist")}
         />
 
         <section className="mt-8">
           <h1 className="pb-2 text-[24px] font-black tracking-[-0.03em] text-white-smoke sm:text-[28px]">Upload your audio files.</h1>
           <p className="mt-2 pb-2 text-[14px] font-semibold leading-relaxed text-white-smoke/90">
             For best quality, use WAV, FLAC, AIFF, or ALAC. The maximum file size is 4GB uncompressed.
-            <button type="button" className="ml-1 border-b border-silver pb-px text-[14px] font-semibold text-white-smoke cursor-pointer">Learn more.</button>
+            <button type="button" data-testid="upload-learn-more" className="ml-1 border-b border-silver pb-px text-[14px] font-semibold text-white-smoke cursor-pointer">Learn more.</button>
           </p>
 
           <input
@@ -810,6 +812,7 @@ export default function UploadPage() {
             accept="audio/*,.wav,.flac,.aiff,.aif,.alac,.m4a,.mp3"
             className="hidden"
             onChange={handleFileSelect}
+            data-testid="upload-file-input"
           />
 
           {/* Drop zone */}
@@ -817,13 +820,14 @@ export default function UploadPage() {
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
+            data-testid="upload-drop-zone"
             className={`mt-6 rounded-md border border-dashed px-5 py-16 transition-colors hover:border-white-smoke sm:px-12 sm:py-20 cursor-pointer
               ${isDragging ? "border-white-smoke bg-chinese-black" : "border-[#3f4047] bg-chinese-black"}`}
           >
             <div onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()} className="mx-auto flex max-w-sm flex-col items-center text-center">
+                onClick={() => fileInputRef.current?.click()} data-testid="upload-drop-click" className="mx-auto flex max-w-sm flex-col items-center text-center">
               <div className="mb-6">
                 <Image
                   src={UploadIconWhite}
@@ -844,6 +848,7 @@ export default function UploadPage() {
                 {isDragging ? "Drop audio files here." : "Drag and drop audio files to get started."}
               </p>
               <label
+                data-testid="upload-choose-files"
                 className="mt-6 rounded-full bg-white-smoke px-7 py-2 text-[14px] border font-bold text-chinese-black transition-opacity hover:opacity-90 cursor-pointer"
               >
                 Choose files
@@ -885,7 +890,7 @@ export default function UploadPage() {
             {footerLinks.map((label, index) => (
               <div key={label} className="flex items-center gap-2">
                 {index > 0 && <span className="text-[#666873]">-</span>}
-                <button type="button" className="transition-colors hover:text-[#e8e8ec] cursor-pointer">{label}</button>
+                <button type="button" data-testid={`upload-footer-${label.toLowerCase().replace(/\s+/g, "-")}`} className="transition-colors hover:text-[#e8e8ec] cursor-pointer">{label}</button>
               </div>
             ))}
           </div>
