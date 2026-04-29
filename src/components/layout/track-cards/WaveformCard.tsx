@@ -123,7 +123,7 @@ export default function WaveformCard({
     loading: repostLoading,
   } = useRepostTrack(trackId, isVisible, repostCount);
 
-  const { progress, currentTime, seekToPercentage } = useAudioProgress();
+  const { progress, currentTime, seekToPercentage, dragStart, dragMove, dragEnd } = useAudioProgress();
 
   const dispatch = useDispatch();
   const { currentTrackId, isPlaying } = useSelector(
@@ -491,15 +491,15 @@ export default function WaveformCard({
           </div>
         </div>
 
-        <div
-          className="w-full max-w-158 h-15 shrink-0 cursor-pointer"
-          onClick={handleOpenCommentBox}
-        >
+        <div className="w-full max-w-158 h-15 shrink-0 cursor-pointer">
           <SausageWaveform
             trackId={trackId}
             samplesUrl={wfLink ?? "/waveform.json"}
             externalProgress={progress}
             onSeek={seekToPercentage}
+            onDragStart={dragStart}
+            onDragMove={dragMove}
+            onDragEnd={dragEnd}
             onPlay={handleWaveformPlay}
             onAvatarHover={handleOpenCommentBox}
             onTimestampChange={setCommentTimestamp}
