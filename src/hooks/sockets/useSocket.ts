@@ -1,6 +1,6 @@
 import { useEffect, useRef } from "react";
 import { Socket } from "socket.io-client";
-import { getSocket, setSocketToken, disconnectSocket } from "@/lib/sockets/socket";
+import { createSocket, getSocket, setSocketToken, disconnectSocket } from "@/lib/sockets/socket";
 import { useAppSelector } from "@/store/hooks";
 import { authService } from "@/services/auth.service";
 
@@ -8,10 +8,6 @@ type SocketEvents = {
   onNotification?: (data: any) => void;
   onMessage?:      (data: any) => void;
 };
-
-function tryGetSocket(): Socket | null {
-  try { return getSocket(); } catch { return null; }
-}
 
 async function getFreshToken(): Promise<string | null> {
   try {
@@ -37,13 +33,15 @@ export function useSocket(events?: SocketEvents): Socket | null {
 
     async function initSocket() {
       try {
-        let socket = tryGetSocket();
-
-        if (!socket) {
+        // Try to reuse existing socket first
+        let socket: Socket | null = null
+        try {
+          socket = getSocket()
+        } catch {
+          // Socket not initialized yet — get a fresh token and create it
           const token = await getFreshToken();
           if (!token) return;
-          socket = tryGetSocket();
-          if (!socket) return;
+          socket = createSocket(); // ← only place that creates the socket
         }
 
         socketRef.current = socket;
@@ -57,8 +55,7 @@ export function useSocket(events?: SocketEvents): Socket | null {
             disconnectSocket();
             const token = await getFreshToken();
             if (!token) return;
-            const newSocket = tryGetSocket();
-            if (!newSocket) return;
+            const newSocket = createSocket(); // ← recreate on auth failure
             socketRef.current = newSocket;
             if (events?.onNotification) newSocket.on("notification:receive", events.onNotification);
             if (events?.onMessage)      newSocket.on("message:notify",       events.onMessage);
@@ -88,9 +85,8 @@ export function useSocket(events?: SocketEvents): Socket | null {
 }
 
 // ─── useChatRoom ───────────────────────────────────────────────────────────────
-// Separate hook called inside Conversation — uses getSocket() with a retry
-// because by the time Conversation mounts the socket is already initialized
-// by useSocket in the layout.
+// Uses getSocket() which NEVER creates a new socket — safe to call from anywhere
+// The global listeners set up by useSocket are never affected
 
 export function useChatRoom(
   chatId: string | null,
@@ -107,10 +103,9 @@ export function useChatRoom(
 
     let socket: Socket | null = null
     let retries = 0
-    const MAX_RETRIES = 20  // 20 × 300ms = 6 seconds max wait
+    const MAX_RETRIES = 20
 
     const handler = (data: any) => {
-      console.log("📨 message:send received:", data)
       callbackRef.current({
         _id:       data.lastMessage._id,
         chatId:    chatId,
@@ -121,16 +116,29 @@ export function useChatRoom(
       })
     }
 
+    const notifyFallback = (data: any) => {
+      const incomingChatId = data._id ?? data.chat
+      if (incomingChatId === chatId) {
+        handler(data)
+      }
+    }
+
     const joinRoom = (s: Socket) => {
       console.log("🟢 Joining chat room:", chatId)
       s.emit("chat:join", { chatId })
       s.off("message:send")
-      s.on("message:send", handler)
+      s.on("message:send", (data: any) => {
+        console.log("📨 message:send received:", data)
+        handler(data)
+      })
+      // Named fallback — socket.off(event, fn) only removes this specific function
+      // leaving the global message:notify listener from useSocket intact
+      s.on("message:notify", notifyFallback)
     }
 
     const tryJoin = () => {
       try {
-        socket = getSocket()
+        socket = getSocket() // safe — never creates a new socket
       } catch {
         if (retries < MAX_RETRIES) {
           retries++
@@ -152,7 +160,8 @@ export function useChatRoom(
       if (socket) {
         console.log("🔴 Leaving chat room:", chatId)
         socket.emit("chat:leave", { chatId })
-        socket.off("message:send", handler)
+        socket.off("message:send")
+        socket.off("message:notify", notifyFallback) // only removes notifyFallback
       }
     }
   }, [chatId])
