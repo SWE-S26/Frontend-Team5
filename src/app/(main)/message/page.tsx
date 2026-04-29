@@ -9,10 +9,10 @@ import NewMessagePopUP from '@/components/messages/NewMessagePopUP'
 import { useMessagesContext } from '@/components/messages/MessagesContext'
 
 const Page = () => {
-  const searchParams                = useSearchParams()
-  const [isOpen, setIsOpen]         = useState(false)
-  const [selectedChatId, setSelectedChatId] = useState<string | null>(null)
-  const { conversations, markAsRead, markAsUnread } = useMessagesContext()
+  const searchParams                                    = useSearchParams()
+  const [isOpen, setIsOpen]                             = useState(false)
+  const [selectedChatId, setSelectedChatId]             = useState<string | null>(null)
+  const { conversations, markAsRead, markAsUnread }     = useMessagesContext()
 
   const selectedConversation = conversations.find((c) => c.chatId === selectedChatId)
 
@@ -34,6 +34,15 @@ const Page = () => {
       markAsRead(first.chatId)
     }
   }, [conversations.length, searchParams])
+
+  // When a new message arrives for the active chat, updateFromSocket updates lastMessageAt
+  // and stamps isUnread: true. Watching lastMessageAt (not isUnread) means this only fires
+  // on actual incoming messages — never when the user manually clicks "Mark as unread".
+  useEffect(() => {
+    if (selectedChatId && selectedConversation?.lastMessageAt) {
+      markAsRead(selectedChatId)
+    }
+  }, [selectedConversation?.lastMessageAt, selectedChatId])
 
   return (
     <div className='flex justify-between'>
