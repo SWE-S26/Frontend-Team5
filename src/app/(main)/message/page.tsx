@@ -35,14 +35,14 @@ const Page = () => {
     }
   }, [conversations.length, searchParams])
 
-  // If updateFromSocket stamps the active conversation as unread (because a new message
-  // arrived while the chat is already open), immediately clear it.
-  // markAsRead is now optimistic so this flips isUnread: false in the same render cycle.
+  // When a new message arrives for the active chat, updateFromSocket updates lastMessageAt
+  // and stamps isUnread: true. Watching lastMessageAt (not isUnread) means this only fires
+  // on actual incoming messages — never when the user manually clicks "Mark as unread".
   useEffect(() => {
-    if (selectedChatId && selectedConversation?.isUnread) {
+    if (selectedChatId && selectedConversation?.lastMessageAt) {
       markAsRead(selectedChatId)
     }
-  }, [selectedConversation?.isUnread, selectedChatId])
+  }, [selectedConversation?.lastMessageAt, selectedChatId])
 
   return (
     <div className='flex justify-between'>
