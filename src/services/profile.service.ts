@@ -3,7 +3,7 @@ import { GetProfileResponse, UpdateProfileRequest, UpdateProfileResponse, Update
 
 export const profileService = {
   getProfile: (userId: string) =>
-    api.get<GetProfileResponse>(`/api/profile/v1/${userId}`),
+    api.get<GetProfileResponse>(`/api/public/profile/v1/${userId}`),
 
   updateProfile: (data: UpdateProfileRequest) =>
     api.patch<UpdateProfileResponse>(`/api/profile/v1`, data),
