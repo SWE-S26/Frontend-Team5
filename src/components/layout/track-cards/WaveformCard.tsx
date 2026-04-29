@@ -2,6 +2,7 @@
 
 import Button from "@/components/ui/Button";
 import Card from "@/components/ui/TrackCard";
+import Card from "@/components/ui/TrackCard";
 import SausageWaveform from "@/components/ui/SausageWaveform";
 import Tooltip from "@/components/ui/Tooltip";
 import MoreDropdown from "@/components/ui/MoreDropdown";
@@ -649,6 +650,15 @@ export default function WaveformCard({
                   icon={<TbCopy className="text-xl" />}
                 />
               </Tooltip>
+              {onAddToPlaylist && canEdit && (
+                <Tooltip label="Add to playlist">
+                  <Button
+                    onClick={onAddToPlaylist}
+                    className="bg-off-black mr-4"
+                    icon={<FiPlusSquare className="text-xl" />}
+                  />
+                </Tooltip>
+              )}
               {onEdit && canEdit && (
                 <Tooltip label="Edit track">
                   <Button
