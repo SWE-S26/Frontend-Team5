@@ -7,21 +7,7 @@ export default function Albums({ items }: Props) {
  return (
      <>
      <div className="flex flex-col gap-12">
-       {items.map((item) => (
-         <WaveformCard
-           key={item.id}
-           img={item.img}
-           title={item.title}
-           artist={item.artist}
-           trackId={item.trackId ?? item.id}
-           trackUrl={item.trackUrl}
-          enableDirectDownload={item.enableDirectDownload}
-           duration={item.duration}
-           likeCount={item.numLikes ?? 0}
-           repostCount={item.numReposts ?? 0}
-           isLikedByUser={item.isLikedByUser}
-         />
-       ))}
+      
      </div>
      
      <div className="flex justify-center">

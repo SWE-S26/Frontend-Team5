@@ -55,14 +55,23 @@ export const playerEngine = {
   _seekPercentage(pct: number) {
     if (!sound) return;
 
+    const clampedPct = Math.max(0, Math.min(100, pct));
+    const wasPlaying = sound.playing();
+
     // Store the seek request to apply after audio loads
-    pendingSeek = pct;
+    pendingSeek = clampedPct;
 
     const duration = sound.duration();
     // If audio is already loaded, seek immediately
     if (duration > 0) {
-      sound.seek((pct / 100) * duration);
+      sound.seek((clampedPct / 100) * duration);
       pendingSeek = null;
+
+      // Some browsers pause HTML5 playback during rapid seeks.
+      // Restore the prior state so dragging the UI does not kill audio.
+      if (wasPlaying && !sound.playing()) {
+        sound.play();
+      }
     }
     // Otherwise, the onload callback will apply this seek
   },

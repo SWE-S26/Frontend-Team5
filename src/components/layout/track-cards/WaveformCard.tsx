@@ -154,7 +154,7 @@ export default function WaveformCard({
     loading: repostLoading,
   } = useRepostTrack(trackId, isVisible, repostCount);
 
-  const { progress, currentTime, seekToPercentage } = useAudioProgress();
+  const { progress, currentTime, seekToPercentage, dragStart, dragMove, dragEnd } = useAudioProgress();
 
   const dispatch = useDispatch();
   const { currentTrackId, isPlaying } = useSelector(

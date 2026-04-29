@@ -1,6 +1,6 @@
 import WaveformCard from "@/components/layout/track-cards/WaveformCard"
 
-interface Item { id: string; trackId?: string; title: string; artist: string; img: string; trackUrl?: string; downloadUrl?: string; enableDirectDownload?: boolean; duration?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean }
+interface Item { id: string; trackId?: string; title: string; artist: string; img: string; trackUrl?: string; downloadUrl?: string; enableDirectDownload?: boolean; duration?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean; numPlays:number; numComments:number; }
 interface Props { items: Item[]; onEditTrack?: (item: Item) => void; onAddToPlaylist?: (item: Item) => void }
 
 export default function Reposts({ items, onEditTrack, onAddToPlaylist }: Props) {
@@ -16,7 +16,7 @@ export default function Reposts({ items, onEditTrack, onAddToPlaylist }: Props) 
              trackId={item.trackId ?? item.id}
              trackUrl={item.trackUrl}
              downloadUrl={item.downloadUrl}
-            enableDirectDownload={item.enableDirectDownload}
+             enableDirectDownload={item.enableDirectDownload}
              duration={item.duration}
              likeCount={item.numLikes ?? 0}
              repostCount={item.numReposts ?? 0}
@@ -24,6 +24,8 @@ export default function Reposts({ items, onEditTrack, onAddToPlaylist }: Props) 
              canEdit={item.canEdit}
              onEdit={onEditTrack ? () => onEditTrack(item) : undefined}
              onAddToPlaylist={onAddToPlaylist ? () => onAddToPlaylist(item) : undefined}
+             playsCount={item.numPlays}
+             commentsCount={item.numComments}
            />
          ))}
        </div>
