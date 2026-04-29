@@ -156,6 +156,7 @@ const ProfilePage = ({ params }: Props) => {
       numReposts: track.numReposts,
       isLikedByUser: track.isLikedByUser,
       numPlays: track.numPlays,
+      numComments: track.numComments ?? 0,
       releaseDate: track.releaseDate,
       canEdit,
     }

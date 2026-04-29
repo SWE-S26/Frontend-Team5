@@ -1,6 +1,6 @@
 import WaveformCard from "@/components/layout/track-cards/WaveformCard"
 
-interface Item { img: string; title: string; artist: string; trackId: string; trackUrl?: string; downloadUrl?: string; enableDirectDownload?: boolean; duration?: number; audioClipStart?: number; audioClipEnd?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean }
+interface Item { img: string; title: string; artist: string; trackId: string; trackUrl?: string; downloadUrl?: string; enableDirectDownload?: boolean; duration?: number; audioClipStart?: number; audioClipEnd?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean; numPlays:number; numComments:number; }
 interface Props { items: Item[]; isLoading?: boolean; onEditTrack?: (item: Item) => void; onAddToPlaylist?: (item: Item) => void }
 
 export default function Tracks({ items, isLoading = false, onEditTrack, onAddToPlaylist }: Props) {
@@ -44,6 +44,8 @@ export default function Tracks({ items, isLoading = false, onEditTrack, onAddToP
                    canEdit={item.canEdit}
                    onEdit={onEditTrack ? () => onEditTrack(item) : undefined}
                    onAddToPlaylist={onAddToPlaylist ? () => onAddToPlaylist(item) : undefined}
+                   playsCount={item.numPlays}
+                   commentsCount={item.numComments}
                  />
                ))}
          </div>

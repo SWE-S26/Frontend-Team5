@@ -9,7 +9,7 @@ import Button from "@/components/ui/Button";
 import WaveformCard from "@/components/layout/track-cards/WaveformCard"
 
 
-interface Item { id: string; trackId?: string; title: string; artist: string; img: string; trackUrl?: string; downloadUrl?: string; enableDirectDownload?: boolean; duration?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean }
+interface Item { id: string; trackId?: string; title: string; artist: string; img: string; trackUrl?: string; downloadUrl?: string; enableDirectDownload?: boolean; duration?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean; numPlays:number; numComments:number;  }
 interface Props { items: Item[]; onEditTrack?: (item: Item) => void; onAddToPlaylist?: (item: Item) => void }
 
 export default function All({ items, onEditTrack, onAddToPlaylist }: Props) {
@@ -36,6 +36,8 @@ export default function All({ items, onEditTrack, onAddToPlaylist }: Props) {
           canEdit={item.canEdit}
           onEdit={onEditTrack ? () => onEditTrack(item) : undefined}
           onAddToPlaylist={onAddToPlaylist ? () => onAddToPlaylist(item) : undefined}
+          playsCount={item.numPlays}
+          commentsCount={item.numComments}
         />
       ))}
     </div>
