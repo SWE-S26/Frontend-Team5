@@ -13,13 +13,13 @@
 
     export const socialService = {
 
-    /* (1) GET /api/social/v1/followers/{userId} */
+    /* (1) GET /api/public/social/v1/followers/{userId} */
     getFollowers: (userId: string) =>
-        api.get<GetFollowersResponse>(`/api/social/v1/followers/${userId}`),
+        api.get<GetFollowersResponse>(`/api/public/social/v1/followers/${userId}`),
 
-    /* (2) GET /api/social/v1/following/{userId} */
+    /* (2) GET /api/public/social/v1/following/{userId} */
     getFollowing: (userId: string) =>
-        api.get<GetFollowingResponse>(`/api/social/v1/following/${userId}`),
+        api.get<GetFollowingResponse>(`/api/public/social/v1/following/${userId}`),
 
     /* (3) GET /api/social/v1/suggested
         offset + limit drive the refresh button — just change the params */
