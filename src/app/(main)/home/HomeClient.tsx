@@ -6,7 +6,13 @@ import { useEffect } from "react";
 import { useGetTracks } from "@/hooks/useTracks";
 import { useGetPlaylists } from "@/hooks/usePlaylists";
 
+import { useGetFollowing } from "@/hooks/useSocial";
+
+import { useAppSelector } from "@/store/hooks";
+
 export default function HomeClient() {
+  const userId = useAppSelector((state) => state.auth.userId);
+
   const {
     getTracks,
     loading: newTracksLoading,
@@ -21,10 +27,18 @@ export default function HomeClient() {
     playlists: newPlaylists,
   } = useGetPlaylists();
 
+  const {
+    getFollowing,
+    loading,
+    error: cantGetFollowing,
+    following,
+  } = useGetFollowing();
+
   useEffect(() => {
     getTracks(1, 100);
     getPlaylists();
-  }, [getTracks, getPlaylists]);
+    getFollowing(userId ?? "");
+  }, [getTracks, getPlaylists, getFollowing]);
 
   return (
     <div className="flex justify-between">
