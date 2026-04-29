@@ -649,20 +649,20 @@ export default function WaveformCard({
               </Tooltip>
               <Tooltip label="Repost">
                 <Button
-                  onClick={handleRepostClick}
+                  onClick={() => repostTrack()}
                   className="bg-off-black mr-4"
                   icon={
                     <LuRepeat2
-                      className={`text-[16px] transition-colors ${isReposted ? "text-inferno" : ""}`}
+                      className={`text-[16px] transition-colors ${reposted ? "text-inferno" : ""}`}
                     />
                   }
                 >
                   <span
-                    className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${isReposted ? "text-inferno" : ""} ${
+                    className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${reposted ? "text-inferno" : ""} ${
                       repostLoading ? "opacity-50" : "opacity-100"
                     }`}
                   >
-                    {repostCountState}
+                    {numOfReposts}
                   </span>
                 </Button>
               </Tooltip>
@@ -700,12 +700,7 @@ export default function WaveformCard({
                 trigger={
                   <Button
                     className="bg-off-black"
-                    onClick={() => setIsMoreOpen((o) => !o)}
-                    icon={
-                      <IoIosMore
-                        className={`text-xl transition-colors ${isMoreOpen ? "text-inferno" : ""}`}
-                      />
-                    }
+                    icon={<IoIosMore className="text-xl" />}
                   />
                 }
                 tooltipLabel="More"
@@ -724,17 +719,6 @@ export default function WaveformCard({
                   { label: "Station", icon: <BiStation className="text-lg" /> },
                 ]}
               />
-              <div className="ml-auto flex items-center gap-4">
-                <div className="flex items-center gap-1 text-silver">
-                  <IoMdPlay className="text-silver text-[12px]" />
-                  <span className="text-[12px]">{playsCount}</span>
-                </div>
-
-                <a className="flex items-center gap-1 cursor-pointer hover:opacity-50 transition-opacity no-underline text-silver">
-                  <BiSolidCommentDetail className="text-silver" />
-                  <span className="text-[12px]">{commentsCount}</span>
-                </a>
-              </div>
             </div>
           </motion.div>
         </div>
