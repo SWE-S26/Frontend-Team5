@@ -14,6 +14,9 @@ export const likeService = {
     api.get<GetTrackLikeStatusResponse>(
       `/api/engagement/tracks/v1/${trackId}/like`,
     ),
+
+  likePlaylist: (playlistId: string) =>
+    api.post(`/api/engagement/playlists/v1/${playlistId}/like`),
 };
 
 export const fetchTrackLikes = async (

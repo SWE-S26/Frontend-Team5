@@ -1,7 +1,7 @@
 "use client";
 
 import Button from "@/components/ui/Button";
-import Card from "@/components/ui/Card";
+import Card from "@/components/ui/TrackCard";
 import SausageWaveform from "@/components/ui/SausageWaveform";
 import Tooltip from "@/components/ui/Tooltip";
 import MoreDropdown from "@/components/ui/MoreDropdown";
@@ -33,6 +33,7 @@ import { ListStart } from "lucide-react";
 import { RiPlayListAddLine } from "react-icons/ri";
 import { BiStation } from "react-icons/bi";
 import { PiPencilSimple } from "react-icons/pi";
+import { BiSolidCommentDetail } from "react-icons/bi";
 
 import { RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
@@ -45,11 +46,15 @@ type CardProps = {
   trackId: string;
   trackUrl?: string;
   duration?: number;
+  tag?: string;
   audioClipStart?: number;
   audioClipEnd?: number;
   likeCount: number;
   repostCount: number;
+  commentsCount: number;
+  playsCount: number;
   isLikedByUser?: boolean;
+  isRepostedByUser?: boolean;
   enableDirectDownload?: boolean;
   downloadUrl?: string;
   canEdit?: boolean;
@@ -70,11 +75,15 @@ export default function WaveformCard({
   trackId,
   trackUrl,
   duration,
+  tag,
   audioClipStart,
   audioClipEnd,
   likeCount,
   repostCount,
+  commentsCount,
+  playsCount,
   isLikedByUser,
+  isRepostedByUser,
   enableDirectDownload = false,
   downloadUrl,
   canEdit = false,
@@ -91,24 +100,46 @@ export default function WaveformCard({
   const [flashComment, setFlashComment] = useState<string | null>(null);
   const [reloadTrigger, setReloadTrigger] = useState(0);
   const [isLiked, setIsLiked] = useState(isLikedByUser ?? false);
+  const [isReposted, setIsReposted] = useState(isRepostedByUser ?? false);
   const [likeCountState, setLikeCountState] = useState(likeCount);
+  const [repostCountState, setRepostCountState] = useState(repostCount);
   const [isAddToPlaylistOpen, setIsAddToPlaylistOpen] = useState(false);
+
+  const [isMoreOpen, setIsMoreOpen] = useState(false);
+
+  useEffect(() => {
+    if (!isMoreOpen) return;
+    const handler = () => setIsMoreOpen(false);
+    setTimeout(() => {
+      document.addEventListener("click", handler);
+    }, 0);
+    return () => document.removeEventListener("click", handler);
+  }, [isMoreOpen]);
 
   const commentBoxRef = useRef<HTMLInputElement>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const previewStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const previewStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
+    null,
+  );
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
   const previewingRef = useRef(false);
   const previewStartingRef = useRef(false);
   const previewRequestIdRef = useRef(0);
   const isHoveringRef = useRef(false);
-  const previewTimeUpdateHandlerRef = useRef<((this: HTMLAudioElement, ev: Event) => any) | null>(null);
-  const fetchClipPromiseRef = useRef<Promise<{ start: number; end: number } | null> | null>(null);
+  const previewTimeUpdateHandlerRef = useRef<
+    ((this: HTMLAudioElement, ev: Event) => any) | null
+  >(null);
+  const fetchClipPromiseRef = useRef<Promise<{
+    start: number;
+    end: number;
+  } | null> | null>(null);
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
   const authRole = useAppSelector((state) => state.auth.role);
-  const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated && state.auth.hasHydrated);
+  const isAuthenticated = useAppSelector(
+    (state) => state.auth.isAuthenticated && state.auth.hasHydrated,
+  );
   const isArtistPro = authRole === "Pro";
   const allowDownload = isArtistPro || !!enableDirectDownload;
 
@@ -134,7 +165,10 @@ export default function WaveformCard({
   const [showPreviewTooltip, setShowPreviewTooltip] = useState(false);
   const [previewTooltipPos, setPreviewTooltipPos] = useState({ x: 0, y: 0 });
   const [isFetchingClip, setIsFetchingClip] = useState(false);
-  const [fetchedClip, setFetchedClip] = useState<{ start: number; end: number } | null>(null);
+  const [fetchedClip, setFetchedClip] = useState<{
+    start: number;
+    end: number;
+  } | null>(null);
 
   useEffect(() => {
     if (isThisCardPlaying) setShowCommentBox(true);
@@ -152,10 +186,14 @@ export default function WaveformCard({
   useEffect(() => {
     return () => {
       if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-      if (previewStopTimerRef.current) clearTimeout(previewStopTimerRef.current);
+      if (previewStopTimerRef.current)
+        clearTimeout(previewStopTimerRef.current);
       if (previewAudioRef.current) {
         if (previewTimeUpdateHandlerRef.current) {
-          previewAudioRef.current.removeEventListener("timeupdate", previewTimeUpdateHandlerRef.current);
+          previewAudioRef.current.removeEventListener(
+            "timeupdate",
+            previewTimeUpdateHandlerRef.current,
+          );
         }
         previewAudioRef.current.pause();
       }
@@ -167,7 +205,8 @@ export default function WaveformCard({
   const parseClipBounds = (startRaw: unknown, endRaw: unknown) => {
     const start = Number(startRaw);
     const end = Number(endRaw);
-    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return null;
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start)
+      return null;
     return { start, end };
   };
 
@@ -175,7 +214,9 @@ export default function WaveformCard({
     return Number(startRaw) === 0 && Number(endRaw) === 0;
   };
 
-  const getClipBounds = (serverClip?: { start: number; end: number } | null) => {
+  const getClipBounds = (
+    serverClip?: { start: number; end: number } | null,
+  ) => {
     if (serverClip) {
       if (isDisabledClip(serverClip.start, serverClip.end)) return null;
       return serverClip;
@@ -197,7 +238,7 @@ export default function WaveformCard({
     setIsFetchingClip(true);
     const request = isAuthenticated
       ? tracksService.getTrackById(trackId)
-      : tracksService.getPublicTrackById(trackId)
+      : tracksService.getPublicTrackById(trackId);
 
     const promise = request
       .then((res) => {
@@ -210,10 +251,7 @@ export default function WaveformCard({
           return disabledClip;
         }
 
-        const clip = parseClipBounds(
-          rawStart,
-          rawEnd,
-        );
+        const clip = parseClipBounds(rawStart, rawEnd);
         if (clip) {
           clipBoundsCache.set(trackId, clip);
           setFetchedClip(clip);
@@ -295,6 +333,16 @@ export default function WaveformCard({
     }
   }
 
+  function handleRepostClick() {
+    repostTrack();
+    setIsReposted((r) => !r);
+    if (isReposted) {
+      setRepostCountState((c) => c - 1);
+    } else {
+      setRepostCountState((c) => c + 1);
+    }
+  }
+
   function handlePlayClick(e: React.MouseEvent) {
     e.stopPropagation();
     if (!trackId || !trackUrl) return;
@@ -354,7 +402,10 @@ export default function WaveformCard({
     }
     if (previewAudioRef.current) {
       if (previewTimeUpdateHandlerRef.current) {
-        previewAudioRef.current.removeEventListener("timeupdate", previewTimeUpdateHandlerRef.current);
+        previewAudioRef.current.removeEventListener(
+          "timeupdate",
+          previewTimeUpdateHandlerRef.current,
+        );
         previewTimeUpdateHandlerRef.current = null;
       }
       previewAudioRef.current.pause();
@@ -396,15 +447,18 @@ export default function WaveformCard({
     }
 
     const playFrom = () => {
-      if (!audio || requestId !== previewRequestIdRef.current || !isHoveringRef.current) {
+      if (
+        !audio ||
+        requestId !== previewRequestIdRef.current ||
+        !isHoveringRef.current
+      ) {
         previewStartingRef.current = false;
         return;
       }
 
       try {
         audio.currentTime = Math.max(0, clipStart);
-      } catch {
-      }
+      } catch {}
 
       audio.play().catch(() => {
         previewStartingRef.current = false;
@@ -416,7 +470,10 @@ export default function WaveformCard({
       setShowPreviewTooltip(true);
 
       if (previewTimeUpdateHandlerRef.current) {
-        audio.removeEventListener("timeupdate", previewTimeUpdateHandlerRef.current);
+        audio.removeEventListener(
+          "timeupdate",
+          previewTimeUpdateHandlerRef.current,
+        );
       }
       const onTimeUpdate = () => {
         if (audio.currentTime >= clipEnd) {
@@ -427,7 +484,8 @@ export default function WaveformCard({
       audio.addEventListener("timeupdate", onTimeUpdate);
 
       const playMs = Math.max(0, clipEnd - clipStart) * 1000;
-      if (previewStopTimerRef.current) clearTimeout(previewStopTimerRef.current);
+      if (previewStopTimerRef.current)
+        clearTimeout(previewStopTimerRef.current);
       previewStopTimerRef.current = setTimeout(stopPreview, playMs + 200);
     };
 
@@ -463,217 +521,226 @@ export default function WaveformCard({
 
   return (
     <>
-    <div className="flex items-stretch">
-      <div className="h-full overflow-hidden -m-1 -mb-1.75"
-        ref={ref}
-        onMouseEnter={handleHoverStart}
-        onMouseMove={handleHoverMove}
-        onMouseLeave={handleHoverEnd}
-      >
-        <Card type="static" img={img} />
-      </div>
-
-      <div className="flex flex-col flex-1 ml-6">
-        <div className="flex items-center mb-4">
-          <div
-            className="w-10 h-10 bg-white-smoke rounded-full flex items-center justify-center cursor-pointer"
-            onClick={handlePlayClick}
-          >
-            {!isThisCardPlaying ? (
-              <IoMdPlay className="text-chinese-black text-[23px] ml-1" />
-            ) : (
-              <IoMdPause className="text-chinese-black text-[23px]" />
-            )}
-          </div>
-          <div>
-            <p className="text-sm font-bold text-silver ml-3">{artist}</p>
-            <p className="text-sm font-bold text-white-smoke ml-3">{title}</p>
-          </div>
-        </div>
-
+      <div className="flex items-stretch">
         <div
-          className="w-full max-w-158 h-15 shrink-0 cursor-pointer"
-          onClick={handleOpenCommentBox}
+          className="h-full overflow-hidden -m-1 -mb-1.75"
+          ref={ref}
+          onMouseEnter={handleHoverStart}
+          onMouseMove={handleHoverMove}
+          onMouseLeave={handleHoverEnd}
         >
-          <SausageWaveform
-            trackId={trackId}
-            samplesUrl={wfLink ?? "/waveform.json"}
-            externalProgress={progress}
-            onSeek={seekToPercentage}
-            onPlay={handleWaveformPlay}
-            onAvatarHover={handleOpenCommentBox}
-            onTimestampChange={setCommentTimestamp}
-            isPlaying={isThisCardPlaying}
-            currentTime={currentTime}
-            duration={duration}
-            isCommenting={inputFocused}
-            commentTimestamp={commentTimestamp}
-            profileAvatarUrl={profileImgLink ?? undefined}
-            flashComment={flashComment}
-            reloadTrigger={reloadTrigger}
-            enabled={isVisible}
-          />
+          <Card appearance="static" img={img} />
         </div>
 
-        <motion.div
-          layout
-          transition={{ layout: transitionConfig }}
-          className="flex flex-col mt-auto"
-        >
-          <AnimatePresence>
-            {showCommentBox && (
-              <motion.div
-                initial={{ opacity: 0, height: 0, marginBottom: 0 }}
-                animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
-                exit={{ opacity: 0, height: 0, marginBottom: 0 }}
-                transition={transitionConfig}
-                className="flex items-center overflow-hidden mt-7"
-              >
-                <Avatar
-                  size="large"
-                  icon={
-                    profileImgLink ? (
-                      <img src={profileImgLink} alt="Profile" />
-                    ) : (
-                      <UserOutlined />
-                    )
-                  }
-                />
-                <input
-                  type="text"
-                  ref={commentBoxRef}
-                  onInput={handleInputChange}
-                  onFocus={handleInputFocus}
-                  onBlur={handleInputBlur}
-                  onKeyDown={handleKeyDown}
-                  placeholder="Write a comment"
-                  className="ml-2 flex-1 bg-off-black rounded px-4 py-2 text-sm text-white-smoke caret-brilliant-orange outline outline-transparent focus:outline-white-smoke/50 transition-[outline-color] duration-200 ease-in-out"
-                />
-                <Button
-                  disabled={!canComment || isSubmitting}
-                  onClick={handleSubmitComment}
-                  className="ml-2 bg-off-black text-chinese-black font-bold py-2 px-4 rounded hover:bg-opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
-                >
-                  <HiOutlinePaperAirplane
-                    className={`text-[20px] text-white-smoke rotate-45 transition-opacity ${isSubmitting ? "opacity-40" : "opacity-100"}`}
-                  />
-                </Button>
-              </motion.div>
-            )}
-          </AnimatePresence>
+        <div className="flex flex-col flex-1 ml-6">
+          <div className="flex items-center mb-4 relative">
+            <div
+              className="w-10 h-10 bg-white-smoke rounded-full flex items-center justify-center cursor-pointer"
+              onClick={handlePlayClick}
+            >
+              {!isThisCardPlaying ? (
+                <IoMdPlay className="text-chinese-black text-[23px] ml-1" />
+              ) : (
+                <IoMdPause className="text-chinese-black text-[23px]" />
+              )}
+            </div>
+            <div>
+              <p className="text-sm font-bold text-silver ml-3">{artist}</p>
+              <p className="text-sm font-bold text-white-smoke ml-3">{title}</p>
+            </div>
 
-          <div className="flex items-center">
-            <Tooltip label="Like">
-              <Button
-                onClick={handleLikeClick}
-                className="bg-off-black mr-4"
-                icon={
-                  <HiHeart
-                    className={`text-[16px] transition-colors ${isLiked ? "text-inferno" : ""}`}
-                  />
-                }
-              >
-                <span
-                  className={`ml-0.5 inline-block min-w-[1ch] text-left transition-colors ${isLiked ? "text-inferno" : ""}`}
-                >
-                  {likeCountState}
+            {tag && (
+              <a className="absolute top-0 right-0 cursor-pointer no-underline group">
+                <span className="text-[13px] text-white-smoke bg-off-black px-2 py-1 rounded-full group-hover:text-white-smoke/50 transition-colors">
+                  # {tag}
                 </span>
-              </Button>
-            </Tooltip>
-            <Tooltip label="Repost">
-              <Button
-                onClick={() => repostTrack()}
-                className="bg-off-black mr-4"
-                icon={
-                  <LuRepeat2
-                    className={`text-[16px] transition-colors ${reposted ? "text-inferno" : ""}`}
-                  />
-                }
-              >
-                <span
-                  className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${reposted ? "text-inferno" : ""} ${
-                    repostLoading ? "opacity-50" : "opacity-100"
-                  }`}
-                >
-                  {numOfReposts}
-                </span>
-              </Button>
-            </Tooltip>
-            <Tooltip label="Share">
-              <Button
-                className="bg-off-black mr-4"
-                icon={<LuShare className="text-xl" />}
-              />
-            </Tooltip>
-            <Tooltip label="Copy Link">
-              <Button
-                className="bg-off-black mr-4"
-                icon={<TbCopy className="text-xl" />}
-              />
-            </Tooltip>
-            {onEdit && canEdit && (
-              <Tooltip label="Edit track">
-                <Button
-                  onClick={onEdit}
-                  className="bg-off-black mr-4"
-                  icon={<PiPencilSimple className="text-xl" />}
-                />
-              </Tooltip>
+              </a>
             )}
-            {allowDownload && downloadUrl && (
-              <Tooltip label="Download">
-                <Button
-                  onClick={handleDownload}
-                  className="bg-off-black mr-4"
-                  icon={<MdOutlineDownloadForOffline className="text-xl" />}
-                />
-              </Tooltip>
-            )}
-            <MoreDropdown
-              trigger={
-                <Button
-                  className="bg-off-black"
-                  icon={<IoIosMore className="text-xl" />}
-                />
-              }
-              tooltipLabel="More"
-              items={[
-                {
-                  label: "Add to Next up",
-                  icon: <ListStart size={19} className="scale-x-[-1]" />,
-                },
-                {
-                  label: "Add to Playlist",
-                  icon: (
-                    <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
-                  ),
-                  onClick: handleOpenAddToPlaylistModal,
-                },
-                { label: "Station", icon: <BiStation className="text-lg" /> },
-              ]}
+          </div>
+
+          <div
+            className="w-full max-w-158 h-15 shrink-0 cursor-pointer"
+            onClick={handleOpenCommentBox}
+          >
+            <SausageWaveform
+              trackId={trackId}
+              samplesUrl={wfLink ?? "/waveform.json"}
+              externalProgress={progress}
+              onSeek={seekToPercentage}
+              onPlay={handleWaveformPlay}
+              onAvatarHover={handleOpenCommentBox}
+              onTimestampChange={setCommentTimestamp}
+              isPlaying={isThisCardPlaying}
+              currentTime={currentTime}
+              duration={duration}
+              isCommenting={inputFocused}
+              commentTimestamp={commentTimestamp}
+              profileAvatarUrl={profileImgLink ?? undefined}
+              flashComment={flashComment}
+              reloadTrigger={reloadTrigger}
+              enabled={isVisible}
             />
           </div>
-        </motion.div>
+
+          <motion.div
+            layout
+            transition={{ layout: transitionConfig }}
+            className="flex flex-col mt-auto"
+          >
+            <AnimatePresence>
+              {showCommentBox && (
+                <motion.div
+                  initial={{ opacity: 0, height: 0, marginBottom: 0 }}
+                  animate={{ opacity: 1, height: "auto", marginBottom: 16 }}
+                  exit={{ opacity: 0, height: 0, marginBottom: 0 }}
+                  transition={transitionConfig}
+                  className="flex items-center overflow-hidden mt-7"
+                >
+                  <Avatar
+                    size="large"
+                    icon={
+                      profileImgLink ? (
+                        <img src={profileImgLink} alt="Profile" />
+                      ) : (
+                        <UserOutlined />
+                      )
+                    }
+                  />
+                  <input
+                    type="text"
+                    ref={commentBoxRef}
+                    onInput={handleInputChange}
+                    onFocus={handleInputFocus}
+                    onBlur={handleInputBlur}
+                    onKeyDown={handleKeyDown}
+                    placeholder="Write a comment"
+                    className="ml-2 flex-1 bg-off-black rounded px-4 py-2 text-sm text-white-smoke caret-brilliant-orange outline outline-transparent focus:outline-white-smoke/50 transition-[outline-color] duration-200 ease-in-out"
+                  />
+                  <Button
+                    disabled={!canComment || isSubmitting}
+                    onClick={handleSubmitComment}
+                    className="ml-2 bg-off-black text-chinese-black font-bold py-2 px-4 rounded hover:bg-opacity-80 disabled:opacity-40 disabled:cursor-not-allowed"
+                  >
+                    <HiOutlinePaperAirplane
+                      className={`text-[20px] text-white-smoke rotate-45 transition-opacity ${isSubmitting ? "opacity-40" : "opacity-100"}`}
+                    />
+                  </Button>
+                </motion.div>
+              )}
+            </AnimatePresence>
+
+            <div className="flex items-center">
+              <Tooltip label="Like">
+                <Button
+                  onClick={handleLikeClick}
+                  className="bg-off-black mr-4"
+                  icon={
+                    <HiHeart
+                      className={`text-[16px] transition-colors ${isLiked ? "text-inferno" : ""}`}
+                    />
+                  }
+                >
+                  <span
+                    className={`ml-0.5 inline-block min-w-[1ch] text-left transition-colors ${isLiked ? "text-inferno" : ""}`}
+                  >
+                    {likeCountState}
+                  </span>
+                </Button>
+              </Tooltip>
+              <Tooltip label="Repost">
+                <Button
+                  onClick={() => repostTrack()}
+                  className="bg-off-black mr-4"
+                  icon={
+                    <LuRepeat2
+                      className={`text-[16px] transition-colors ${reposted ? "text-inferno" : ""}`}
+                    />
+                  }
+                >
+                  <span
+                    className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${reposted ? "text-inferno" : ""} ${
+                      repostLoading ? "opacity-50" : "opacity-100"
+                    }`}
+                  >
+                    {numOfReposts}
+                  </span>
+                </Button>
+              </Tooltip>
+              <Tooltip label="Share">
+                <Button
+                  className="bg-off-black mr-4"
+                  icon={<LuShare className="text-xl" />}
+                />
+              </Tooltip>
+              <Tooltip label="Copy Link">
+                <Button
+                  className="bg-off-black mr-4"
+                  icon={<TbCopy className="text-xl" />}
+                />
+              </Tooltip>
+              {onEdit && canEdit && (
+                <Tooltip label="Edit track">
+                  <Button
+                    onClick={onEdit}
+                    className="bg-off-black mr-4"
+                    icon={<PiPencilSimple className="text-xl" />}
+                  />
+                </Tooltip>
+              )}
+              {allowDownload && downloadUrl && (
+                <Tooltip label="Download">
+                  <Button
+                    onClick={handleDownload}
+                    className="bg-off-black mr-4"
+                    icon={<MdOutlineDownloadForOffline className="text-xl" />}
+                  />
+                </Tooltip>
+              )}
+              <MoreDropdown
+                trigger={
+                  <Button
+                    className="bg-off-black"
+                    icon={<IoIosMore className="text-xl" />}
+                  />
+                }
+                tooltipLabel="More"
+                items={[
+                  {
+                    label: "Add to Next up",
+                    icon: <ListStart size={19} className="scale-x-[-1]" />,
+                  },
+                  {
+                    label: "Add to Playlist",
+                    icon: (
+                      <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
+                    ),
+                    onClick: handleOpenAddToPlaylistModal,
+                  },
+                  { label: "Station", icon: <BiStation className="text-lg" /> },
+                ]}
+              />
+            </div>
+          </motion.div>
+        </div>
       </div>
-    </div>
-    {showPreviewTooltip && (
-      <PreviewTooltip
-        x={previewTooltipPos.x}
-        y={previewTooltipPos.y}
-        img={img}
-        title={title}
-        artist={artist}
-        isPreviewActive={showPreviewTooltip}
+      {showPreviewTooltip && (
+        <PreviewTooltip
+          x={previewTooltipPos.x}
+          y={previewTooltipPos.y}
+          img={img}
+          title={title}
+          artist={artist}
+          isPreviewActive={showPreviewTooltip}
+        />
+      )}
+      <AddToPlaylistModal
+        isOpen={isAddToPlaylistOpen}
+        onClose={() => setIsAddToPlaylistOpen(false)}
+        trackId={trackId}
+        trackTitle={title}
+        artistName={artist}
+        trackImage={img}
       />
-    )}
-    <AddToPlaylistModal
-      isOpen={isAddToPlaylistOpen}
-      onClose={() => setIsAddToPlaylistOpen(false)}
-      trackId={trackId}
-      trackTitle={title}
-      artistName={artist}
-      trackImage={img}
-    />
     </>
   );
 }

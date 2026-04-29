@@ -1,5 +1,5 @@
 "use client";
-import Link from "next/link"
+import Link from "next/link";
 import { useRef, useState } from "react";
 import {
   useFloating,
@@ -23,7 +23,7 @@ export interface DropdownItem {
   icon?: React.ReactNode;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
-  href?: string 
+  href?: string;
   testId?: string;
 }
 
@@ -32,8 +32,8 @@ interface MoreDropdownProps {
   items: DropdownItem[];
   width?: string;
   tooltipLabel?: string;
-  testId?: string
-  gap?: string
+  testId?: string;
+  gap?: string;
 }
 
 export default function MoreDropdown({
@@ -135,41 +135,45 @@ export default function MoreDropdown({
             data-testid={testId}
             className={`z-9999 flex flex-col ${width} ${gap} bg-chinese-black border border-silver/40 rounded-sm py-2`}
           >
-          {items.map((item, index) =>
-            item.type === "separator" ? (
-              <hr key={index} className="border-silver/40 my-1" />
-            ) : item.href ? (
-              <Link
-                key={index}
-                href={item.href}
-                onClick={() => setIsOpen(false)}
-                data-testid={item.testId}
-                className="flex items-center gap-3 pl-3 pr-6 py-1.5 text-left text-white-smoke hover:text-white-smoke/50 transition-colors"
-              >
-                {item.icon && <span className="text-lg shrink-0">{item.icon}</span>}
-                <span className="text-sm font-bold">{item.label}</span>
-              </Link>
-            ) : (
-              <button
-                key={index}
-                disabled={item.disabled}
-                data-testid={item.testId}
-                onClick={(e) => {
-                  e.stopPropagation();
-                  item.onClick?.(e);
-                  setIsOpen(false);
-                }}
-                className={`flex items-center gap-3 pl-3 pr-6 py-1.5 text-left transition-colors ${
-                  item.disabled
-                    ? "text-silver/50 cursor-not-allowed"
-                    : "text-white-smoke hover:text-white-smoke/50 cursor-pointer"
-                }`}
-              >
-                {item.icon && <span className="text-lg shrink-0">{item.icon}</span>}
-                <span className="text-sm font-bold">{item.label}</span>
-              </button>
-            )
-          )}
+            {items.map((item, index) =>
+              item.type === "separator" ? (
+                <hr key={index} className="border-silver/40 my-1" />
+              ) : item.href ? (
+                <Link
+                  key={index}
+                  href={item.href}
+                  onClick={() => setIsOpen(false)}
+                  data-testid={item.testId}
+                  className="flex items-center gap-3 pl-3 pr-6 py-1.5 text-left text-white-smoke hover:text-white-smoke/50 transition-colors"
+                >
+                  {item.icon && (
+                    <span className="text-lg shrink-0">{item.icon}</span>
+                  )}
+                  <span className="text-sm font-bold">{item.label}</span>
+                </Link>
+              ) : (
+                <button
+                  key={index}
+                  disabled={item.disabled}
+                  data-testid={item.testId}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    item.onClick?.(e);
+                    setIsOpen(false);
+                  }}
+                  className={`flex items-center gap-3 pl-3 pr-6 py-1.5 text-left transition-colors ${
+                    item.disabled
+                      ? "text-silver/50 cursor-not-allowed"
+                      : "text-white-smoke hover:text-white-smoke/50 cursor-pointer"
+                  }`}
+                >
+                  {item.icon && (
+                    <span className="text-lg shrink-0">{item.icon}</span>
+                  )}
+                  <span className="text-sm font-bold">{item.label}</span>
+                </button>
+              ),
+            )}
           </div>
         )}
       </FloatingPortal>
