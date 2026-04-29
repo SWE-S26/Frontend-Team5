@@ -94,11 +94,13 @@ export default function TrackCard({
 
     dispatch(
       playNext({
-        id: trackId,
-        url: trackUrl,
-        title,
-        artist,
-        img,
+        tracks: {
+          id: trackId,
+          url: trackUrl,
+          title,
+          artist,
+          img,
+        },
       }),
     );
 

@@ -199,14 +199,33 @@ const playerSlice = createSlice({
       if (!exists) state.tracks.push(action.payload);
     },
 
-    playNext(state, action: PayloadAction<Track>) {
+    playNext(state, action: PayloadAction<{ tracks: Track | Track[] }>) {
+      const { tracks } = action.payload;
+      const incomingTracks = Array.isArray(tracks) ? tracks : [tracks];
+      const incomingIds = new Set(incomingTracks.map((t) => t.id));
+
+      // 1. Find where to insert (after current track)
       const currentIndex = state.tracks.findIndex(
         (t) => t.id === state.currentTrackId,
       );
       const insertAt = currentIndex === -1 ? 0 : currentIndex + 1;
-      const filtered = state.tracks.filter((t) => t.id !== action.payload.id);
-      filtered.splice(insertAt, 0, action.payload);
-      state.tracks = filtered;
+
+      // 2. Filter out the incoming tracks from the current queue to prevent duplicates
+      const filteredQueue = state.tracks.filter((t) => !incomingIds.has(t.id));
+
+      // 3. Insert the new tracks at the correct position
+      filteredQueue.splice(insertAt, 0, ...incomingTracks);
+
+      state.tracks = filteredQueue;
+
+      // 4. If shuffle is on, we should technically rebuild or update the shuffle queue
+      if (state.shuffle && state.tracks.length > 1) {
+        state.shuffleQueue = buildShuffleQueue(
+          state.tracks,
+          state.currentTrackId!,
+        );
+        state.shuffleIndex = 0;
+      }
     },
 
     removeFromQueue(state, action: PayloadAction<string>) {

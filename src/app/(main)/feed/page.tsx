@@ -130,12 +130,18 @@ export default function Feed() {
     [allTracks],
   );
 
-  // Re-sort rendered cards to match feed order
   const orderedTracks = useMemo(() => {
+    const seen = new Set<string>();
     const idOrder = items
       .filter((item) => item.type === "track")
       .map((item) => item.id);
+
     return idOrder
+      .filter((id) => {
+        if (seen.has(id)) return false;
+        seen.add(id);
+        return true;
+      })
       .map((id) => allTracks.find((t) => t.trackId === id))
       .filter(Boolean) as ApiTrack[];
   }, [allTracks, items]);
@@ -205,13 +211,19 @@ export default function Feed() {
                     trackUrl={track.audio?.audioLink}
                     wfLink={track.audio?.waveformLink}
                     duration={track.durationInSeconds}
+                    tag={track.basicInfo?.tags?.[0]}
                     audioClipStart={track.audioClip?.start}
                     audioClipEnd={track.audioClip?.end}
                     likeCount={track.numLikes}
                     repostCount={track.numReposts}
+                    playsCount={track.numPlays}
+                    commentsCount={track.numComments}
                     isLikedByUser={track.isLikedByUser}
+                    isRepostedByUser={track.isRepostedByUser}
                     allTracks={reduxTracks}
-                    enableDirectDownload={track.permissions?.enableDirectDownload ?? false}
+                    enableDirectDownload={
+                      track.permissions?.enableDirectDownload ?? false
+                    }
                   />
                 </div>
               );
