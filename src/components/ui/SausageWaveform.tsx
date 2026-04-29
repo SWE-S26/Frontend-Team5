@@ -1,6 +1,6 @@
 "use client";
 
-import React, { use, useEffect, useRef, useState } from "react";
+import React, { useEffect, useRef, useState } from "react";
 import { useStatelessComments } from "@/hooks/useComments";
 import { TrackComment } from "@/types/comments.types";
 
@@ -81,7 +81,6 @@ function CommentAvatar({
       onMouseEnter={onEnter}
       onMouseLeave={onLeave}
     >
-      {/* Bubble — always in DOM, fades in/out, anchored to fixed container */}
       <div
         className="absolute top-full mt-1 pointer-events-none flex items-baseline gap-1.5 bg-off-black text-white-smoke text-[11px] rounded px-2 py-1.5 shadow-lg overflow-hidden transition-opacity duration-150"
         style={{
@@ -110,7 +109,6 @@ function CommentAvatar({
           </>
         )}
       </div>
-      {/* Avatar */}
       <img
         src={comment.avatarUrl}
         alt={comment.displayName}
@@ -204,6 +202,9 @@ export default function SausageWaveform({
   samplesUrl,
   externalProgress,
   onSeek,
+  onDragStart,
+  onDragMove,
+  onDragEnd,
   onPlay,
   onAvatarHover,
   onTimestampChange,
@@ -221,6 +222,9 @@ export default function SausageWaveform({
   samplesUrl: string;
   externalProgress?: number;
   onSeek?: (percentage: number) => void;
+  onDragStart?: () => void;
+  onDragMove?: (percentage: number) => void;
+  onDragEnd?: (percentage: number) => void;
   onPlay?: (seekPercentage?: number) => void;
   onAvatarHover?: () => void;
   onTimestampChange?: (seconds: number) => void;
@@ -256,9 +260,12 @@ export default function SausageWaveform({
   const [isHovering, setIsHovering] = useState(false);
   const [isPreviewing, setIsPreviewing] = useState(false);
   const [previewPct, setPreviewPct] = useState<number | null>(null);
-  const [isDragging, setIsDragging] = useState(false);
+
+  // Use refs for drag state — no re-renders mid-drag, no fighting the RAF loop
+  const isDraggingRef = useRef(false);
   const dragEndedRef = useRef(false);
-  const [isPendingDrag, setIsPendingDrag] = useState(false);
+  // Local visual progress during drag so the waveform scrubs smoothly
+  const [dragProgress, setDragProgress] = useState<number | null>(null);
 
   const lastProgressRef = useRef(0);
   const hasPlayedRef = useRef(false);
@@ -271,8 +278,12 @@ export default function SausageWaveform({
     hasPlayedRef.current = true;
   }
 
+  // While dragging, show dragProgress so the waveform follows the cursor.
+  // Otherwise show the real external progress driven by the RAF loop.
   const progress =
-    (isPlaying ? externalProgress : lastProgressRef.current) ?? 0;
+    dragProgress !== null
+      ? dragProgress
+      : (isPlaying ? externalProgress : lastProgressRef.current) ?? 0;
 
   const { comments, loadComments } = useStatelessComments();
   useEffect(() => {
@@ -320,41 +331,11 @@ export default function SausageWaveform({
     const bgTopColor = theme === "dark" ? "#ffffff" : "#121212";
     const bgBottomColor = theme === "dark" ? "#e5e5e5" : "#b2b2b2";
     const layers: [string, (png: string) => void][] = [
-      [
-        bgTopColor,
-        (png) => {
-          setBgTop(png);
-          markLoaded();
-        },
-      ],
-      [
-        bgBottomColor,
-        (png) => {
-          setBgBottom(png);
-          markLoaded();
-        },
-      ],
-      [
-        "gradient",
-        (png) => {
-          setFgTopGradient(png);
-          markLoaded();
-        },
-      ],
-      [
-        "#faad87",
-        (png) => {
-          setFgTopFlat(png);
-          markLoaded();
-        },
-      ],
-      [
-        "#faad87",
-        (png) => {
-          setFgBottom(png);
-          markLoaded();
-        },
-      ],
+      [bgTopColor, (png) => { setBgTop(png); markLoaded(); }],
+      [bgBottomColor, (png) => { setBgBottom(png); markLoaded(); }],
+      ["gradient", (png) => { setFgTopGradient(png); markLoaded(); }],
+      ["#faad87", (png) => { setFgTopFlat(png); markLoaded(); }],
+      ["#faad87", (png) => { setFgBottom(png); markLoaded(); }],
     ];
     const halves = ["top", "bottom", "top", "top", "bottom"];
     layers.forEach(([wave_color, onComplete], i) => {
@@ -382,47 +363,58 @@ export default function SausageWaveform({
     return `${minutes}:${seconds < 10 ? "0" : ""}${seconds}`;
   };
 
-  useEffect(() => {
-    if (!isPendingDrag) return;
-    const handleGlobalMouseMove = (e: MouseEvent) => {
-      const pct = getPct(e);
-      if (!isDragging) {
-        setIsDragging(true);
-        setIsPreviewing(false);
-        setPreviewPct(null);
-        if (!isPlaying) {
-          onPlay?.(pct); // only start playback if not already playing
-        } else {
-          onSeek?.(pct); // if playing, just seek
-        }
-      } else {
-        onSeek?.(pct);
-      }
-    };
-    const handleGlobalMouseUp = (e: MouseEvent) => {
-      const pct = getPct(e);
-      if (isDragging) {
-        onSeek?.(pct);
-        dragEndedRef.current = true;
-      }
-      setIsDragging(false);
-      setIsPendingDrag(false);
-    };
-    window.addEventListener("mousemove", handleGlobalMouseMove);
-    window.addEventListener("mouseup", handleGlobalMouseUp);
-    return () => {
-      window.removeEventListener("mousemove", handleGlobalMouseMove);
-      window.removeEventListener("mouseup", handleGlobalMouseUp);
-    };
-  }, [isPendingDrag, isDragging, onSeek, onPlay]);
-
   const handleMouseDown = (e: React.MouseEvent) => {
     if (e.button !== 0) return;
     e.preventDefault();
-    setIsPendingDrag(true);
+
+    const startPct = getPct(e);
+    isDraggingRef.current = false; // becomes true on first move
+    dragEndedRef.current = false;
+
+    const handleMouseMove = (e: MouseEvent) => {
+      const pct = getPct(e);
+
+      if (!isDraggingRef.current) {
+        // First movement — lock in drag mode
+        isDraggingRef.current = true;
+        setIsPreviewing(false);
+        setPreviewPct(null);
+
+        // Tell the hook to freeze its RAF loop
+        onDragStart?.();
+
+        // Start playback if not already playing
+        if (!isPlaying) {
+          onPlay?.(pct);
+        }
+      }
+
+      // Update local visual progress (smooth scrub) — no audio seek yet
+      setDragProgress(pct);
+      // Tell the hook to update currentTime display only
+      onDragMove?.(pct);
+    };
+
+    const handleMouseUp = (e: MouseEvent) => {
+      window.removeEventListener("mousemove", handleMouseMove);
+      window.removeEventListener("mouseup", handleMouseUp);
+
+      if (isDraggingRef.current) {
+        // Drag ended — commit single seek to audio
+        const pct = getPct(e);
+        onDragEnd?.(pct);
+        setDragProgress(null); // hand control back to RAF loop
+        dragEndedRef.current = true;
+        isDraggingRef.current = false;
+      }
+    };
+
+    window.addEventListener("mousemove", handleMouseMove);
+    window.addEventListener("mouseup", handleMouseUp);
   };
 
   const handleClick = (e: React.MouseEvent) => {
+    // Suppress click that fires after a drag
     if (dragEndedRef.current) {
       dragEndedRef.current = false;
       return;
@@ -443,7 +435,7 @@ export default function SausageWaveform({
   };
 
   const handleMouseMove = (e: React.MouseEvent) => {
-    if (isPreviewing && !isDragging) setPreviewPct(getPct(e));
+    if (isPreviewing && !isDraggingRef.current) setPreviewPct(getPct(e));
   };
 
   const handleMouseEnter = () => setIsHovering(true);
@@ -455,7 +447,7 @@ export default function SausageWaveform({
 
   const hoverFade = isPlaying || isHovering ? 1 : 0.7;
   const fadeIn = "transition-opacity duration-150";
-  const showFlatWindow = isPreviewing && previewPct !== null && !isDragging;
+  const showFlatWindow = isPreviewing && previewPct !== null && !isDraggingRef.current;
 
   return (
     <div className="space-y-2">

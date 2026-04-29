@@ -48,7 +48,7 @@ export default function All({ items, onEditTrack, onAddToPlaylist }: Props) {
     </div>
     <p className="flex justify-center">More uploads means more listeners.</p>
     <div className="flex justify-center">
-          (isOwn && (
+          {isOwn && (
             <Button
               data-testid="upload more-button-All tab"
               className="bg-white-smoke text-chinese-black cursor-pointer w-30"
@@ -56,7 +56,7 @@ export default function All({ items, onEditTrack, onAddToPlaylist }: Props) {
             >
               Upload more
             </Button>
-          ))
+          )}
           
     </div>
     
