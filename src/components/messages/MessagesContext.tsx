@@ -2,7 +2,7 @@
 
 import { createContext, useContext, ReactNode } from "react"
 import { useConversations } from "@/hooks/sockets/useMessaging"
-import type { Conversation, SocketConversationUpdate } from "@/types/message.types"
+import type { Conversation, SocketConversationUpdate, ChatConversation } from "@/types/message.types"
 
 // ─── Context shape ─────────────────────────────────────────────────────────────
 
@@ -14,6 +14,7 @@ interface MessagesContextValue {
   markAsUnread:        (chatId: string) => Promise<void>
   archiveConversation: (chatId: string) => Promise<void>
   updateFromSocket:    (data: SocketConversationUpdate) => void
+  updateFromLocalSend: (data: ChatConversation) => void
 }
 
 const MessagesContext = createContext<MessagesContextValue | null>(null)
@@ -28,6 +29,7 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
     markAsUnread,
     archiveConversation,
     updateFromSocket,
+    updateFromLocalSend,
   } = useConversations()
 
   // Derived — count of conversations with isUnread: true
@@ -43,6 +45,7 @@ export function MessagesProvider({ children }: { children: ReactNode }) {
         markAsUnread,
         archiveConversation,
         updateFromSocket,
+        updateFromLocalSend,
       }}
     >
       {children}
