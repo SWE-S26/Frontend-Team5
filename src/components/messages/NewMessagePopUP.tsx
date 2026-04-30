@@ -52,7 +52,7 @@ const NewMessagePopUP = ({ isOpen, onClose, prefilledUser }: NewMessagePopUPProp
     <AnimatePresence>
       {isOpen && (
         <div
-          className='fixed inset-0 bg-white/30 z-1001 flex items-start pt-25 justify-center'
+          className='fixed inset-0 bg-white-smoke/30 z-1001 flex items-start pt-25 justify-center'
           onClick={onClose}
         >
           <button
@@ -67,7 +67,7 @@ const NewMessagePopUP = ({ isOpen, onClose, prefilledUser }: NewMessagePopUPProp
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -60 }}
             transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className='flex flex-col w-200 p-6 bg-black rounded-md relative'
+            className='flex flex-col w-200 p-6 bg-chinese-black rounded-md relative'
             onClick={(e) => e.stopPropagation()}
           >
             <p className='text-xl text-white-smoke font-bold mb-8'>New message</p>
@@ -89,7 +89,7 @@ const NewMessagePopUP = ({ isOpen, onClose, prefilledUser }: NewMessagePopUPProp
                     </span>
                     <button
                       onClick={() => setRecipient(null)}
-                      className='text-silver hover:text-white text-xs ml-1 cursor-pointer'
+                      className='text-silver hover:text-white-smoke text-xs ml-1 cursor-pointer'
                     >
                       ✕
                     </button>
@@ -117,7 +117,7 @@ const NewMessagePopUP = ({ isOpen, onClose, prefilledUser }: NewMessagePopUPProp
               <Button
                 onClick={handleSend}
                 disabled={!recipient || !content.trim() || isSending}
-                className='text-black text-sm bg-white-smoke disabled:opacity-50'
+                className='text-chinese-black text-sm bg-white-smoke disabled:opacity-50'
               >
                 {isSending ? 'Sending...' : 'Send'}
               </Button>
