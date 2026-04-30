@@ -64,7 +64,7 @@ export default function ConfirmPopover({
             ref={refs.setFloating}
             style={floatingStyles}
             {...getFloatingProps()}
-            className="z-[9999]"
+            className="z-9999"
           >
             {/* Arrow (LIKE ProfilePopover) */}
             <div

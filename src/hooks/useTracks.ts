@@ -2,7 +2,7 @@ import axios from "axios";
 import { tracksService } from "@/services/tracks.service";
 import { useCallback, useRef, useState } from "react";
 import { useAppSelector } from "@/store/hooks";
-import { CreateTrackRequest } from "@/types/tracks.types";
+import { CreateTrackRequest, incrementPlayCountRequest } from "@/types/tracks.types";
 import {
   GetPostedTracksResponse,
   GetTracksErrorResponse,
@@ -325,12 +325,12 @@ export function useIncrementPlayCount() {
   const [success, setSuccess] = useState<boolean | null>(null);
 
   const incrementPlayCount = useCallback(
-    async (id: string) => {
+    async (data: incrementPlayCountRequest) => {
       setLoading(true);
       setError(null);
       setSuccess(null);
       try {
-        const res = await tracksService.incrementPlayCount(id);
+        const res = await tracksService.incrementPlayCount(data);
         setSuccess(true);
         return res.data;
       } catch (err: any) {

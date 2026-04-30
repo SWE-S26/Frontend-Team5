@@ -19,6 +19,7 @@ const PUBLIC_ROUTES = [
   "/api/tracks/v1",
   "/api/auth/v1/google/resend-code",
   "/api/tracks/v1/listen",
+  "/api/tracks/v2/listen",
   "/api/tracks/v1/quota",
   "/api/public/tracks/v1",
   "/api/public/tracks/v2",
