@@ -336,7 +336,6 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
     try {
       await deleteTrack(id);
       setDeletedIds((prev) => new Set(prev).add(id));
-      setContextMenu(null);
     } catch {
       // error is surfaced via errorDelete from the hook
     } finally {

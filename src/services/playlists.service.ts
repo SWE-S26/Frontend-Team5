@@ -230,7 +230,7 @@ export const playlistsService = {
 
   reorderPlaylistTracks: (playlistId: string, data: ReorderPlaylistTracksRequest) =>
     api.patch<ReorderPlaylistTracksResponse>(
-      `/api/playlists/v1/${playlistId}/tracks`,
+      `/api/playlists/v1/${playlistId}/tracks/order`,
       data
     ),
 

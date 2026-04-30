@@ -56,13 +56,14 @@ function formatPlays(n: number): string {
   return String(n);
 }
 
-function TrackRow({
+export function TrackRow({
   track,
   index,
   isPlaying,
   isCurrent,
   onPlay,
   rowRef,
+  showArtist = false,
 }: {
   track: PlaylistTrack;
   index: number;
@@ -70,6 +71,7 @@ function TrackRow({
   isCurrent: boolean;
   onPlay: () => void;
   rowRef?: (el: HTMLDivElement | null) => void;
+  showArtist?: boolean;
 }) {
   const [hovered, setHovered] = useState(false);
   const { likeTrack } = useLikeTrackOptimistic(track._id);
@@ -100,7 +102,7 @@ function TrackRow({
   return (
     <div
       ref={rowRef}
-      className="flex items-center gap-2 px-2 py-2 rounded hover:bg-white/5 transition-colors cursor-pointer group/row h-[52px]"
+      className="flex items-center gap-2 px-2 py-2 rounded hover:bg-white/5 transition-colors cursor-pointer group/row h-13"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onPlay}
@@ -122,7 +124,7 @@ function TrackRow({
               {isPlaying ? (
                 <IoMdPause className="text-chinese-black text-[11px] group-hover/playicon:opacity-50" />
               ) : (
-                <IoMdPlay className="text-chinese-black text-[11px] ml-[1px] group-hover/playicon:opacity-50" />
+                <IoMdPlay className="text-chinese-black text-[11px] ml-px group-hover/playicon:opacity-50" />
               )}
             </div>
           </div>
@@ -132,7 +134,15 @@ function TrackRow({
       <span className={`${indexColor} text-sm font-normal shrink-0`}>
         {index + 1}
       </span>
-      <span className={`${indexColor} text-sm shrink-0`}>·</span>
+      <span className={`${indexColor} text-sm shrink-0`}>{"\u00b7"}</span>
+      {showArtist && (
+        <>
+          <span className="max-w-44 truncate text-sm font-bold text-silver shrink-0">
+            {track.basicInfo.mainArtists?.join(", ") || "Unknown artist"}
+          </span>
+          <span className={`${indexColor} text-sm shrink-0`}>{"\u00b7"}</span>
+        </>
+      )}
       <a
         href="#"
         onClick={(e) => e.stopPropagation()}
@@ -389,7 +399,7 @@ export default function PlaylistWaveformCard({
         {/* Track list */}
         <div
           ref={listRef}
-          className={`mt-4 ${tracksExpanded ? "overflow-y-auto max-h-[260px]" : "overflow-hidden"}`}
+          className={`mt-4 ${tracksExpanded ? "overflow-y-auto max-h-65" : "overflow-hidden"}`}
         >
           {cachedTracks.map((track, i) => (
             <TrackRow
