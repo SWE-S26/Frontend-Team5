@@ -13,6 +13,7 @@ import {
   GetTrackDetailedResponse,
   TrackPlaylist,
   GetTrackPlaylistsResponse,
+  TrackFan, GetTrackStatsResponse,
 } from "@/types/tracks.types";
 import { GetTrackByIdResponse } from "@/types/tracks.types";
 
@@ -458,32 +459,7 @@ export function useGetTrackAlbums() {
 }
 
 
-export function useGetPublicTrackPlaylists() {
-  const [loading, setLoading] = useState(false)
-  const [error, setError] = useState<string | null>(null)
-  const [playlists, setPlaylists] = useState<TrackPlaylist[]>([])
 
-  const getPublicTrackPlaylists = useCallback(async (trackId: string) => {
-    if (!trackId) return
-    setLoading(true)
-    setError(null)
-    try {
-      const res = await tracksService.getPublicTrackPlaylists(trackId)
-      setPlaylists(res.data.data)
-      return res.data
-    } catch (err) {
-      if (axios.isAxiosError(err)) {
-        setError(err.response?.data?.message || "Failed to fetch playlists")
-      } else {
-        setError("Something went wrong")
-      }
-    } finally {
-      setLoading(false)
-    }
-  }, [])
-
-  return { getPublicTrackPlaylists, loading, error, playlists }
-}
 
 
 export function useGetTrackByPermalink() {
@@ -541,4 +517,33 @@ export function useCheckTrackPermalinkValidity() {
   }, [])
 
   return { checkTrackPermalinkValidity, loading, error, isFound }
+}
+
+export function useGetTrackStats() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [topFans, setTopFans] = useState<TrackFan[]>([]);
+  const [firstFans, setFirstFans] = useState<TrackFan[]>([]);
+  const isAuthenticated = useTrackAuthState();
+
+  const getTrackStats = useCallback(async (trackId: string) => {
+    if (!trackId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const request = isAuthenticated
+        ? tracksService.getTrackStats(trackId)
+        : tracksService.getPublicTrackStats(trackId);
+      const res = await request;
+      setTopFans(res.data.data.topFans);
+      setFirstFans(res.data.data.firstFans);
+      return res.data;
+    } catch (err) {
+      setError(getTrackErrorMessage(err, "Failed to fetch track stats"));
+    } finally {
+      setLoading(false);
+    }
+  }, [isAuthenticated]);
+
+  return { getTrackStats, loading, error, topFans, firstFans };
 }

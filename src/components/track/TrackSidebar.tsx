@@ -6,12 +6,9 @@ import { Avatar } from "antd";
 import { useLikeTrack } from "@/hooks/useLikes";
 import { useTrackRepostsList } from "@/hooks/useReposts";
 import ProfilePopover from "../layout/track-cards/ProfilePopover";
-
-import { useGetTrackAlbums, useGetTrackPlaylists } from "@/hooks/useTracks"
+import { useGetTrackAlbums, useGetTrackPlaylists, useGetTrackStats } from "@/hooks/useTracks"
 import PlaylistCard from "@/components/track/PlaylistCard";
-
-
-
+import FanCard from "./FanCard";
 interface TrackSidebarProps {
   trackId: string
 }
@@ -21,31 +18,28 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
 
   const { users, total: LikesCount, loadLikes } = useLikeTrack()
   const { users: repostUsers, total: RepostsCount, loadReposts } = useTrackRepostsList(trackId)
-
-
-  const { playlists: trackPlaylists, getTrackPlaylists } = useGetTrackPlaylists()
+  const { playlists: trackPlaylists, getTrackPlaylists, loading: playlistsLoading } = useGetTrackPlaylists()
   const { albums: trackAlbums, getTrackAlbums } = useGetTrackAlbums()
+  const { topFans, firstFans, loading: fansLoading, getTrackStats } = useGetTrackStats()
 
-  useEffect(() => {
-    void getTrackPlaylists(trackId)
-  }, [trackId, getTrackPlaylists])
-
-  useEffect(() => {
-    void getTrackAlbums(trackId)
-  }, [trackId, getTrackAlbums])
-
-  useEffect(() => {
-    loadLikes(trackId)
-  }, [trackId])
-
-  useEffect(() => {
-    loadReposts()
-  }, [trackId])
+  useEffect(() => { void getTrackPlaylists(trackId) }, [trackId])
+  useEffect(() => { void getTrackAlbums(trackId) }, [trackId])
+  useEffect(() => { loadLikes(trackId) }, [trackId])
+  useEffect(() => { loadReposts() }, [trackId])
+  useEffect(() => { void getTrackStats(trackId) }, [trackId])
 
   const SideTabs = [
     { href: "", label: "Top",   value: "top"   },
     { href: "", label: "First", value: "first" },
   ]
+
+  
+
+  const activeFans = activeTab === "top" ? topFans : firstFans
+
+  // const activeFans = activeTab === "top"
+  // ? (topFans.length > 0 ? topFans : mockFans)
+  // : (firstFans.length > 0 ? firstFans : mockFans)
 
   return (
     <aside className="w-85 sticky top-20 h-fit flex flex-col gap-10 text-white">
@@ -73,11 +67,21 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
             : "Fans who played this track in the first 7 days:"}
         </p>
 
+        {fansLoading ? (
         <div className="flex flex-col gap-3 mt-2">
           <div className="h-6 bg-white/5 rounded animate-pulse" />
           <div className="h-6 bg-white/5 rounded animate-pulse" />
           <div className="h-6 bg-white/5 rounded animate-pulse" />
         </div>
+      ) : activeFans.length === 0 ? (
+        <p className="text-xs text-gray-500">No fans yet</p>
+      ) : (
+        <div className="flex flex-col gap-2 mt-1">
+          {activeFans.map((fan, index) => (
+            <FanCard key={index} fan={fan} index={index} activeTab={activeTab} />
+          ))}
+        </div>
+      )}
       </section>
 
       {/* RELATED TRACKS */}
@@ -104,33 +108,21 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
         </div>
       </section>
 
-      {/* ALBUMS */}
-      <section className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold uppercase text-white">In Albums</h2>
-          <button className="text-xs text-gray-500 hover:text-white cursor-pointer">View all</button>
-        </div>
-        <div className="flex flex-col gap-3">
-          {trackAlbums.length === 0 ? (
-            <p className="text-xs text-gray-500">Not in any albums</p>
-          ) : (
-            trackAlbums.map((album) => (
-              <PlaylistCard key={album._id} playlist={album} />
-            ))
-          )}
-        </div>
-      </section>
+ 
 
       {/* PLAYLISTS */}
-      
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase text-white">In Playlists</h2>
           <button className="text-xs text-gray-500 hover:text-white cursor-pointer">View all</button>
         </div>
-
         <div className="flex flex-col gap-3">
-          {trackPlaylists.length === 0 ? (
+          {playlistsLoading ? (
+            <>
+              <div className="h-10 bg-white/5 rounded animate-pulse" />
+              <div className="h-10 bg-white/5 rounded animate-pulse" />
+            </>
+          ) : trackPlaylists.length === 0 ? (
             <p className="text-xs text-gray-500">Not in any playlists</p>
           ) : (
             trackPlaylists.map((playlist) => (
@@ -146,9 +138,8 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
           <h2 className="text-sm font-bold uppercase text-white">{LikesCount} Likes</h2>
           <button className="text-xs text-gray-500 hover:text-white cursor-pointer">View all</button>
         </div>
-
         <Avatar.Group className="w-100">
-          {users.map((user, index) => (
+          {users.map((user) => (
             <ProfilePopover
               key={user.userId}
               id={`like-${user.userId}`}
@@ -168,9 +159,8 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
           <h2 className="text-sm font-bold uppercase text-white">{RepostsCount} Reposts</h2>
           <button className="text-xs text-gray-500 hover:text-white cursor-pointer">View all</button>
         </div>
-
         <Avatar.Group className="w-100">
-          {repostUsers.map((user, index) => (
+          {repostUsers.map((user) => (
             <ProfilePopover
               key={user.userId}
               id={`repost-${user.userId}`}
