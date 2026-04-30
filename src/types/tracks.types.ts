@@ -304,7 +304,10 @@ export interface GetTrackPlaylistsResponse {
 export interface TrackFan {
   userId: {
     displayName: string;
-    profileImg: string;
+    profileImg: {
+      imgLink: string;
+      publicId: string;
+    };
   };
   trackId: string;
   totalNumberOfPlay: number;

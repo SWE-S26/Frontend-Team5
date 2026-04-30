@@ -24,7 +24,7 @@ export default function FanCard({ fan, index, activeTab }: FanCardProps) {
       >
         <span className="text-white text-xs w-4 shrink-0">{index + 1}</span>
         <Avatar
-          src={fan.userId.profileImg || undefined}
+          src={fan.userId.profileImg?.imgLink || undefined}
           size={28}
           className="shrink-0"
         />

@@ -33,44 +33,13 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
     { href: "", label: "First", value: "first" },
   ]
 
-  const mockFans = [
-  {
-    userId: { displayName: "John Doe", profileImg: "" },
-    trackId: "mock",
-    totalNumberOfPlay: 42,
-    isFanOfArtist: true,
-    firstWeekNumPlays: 10,
-    trackCreatedAt: new Date().toISOString(),
-    playThroughPercentage: 85,
-    totalListenedDuration: 3600,
-  },
-  {
-    userId: { displayName: "Jane Smith", profileImg: "" },
-    trackId: "mock",
-    totalNumberOfPlay: 28,
-    isFanOfArtist: false,
-    firstWeekNumPlays: 7,
-    trackCreatedAt: new Date().toISOString(),
-    playThroughPercentage: 60,
-    totalListenedDuration: 2100,
-  },
-  {
-    userId: { displayName: "Ali Hassan", profileImg: "" },
-    trackId: "mock",
-    totalNumberOfPlay: 15,
-    isFanOfArtist: true,
-    firstWeekNumPlays: 15,
-    trackCreatedAt: new Date().toISOString(),
-    playThroughPercentage: 100,
-    totalListenedDuration: 1800,
-  },
-]
+  
 
-  // const activeFans = activeTab === "top" ? topFans : firstFans
+  const activeFans = activeTab === "top" ? topFans : firstFans
 
-  const activeFans = activeTab === "top"
-  ? (topFans.length > 0 ? topFans : mockFans)
-  : (firstFans.length > 0 ? firstFans : mockFans)
+  // const activeFans = activeTab === "top"
+  // ? (topFans.length > 0 ? topFans : mockFans)
+  // : (firstFans.length > 0 ? firstFans : mockFans)
 
   return (
     <aside className="w-85 sticky top-20 h-fit flex flex-col gap-10 text-white">
@@ -139,14 +108,7 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
         </div>
       </section>
 
-      {/* ALBUMS */}
-      <section className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold uppercase text-white">In Albums</h2>
-          <button className="text-xs text-gray-500 hover:text-white cursor-pointer">View all</button>
-        </div>
-        
-      </section>
+ 
 
       {/* PLAYLISTS */}
       <section className="flex flex-col gap-3">
