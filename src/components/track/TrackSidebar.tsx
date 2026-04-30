@@ -9,11 +9,14 @@ import ProfilePopover from "../layout/track-cards/ProfilePopover";
 import { useGetTrackAlbums, useGetTrackPlaylists, useGetTrackStats } from "@/hooks/useTracks"
 import PlaylistCard from "@/components/track/PlaylistCard";
 import FanCard from "./FanCard";
+import LeaderboardActions from "./LeaderboardActions";
+
 interface TrackSidebarProps {
-  trackId: string
+  trackId: string,
+  track: any;
 }
 
-export default function TrackSidebar({ trackId }: TrackSidebarProps) {
+export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
   const [activeTab, setActiveTab] = useState("top");
 
   const { users, total: LikesCount, loadLikes } = useLikeTrack()
@@ -22,28 +25,26 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
   const { albums: trackAlbums, getTrackAlbums } = useGetTrackAlbums()
   const { topFans, firstFans, loading: fansLoading, getTrackStats } = useGetTrackStats()
 
-  useEffect(() => { void getTrackPlaylists(trackId) }, [trackId])
-  useEffect(() => { void getTrackAlbums(trackId) }, [trackId])
-  useEffect(() => { loadLikes(trackId) }, [trackId])
-  useEffect(() => { loadReposts() }, [trackId])
-  useEffect(() => { void getTrackStats(trackId) }, [trackId])
+  // Single useEffect — all sidebar data fetched together once
+  useEffect(() => {
+    if (!trackId) return
+    void getTrackPlaylists(trackId)
+    void getTrackAlbums(trackId)
+    loadLikes(trackId)
+    loadReposts()
+    void getTrackStats(trackId)
+  }, [trackId]) // no function refs in deps
 
   const SideTabs = [
     { href: "", label: "Top",   value: "top"   },
     { href: "", label: "First", value: "first" },
   ]
 
-  
-
   const activeFans = activeTab === "top" ? topFans : firstFans
-
-  // const activeFans = activeTab === "top"
-  // ? (topFans.length > 0 ? topFans : mockFans)
-  // : (firstFans.length > 0 ? firstFans : mockFans)
 
   return (
     <aside className="w-85 sticky top-20 h-fit flex flex-col gap-10 text-white">
-      
+
       <section className="flex flex-col gap-3 mt-5">
         <div className="flex">
           <h2 className="text-sm font-bold uppercase tracking-wide text-white">Fans</h2>
@@ -68,23 +69,30 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
         </p>
 
         {fansLoading ? (
-        <div className="flex flex-col gap-3 mt-2">
-          <div className="h-6 bg-white/5 rounded animate-pulse" />
-          <div className="h-6 bg-white/5 rounded animate-pulse" />
-          <div className="h-6 bg-white/5 rounded animate-pulse" />
-        </div>
-      ) : activeFans.length === 0 ? (
-        <p className="text-xs text-gray-500">No fans yet</p>
-      ) : (
-        <div className="flex flex-col gap-2 mt-1">
-          {activeFans.map((fan, index) => (
-            <FanCard key={index} fan={fan} index={index} activeTab={activeTab} />
-          ))}
-        </div>
-      )}
+          <div className="flex flex-col gap-3 mt-2">
+            <div className="h-6 bg-white/5 rounded animate-pulse" />
+            <div className="h-6 bg-white/5 rounded animate-pulse" />
+            <div className="h-6 bg-white/5 rounded animate-pulse" />
+          </div>
+        ) : activeFans.length === 0 ? (
+          <p className="text-xs text-gray-500">No fans yet</p>
+        ) : (
+          <div className="flex flex-col gap-2 mt-1">
+            {activeFans.map((fan, index) => (
+              <FanCard key={index} fan={fan} index={index} activeTab={activeTab} />
+            ))}
+          </div>
+        )}
       </section>
 
-      {/* RELATED TRACKS */}
+      <section>
+        <LeaderboardActions
+          trackId={trackId}
+          isLikedByUser={track?.isLikedByUser ?? false}
+          posterId={track?.posterId ?? ""}
+        />
+      </section>
+
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase text-white">Related Tracks</h2>
@@ -108,9 +116,6 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
         </div>
       </section>
 
- 
-
-      {/* PLAYLISTS */}
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase text-white">In Playlists</h2>
@@ -132,7 +137,6 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
         </div>
       </section>
 
-      {/* Likes */}
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase text-white">{LikesCount} Likes</h2>
@@ -153,7 +157,6 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
         </Avatar.Group>
       </section>
 
-      {/* Reposts */}
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase text-white">{RepostsCount} Reposts</h2>
