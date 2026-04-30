@@ -205,7 +205,7 @@ export default function TrackCard({
 
           {/* Title */}
           <a
-            href="#"
+            href={`/track/${trackId}`}
             className="text-white-smoke no-underline hover:text-gray-300 text-[14px] font-bold tracking-tight pl-1 animate-fade-in truncate"
           >
             {title}

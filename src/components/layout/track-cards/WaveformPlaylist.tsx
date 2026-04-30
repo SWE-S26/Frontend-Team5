@@ -1,16 +1,9 @@
 "use client";
 
-import { useState, useEffect } from "react";
-import { motion, AnimatePresence, Transition } from "framer-motion";
+import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import {
-  play,
-  pause,
-  playAudio,
-  playNext,
-  Track,
-} from "@/store/slices/playerSlice";
+import { play, pause, playAudio, playNext } from "@/store/slices/playerSlice";
 import { useAudioProgress } from "@/hooks/useAudioProgress";
 import { useIsVisible } from "@/hooks/useIsVisible";
 import {
@@ -25,11 +18,11 @@ import PlaylistCard from "@/components/ui/PlaylistCard";
 import Button from "@/components/ui/Button";
 import Tooltip from "@/components/ui/Tooltip";
 
-import { IoMdPlay, IoMdPause } from "react-icons/io";
+import { IoMdPlay, IoMdPause, IoIosMore } from "react-icons/io";
 import { HiHeart } from "react-icons/hi";
 import { LuRepeat2, LuShare } from "react-icons/lu";
 import { TbCopy } from "react-icons/tb";
-import { ListStart, MoreHorizontal } from "lucide-react";
+import { ListStart } from "lucide-react";
 
 type PlaylistTrack = {
   _id: string;
@@ -69,17 +62,18 @@ function TrackRow({
   isPlaying,
   isCurrent,
   onPlay,
+  rowRef,
 }: {
   track: PlaylistTrack;
   index: number;
   isPlaying: boolean;
   isCurrent: boolean;
   onPlay: () => void;
+  rowRef?: (el: HTMLDivElement | null) => void;
 }) {
   const [hovered, setHovered] = useState(false);
   const { likeTrack } = useLikeTrackOptimistic(track._id);
   const [isLiked, setIsLiked] = useState(track.isLiked);
-
   const { repostTrack } = useRepostTrack(
     track._id,
     true,
@@ -98,7 +92,6 @@ function TrackRow({
     likeTrack();
     setIsLiked((l) => !l);
   }
-
   function handleRepostClick() {
     repostTrack();
     setIsReposted((r) => !r);
@@ -106,91 +99,108 @@ function TrackRow({
 
   return (
     <div
-      className="flex items-center gap-2 px-2 py-2 rounded hover:bg-white/5 transition-colors cursor-pointer group/row overflow-hidden"
+      ref={rowRef}
+      className="flex items-center gap-2 px-2 py-2 rounded hover:bg-white/5 transition-colors cursor-pointer group/row h-[52px]"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onPlay}
     >
-      <img
-        src={track.image.imgLink}
-        className="w-9 h-9 rounded object-cover shrink-0"
-      />
-      <span className={`${indexColor} text-sm font-normal shrink-0 w-4`}>
+      <div className="relative w-9 h-9 shrink-0">
+        <img
+          src={track.image.imgLink}
+          className="w-9 h-9 rounded object-cover"
+        />
+        {(hovered || isPlaying) && (
+          <div
+            className="absolute inset-0 flex items-center justify-center rounded"
+            onClick={(e) => {
+              e.stopPropagation();
+              onPlay();
+            }}
+          >
+            <div className="w-5 h-5 bg-white-smoke rounded-full flex items-center justify-center group/playicon">
+              {isPlaying ? (
+                <IoMdPause className="text-chinese-black text-[11px] group-hover/playicon:opacity-50" />
+              ) : (
+                <IoMdPlay className="text-chinese-black text-[11px] ml-[1px] group-hover/playicon:opacity-50" />
+              )}
+            </div>
+          </div>
+        )}
+      </div>
+
+      <span className={`${indexColor} text-sm font-normal shrink-0`}>
         {index + 1}
       </span>
-      <span className="text-silver text-sm shrink-0">·</span>
-      <span
-        className={`text-sm font-bold min-w-0 flex-1 truncate transition-colors ${titleColor}`}
+      <span className={`${indexColor} text-sm shrink-0`}>·</span>
+      <a
+        href="#"
+        onClick={(e) => e.stopPropagation()}
+        className={`text-sm font-bold flex-1 truncate min-w-0 no-underline transition-colors ${
+          isCurrent
+            ? "text-inferno"
+            : hovered
+              ? "text-silver"
+              : "text-white-smoke"
+        }`}
       >
         {track.basicInfo.title}
-      </span>
+      </a>
 
-      <AnimatePresence mode="wait">
-        {hovered ? (
-          <motion.div
-            key="buttons"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="flex items-center gap-1 shrink-0 h-6"
-            onClick={(e) => e.stopPropagation()}
-          >
+      <div
+        className="shrink-0 w-48 flex items-center justify-end"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {hovered || isPlaying ? (
+          <div className="flex items-center gap-3">
             <Tooltip label="Like">
               <Button
-                className="bg-transparent p-1"
+                className={isPlaying ? "bg-off-black" : "bg-transparent"}
                 onClick={handleLikeClick}
                 icon={
                   <HiHeart
-                    className={`text-[14px] ${isLiked ? "text-inferno" : ""}`}
+                    className={`text-[15px] ${isLiked ? "text-inferno" : ""}`}
                   />
                 }
               />
             </Tooltip>
             <Tooltip label="Repost">
               <Button
-                className="bg-transparent p-1"
+                className={isPlaying ? "bg-off-black" : "bg-transparent"}
                 onClick={handleRepostClick}
                 icon={
                   <LuRepeat2
-                    className={`text-[14px] ${isReposted ? "text-inferno" : ""}`}
+                    className={`text-[15px] ${isReposted ? "text-inferno" : ""}`}
                   />
                 }
               />
             </Tooltip>
             <Tooltip label="Share">
               <Button
-                className="bg-transparent p-1"
-                icon={<LuShare className="text-[14px]" />}
+                className={isPlaying ? "bg-off-black" : "bg-transparent"}
+                icon={<LuShare className="text-[15px]" />}
               />
             </Tooltip>
             <Tooltip label="Copy Link">
               <Button
-                className="bg-transparent p-1"
-                icon={<TbCopy className="text-[14px]" />}
+                className={isPlaying ? "bg-off-black" : "bg-transparent"}
+                icon={<TbCopy className="text-[15px]" />}
               />
             </Tooltip>
             <Tooltip label="More">
               <Button
-                className="bg-transparent p-1"
-                icon={<MoreHorizontal className="text-[14px]" />}
+                className={isPlaying ? "bg-off-black" : "bg-transparent"}
+                icon={<IoIosMore className="text-[16px]" />}
               />
             </Tooltip>
-          </motion.div>
+          </div>
         ) : (
-          <motion.div
-            key="playcount"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            transition={{ duration: 0.15 }}
-            className="flex items-center gap-1 text-silver shrink-0 text-[11px] h-6"
-          >
+          <div className="flex items-center gap-1 text-silver text-[11px]">
             <IoMdPlay className="text-[11px]" />
             <span>{formatPlays(track.numOfPlays)}</span>
-          </motion.div>
+          </div>
         )}
-      </AnimatePresence>
+      </div>
     </div>
   );
 }
@@ -225,14 +235,15 @@ export default function PlaylistWaveformCard({
   const [likeCountState, setLikeCountState] = useState(likeCount);
   const [repostCountState, setRepostCountState] = useState(repostCount);
 
+  const listRef = useRef<HTMLDivElement>(null);
+  const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+
   const { likePlaylist } = useLikePlaylistOptimistic(playlistId ?? "");
   const { repostPlaylist } = useRepostPlaylist(
     playlistId ?? "",
     isVisible,
     repostCount,
   );
-
-  const transitionConfig: Transition = { duration: 0.25, ease: "easeOut" };
 
   const isThisPlaying =
     isPlaying && cachedTracks.some((t) => t._id === currentTrackId);
@@ -247,24 +258,28 @@ export default function PlaylistWaveformCard({
   }, [likeCount, repostCount, isLikedByUser, isRepostedByUser]);
 
   useEffect(() => {
-    if (preloadedTracks && preloadedTracks.length > 0) {
+    if (preloadedTracks && preloadedTracks.length > 0)
       setCachedTracks(preloadedTracks);
-    }
   }, [preloadedTracks]);
+
+  useEffect(() => {
+    if (!currentTrackId || !listRef.current || !isThisPlaying) return;
+    const el = rowRefs.current.get(currentTrackId);
+    if (!el) return;
+    const container = listRef.current;
+    const containerRect = container.getBoundingClientRect();
+    const elRect = el.getBoundingClientRect();
+    const offset = elRect.top - containerRect.top + container.scrollTop;
+    container.scrollTo({ top: offset, behavior: "smooth" });
+  }, [currentTrackId, isThisPlaying]);
 
   async function ensureTracks(): Promise<PlaylistTrack[]> {
     if (cachedTracks.length > 0) return cachedTracks;
-
-    if (!playlistId) {
-      console.error("Playlist ID is missing");
-      return [];
-    }
-
+    if (!playlistId) return [];
     const res = await getPlaylistById(playlistId);
     const pl = res?.data?.playlist;
     const detail = Array.isArray(pl) ? pl[0] : pl;
     const tracks = detail?.tracks ?? [];
-
     setCachedTracks(tracks);
     return tracks;
   }
@@ -306,28 +321,15 @@ export default function PlaylistWaveformCard({
     setTimeout(() => dispatch(play()), 0);
   }
 
-  async function handleExpandTracks() {
-    await ensureTracks();
-    setTracksExpanded(true);
-  }
-
   function handleLikeClick() {
     likePlaylist();
-    if (isLiked) {
-      setLikeCountState((c) => (c ?? 0) - 1);
-    } else {
-      setLikeCountState((c) => (c ?? 0) + 1);
-    }
+    setLikeCountState((c) => (isLiked ? (c ?? 0) - 1 : (c ?? 0) + 1));
     setIsLiked((l) => !l);
   }
 
   function handleRepostClick() {
     repostPlaylist();
-    if (isReposted) {
-      setRepostCountState((c) => (c ?? 0) - 1);
-    } else {
-      setRepostCountState((c) => (c ?? 0) + 1);
-    }
+    setRepostCountState((c) => (isReposted ? (c ?? 0) - 1 : (c ?? 0) + 1));
     setIsReposted((r) => !r);
   }
 
@@ -369,7 +371,7 @@ export default function PlaylistWaveformCard({
           )}
         </div>
 
-        {/* Waveform — updates to current playing track */}
+        {/* Waveform */}
         <div className="w-full max-w-158 h-15 shrink-0">
           <SausageWaveform
             trackId={currentTrack?._id ?? playlistId}
@@ -384,9 +386,12 @@ export default function PlaylistWaveformCard({
           />
         </div>
 
-        {/* Track list - always show first 5 tracks */}
-        <div className="mt-4">
-          {cachedTracks.slice(0, 5).map((track, i) => (
+        {/* Track list */}
+        <div
+          ref={listRef}
+          className={`mt-4 ${tracksExpanded ? "overflow-y-auto max-h-[260px]" : "overflow-hidden"}`}
+        >
+          {cachedTracks.map((track, i) => (
             <TrackRow
               key={track._id}
               track={track}
@@ -394,56 +399,34 @@ export default function PlaylistWaveformCard({
               isCurrent={currentTrackId === track._id}
               isPlaying={currentTrackId === track._id && isPlaying}
               onPlay={() => handleTrackPlay(track)}
+              rowRef={(el) => {
+                if (el) rowRefs.current.set(track._id, el);
+                else rowRefs.current.delete(track._id);
+              }}
             />
           ))}
         </div>
 
-        {/* Expanded track list - show remaining tracks when expanded */}
-        <AnimatePresence>
-          {tracksExpanded && cachedTracks.length > 5 && (
-            <motion.div
-              initial={{ height: 0, opacity: 0 }}
-              animate={{ height: "auto", opacity: 1 }}
-              exit={{ height: 0, opacity: 0 }}
-              transition={transitionConfig}
-              className="overflow-y-auto max-h-64 mt-2"
-            >
-              {cachedTracks.slice(5).map((track, i) => (
-                <TrackRow
-                  key={track._id}
-                  track={track}
-                  index={i + 5}
-                  isCurrent={currentTrackId === track._id}
-                  isPlaying={currentTrackId === track._id && isPlaying}
-                  onPlay={() => handleTrackPlay(track)}
-                />
-              ))}
-              <button
-                onClick={() => setTracksExpanded(false)}
-                className="text-sm text-silver hover:text-white-smoke transition-colors mt-2 mb-1 px-2"
-              >
-                Show less
-              </button>
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* View more tracks button */}
-        {!tracksExpanded && cachedTracks.length > 5 && (
+        {cachedTracks.length > 5 && (
           <button
-            onClick={handleExpandTracks}
+            onClick={async () => {
+              if (!tracksExpanded) await ensureTracks();
+              setTracksExpanded((e) => !e);
+            }}
             className="text-sm text-silver hover:text-white-smoke transition-colors mt-3 text-left"
           >
-            View {(totalTracks ?? cachedTracks.length) - 5} more tracks
+            {tracksExpanded
+              ? "Show less"
+              : `View ${totalTracks ?? cachedTracks.length} tracks`}
           </button>
         )}
 
         {/* Bottom actions */}
-        <div className="flex items-center mt-4 gap-2">
+        <div className="flex items-center mt-4 gap-4">
           <Tooltip label="Like">
             <Button
               onClick={handleLikeClick}
-              className="bg-off-black mr-2"
+              className="bg-off-black"
               icon={
                 <HiHeart
                   className={`text-[16px] transition-colors ${isLiked ? "text-inferno" : ""}`}
@@ -460,7 +443,7 @@ export default function PlaylistWaveformCard({
           <Tooltip label="Repost">
             <Button
               onClick={handleRepostClick}
-              className="bg-off-black mr-2"
+              className="bg-off-black"
               icon={
                 <LuRepeat2
                   className={`text-[16px] transition-colors ${isReposted ? "text-inferno" : ""}`}
@@ -476,23 +459,22 @@ export default function PlaylistWaveformCard({
           </Tooltip>
           <Tooltip label="Share">
             <Button
-              className="bg-off-black mr-2"
+              className="bg-off-black"
               icon={<LuShare className="text-xl" />}
             />
           </Tooltip>
           <Tooltip label="Copy Link">
             <Button
-              className="bg-off-black mr-2"
+              className="bg-off-black"
               icon={<TbCopy className="text-xl" />}
             />
           </Tooltip>
-          <Tooltip label="Add to Queue">
+          <Tooltip label="Add to Next up">
             <Button
               className="bg-off-black"
               onClick={async () => {
                 const rawTracks = await ensureTracks();
-
-                const mappedTracks = rawTracks.map((t: any) => ({
+                const mappedTracks = rawTracks.map((t) => ({
                   id: t._id,
                   url: t.audio.audioLink,
                   title: t.basicInfo.title,
@@ -500,12 +482,7 @@ export default function PlaylistWaveformCard({
                   img: t.image.imgLink,
                   duration: t.durationInSeconds,
                 }));
-
-                dispatch(
-                  playNext({
-                    tracks: mappedTracks,
-                  }),
-                );
+                dispatch(playNext({ tracks: mappedTracks }));
               }}
               icon={<ListStart size={18} className="scale-x-[-1]" />}
             />

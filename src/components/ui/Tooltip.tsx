@@ -51,11 +51,11 @@ export default function Tooltip({ label, children }: TooltipProps) {
             <FloatingArrow
               ref={arrowRef}
               context={context}
-              className="fill-off-black -translate-x-[8px]"
+              className="fill-off-black"
               width={10}
               height={5}
             />
-            <div className="px-2 py-1 bg-off-black text-white-smoke text-[11px] rounded border border-chinese-black whitespace-nowrap -translate-x-[8px]">
+            <div className="px-2 py-1 bg-off-black text-white-smoke text-[11px] rounded border border-chinese-black whitespace-nowrap">
               {label}
             </div>
           </div>
