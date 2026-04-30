@@ -1,7 +1,7 @@
 "use client"
 import { useState, useEffect, useRef } from "react"
 import { motion, AnimatePresence } from "framer-motion"
-import AvatarUpload from "./profile-header/AvatarUpload"
+import InfoPopover from "@/components/settings/InfoPopover"
 import Button from "@/components/ui/Button"
 import { useAppSelector } from "@/store/hooks"
 
@@ -13,13 +13,15 @@ import Cropper from "react-easy-crop"
 import type { Area } from "react-easy-crop"
 import { useCallback } from "react"
 
-import { IoIosInformationCircle } from "react-icons/io"
 import { IoIosLink } from "react-icons/io"
 import { FiTrash2 } from "react-icons/fi"
 
 import { FaFacebook, FaInstagram, FaSpotify, FaPaperPlane, FaYoutube, FaTiktok, FaPinterest, FaLinkedin } from "react-icons/fa6"
 import { FaSoundcloud, FaTwitter } from "react-icons/fa6"
 import { IoEarthSharp } from "react-icons/io5"
+
+import { Select } from "antd"
+import { COUNTRIES } from "@/components/payment/countries"
 
 interface EditProfilePopUPProps {
   isOpen: boolean
@@ -32,20 +34,21 @@ interface LinkItem {
   link:   string
 }
 
+const LINK_ICON_CLASS = "text-silver"
 const getLinkIcon = (link: string) => {
   const url = link.toLowerCase()
-  if (url.includes("facebook.com"))   return <FaFacebook   className="text-silver mt-2.5" />
-  if (url.includes("instagram.com"))  return <FaInstagram  className="text-silver mt-2.5" />
-  if (url.includes("spotify.com"))    return <FaSpotify    className="text-silver mt-2.5" />
-  if (url.includes("soundcloud.com")) return <FaSoundcloud className="text-silver mt-2.5" />
-  if (url.includes("twitter.com") || url.includes("x.com")) return <FaTwitter className="text-silver mt-2.5" />
-  if (url.includes("youtube.com"))    return <FaYoutube    className="text-silver mt-2.5" />
-  if (url.includes("tiktok.com"))     return <FaTiktok     className="text-silver mt-2.5" />
-  if (url.includes("pinterest.com"))  return <FaPinterest  className="text-silver mt-2.5" />
-  if (url.includes("linkedin.com"))   return <FaLinkedin   className="text-silver mt-2.5" />
-  if (url.startsWith("mailto:") || url.includes("gmail.com") || url.includes("@")) return <FaPaperPlane className="text-silver mt-2.5" />
-  if (url.trim() === "")              return <IoIosLink    className="text-silver mt-2.5" />
-  return <IoEarthSharp className="text-silver mt-2.5" />
+  if (url.includes("facebook.com"))   return <FaFacebook   className={LINK_ICON_CLASS} />
+  if (url.includes("instagram.com"))  return <FaInstagram  className={LINK_ICON_CLASS} />
+  if (url.includes("spotify.com"))    return <FaSpotify    className={LINK_ICON_CLASS} />
+  if (url.includes("soundcloud.com")) return <FaSoundcloud className={LINK_ICON_CLASS} />
+  if (url.includes("twitter.com") || url.includes("x.com")) return <FaTwitter className={LINK_ICON_CLASS} />
+  if (url.includes("youtube.com"))    return <FaYoutube    className={LINK_ICON_CLASS} />
+  if (url.includes("tiktok.com"))     return <FaTiktok     className={LINK_ICON_CLASS} />
+  if (url.includes("pinterest.com"))  return <FaPinterest  className={LINK_ICON_CLASS} />
+  if (url.includes("linkedin.com"))   return <FaLinkedin   className={LINK_ICON_CLASS} />
+  if (url.startsWith("mailto:") || url.includes("gmail.com") || url.includes("@")) return <FaPaperPlane className={LINK_ICON_CLASS} />
+  if (url.trim() === "")              return <IoIosLink    className={LINK_ICON_CLASS} />
+  return <IoEarthSharp className={LINK_ICON_CLASS} />
 }
 
 const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
@@ -558,15 +561,18 @@ const handleSave = async () => {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">Country</p>
-                    <input data-testid="Country-input"
-                      maxLength={40}
-                      value={formCountry || ""}
-                      onChange={(e) => {
-                        setFormCountry(e.target.value)
+                    <Select
+                      data-testid="Country-input-dropdown"
+                      value={formCountry || undefined}
+                      onChange={(value) => {
+                        setFormCountry(value)
                         setIsDirty(true)
                       }}
-                      className="w-full bg-off-black px-3 py-2 text-white-smoke rounded"
                       placeholder="Country"
+                      options={COUNTRIES.map((c) => ({ value: c.label, label: c.label }))}
+                      className="w-full notif-select"
+                      classNames={{ popup: { root: "notif-dropdown-popup" } }}
+                      style={{ height: 38 }}
                     />
                   </div>
                 </div>
@@ -590,12 +596,7 @@ const handleSave = async () => {
             {/* Your links header with info tooltip */}
             <div ref={linksInfoRef} className="flex items-center gap-2 mb-2 relative">
               <p className="text-sm text-white-smoke font-bold">Your links</p>
-              <button data-testid="info-button-EditForm"
-                onClick={() => setShowLinksInfo((prev) => !prev)}
-                className="text-silver hover:text-white-smoke transition-colors cursor-pointer"
-              >
-                <IoIosInformationCircle />
-              </button>
+              <InfoPopover text="Add links to your social media profiles, website, or other pages you want to share with your fans." data-testid="Your-links-button-EditForm"/>
               {showLinksInfo && (
                 <div className="absolute left-16 -top-2 z-10 w-64 bg-zinc-700 text-white-smoke text-sm rounded-md px-4 py-3 shadow-lg">
                   Add links to your website and social network profiles to help your audience find you wherever you are.
@@ -606,7 +607,7 @@ const handleSave = async () => {
             {formLinks.length > 0 && (
               <div className="flex flex-col gap-3 mb-3">
                 {formLinks.map((l) => (
-                  <div key={l.linkId} className="flex items-start gap-2">
+                  <div key={l.linkId} className="flex items-center gap-2">
                     <span>{getLinkIcon(l.link)}</span>
 
                     <div className="flex-1 flex flex-col gap-1">
@@ -639,7 +640,7 @@ const handleSave = async () => {
 
                     <button data-testid="RemoveLink-button-EditForm"
                       onClick={() => handleRemoveLink(l.linkId)}
-                      className="text-silver bg-off-black transition-colors mt-2 cursor-pointer rounded border border-transparent hover:text-red-400"
+                      className="text-silver transition-colors cursor-pointer rounded border border-transparent hover:text-red-400"
                     >
                       <FiTrash2 />
                     </button>
@@ -651,7 +652,7 @@ const handleSave = async () => {
             {/* Support link input row */}
             {formSupportLink !== null && (
               <div className="flex flex-col gap-1 mb-5">
-                <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1.5">
                   <span className="text-silver">
                     <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
                       <circle cx="12" cy="12" r="10" />
@@ -670,24 +671,15 @@ const handleSave = async () => {
                     className="flex-1 bg-off-black px-3 py-2 text-white-smoke rounded border border-transparent"
                   />
 
-                  {/* info icon with tooltip */}
-                  <div ref={supportLinkInfoRef} className="relative">
-                    <button  data-testid="info-button-EditForm"
-                      onClick={() => setShowSupportLinkInfo((prev) => !prev)}
-                      className="text-silver hover:text-white-smoke transition-colors cursor-pointer"
-                    >
-                      <IoIosInformationCircle />
-                    </button>
-                    {showSupportLinkInfo && (
-                      <div className="absolute right-0 -top-2 z-10 w-64 bg-zinc-700 text-white-smoke text-sm rounded-md px-4 py-3 shadow-lg">
-                        Add a link to your support page so fans can support you directly.
-                      </div>
-                    )}
-                  </div>
+                  <InfoPopover
+                    text="Add a link to your support page so fans can support you directly."
+                    data-testid="info-button-EditForm"
+                    position="right"
+                  />
 
                   <button data-testid="Remove-button-EditForm"
                     onClick={() => { setFormSupportLink(null); setIsDirty(true) }}
-                    className="text-silver bg-off-black transition-colors cursor-pointer rounded border border-transparent hover:text-red-400"
+                    className="text-silver transition-colors cursor-pointer rounded border border-transparent hover:text-red-400"
                   >
                     <FiTrash2 />
                   </button>
@@ -702,42 +694,41 @@ const handleSave = async () => {
 
             {/* Add link / Add support link buttons */}
             <div className="flex gap-3 mb-3">
-              <button data-testid="AddLink-button-EditForm"
+              <Button
+                data-testid="AddLink-button-EditForm"
                 onClick={handleAddLink}
-                className="bg-off-black text-white-smoke px-4 py-2 rounded cursor-pointer"
+                className="bg-off-black text-white-smoke"
               >
                 Add link
-              </button>
+              </Button>
 
-              <button data-testid="AddSupportLink-button-EditForm"
-                  onClick={() => setFormSupportLink("")}
-                  disabled={formSupportLink !== null}
-                  className="bg-white-smoke text-chinese-black px-4 py-2 rounded cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Add support link
-              </button>
+              <Button
+                data-testid="AddSupportLink-button-EditForm"
+                onClick={() => setFormSupportLink("")}
+                disabled={formSupportLink !== null}
+                className="bg-white-smoke text-chinese-black"
+              >
+                Add support link
+              </Button>
             </div>
-
-            {/* Links list */}
-            
-
-            
 
             {/* Footer buttons */}
             <div className="flex justify-end gap-3">
-              <button data-testid="cancel-button-EditForm"
+              <Button
+                data-testid="cancel-button-EditForm"
                 onClick={handleCancel}
-                className="bg-off-black text-white-smoke px-4 py-2 rounded cursor-pointer"
+                className="bg-off-black text-white-smoke"
               >
                 Cancel
-              </button>
-              <button data-testid="Save-button-EditForm"
+              </Button>
+              <Button
+                data-testid="Save-button-EditForm"
                 onClick={handleSave}
                 disabled={loading || !isDirty}
-                className="bg-white-smoke text-chinese-black px-4 py-2 rounded cursor-pointer disabled:opacity-50"
+                className="bg-white-smoke text-chinese-black"
               >
                 {loading ? "Saving..." : "Save changes"}
-              </button>
+              </Button>
             </div>
 
           </motion.div>

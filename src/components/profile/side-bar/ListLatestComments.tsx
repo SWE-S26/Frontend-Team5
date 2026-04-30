@@ -1,6 +1,6 @@
 import LatestComment from './LatestComment'
 
-const ListLatestComments = () => {
+export default function ListLatestComments() {
   return (
     <>
         <div className='flex gap-41 justify-between mb-0.5 cursor-pointer'>
@@ -13,5 +13,3 @@ const ListLatestComments = () => {
     </>
   )
 }
-
-export default ListLatestComments

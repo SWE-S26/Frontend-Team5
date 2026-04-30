@@ -1,7 +1,0 @@
-export default function UpgradeProButton() {
-  return (
-    <div className="mb-8">
-      <button className="bg-white-smoke text-chinese-black text-sm font-bold rounded-full px-3 py-3 w-85"> Upgrade to Artist Pro </button>
-    </div>
-  )
-}

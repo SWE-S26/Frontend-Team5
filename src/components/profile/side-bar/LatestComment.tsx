@@ -2,9 +2,7 @@
 import React, { useState } from 'react'
 import { FaRegTrashCan } from "react-icons/fa6";
 
-
-
-const LatestComment = () => {
+export default function LatestComment() {
     const [isHovered, setIsHovered] = useState(false);
     return (
         <>
@@ -32,10 +30,7 @@ const LatestComment = () => {
                         </div>
                     )}
                 </div>
-
             </div>
         </>
     );
-};
-
-export default LatestComment
+}

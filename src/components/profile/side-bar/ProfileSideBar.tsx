@@ -12,14 +12,16 @@ import SupportLink from "./SupportLink"
 import FollowersList from "./FollowersList"
 
 
-
-
-
-const ProfileSideBar = () => {
-  const bio = useSelector((state: RootState) => state.profile.bio)
-  const links = useSelector((state: RootState) => state.profile.bannerLinks)
+export default function ProfileSideBar() {
+  const bio          = useSelector((state: RootState) => state.profile.bio)
+  const links        = useSelector((state: RootState) => state.profile.bannerLinks)
   const supportLink  = useSelector((state: RootState) => state.profile.supportLink)
-const displayName  = useSelector((state: RootState) => state.profile.displayName)
+  const displayName  = useSelector((state: RootState) => state.profile.displayName)
+  const isOwnProfile = useSelector((state: RootState) => state.profile.isOwnProfile)
+  const role         = useSelector((state: RootState) => state.auth.role)
+
+  const showOnTour = isOwnProfile && role !== "Pro"
+
   return (
     <div className="w-full">
         <div className="w-full flex flex-col items-center mb-7 ">
@@ -27,7 +29,7 @@ const displayName  = useSelector((state: RootState) => state.profile.displayName
             <div><ProfileStats /></div>
             <div className="w-full"><BioSection bio={bio} /></div>
             <div className="w-full"><SocialLinks links={links} /></div>
-            <div><OnTourSection /></div>
+            {showOnTour && <div><OnTourSection /></div>}
             <div className="w-full"><FollowersList /></div>
             <div className="w-full"><Following /></div>
             <div className="w-full"><ListLatestComments /></div>
@@ -36,5 +38,3 @@ const displayName  = useSelector((state: RootState) => state.profile.displayName
     </div>
   )
 }
-
-export default ProfileSideBar

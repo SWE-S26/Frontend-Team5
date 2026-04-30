@@ -44,7 +44,7 @@ const LANGUAGE_OPTIONS = [
 const RSS_FEED_INFO = "Share your uploads with an RSS feed to enable your listeners to subscribe in Podcasting apps"
 const STATS_INFO    = "To use a 3rd-party service to track RSS activity, insert a URL prefix here. Podtrac users, enter http://www.podtrac.com/pts/redirect.mp3/"
 const REDIRECT_INFO = "Adding a URL here will redirect your SoundCloud RSS feed to a new location"
-const UPLOAD_INFO   = "Save time during upload by setting defaults. Track options can be changed at any time when uploading or editing."
+const UPLOAD_INFO   = "Save time during upload by setting defaults. Track options can be changed at any time when uploading or editing"
 
 // ─── Field components ─────────────────────────────────────────────────────────
 
@@ -209,7 +209,7 @@ export default function Content() {
         <div className="flex items-center justify-between mb-5">
           <h1 className="text-lg flex items-center gap-2">
             RSS feed
-            <InfoPopover text={RSS_FEED_INFO} className="w-72" />
+            <InfoPopover text={RSS_FEED_INFO} className="w-88" />
           </h1>
 
           <span
@@ -278,7 +278,7 @@ export default function Content() {
           <div>
             <label className="text-sm mb-2 flex items-center gap-1.5">
               Stats-service URL prefix
-              <InfoPopover text={STATS_INFO} className="w-72" />
+              <InfoPopover text={STATS_INFO} className="w-90" />
             </label>
             <TextInput placeholder="http://" value={statsPrefix} onChange={setStatsPrefix} />
           </div>
@@ -304,7 +304,7 @@ export default function Content() {
           <div>
             <label className="text-sm mb-2 flex items-center gap-1.5">
               Subscriber redirect
-              <InfoPopover text={REDIRECT_INFO} className="w-72" />
+              <InfoPopover text={REDIRECT_INFO} className="w-76" />
             </label>
             <TextInput placeholder="http://" value={subscriberRedirect} onChange={setSubscriberRedirect} />
           </div>
@@ -321,7 +321,7 @@ export default function Content() {
       <div>
         <h1 className="text-lg mb-5 flex items-center gap-2">
           Upload Defaults
-          <InfoPopover text={UPLOAD_INFO} className="w-72" />
+          <InfoPopover text={UPLOAD_INFO} className="w-108" />
         </h1>
 
         <div className="space-y-3">

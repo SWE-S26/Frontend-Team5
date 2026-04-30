@@ -1,33 +1,33 @@
-    'use client'
+'use client'
 
-    import { useState, useRef, useEffect } from "react"
+import { useState, useRef, useEffect } from "react"
 
-    interface BioSectionProps {
+interface BioSectionProps {
     bio: string | null
-    }
+}
 
-    const urlRegex = /(https?:\/\/[^\s]+)/g
+const urlRegex = /(https?:\/\/[^\s]+)/g
 
-    const renderBioWithLinks = (text: string) => {
+const renderBioWithLinks = (text: string) => {
     const parts = text.split(urlRegex)
-    return parts.map((part, i) =>
-        urlRegex.test(part) ? (
-        <a
-            key={i}
-            href={part}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="text-[#4a90d9] hover:underline"
-        >
-            {part}
-        </a>
+    return parts.map(
+        (part, i) => urlRegex.test(part) ? (
+            <a
+                key={i}
+                href={part}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-[#4a90d9] hover:underline"
+            >
+                {part}
+            </a>
         ) : (
-        part
+            part
         )
     )
-    }
+}
 
-    const BioSection = ({ bio }: BioSectionProps) => {
+export default function BioSection({ bio }: BioSectionProps) {
     const [expanded, setExpanded] = useState(false)
     const [isOverflowing, setIsOverflowing] = useState(false)
     const textRef = useRef<HTMLParagraphElement>(null)
@@ -42,7 +42,7 @@
     if (!bio) return null
 
     return (
-        <div className="w-full  mb-4">
+        <div className="w-full mb-4">
         <div className="relative">
             <p
             ref={textRef}
@@ -67,6 +67,4 @@
         )}
         </div>
     )
-    }
-
-    export default BioSection
+}
