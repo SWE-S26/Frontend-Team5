@@ -3,6 +3,7 @@ import {
   GetPostedTracksResponse,
   GetTrackPlaylistsResponse,
   GetTracksResponse,
+  GetTrackStatsResponse,
 } from "@/types/tracks.types";
 
 import {
@@ -138,7 +139,7 @@ export const tracksService = {
     api.get<CheckTrackPermalinkResponse>(`/api/tracks/v1/permalink/valid/${permalink}`),
 
   getTrackPlaylists: (trackId: string) =>
-  api.get<GetTrackPlaylistsResponse>(`/api/tracks/v2/playlists/${trackId}`),
+  api.get<GetTrackPlaylistsResponse>(`/api/tracks/v1/playlists/${trackId}`),
   
   getPublicTrackPlaylists: (trackId: string) =>
   api.get<GetTrackPlaylistsResponse>(`/api/public/tracks/v1/playlists/${trackId}`),
@@ -148,6 +149,13 @@ export const tracksService = {
 
   getPublicTrackAlbums: (trackId: string) =>
     api.get<GetTrackPlaylistsResponse>(`/api/public/tracks/v1/albums/${trackId}`),
+
+  getTrackStats: (trackId: string) =>
+  api.get<GetTrackStatsResponse>(`/api/tracks/v2/stats/${trackId}`),
+
+  getPublicTrackStats: (trackId: string) =>
+    api.get<GetTrackStatsResponse>(`/api/public/tracks/v2/stats/${trackId}`),
+
 };
 
 
