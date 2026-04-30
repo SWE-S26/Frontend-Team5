@@ -1,11 +1,38 @@
-import { useRef, useEffect } from "react";
-import { FiEdit2, FiPlusSquare, FiDollarSign, FiSliders, FiGlobe, FiBarChart2, FiDownload, FiLink, FiTrash2 } from "react-icons/fi";
+"use client";
+
+import { useState, useEffect } from "react";
+import {
+  useFloating,
+  useClick,
+  useDismiss,
+  useInteractions,
+  useRole,
+  FloatingPortal,
+  offset,
+  flip,
+  shift,
+  autoUpdate,
+} from "@floating-ui/react";
+import { FiPlusSquare, FiDownload, FiLink, FiTrash2 } from "react-icons/fi";
 import { PiPencilSimple } from "react-icons/pi";
+import { BsThreeDots } from "react-icons/bs";
+
+function useIsMobile(breakpoint = 768) {
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const mql = window.matchMedia(`(max-width: ${breakpoint - 1}px)`);
+    setIsMobile(mql.matches);
+    const handler = (e: MediaQueryListEvent) => setIsMobile(e.matches);
+    mql.addEventListener("change", handler);
+    return () => mql.removeEventListener("change", handler);
+  }, [breakpoint]);
+
+  return isMobile;
+}
 
 export function TrackContextMenu({
   trackId,
-  position,
-  onClose,
   onEdit,
   onAddToPlaylist,
   onDownload,
@@ -14,8 +41,6 @@ export function TrackContextMenu({
   isArtistPro,
 }: {
   trackId: string;
-  position: { x: number; y: number };
-  onClose: () => void;
   onEdit: (id: string) => void;
   onAddToPlaylist: (id: string) => void;
   onDownload: (id: string) => void;
@@ -23,56 +48,97 @@ export function TrackContextMenu({
   onDelete: (id: string) => void;
   isArtistPro?: boolean;
 }) {
-  const ref = useRef<HTMLDivElement>(null);
+  const [isOpen, setIsOpen] = useState(false);
+  const isMobile = useIsMobile();
 
-  useEffect(() => {
-    const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) onClose();
-    };
-    document.addEventListener("mousedown", handler);
-    return () => document.removeEventListener("mousedown", handler);
-  }, [onClose]);
+  const { refs, floatingStyles, context } = useFloating({
+    open: isOpen,
+    onOpenChange: setIsOpen,
+    placement: "bottom-end",
+    strategy: "fixed",
+    whileElementsMounted: autoUpdate,
+    middleware: [offset(4), flip(), shift({ padding: 8 })],
+  });
+
+  const click = useClick(context);
+  const dismiss = useDismiss(context);
+  const role = useRole(context, { role: "menu" });
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
   const menuItems = [
-    { icon: PiPencilSimple,      label: "Edit",            action: () => { onEdit(trackId); onClose(); } },
-    { icon: FiPlusSquare, label: "Add to playlist", action: () => { onAddToPlaylist(trackId); onClose(); } },
+    { icon: PiPencilSimple, label: "Edit", action: () => { onEdit(trackId); setIsOpen(false); } },
+    { icon: FiPlusSquare, label: "Add to playlist", action: () => { onAddToPlaylist(trackId); setIsOpen(false); } },
     ...(isArtistPro
-      ? [{ icon: FiDownload, label: "Download file", action: () => { if (canDownload) onDownload(trackId); onClose(); }, disabled: !canDownload }]
+      ? [{ icon: FiDownload, label: "Download file", action: () => { if (canDownload) onDownload(trackId); setIsOpen(false); }, disabled: !canDownload }]
       : []),
-    { icon: FiLink,       label: "Copy link",        action: onClose },
-    { icon: FiTrash2,     label: "Delete track",     action: () => { onDelete(trackId); onClose(); }, danger: true },
+    { icon: FiLink, label: "Copy link", action: () => setIsOpen(false) },
+    { icon: FiTrash2, label: "Delete track", action: () => { onDelete(trackId); setIsOpen(false); }, danger: true },
   ];
 
-  // Adjust position if menu would overflow viewport bottom
-  const menuHeight = menuItems.length * 44;
-  const adjustedY = position.y + menuHeight > window.innerHeight ? position.y - menuHeight : position.y;
-  const adjustedX = position.x + 208 > window.innerWidth ? position.x - 208 : position.x;
+  const menuContent = menuItems.map(({ icon: Icon, label, action, danger, disabled }) => (
+    <button
+      key={label}
+      type="button"
+      onClick={action}
+      disabled={disabled}
+      data-testid={`artist-track-menu-${label.toLowerCase().replace(/\s+/g, "-")}`}
+      className={`flex w-full items-center gap-3 px-4 py-2.5 text-[13px] transition-colors hover:bg-chinese-black cursor-pointer ${
+        disabled
+          ? "cursor-not-allowed text-[#555]"
+          : danger
+            ? "text-red-400 hover:text-red-300"
+            : "text-white-smoke hover:text-upload-select"
+      }`}
+    >
+      <Icon className="shrink-0 text-[15px]" />
+      {label}
+    </button>
+  ));
 
   return (
-    <div
-      ref={ref}
-      className="fixed z-1100 w-52 rounded-xl border border-[#2a2a2a] bg-chinese-black py-1.5 shadow-2xl"
-      style={{ top: adjustedY, left: adjustedX }}
-    >
-      {menuItems.map(({ icon: Icon, label, action, danger, disabled }) => (
-        <button
-          key={label}
-          type="button"
-          onClick={action}
-          disabled={disabled}
-          data-testid={`artist-track-menu-${label.toLowerCase().replace(/\s+/g, "-")}`}
-          className={`flex w-full items-center gap-3 px-4 py-2.5 text-[13px] transition-colors hover:bg-chinese-black cursor-pointer ${
-            disabled
-              ? "cursor-not-allowed text-[#555]"
-              : danger
-                ? "text-red-400 hover:text-red-300"
-                : "text-white-smoke hover:text-upload-select"
-          }`}
-        >
-          <Icon className="shrink-0 text-[15px]" />
-          {label}
-        </button>
-      ))}
-    </div>
+    <>
+      <button
+        ref={refs.setReference}
+        {...getReferenceProps()}
+        type="button"
+        className="shrink-0 text-white-smoke hover:text-upload-select transition-colors"
+        data-testid={`artist-track-row-menu-${trackId}`}
+      >
+        <BsThreeDots className="text-[16px]" />
+      </button>
+
+      <FloatingPortal>
+        {isOpen && isMobile ? (
+          <>
+            {/* Backdrop */}
+            <div
+              className="fixed inset-0 z-1099 bg-chinese-black/50"
+              onClick={() => setIsOpen(false)}
+            />
+            {/* Bottom sheet */}
+            <div
+              className="fixed inset-x-0 bottom-0 z-1100 rounded-t-2xl border-t border-[#2a2a2a] bg-chinese-black pb-[env(safe-area-inset-bottom)] shadow-2xl"
+              role="menu"
+            >
+              {/* Drag handle */}
+              <div className="flex justify-center pt-3 pb-1">
+                <div className="h-1 w-10 rounded-full bg-[#444]" />
+              </div>
+              {menuContent}
+              <div className="h-2" />
+            </div>
+          </>
+        ) : isOpen ? (
+          <div
+            ref={refs.setFloating}
+            style={floatingStyles}
+            {...getFloatingProps()}
+            className="z-1100 w-52 rounded-xl border border-[#2a2a2a] bg-chinese-black py-1.5 shadow-2xl"
+          >
+            {menuContent}
+          </div>
+        ) : null}
+      </FloatingPortal>
+    </>
   );
 }

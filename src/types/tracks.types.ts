@@ -239,6 +239,12 @@ export interface UpdateTrackResponse {
   data?: string;
 }
 
+export interface incrementPlayCountRequest{
+  trackId: string
+  listenedDuration: number
+  sessionIdPlay: string
+}
+
 export interface incrementPlayCountResponse {
   message: string;
   errors?: CreateTrackValidationError[];

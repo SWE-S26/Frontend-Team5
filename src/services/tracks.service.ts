@@ -1,3 +1,4 @@
+import { incrementPlayCountRequest } from './../types/tracks.types';
 import api from "@/lib/api";
 import {
   GetPostedTracksResponse,
@@ -125,8 +126,8 @@ export const tracksService = {
   },
   updateTrack: (data: UpdateTrackRequest) => submitUpdateTrack(data),
 
-  incrementPlayCount: (id: string) =>
-    api.patch<incrementPlayCountResponse>(`/api/tracks/v1/listen/${id}`),
+  incrementPlayCount: (data: incrementPlayCountRequest) =>
+    api.patch<incrementPlayCountResponse>(`/api/tracks/v2/listen`, data),
   addTrackToHistory: (id: string) =>
     api.post<AddTrackToHistoryResponse>(`/api/tracks/v1/played/${id}`),
 

@@ -9,7 +9,6 @@ import { next } from "@/store/slices/playerSlice";
 import { tracksService } from "@/services/tracks.service";
 import { Howler } from "howler";
 
-const LISTEN_THRESHOLD_SECONDS = 15;
 Howler.html5PoolSize = 1;
 
 export default function PlayerController() {
@@ -19,7 +18,7 @@ export default function PlayerController() {
   const historyTrackedForCurrentRef = useRef(false);
   const listenTimerRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
-  const { tracks, currentTrackId, currentTrackUrl, isPlaying, volume, loop } =
+  const { tracks, currentTrackId, currentTrackUrl, isPlaying, volume, loop, currentTrackDuration } =
     useSelector((state: RootState) => state.player);
 
   const track = tracks.find((t) => t.id === currentTrackId);
@@ -64,10 +63,10 @@ export default function PlayerController() {
 
     listenTimerRef.current = setInterval(() => {
       const currentTime = playerEngine.getCurrentTime();
-      if (
-        currentTime < LISTEN_THRESHOLD_SECONDS ||
-        listenTrackedForCurrentRef.current
-      ) {
+      const duration = currentTrackDuration > 0 ? currentTrackDuration : playerEngine.getDuration();
+      const threshold = Math.ceil(duration * 0.3);
+
+      if (currentTime < threshold || listenTrackedForCurrentRef.current) {
         return;
       }
 
@@ -83,8 +82,28 @@ export default function PlayerController() {
           .addTrackToHistory(currentTrackId)
           .catch(() => undefined);
       }
+
+      const dur = duration || 0;
+      let listenedDuration = Math.floor(currentTime);
+      if (dur > 0 && listenedDuration > dur) listenedDuration = Math.floor(dur);
+
+      const generateUUID = () => {
+        try {
+          if (typeof crypto !== "undefined" && typeof (crypto as any).randomUUID === "function") {
+            return (crypto as any).randomUUID();
+          }
+        } catch (e) {}
+        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+          const r = (Math.random() * 16) | 0;
+          const v = c === 'x' ? r : (r & 0x3) | 0x8;
+          return v.toString(16);
+        });
+      };
+
+      const sessionIdPlay = generateUUID();
+
       void tracksService
-        .incrementPlayCount(currentTrackId)
+        .incrementPlayCount({ trackId: currentTrackId, listenedDuration, sessionIdPlay })
         .catch(() => undefined);
     }, 1000);
 

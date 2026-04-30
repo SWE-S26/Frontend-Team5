@@ -20,7 +20,7 @@ export function TrackRow({
   isSelected,
   onSelect,
   onAmplify,
-  onContextMenu,
+  contextMenu,
   isDeleting,
 }: {
   track: ArtistTrackRow;
@@ -29,7 +29,7 @@ export function TrackRow({
   isSelected: boolean;
   onSelect: (id: string, v: boolean) => void;
   onAmplify: (id: string) => void;
-  onContextMenu: (id: string, e: React.MouseEvent) => void;
+  contextMenu?: React.ReactNode;
   isDeleting: boolean;
 }) {
   const dispatch = useDispatch();
@@ -103,15 +103,7 @@ export function TrackRow({
           <PrettyCheckbox checked={isSelected} onChange={(v) => onSelect(track.id, v)} />
           {trackCover}
           <div className="min-w-0 flex-1">{trackMeta}</div>
-          <button
-            type="button"
-            onClick={(e) => onContextMenu(track.id, e)}
-            data-testid={`artist-track-row-menu-${track.id}`}
-            className="text-[18px] text-[#666] hover:text-[#aaa] transition-colors cursor-pointer"
-            aria-label="Track actions"
-          >
-            ⋮
-          </button>
+          {contextMenu}
         </div>
 
         <div className="mt-2.5 flex flex-wrap items-center gap-x-3 gap-y-1.5 text-[11px] text-white-smoke">
@@ -178,15 +170,7 @@ export function TrackRow({
       </div>
 
       <div className="flex justify-center">
-        <button
-          type="button"
-          onClick={(e) => onContextMenu(track.id, e)}
-          data-testid={`artist-track-row-menu-${track.id}`}
-          className="text-[18px] text-[#666] hover:text-[#aaa] transition-colors cursor-pointer"
-          aria-label="Track actions"
-        >
-          ⋮
-        </button>
+        {contextMenu}
       </div>
     </div>
   );

@@ -245,13 +245,7 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
   const [editTrackId, setEditTrackId]             = useState<string | null>(null);
   const [bulkEditOpen, setBulkEditOpen]           = useState(false);
   const [addToPlaylistOpen, setAddToPlaylistOpen] = useState(false);
-  const [contextMenu, setContextMenu]             = useState<{ id: string; x: number; y: number } | null>(null);
   const [pendingDeleteTrackId, setPendingDeleteTrackId] = useState<string | null>(null);
-
-  const openContextMenu = (id: string, e: React.MouseEvent) => {
-    e.stopPropagation();
-    setContextMenu({ id, x: e.clientX, y: e.clientY });
-  };
 
   useEffect(() => {
     if (isArtistPro) setAmplifyOpen(false);
@@ -443,7 +437,19 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
             isSelected={selectedIds.has(track.id)}
             onSelect={toggleSelect}
             onAmplify={() => { if (!isArtistPro) setAmplifyOpen(true); }}
-            onContextMenu={openContextMenu}
+            contextMenu={
+              <TrackContextMenu
+                trackId={track.id}
+                onEdit={(id) => setEditTrackId(id)}
+                onAddToPlaylist={() => setAddToPlaylistOpen(true)}
+                onDownload={handleDownload}
+                canDownload={isArtistPro && Boolean(track.downloadUrl)}
+                onDelete={(id) => {
+                  setPendingDeleteTrackId(id);
+                }}
+                isArtistPro={isArtistPro}
+              />
+            }
             isDeleting={deletingId === track.id}
           />
         ))}
@@ -456,22 +462,6 @@ export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArti
 
       {amplifyOpen && !isArtistPro && (
         <AmplifyModal onClose={() => setAmplifyOpen(false)} onUnlock={() => router.push("/artist")} />
-      )}
-      {contextMenu && (
-        <TrackContextMenu
-          trackId={contextMenu.id}
-          position={{ x: contextMenu.x, y: contextMenu.y }}
-          onClose={() => setContextMenu(null)}
-          onEdit={(id) => setEditTrackId(id)}
-          onAddToPlaylist={() => setAddToPlaylistOpen(true)}
-          onDownload={handleDownload}
-          canDownload={isArtistPro && Boolean(rows.find((r) => r.id === contextMenu.id)?.downloadUrl)}
-          onDelete={(id) => {
-            setPendingDeleteTrackId(id);
-            setContextMenu(null);
-          }}
-          isArtistPro={isArtistPro}
-        />
       )}
       <DeleteTrackModal
         isOpen={Boolean(pendingDeleteTrackId)}
