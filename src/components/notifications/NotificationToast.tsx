@@ -52,11 +52,11 @@ export default function NotificationToast() {
       {toasts.map((toast) => (
         <div
           key={toast.id}
-          className="flex items-center gap-3 bg-off-black text-white border border-white-smoke/20 rounded-md px-3 py-3 w-full shadow-xl animate-slide-in"
+          className="flex items-center gap-3 bg-off-black border border-white-smoke/20 rounded-md px-3 py-3 w-full shadow-xl animate-slide-in"
         >
             <Link
             href={`/profile/${toast.actor.userId}`}
-            className="no-underline hover:opacity-70 transition-opacity text-white"
+            className="no-underline hover:opacity-70 transition-opacity"
             >
               <ProfileImage
                 src={
@@ -75,12 +75,12 @@ export default function NotificationToast() {
             <p className="text-xs sm:text-sm font-semibold m-0 leading-snug">
               <Link
                 href={`/profile/${toast.actor.userId}`}
-                className="no-underline hover:opacity-70 transition-opacity text-white"
+                className="no-underline hover:opacity-70 transition-opacity text-white-smoke"
               >
                 {toast.actor.displayName}
               </Link>
               {" "}
-              <span className="font-normal text-white/80">
+              <span className="font-normal text-white-smoke/80">
                 {MESSAGES[toast.activityType]?.(toast.actor.displayName).replace(toast.actor.displayName, "")}
               </span>
             </p>
@@ -89,14 +89,14 @@ export default function NotificationToast() {
                 {toast.target.title || toast.target.commentText}
               </p>
             )}
-            <p className="text-xs text-white/30 mt-1 m-0">
+            <p className="text-xs text-white-smoke/30 mt-1 m-0">
               {timeAgo(toast.createdAt)}
             </p>
           </div>
 
           <button
             onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
-            className="text-white/40 hover:text-white/80 text-xl leading-none bg-transparent border-none cursor-pointer shrink-0"
+            className="text-white-smoke/40 hover:text-white-smoke/80 text-xl leading-none bg-transparent border-none cursor-pointer shrink-0"
           >
             <MdClose />
           </button>

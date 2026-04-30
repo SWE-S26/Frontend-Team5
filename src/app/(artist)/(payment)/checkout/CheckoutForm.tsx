@@ -185,7 +185,7 @@ const stripe = useStripe()
                     <div>
                         <Link data-testid="navbar_logo" href={isAuthenticated ? '/home' : '/'} className="flex items-center">
                             <img src="/app-logo/beatza.png" alt="BeatZa" className="w-8 sm:w-10 sm:h-6 mr-1.5 mt-1" />
-                            <h1 className="text-white-smoke font-bold text-[14px] mr-2">CRAVING TUNES</h1>
+                            <h1 className="text-white font-bold text-[14px] mr-2">CRAVING TUNES</h1>
                         </Link>
                     </div>
                     <div className="flex w-45 relative overflow-visible">
@@ -203,11 +203,11 @@ const stripe = useStripe()
                                             height={26}
                                             className="rounded-full w-6.5 h-6.5 object-cover mr-2"
                                         />
-                                        <h1 className="text-white-smoke font-bold text-[14px] mr-2 hover:opacity-80 transition-opacity truncate max-w-33">
+                                        <h1 className="text-white font-bold text-[14px] mr-2 hover:opacity-80 transition-opacity truncate max-w-33">
                                             {headerName}
                                         </h1>
                                     </div>
-                                    <IoIosArrowDown />
+                                    <IoIosArrowDown className="text-white"/>
                                 </button>
 
                                 {isDropdownOpen && (
