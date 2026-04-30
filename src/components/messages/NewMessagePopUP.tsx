@@ -3,7 +3,7 @@ import { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { IoClose } from "react-icons/io5";
 import { useSendMessage } from "@/hooks/sockets/useMessaging";
-import { messageToast } from "@/lib/toasts/messageToast";
+import { messageToastBus } from "@/lib/sockets/messageToastBus";
 import Button from "@/components/ui/Button";
 
 interface PrefilledUser {
@@ -38,7 +38,11 @@ const NewMessagePopUP = ({
 
   const { send, isSending } = useSendMessage(() => {
     if (recipient) {
-      messageToast.sent(recipient.displayName, recipient.photoUrl);
+      messageToastBus.emit({
+        type: "sent",
+        recipientName: recipient.displayName,
+        recipientPhoto: recipient.photoUrl,
+      });
     }
     setContent("");
     setRecipient(null);

@@ -32,9 +32,7 @@ import { ListStart } from "lucide-react";
 import MoreDropdown from "@/components/ui/MoreDropdown";
 import { BiStation } from "react-icons/bi";
 import { RiPlayListAddLine } from "react-icons/ri";
-import { toastBus } from "@/lib/toasts/toastBus";
 import { getBaseUrl } from "@/utilities/getBaseUrl";
-import { interactionToast } from "@/lib/toasts/interactionToast";
 
 type PlaylistTrack = {
   _id: string;
@@ -107,14 +105,14 @@ function TrackRow({
     likeTrack();
     setIsLiked((l) => !l);
     if (!isLiked) {
-      interactionToast.liked(track.basicInfo.title, track.image.imgLink);
+      // interactionToast.liked(track.basicInfo.title, track.image.imgLink);
     }
   }
   function handleRepostClick() {
     repostTrack();
     setIsReposted((r) => !r);
     if (!isReposted) {
-      interactionToast.reposted(track.basicInfo.title, track.image.imgLink);
+      // interactionToast.reposted(track.basicInfo.title, track.image.imgLink);
     }
   }
 
@@ -122,7 +120,7 @@ function TrackRow({
     e.stopPropagation();
     if (!track._id || !track.audio) return;
 
-    interactionToast.queued(track.basicInfo.title, track.image.imgLink);
+    // interactionToast.queued(track.basicInfo.title, track.image.imgLink);
 
     dispatch(
       playNext({
@@ -143,10 +141,10 @@ function TrackRow({
     const url = `${getBaseUrl()}/track/${track._id}`;
 
     navigator.clipboard.writeText(url);
-    toastBus.emit({
-      category: "interaction",
-      type: "copied",
-    });
+    // toastBus.emit({
+    //   category: "interaction",
+    //   type: "copied",
+    // });
   };
 
   return (
@@ -402,7 +400,7 @@ export default function PlaylistWaveformCard({
     setLikeCountState((c) => (isLiked ? (c ?? 0) - 1 : (c ?? 0) + 1));
     setIsLiked((l) => !l);
     if (!isLiked) {
-      interactionToast.liked(title ?? "this playlist", img ?? "");
+      // interactionToast.liked(title ?? "this playlist", img ?? "");
     }
   }
 
@@ -411,7 +409,7 @@ export default function PlaylistWaveformCard({
     setRepostCountState((c) => (isReposted ? (c ?? 0) - 1 : (c ?? 0) + 1));
     setIsReposted((r) => !r);
     if (!isReposted) {
-      interactionToast.reposted(title ?? "this playlist", img ?? "");
+      // interactionToast.reposted(title ?? "this playlist", img ?? "");
     }
   }
 
@@ -421,10 +419,10 @@ export default function PlaylistWaveformCard({
     const url = `${getBaseUrl()}/playlist/${playlistId}`;
 
     navigator.clipboard.writeText(url);
-    toastBus.emit({
-      category: "interaction",
-      type: "copied",
-    });
+    // toastBus.emit({
+    //   category: "interaction",
+    //   type: "copied",
+    // });
   };
 
   return (
@@ -568,12 +566,12 @@ export default function PlaylistWaveformCard({
             <Button
               className="bg-off-black"
               onClick={async () => {
-                toastBus.emit({
-                  category: "interaction",
-                  type: "queued",
-                  name: title ?? "this playlist",
-                  image: img ?? "",
-                });
+                // toastBus.emit({
+                //   category: "interaction",
+                //   type: "queued",
+                //   name: title ?? "this playlist",
+                //   image: img ?? "",
+                // });
                 const rawTracks = await ensureTracks();
                 const mappedTracks = rawTracks.map((t) => ({
                   id: t._id,

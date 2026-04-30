@@ -3,14 +3,14 @@ import AuthGuard from "@/components/layout/AuthGuard";
 import Navbar from "@/components/layout/navbar/main-navbar/Navbar";
 import PlayerBar from "@/components/layout/player/PlayerBar";
 import NotificationToast from "@/components/notifications/NotificationToast";
-import MessageToast from "@/components/ui/Toasts";
+import MessageToast from "@/components/messages/MessageToast";
 import { NotificationsProvider } from "@/components/notifications/NotificationsContext";
 import { useNotificationsContext } from "@/components/notifications/NotificationsContext";
 import { MessagesProvider } from "@/components/messages/MessagesContext";
 import { useMessagesContext } from "@/components/messages/MessagesContext";
 import { useSocket } from "@/hooks/sockets/useSocket";
-import { toastBus } from "@/lib/toasts/toastBus";
-import { messageToast } from "@/lib/toasts/messageToast";
+import { toastBus } from "@/lib/sockets/toastBus";
+import { messageToastBus } from "@/lib/sockets/messageToastBus";
 import { SocketProvider } from "@/lib/sockets/SocketContext";
 
 function SocketInitializer() {
@@ -26,11 +26,12 @@ function SocketInitializer() {
     onMessage: (data) => {
       updateFromSocket(data);
       // Show received message toast
-      messageToast.received(
-        data.sender?.displayName ?? "Someone",
-        data.sender?.photoUrl ?? "",
-        data.lastMessage?.content ?? "",
-      );
+      messageToastBus.emit({
+        type: "received",
+        senderName: data.sender?.displayName ?? "Someone",
+        senderPhoto: data.sender?.photoUrl ?? "",
+        content: data.lastMessage?.content ?? "",
+      });
     },
   });
 

@@ -1,7 +1,7 @@
 import { useState, useEffect, useCallback, useRef } from "react";
 import { messageService } from "@/services/message.service";
 import { useAppSelector } from "@/store/hooks";
-import { messageToast } from "@/lib/toasts/messageToast";
+import { messageToastBus } from "@/lib/sockets/messageToastBus";
 import type {
   Conversation,
   Message,
@@ -109,18 +109,44 @@ export function useConversations() {
   const updateFromSocket = useCallback((data: SocketConversationUpdate) => {
     const incomingChatId = data._id ?? (data as any).chat;
     setConversations((prev) =>
-      prev.map((c) =>
-        c.chatId === incomingChatId
-          ? {
-              ...c,
-              lastMessage: data.lastMessage.content,
-              lastMessageAt: data.lastMessage.createdAt,
-              isUnread: true,
-            }
-          : c,
-      ),
+      prev.some((c) => c.chatId === incomingChatId)
+        ? prev.map((c) =>
+            c.chatId === incomingChatId
+              ? {
+                  ...c,
+                  lastMessage: data.lastMessage.content,
+                  lastMessageAt: data.lastMessage.createdAt,
+                  isUnread: true,
+                }
+              : c,
+          )
+        : prev,
     );
   }, []);
+
+  // Called on local send success to update sidebar immediately
+  const updateFromLocalSend = useCallback(
+    (raw: ChatConversation) => {
+      const normalized = normalizeConversation(raw, currentUserId);
+      setConversations((prev) => {
+        const exists = prev.some((c) => c.chatId === normalized.chatId);
+        if (exists) {
+          return prev.map((c) =>
+            c.chatId === normalized.chatId
+              ? {
+                  ...c,
+                  lastMessage: normalized.lastMessage,
+                  lastMessageAt: normalized.lastMessageAt,
+                  isUnread: false,
+                }
+              : c,
+          );
+        }
+        return [...prev, { ...normalized, isUnread: false }];
+      });
+    },
+    [currentUserId],
+  );
 
   useEffect(() => {
     fetchConversations();
@@ -133,6 +159,7 @@ export function useConversations() {
     markAsUnread,
     archiveConversation,
     updateFromSocket,
+    updateFromLocalSend,
   };
 }
 
@@ -184,13 +211,16 @@ export function useMessages(chatId: string | null) {
 // ─── useSendMessage ────────────────────────────────────────────────────────────
 
 export function useSendMessage(
-  onSuccess?: (raw: {
-    _id: string;
-    chatId: string;
-    senderId: string;
-    content: string;
-    seenBy: string[];
-    createdAt: string;
+  onSuccess?: (payload: {
+    message: {
+      _id: string;
+      chatId: string;
+      senderId: string;
+      content: string;
+      seenBy: string[];
+      createdAt: string;
+    };
+    conversation: ChatConversation;
   }) => void,
 ) {
   const [isSending, setIsSending] = useState(false);
@@ -203,12 +233,15 @@ export function useSendMessage(
         const res = await messageService.sendMessage({ receiverId, content });
         const last = res.data.data.lastMessage;
         onSuccess?.({
-          _id: last._id,
-          chatId: res.data.data.chat,
-          senderId: last.senderId,
-          content: last.content,
-          seenBy: last.seenBy,
-          createdAt: last.createdAt,
+          message: {
+            _id: last._id,
+            chatId: res.data.data.chat,
+            senderId: last.senderId,
+            content: last.content,
+            seenBy: last.seenBy,
+            createdAt: last.createdAt,
+          },
+          conversation: res.data.data,
         });
       } catch (err: any) {
         if (err?.response?.status === 403) {

@@ -1,13 +1,13 @@
 "use client";
 import { useState } from "react";
 import Button from "@/components/ui/Button";
-import { messageToast } from "@/lib/toasts/messageToast";
+import { messageToastBus } from "@/lib/sockets/messageToastBus";
 
 interface ConversationInputProps {
   receiverId: string;
   onSend: (receiverId: string, content: string) => Promise<void>;
   isSending: boolean;
-  disabled: boolean; // isReceiverBlocked
+  disabled: boolean;
 }
 
 const ConversationInput = ({
@@ -20,7 +20,10 @@ const ConversationInput = ({
 
   const handleSend = async () => {
     if (disabled) {
-      messageToast.error("Unable to send message to this user.");
+      messageToastBus.emit({
+        type: "error",
+        message: "Unable to send message to this user.",
+      });
       return;
     }
     if (!content.trim() || isSending) return;

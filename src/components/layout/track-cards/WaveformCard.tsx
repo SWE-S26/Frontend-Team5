@@ -44,8 +44,8 @@ import {
   playNext,
   Track,
 } from "@/store/slices/playerSlice";
-import { interactionToast } from "@/lib/toasts/interactionToast";
-import { toastBus } from "@/lib/toasts/toastBus";
+// import { interactionToast } from "@/lib/toasts/interactionToast";
+// import { toastBus } from "@/lib/toasts/toastBus";
 import { getBaseUrl } from "@/utilities/getBaseUrl";
 
 type CardProps = {
@@ -346,7 +346,7 @@ export default function WaveformCard({
       setLikeCountState((c) => c - 1);
     } else {
       setLikeCountState((c) => c + 1);
-      interactionToast.liked(title ?? "the track", img ?? "");
+      // interactionToast.liked(title ?? "the track", img ?? "");
     }
   }
 
@@ -357,7 +357,7 @@ export default function WaveformCard({
       setRepostCountState((c) => c - 1);
     } else {
       setRepostCountState((c) => c + 1);
-      interactionToast.reposted(title ?? "the track", img ?? "");
+      // interactionToast.reposted(title ?? "the track", img ?? "");
     }
   }
 
@@ -367,10 +367,10 @@ export default function WaveformCard({
     const url = `${getBaseUrl()}/track/${trackId}`;
 
     navigator.clipboard.writeText(url);
-    toastBus.emit({
-      category: "interaction",
-      type: "copied",
-    });
+    // toastBus.emit({
+    //   category: "interaction",
+    //   type: "copied",
+    // });
   };
 
   const allTracksRef = useRef(allTracks);
@@ -416,7 +416,7 @@ export default function WaveformCard({
     e.stopPropagation();
     if (!trackId || !trackUrl) return;
 
-    interactionToast.queued(title ?? "the track", img ?? "");
+    // interactionToast.queued(title ?? "the track", img ?? "");
 
     dispatch(
       playNext({

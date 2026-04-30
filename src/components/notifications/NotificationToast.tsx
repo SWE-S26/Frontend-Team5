@@ -1,7 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { MdClose } from "react-icons/md";
-import { toastBus } from "@/lib/toasts/toastBus";
+import { toastBus } from "@/lib/sockets/toastBus";
 import ProfileImage from "@/components/ui/ProfileImage";
 import { DEFAULT_PROFILE_IMAGE_URL } from "@/store/slices/authSlice";
 import Link from "next/link";
