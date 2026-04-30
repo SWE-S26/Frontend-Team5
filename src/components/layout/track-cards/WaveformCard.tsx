@@ -37,7 +37,13 @@ import { BiSolidCommentDetail } from "react-icons/bi";
 
 import { RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
-import { pause, play, playAudio, Track } from "@/store/slices/playerSlice";
+import {
+  pause,
+  play,
+  playAudio,
+  playNext,
+  Track,
+} from "@/store/slices/playerSlice";
 
 type CardProps = {
   img?: string;
@@ -154,7 +160,14 @@ export default function WaveformCard({
     loading: repostLoading,
   } = useRepostTrack(trackId, isVisible, repostCount);
 
-  const { progress, currentTime, seekToPercentage, dragStart, dragMove, dragEnd } = useAudioProgress();
+  const {
+    progress,
+    currentTime,
+    seekToPercentage,
+    dragStart,
+    dragMove,
+    dragEnd,
+  } = useAudioProgress();
 
   const dispatch = useDispatch();
   const { currentTrackId, isPlaying } = useSelector(
@@ -377,6 +390,23 @@ export default function WaveformCard({
       if (seekPercentage !== undefined) seekToPercentage(seekPercentage);
       dispatch(play());
     }, 100);
+  }
+
+  function handlePlayNextClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!trackId || !trackUrl) return;
+
+    dispatch(
+      playNext({
+        tracks: {
+          id: trackId,
+          url: trackUrl,
+          title,
+          artist,
+          img,
+        },
+      }),
+    );
   }
 
   const transitionConfig: Transition = { duration: 0.25, ease: "easeOut" };
@@ -629,11 +659,11 @@ export default function WaveformCard({
               )}
             </AnimatePresence>
 
-            <div className="flex items-center">
+            <div className="flex items-center gap-4">
               <Tooltip label="Like">
                 <Button
                   onClick={handleLikeClick}
-                  className="bg-off-black mr-4"
+                  className="bg-off-black"
                   icon={
                     <HiHeart
                       className={`text-[16px] transition-colors ${isLiked ? "text-inferno" : ""}`}
@@ -649,32 +679,32 @@ export default function WaveformCard({
               </Tooltip>
               <Tooltip label="Repost">
                 <Button
-                  onClick={() => repostTrack()}
-                  className="bg-off-black mr-4"
+                  onClick={handleRepostClick}
+                  className="bg-off-black"
                   icon={
                     <LuRepeat2
-                      className={`text-[16px] transition-colors ${reposted ? "text-inferno" : ""}`}
+                      className={`text-[16px] transition-colors ${isReposted ? "text-inferno" : ""}`}
                     />
                   }
                 >
                   <span
-                    className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${reposted ? "text-inferno" : ""} ${
+                    className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${isReposted ? "text-inferno" : ""} ${
                       repostLoading ? "opacity-50" : "opacity-100"
                     }`}
                   >
-                    {numOfReposts}
+                    {repostCountState}
                   </span>
                 </Button>
               </Tooltip>
               <Tooltip label="Share">
                 <Button
-                  className="bg-off-black mr-4"
+                  className="bg-off-black"
                   icon={<LuShare className="text-xl" />}
                 />
               </Tooltip>
               <Tooltip label="Copy Link">
                 <Button
-                  className="bg-off-black mr-4"
+                  className="bg-off-black"
                   icon={<TbCopy className="text-xl" />}
                 />
               </Tooltip>
@@ -682,7 +712,7 @@ export default function WaveformCard({
                 <Tooltip label="Edit track">
                   <Button
                     onClick={onEdit}
-                    className="bg-off-black mr-4"
+                    className="bg-off-black"
                     icon={<PiPencilSimple className="text-xl" />}
                   />
                 </Tooltip>
@@ -691,7 +721,7 @@ export default function WaveformCard({
                 <Tooltip label="Download">
                   <Button
                     onClick={handleDownload}
-                    className="bg-off-black mr-4"
+                    className="bg-off-black"
                     icon={<MdOutlineDownloadForOffline className="text-xl" />}
                   />
                 </Tooltip>
