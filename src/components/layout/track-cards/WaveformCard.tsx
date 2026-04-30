@@ -773,6 +773,18 @@ export default function WaveformCard({
                   { label: "Station", icon: <BiStation className="text-lg" /> },
                 ]}
               />
+
+              <div className="ml-auto flex items-center gap-4">
+                <div className="flex items-center gap-1 text-silver">
+                  <IoMdPlay className="text-silver text-[12px]" />
+                  <span className="text-[12px]">{playsCount}</span>
+                </div>
+
+                <a className="flex items-center gap-1 cursor-pointer hover:opacity-50 transition-opacity no-underline text-silver">
+                  <BiSolidCommentDetail className="text-silver" />
+                  <span className="text-[12px]">{commentsCount}</span>
+                </a>
+              </div>
             </div>
           </motion.div>
         </div>
