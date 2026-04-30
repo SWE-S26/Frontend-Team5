@@ -74,7 +74,7 @@ export default function Track() {
 
         <div className="w-[340px] shrink-0">
           <PopoverProvider>
-            <TrackSidebar trackId={trackid} />
+            <TrackSidebar trackId={trackid} track={track} />
           </PopoverProvider>
         </div>
       </div>

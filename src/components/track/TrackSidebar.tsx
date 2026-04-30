@@ -9,12 +9,14 @@ import ProfilePopover from "../layout/track-cards/ProfilePopover";
 import { useGetTrackAlbums, useGetTrackPlaylists, useGetTrackStats } from "@/hooks/useTracks"
 import PlaylistCard from "@/components/track/PlaylistCard";
 import FanCard from "./FanCard";
+import LeaderboardActions from "./LeaderboardActions";
 
 interface TrackSidebarProps {
-  trackId: string
+  trackId: string,
+  track: any;
 }
 
-export default function TrackSidebar({ trackId }: TrackSidebarProps) {
+export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
   const [activeTab, setActiveTab] = useState("top");
 
   const { users, total: LikesCount, loadLikes } = useLikeTrack()
@@ -81,6 +83,14 @@ export default function TrackSidebar({ trackId }: TrackSidebarProps) {
             ))}
           </div>
         )}
+      </section>
+
+      <section>
+        <LeaderboardActions
+          trackId={trackId}
+          isLikedByUser={track?.isLikedByUser ?? false}
+          posterId={track?.posterId ?? ""}
+        />
       </section>
 
       <section className="flex flex-col gap-3">
