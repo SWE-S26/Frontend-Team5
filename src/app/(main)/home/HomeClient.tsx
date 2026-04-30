@@ -10,6 +10,7 @@ import { useGetFollowing } from "@/hooks/useSocial";
 
 import { useAppSelector } from "@/store/hooks";
 import PlaylistWaveformCard from "@/components/layout/track-cards/WaveformPlaylist";
+import ArtistTools from "@/components/home/ArtistTools";
 
 export default function HomeClient() {
   const userId = useAppSelector((state) => state.auth.userId);
@@ -83,7 +84,13 @@ export default function HomeClient() {
         />
       </div>
       <div className="hidden md:block md:w-[27.75%]">
-        <SuggestedWrapper />
+        <div className="w-full">
+        <div className="w-full flex flex-col items-center mb-5 ">
+            <div className="w-full"> <ArtistTools /> </div>
+            <div className="w-full"> <SuggestedWrapper /> </div>
+        </div>
+        
+    </div>
       </div>
     </div>
   );

@@ -39,7 +39,7 @@ const ConversationInput = ({ receiverId, onSend, isSending, disabled }: Conversa
       <div className='flex justify-end'>
         <Button
           onClick={handleSend}
-          className='text-black text-sm bg-white-smoke disabled:opacity-50'
+          className='text-chinese-black text-sm bg-white-smoke disabled:opacity-50'
           disabled={isSending}
         >
           {isSending ? 'Sending...' : 'Send'}
