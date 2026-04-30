@@ -230,9 +230,7 @@ export default function CommentList({
   const hasMore = comments.length < total
   const [sortBy, setSortBy] = useState<SortOption>("Newest")
 
-  useEffect(() => {
-    loadComments(trackId)
-  }, [trackId])
+  
 
   const sortedComments = useMemo(() => {
     const copy = [...comments]
