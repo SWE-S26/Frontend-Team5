@@ -1,5 +1,711 @@
-export default function Playlist() {
+"use client";
+
+import { type ChangeEvent, useEffect, useMemo, useRef, useState } from "react";
+import Link from "next/link";
+import { useParams, useRouter } from "next/navigation";
+import { Reorder, useDragControls } from "framer-motion";
+import {
+  BadgeCheck,
+  GripVertical,
+  Heart,
+  ImagePlus,
+  ListPlus,
+  Lock,
+  MoreHorizontal,
+  Play,
+  Repeat2,
+  Share2,
+  ShieldCheck,
+  Trash2,
+  User,
+  AudioLines,
+} from "lucide-react";
+
+import {
+  useAddPlaylistToHistory,
+  useDeletePlaylist,
+  useGetPlaylistById,
+  useGetPlaylistCreator,
+  useGetRecommendedPlaylists,
+  useReorderPlaylistTracks,
+  useUpdatePlaylist,
+  useUpdatePlaylistImage,
+} from "@/hooks/usePlaylists";
+import { useAudioProgress } from "@/hooks/useAudioProgress";
+import { useLikePlaylistOptimistic } from "@/hooks/useLikes";
+import { useRepostPlaylist } from "@/hooks/useReposts";
+import SausageWaveform from "@/components/ui/SausageWaveform";
+import { TrackRow as PlaylistTrackRow } from "@/components/layout/track-cards/WaveformPlaylist";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { pause, play, playAudio, playNext } from "@/store/slices/playerSlice";
+import type { Playlist, PlaylistTrack } from "@/types/playlists.types";
+
+const FALLBACK_COVER = "/test.jpg";
+
+function formatCount(value?: number | null) {
+  const count = value ?? 0;
+  if (count >= 1_000_000) return `${(count / 1_000_000).toFixed(1)}M`;
+  if (count >= 1_000) return `${(count / 1_000).toFixed(1)}K`;
+  return `${count}`;
+}
+
+function formatDuration(seconds?: number | null) {
+  const safeSeconds = Math.max(0, Math.floor(seconds ?? 0));
+  const hours = Math.floor(safeSeconds / 3600);
+  const minutes = Math.floor((safeSeconds % 3600) / 60);
+  const secs = safeSeconds % 60;
+
+  if (hours > 0) {
+    return `${hours}:${minutes.toString().padStart(2, "0")}:${secs
+      .toString()
+      .padStart(2, "0")}`;
+  }
+
+  return `${minutes}:${secs.toString().padStart(2, "0")}`;
+}
+
+function mapTracksForPlayer(tracks: PlaylistTrack[]) {
+  return tracks
+    .filter((track) => track.audio?.audioLink)
+    .map((track) => ({
+      id: track._id,
+      url: track.audio.audioLink,
+      title: track.basicInfo.title,
+      artist: track.basicInfo.mainArtists?.[0] ?? "Unknown artist",
+      img: track.image?.imgLink ?? FALLBACK_COVER,
+      duration: track.durationInSeconds,
+    }));
+}
+
+function getFeaturedArtists(tracks: PlaylistTrack[]) {
+  const artists = new Map<
+    string,
+    { name: string; tracks: number; plays: number; image: string }
+  >();
+
+  tracks.forEach((track) => {
+    const names = track.basicInfo.mainArtists?.length
+      ? track.basicInfo.mainArtists
+      : ["Unknown artist"];
+
+    names.forEach((name) => {
+      const existing = artists.get(name);
+      artists.set(name, {
+        name,
+        tracks: (existing?.tracks ?? 0) + 1,
+        plays: (existing?.plays ?? 0) + (track.numOfPlays ?? 0),
+        image: existing?.image ?? track.image?.imgLink ?? FALLBACK_COVER,
+      });
+    });
+  });
+
+  return [...artists.values()]
+    .sort((a, b) => b.plays - a.plays)
+    .slice(0, 3);
+}
+
+function RecommendedPlaylist({ playlist }: { playlist: Playlist }) {
   return (
-    <div>Playlist Page</div>
-  )
+    <Link
+      href={`/playlist/${playlist._id}`}
+      className="flex items-center gap-3 rounded-sm p-2 no-underline transition-colors hover:bg-white-smoke/5"
+    >
+      <img
+        src={playlist.image?.imgLink || FALLBACK_COVER}
+        alt=""
+        className="h-12 w-12 shrink-0 rounded-sm object-cover"
+      />
+      <div className="min-w-0">
+        <p className="truncate text-sm font-bold text-white-smoke">{playlist.title}</p>
+        <p className="truncate text-xs text-silver">
+          {playlist.listOfTracks?.length ?? 0} tracks
+        </p>
+      </div>
+    </Link>
+  );
+}
+
+function ReorderableTrackRow({
+  track,
+  index,
+  isOwner,
+  isCurrent,
+  isPlaying,
+  onPlay,
+  onReorderStart,
+  onReorderEnd,
+}: {
+  track: PlaylistTrack;
+  index: number;
+  isOwner: boolean;
+  isCurrent: boolean;
+  isPlaying: boolean;
+  onPlay: () => void;
+  onReorderStart: (trackId: string) => void;
+  onReorderEnd: (trackId: string) => void;
+}) {
+  const dragControls = useDragControls();
+
+  return (
+    <Reorder.Item
+      value={track}
+      dragListener={false}
+      dragControls={dragControls}
+      onDragEnd={() => onReorderEnd(track._id)}
+      className="list-none"
+      whileDrag={{
+        scale: 1.01,
+        zIndex: 20,
+        boxShadow: "0 12px 30px rgba(0,0,0,0.35)",
+      }}
+      transition={{ type: "spring", stiffness: 450, damping: 34 }}
+    >
+      <div className="group/reorder flex items-center rounded-sm transition-colors hover:bg-white-smoke/5">
+        {isOwner && (
+          <button
+            type="button"
+            aria-label="Drag to reorder track"
+            onPointerDown={(event) => {
+              onReorderStart(track._id);
+              dragControls.start(event);
+            }}
+            className="flex h-13 w-8 shrink-0 cursor-grab items-center justify-center text-silver opacity-50 transition-opacity hover:text-white-smoke hover:opacity-100 active:cursor-grabbing group-hover/reorder:opacity-100"
+          >
+            <GripVertical className="h-5 w-5" />
+          </button>
+        )}
+        <div className="min-w-0 flex-1">
+          <PlaylistTrackRow
+            track={track}
+            index={index}
+            isCurrent={isCurrent}
+            isPlaying={isPlaying}
+            onPlay={onPlay}
+            showArtist
+          />
+        </div>
+      </div>
+    </Reorder.Item>
+  );
+}
+
+export default function PlaylistPage() {
+  const { playlistid } = useParams<{ playlistid: string }>();
+  const router = useRouter();
+  const dispatch = useAppDispatch();
+  const fileInputRef = useRef<HTMLInputElement | null>(null);
+  const { currentTrackId, isPlaying } = useAppSelector((state) => state.player);
+  const authUserId = useAppSelector((state) => state.auth.userId);
+  const {
+    progress,
+    currentTime,
+    seekToPercentage,
+    dragStart,
+    dragMove,
+    dragEnd,
+  } = useAudioProgress();
+
+  const { getPlaylistById, playlist, loading, error } = useGetPlaylistById();
+  const { getPlaylistCreator, creator } = useGetPlaylistCreator();
+  const { getRecommendedPlaylists, playlists: recommended } =
+    useGetRecommendedPlaylists();
+  const { addPlaylistToHistory } = useAddPlaylistToHistory();
+  const { updatePlaylist, loading: updatingPlaylist } = useUpdatePlaylist();
+  const { updatePlaylistImage, loading: updatingImage } = useUpdatePlaylistImage();
+  const { deletePlaylist, loading: deletingPlaylist } = useDeletePlaylist();
+  const { reorderPlaylistTracks, loading: reorderingTracks } =
+    useReorderPlaylistTracks();
+
+  const [isLiked, setIsLiked] = useState(false);
+  const [likeCount, setLikeCount] = useState(0);
+  const [isReposted, setIsReposted] = useState(false);
+  const [repostCount, setRepostCount] = useState(0);
+  const [isPrivate, setIsPrivate] = useState(false);
+  const [localTracks, setLocalTracks] = useState<PlaylistTrack[]>([]);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const dragStartRef = useRef<{
+    trackId: string;
+    apiTrackId: string;
+    oldPosition: number;
+    previousTracks: PlaylistTrack[];
+  } | null>(null);
+  const localTracksRef = useRef<PlaylistTrack[]>([]);
+
+  const { likePlaylist } = useLikePlaylistOptimistic(playlistid ?? "");
+  const { repostPlaylist } = useRepostPlaylist(
+    playlistid ?? "",
+    Boolean(playlistid),
+    playlist?.numOfReposts,
+  );
+
+  const tracks = localTracks;
+  const mappedTracks = useMemo(() => mapTracksForPlayer(tracks), [tracks]);
+  const featuredArtists = useMemo(() => getFeaturedArtists(tracks), [tracks]);
+  const isOwner = Boolean(authUserId && playlist?.artistId === authUserId);
+  const isPlaylistPlaying =
+    isPlaying && tracks.some((track) => track._id === currentTrackId);
+  const waveformTrack =
+    tracks.find((track) => track._id === currentTrackId) ?? tracks[0];
+
+  useEffect(() => {
+    localTracksRef.current = localTracks;
+  }, [localTracks]);
+
+  useEffect(() => {
+    if (!playlistid) return;
+    void getPlaylistById(playlistid);
+    void addPlaylistToHistory(playlistid).catch(() => undefined);
+  }, [playlistid, getPlaylistById, addPlaylistToHistory]);
+
+  useEffect(() => {
+    if (!playlist) return;
+    setIsLiked(playlist.isLiked);
+    setLikeCount(playlist.numOfLikes ?? 0);
+    setIsReposted(playlist.isReposted);
+    setRepostCount(playlist.numOfReposts ?? 0);
+    setIsPrivate(playlist.isPrivate);
+    setLocalTracks(playlist.tracks ?? []);
+  }, [playlist]);
+
+  useEffect(() => {
+    if (!playlist?.artistId) return;
+    void getPlaylistCreator(playlist.artistId);
+    void getRecommendedPlaylists(playlist._id, playlist.artistId, false, 4);
+  }, [playlist, getPlaylistCreator, getRecommendedPlaylists]);
+
+  function handlePlaylistPlay() {
+    if (!mappedTracks.length) return;
+
+    if (isPlaylistPlaying) {
+      dispatch(pause());
+      return;
+    }
+
+    dispatch(playAudio({ tracks: mappedTracks, startId: mappedTracks[0].id }));
+    setTimeout(() => dispatch(play()), 0);
+  }
+
+  function handleTrackPlay(trackId: string) {
+    if (!mappedTracks.length) return;
+
+    if (currentTrackId === trackId && isPlaying) {
+      dispatch(pause());
+      return;
+    }
+
+    dispatch(playAudio({ tracks: mappedTracks, startId: trackId }));
+    setTimeout(() => dispatch(play()), 0);
+  }
+
+  function handleWaveformPlay(seekPercentage?: number) {
+    if (!waveformTrack || !mappedTracks.length) return;
+
+    const shouldStartTrack = currentTrackId !== waveformTrack._id || !isPlaying;
+    if (shouldStartTrack) {
+      dispatch(playAudio({ tracks: mappedTracks, startId: waveformTrack._id }));
+      setTimeout(() => {
+        dispatch(play());
+        if (seekPercentage !== undefined) seekToPercentage(seekPercentage);
+      }, 0);
+      return;
+    }
+
+    if (seekPercentage !== undefined) seekToPercentage(seekPercentage);
+  }
+
+  function handleLikePlaylist() {
+    void likePlaylist();
+    setLikeCount((count) => Math.max(0, count + (isLiked ? -1 : 1)));
+    setIsLiked((liked) => !liked);
+  }
+
+  function handleRepostPlaylist() {
+    void repostPlaylist();
+    setRepostCount((count) => Math.max(0, count + (isReposted ? -1 : 1)));
+    setIsReposted((reposted) => !reposted);
+  }
+
+  async function handlePrivacyToggle() {
+    if (!playlist || updatingPlaylist) return;
+
+    const nextPrivate = !isPrivate;
+    setIsPrivate(nextPrivate);
+    setStatusMessage(null);
+
+    try {
+      await updatePlaylist(playlist._id, { isPrivate: nextPrivate });
+      setStatusMessage(nextPrivate ? "Playlist set to private" : "Playlist set to public");
+      void getPlaylistById(playlist._id);
+    } catch {
+      setIsPrivate(!nextPrivate);
+      setStatusMessage("Could not update playlist privacy");
+    }
+  }
+
+  async function handleImageChange(event: ChangeEvent<HTMLInputElement>) {
+    const file = event.target.files?.[0];
+    if (!playlist || !file) return;
+
+    setStatusMessage(null);
+    try {
+      await updatePlaylistImage(playlist._id, file);
+      setStatusMessage("Playlist artwork updated");
+      void getPlaylistById(playlist._id);
+    } catch {
+      setStatusMessage("Could not update playlist artwork");
+    } finally {
+      event.target.value = "";
+    }
+  }
+
+  async function handleDeletePlaylist() {
+    if (!playlist || deletingPlaylist) return;
+    const confirmed = window.confirm(`Delete "${playlist.title}"? This cannot be undone.`);
+    if (!confirmed) return;
+
+    setStatusMessage(null);
+    try {
+      await deletePlaylist(playlist._id);
+      router.push("/library/playlists");
+    } catch {
+      setStatusMessage("Could not delete playlist");
+    }
+  }
+
+  function handleReorderStart(trackId: string) {
+    const oldPosition = localTracksRef.current.findIndex((t) => t._id === trackId);
+    if (oldPosition < 0) return;
+
+    dragStartRef.current = {
+      trackId,
+      apiTrackId: trackId,
+      oldPosition,
+      previousTracks: [...localTracksRef.current],
+    };
+  }
+
+  function handleReorderChange(nextTracks: PlaylistTrack[]) {
+    if (!isOwner) return;
+    localTracksRef.current = nextTracks;
+    setLocalTracks(nextTracks);
+  }
+
+  async function handleReorderEnd(trackId: string) {
+    if (!playlist || !isOwner || !dragStartRef.current) return;
+
+    const { apiTrackId, oldPosition, previousTracks } = dragStartRef.current;
+    if (!apiTrackId) return;
+    dragStartRef.current = null;
+    const newPosition = localTracksRef.current.findIndex((track) => track._id === trackId);
+    if (newPosition < 0 || oldPosition === newPosition) return;
+
+    setStatusMessage(null);
+
+    try {
+      await reorderPlaylistTracks(playlist._id, {
+        trackId: apiTrackId,
+        oldPosition,
+        newPosition,
+      });
+      setStatusMessage("Playlist order saved");
+    } catch {
+      setLocalTracks(previousTracks);
+      setStatusMessage("Could not save playlist order");
+    }
+  }
+
+  if (loading && !playlist) {
+    return (
+      <div className="min-h-[70vh] animate-pulse px-1 py-4">
+        <div className="h-120 bg-off-black" />
+        <div className="mt-8 h-80 bg-off-black/60" />
+      </div>
+    );
+  }
+
+  if (error) {
+    return <div className="px-4 py-16 text-center text-anger">{error}</div>;
+  }
+
+  if (!playlist) {
+    return <div className="px-4 py-16 text-center text-silver">Playlist not found.</div>;
+  }
+
+  const cover = playlist.image?.imgLink || FALLBACK_COVER;
+  const creatorName = creator?.displayName ?? "Unknown creator";
+  const trackCount = playlist.totalTracks ?? tracks.length;
+
+  return (
+    <div className="w-full pb-14 text-white-smoke">
+      <section className="mx-1 min-h-120 bg-chinese-black p-10">
+        <div className="flex min-h-92 gap-8 border-white-smoke">
+          <button
+            type="button"
+            onClick={handlePlaylistPlay}
+            aria-label={isPlaylistPlaying ? "Pause playlist" : "Play playlist"}
+            className="mt-0 flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-chinese-black text-white-smoke transition-transform hover:scale-105"
+          >
+            <Play className="h-10 w-10 fill-current" />
+          </button>
+
+          <div className="flex flex-1 flex-col justify-between">
+            <div>
+              <div className="inline-block max-w-165 bg-chinese-black/90 px-3 py-2">
+                <h1 className="text-3xl font-bold leading-tight md:text-4xl">
+                  {playlist.title}
+                </h1>
+              </div>
+              <div className="mt-3">
+                {playlist.isPrivate && (
+                  <span className="inline-flex items-center gap-1 rounded-sm bg-off-black px-2 py-1 text-xs font-bold uppercase tracking-wide text-silver">
+                    <Lock className="h-3 w-3" />
+                    Private
+                  </span>
+                )}
+                {isOwner && (
+                  <span className="ml-2 inline-flex items-center gap-1 rounded-sm bg-chinese-black/80 px-2 py-1 text-xs font-bold uppercase tracking-wide text-silver">
+                    <ShieldCheck className="h-3 w-3" />
+                    Owner tools
+                  </span>
+                )}
+              </div>
+            </div>
+
+            <div className="flex flex-col gap-4">
+              {isPlaylistPlaying ? (
+                <div className="h-20 w-full max-w-lg">
+                  <SausageWaveform
+                    trackId={waveformTrack?._id}
+                    samplesUrl={waveformTrack?.audio.waveformLink ?? "/waveform.json"}
+                    externalProgress={progress}
+                    currentTime={currentTime}
+                    duration={waveformTrack?.durationInSeconds ?? 0}
+                    isPlaying={isPlaying}
+                    onSeek={seekToPercentage}
+                    onDragStart={dragStart}
+                    onDragMove={dragMove}
+                    onDragEnd={dragEnd}
+                    onPlay={handleWaveformPlay}
+                    enabled
+                  />
+                </div>
+              ) : (
+                <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-white-smoke text-center">
+                  <div className="text-3xl font-bold text-chinese-black leading-none">{trackCount}</div>
+                  <div className="mt-1 text-xs font-bold text-chinese-black uppercase tracking-wide">Tracks</div>
+                  <div className="mt-1 text-sm font-bold text-chinese-black">
+                    {formatDuration(playlist.playlistLengthInSeconds)}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          <div className="relative ml-auto hidden h-100 w-100 shrink-0 overflow-hidden rounded-lg bg-off-black md:block">
+            <img
+              src={cover}
+              alt={`${playlist.title} cover`}
+              className="h-full w-full object-cover"
+            />
+            {isOwner && (
+              <button
+                type="button"
+                onClick={() => fileInputRef.current?.click()}
+                disabled={updatingImage}
+                className="absolute right-4 top-4 inline-flex items-center gap-2 rounded-sm bg-chinese-black/80 px-3 py-2 text-sm font-bold hover:opacity-80 disabled:opacity-50"
+              >
+                <ImagePlus className="h-4 w-4" />
+                {updatingImage ? "Updating" : "Artwork"}
+              </button>
+            )}
+          </div>
+        </div>
+      </section>
+
+      {isOwner && (
+        <input
+          ref={fileInputRef}
+          type="file"
+          accept="image/*"
+          className="hidden"
+          onChange={handleImageChange}
+        />
+      )}
+
+      <section className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_410px]">
+        <div className="min-w-0">
+          <div className="mb-8 flex flex-wrap items-center gap-5">
+            <button
+              type="button"
+              onClick={handleLikePlaylist}
+              aria-label={`${isLiked ? "Unlike" : "Like"} playlist with ${formatCount(likeCount)} likes`}
+              className={`inline-flex h-10 items-center gap-2 rounded-sm bg-off-black px-4 text-sm font-bold hover:opacity-80 ${
+                isLiked ? "text-inferno" : "text-white-smoke"
+              }`}
+            >
+              <Heart className="h-4 w-4 fill-current" />
+              {formatCount(likeCount)}
+            </button>
+            <button
+              type="button"
+              onClick={handleRepostPlaylist}
+              className={`inline-flex h-10 items-center gap-2 rounded-sm bg-off-black px-4 text-sm font-bold hover:opacity-80 ${
+                isReposted ? "text-inferno" : "text-white-smoke"
+              }`}
+            >
+              <Repeat2 className="h-4 w-4" />
+              {formatCount(repostCount)}
+            </button>
+            <button
+              type="button"
+              className="inline-flex h-10 items-center gap-2 rounded-sm bg-off-black px-4 text-sm font-bold hover:opacity-80"
+            >
+              <Share2 className="h-4 w-4" />
+              Share
+            </button>
+            <button
+              type="button"
+              onClick={() => dispatch(playNext({ tracks: mappedTracks }))}
+              disabled={!mappedTracks.length}
+              className="inline-flex h-10 items-center gap-2 rounded-sm bg-off-black px-4 text-sm font-bold hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+            >
+              <ListPlus className="h-4 w-4" />
+              Add to Next up
+            </button>
+            <button
+              type="button"
+              className="inline-flex h-10 items-center gap-2 rounded-sm bg-off-black px-4 text-sm font-bold hover:opacity-80"
+            >
+              <MoreHorizontal className="h-4 w-4" />
+              More
+            </button>
+            {isOwner && (
+              <>
+                <button
+                  type="button"
+                  onClick={handlePrivacyToggle}
+                  disabled={updatingPlaylist}
+                  className="inline-flex h-10 items-center gap-2 rounded-sm bg-off-black px-4 text-sm font-bold hover:opacity-80 disabled:opacity-50"
+                >
+                  <Lock className="h-4 w-4" />
+                  {isPrivate ? "Make public" : "Make private"}
+                </button>
+                <button
+                  type="button"
+                  onClick={handleDeletePlaylist}
+                  disabled={deletingPlaylist}
+                  className="inline-flex h-10 items-center gap-2 rounded-sm bg-off-black px-4 text-sm font-bold text-anger hover:opacity-80 disabled:opacity-50"
+                >
+                  <Trash2 className="h-4 w-4" />
+                  Delete
+                </button>
+              </>
+            )}
+          </div>
+
+          {(statusMessage || (isOwner && reorderingTracks)) && (
+            <div className="mb-5 text-sm font-bold text-silver">
+              {reorderingTracks ? "Saving playlist order..." : statusMessage}
+            </div>
+          )}
+
+          {tracks.length > 0 ? (
+            <Reorder.Group
+              axis="y"
+              values={tracks}
+              onReorder={handleReorderChange}
+              className="space-y-1"
+            >
+              {tracks.map((track, index) => (
+                <ReorderableTrackRow
+                  key={track._id}
+                  track={track}
+                  index={index}
+                  isOwner={isOwner}
+                  isCurrent={currentTrackId === track._id}
+                  isPlaying={currentTrackId === track._id && isPlaying}
+                  onPlay={() => handleTrackPlay(track._id)}
+                  onReorderStart={handleReorderStart}
+                  onReorderEnd={handleReorderEnd}
+                />
+              ))}
+            </Reorder.Group>
+          ) : (
+            <div className="py-16 text-center text-silver">
+              This playlist has no tracks yet.
+            </div>
+          )}
+        </div>
+
+        <aside className="min-w-0 space-y-8 pr-4">
+          <div className="text-base font-bold leading-6">
+            Based on {tracks[0]?.basicInfo.title ?? playlist.title}
+          </div>
+
+          {featuredArtists.length > 0 && (
+            <section>
+              <h2 className="mb-5 text-sm font-bold uppercase tracking-wide">
+                Artists Featured
+              </h2>
+              <div className="space-y-6">
+                {featuredArtists.map((artist) => (
+                  <div key={artist.name} className="flex items-center gap-4">
+                    <img
+                      src={artist.image}
+                      alt=""
+                      className="h-15 w-15 rounded-full object-cover"
+                    />
+                    <div className="min-w-0 flex-1">
+                      <div className="flex items-center gap-1">
+                        <span className="truncate text-lg font-bold">{artist.name}</span>
+                        <BadgeCheck className="h-5 w-5 fill-[#5797ff] text-white-smoke" />
+                      </div>
+                      <div className="mt-1 flex items-center gap-3 text-sm text-silver">
+                        <span className="inline-flex items-center gap-1">
+                          <User className="h-4 w-4 fill-current" />
+                          {formatCount(artist.plays)}
+                        </span>
+                        <span className="inline-flex items-center gap-1">
+                          <AudioLines className="h-4 w-4" />
+                          {artist.tracks}
+                        </span>
+                      </div>
+                    </div>
+                    <button
+                      type="button"
+                      className="h-10 rounded-sm bg-white-smoke px-5 text-sm font-bold text-chinese-black hover:opacity-80"
+                    >
+                      Follow
+                    </button>
+                  </div>
+                ))}
+              </div>
+            </section>
+          )}
+
+          {recommended && recommended.length > 0 && (
+            <section>
+              <h2 className="mb-3 text-sm font-bold uppercase tracking-wide">
+                Recommended
+              </h2>
+              <div className="space-y-1">
+                {recommended.map((item) => (
+                  <RecommendedPlaylist key={item._id} playlist={item} />
+                ))}
+              </div>
+            </section>
+          )}
+          <div className="max-w-85 text-sm leading-6 text-silver">
+            Legal {"\u00b7"} Privacy {"\u00b7"} Cookie Policy {"\u00b7"} Cookie
+            Manager {"\u00b7"} Imprint {"\u00b7"} Artist Resources {"\u00b7"}
+            Newsroom {"\u00b7"} Charts {"\u00b7"} Transparency Reports
+          </div>
+          <div className="text-sm">
+            <span className="text-silver">Language: </span>
+            <span className="text-[#5797ff]">English (US)</span>
+          </div>
+        </aside>
+      </section>
+    </div>
+  );
 }
