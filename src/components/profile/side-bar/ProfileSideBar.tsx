@@ -26,7 +26,7 @@ export default function ProfileSideBar() {
     <div className="w-full">
         <div className="w-full flex flex-col items-center mb-7 ">
             <div className="w-full"><SupportLink supportLink={supportLink} displayName={displayName} /></div>
-            <div><ProfileStats /></div>
+            <div className="w-full"><ProfileStats /></div>
             <div className="w-full"><BioSection bio={bio} /></div>
             <div className="w-full"><SocialLinks links={links} /></div>
             {showOnTour && <div><OnTourSection /></div>}
