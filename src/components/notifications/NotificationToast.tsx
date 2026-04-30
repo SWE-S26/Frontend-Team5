@@ -49,7 +49,7 @@ export default function NotificationToast() {
       setToasts((prev) => [{ ...data, id }, ...prev]);
       setTimeout(() => {
         setToasts((prev) => prev.filter((t) => t.id !== id));
-      }, 200000);
+      }, 4000);
     });
   }, []);
 
