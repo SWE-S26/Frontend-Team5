@@ -20,6 +20,7 @@ export default function Track() {
   const { comments, total, loading: commentsLoading, loadComments, loadMore, submitComment, toggleLike, postReply, deleteCommentById } = useStatelessComments()
 
   const [posterId, setPosterId] = useState<string | null>(null)
+  const description = track?.basicInfo?.description
 
   useEffect(() => {
     if (!trackid) return
@@ -29,6 +30,8 @@ export default function Track() {
   useEffect(() => {
     if (track?.posterId) setPosterId(track.posterId)
   }, [track])
+
+
 
   // don't conditionally return — keep the full tree mounted
   return (
@@ -43,19 +46,29 @@ export default function Track() {
           {!loading && !error && (
             <>
               <CommentInput trackId={trackid} submitComment={submitComment} loading={commentsLoading} />
-              {posterId && <Uploader posterId={posterId} />}
-              <CommentListProps
-                trackId={trackid}
-                comments={comments}
-                total={total}
-                loading={commentsLoading}
-                loadComments={loadComments}
-                loadMore={loadMore}
-                toggleLike={toggleLike}
-                submitComment={submitComment}
-                postReply={postReply}
-                deleteCommentById={deleteCommentById}
-              />
+              
+              <div className="flex gap-4">
+                {posterId && <Uploader posterId={posterId} />}
+                
+                <div className="flex flex-col gap-4">
+                  {description && (
+                    <p className="text-white mt-4">{description}</p>
+                  )}
+
+                  <CommentListProps
+                    trackId={trackid}
+                    comments={comments}
+                    total={total}
+                    loading={commentsLoading}
+                    loadComments={loadComments}
+                    loadMore={loadMore}
+                    toggleLike={toggleLike}
+                    submitComment={submitComment}
+                    postReply={postReply}
+                    deleteCommentById={deleteCommentById}
+                  />
+                </div>
+              </div>
             </>
           )}
         </div>

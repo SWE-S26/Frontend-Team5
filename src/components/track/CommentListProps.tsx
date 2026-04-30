@@ -250,7 +250,8 @@ export default function CommentList({
 
   return (
     <div className="flex flex-col w-full mt-4">
-      <div className="flex items-center justify-between mb-6">
+
+      <div className="flex items-center justify-end gap-55 mb-6 ">
         <h2 className="text-white font-bold text-lg">
           {total.toLocaleString()} comments
         </h2>
