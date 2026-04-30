@@ -1,4 +1,5 @@
     import { useState, useCallback } from "react"
+    import { useAppSelector } from "@/store/hooks"
     import { socialService } from "@/services/social.service"
     import {
     GetFollowersResponse,
@@ -67,17 +68,22 @@
 
     // ─────────────────────────────────────────────────────────────────────────────
     // (3) Get followers of a user
+    // Uses public endpoint when unauthenticated, authenticated endpoint otherwise
     // ─────────────────────────────────────────────────────────────────────────────
     export function useGetFollowers() {
     const [loading,   setLoading]   = useState(false)
     const [error,     setError]     = useState<string | null>(null)
     const [followers, setFollowers] = useState<GetFollowersResponse | null>(null)
 
+    const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+
     const getFollowers = useCallback(async (userId: string) => {
         setLoading(true)
         setError(null)
         try {
-        const res = await socialService.getFollowers(userId)
+        const res = isAuthenticated
+            ? await socialService.getFollowers(userId)
+            : await socialService.getFollowersPublic(userId)
         setFollowers(res.data)
         return res.data
         } catch (err: any) {
@@ -86,24 +92,29 @@
         } finally {
         setLoading(false)
         }
-    }, [])
+    }, [isAuthenticated])
 
     return { getFollowers, loading, error, followers }
     }
 
     // ─────────────────────────────────────────────────────────────────────────────
     // (4) Get users that a user is following
+    // Uses public endpoint when unauthenticated, authenticated endpoint otherwise
     // ─────────────────────────────────────────────────────────────────────────────
     export function useGetFollowing() {
     const [loading,   setLoading]   = useState(false)
     const [error,     setError]     = useState<string | null>(null)
     const [following, setFollowing] = useState<GetFollowingResponse | null>(null)
 
+    const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
+
     const getFollowing = useCallback(async (userId: string) => {
         setLoading(true)
         setError(null)
         try {
-        const res = await socialService.getFollowing(userId)
+        const res = isAuthenticated
+            ? await socialService.getFollowing(userId)
+            : await socialService.getFollowingPublic(userId)
         setFollowing(res.data)
         return res.data
         } catch (err: any) {
@@ -112,7 +123,7 @@
         } finally {
         setLoading(false)
         }
-    }, [])
+    }, [isAuthenticated])
 
     return { getFollowing, loading, error, following }
     }

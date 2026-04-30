@@ -11,7 +11,7 @@ export default function ProfileStats() {
     const trackCount      = useSelector((state: RootState) => state.profile.trackCount)
 
   return (
-        <div className='mb-4 -ml-5'>
+    <div className='mb-4 -ml-5'>
         <div className="flex flex-row gap-17">
             <Link href={`/profile/${username}/followers`} className="flex flex-col gap-3 group/followers cursor-pointer">
             <p className="text-sm text-silver font-bold">Followers</p>
@@ -34,6 +34,6 @@ export default function ProfileStats() {
             </div>
             </Link>
         </div>
-        </div>
+    </div>
   )
 }

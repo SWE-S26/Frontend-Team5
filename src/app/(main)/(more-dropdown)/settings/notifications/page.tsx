@@ -234,7 +234,7 @@ export default function Notifications() {
           <div key={row.key} className="flex items-center py-3 font-bold">
             <span className="flex-1 text-xs sm:text-sm text-white-smoke flex items-center min-w-0 pr-2">
               <span className="truncate sm:whitespace-normal">{row.label}</span>
-              {row.hasInfo && <InfoPopover text={INFO_TEXT} className="w-72 sm:w-90" />}
+              {row.hasInfo && <InfoPopover text={INFO_TEXT} className="w-72 sm:w-100" />}
             </span>
 
             <div className="flex items-center gap-1 sm:gap-2 mr-3 sm:mr-6">

@@ -5,9 +5,11 @@ import { useState, useEffect, useRef } from "react";
 interface InfoPopoverProps {
   text: string;
   className?: string;
+  size?: number;
+  position?: "left" | "right";
 }
 
-export default function InfoPopover({ text, className }: InfoPopoverProps) {
+export default function InfoPopover({ text, className, size = 16, position = "left" }: InfoPopoverProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
@@ -25,12 +27,15 @@ export default function InfoPopover({ text, className }: InfoPopoverProps) {
       <button
         type="button"
         onClick={() => setOpen((v) => !v)}
-        className="inline-flex h-4 w-4 items-center justify-center rounded-full bg-white-smoke text-chinese-black text-[10px] select-none cursor-pointer hover:bg-white/30 hover:text-white-smoke transition-colors"
+        className="inline-flex items-center justify-center rounded-full bg-white-smoke text-chinese-black text-[10px] select-none cursor-pointer hover:bg-white/30 hover:text-white-smoke transition-colors"
+        style={{ width: size, height: size }}
       >
         i
       </button>
       {open && (
-        <div className={`absolute left-0 top-6 z-50 rounded-lg bg-white-smoke p-4 shadow-xl ${className ?? "w-64"}`}>
+        <div
+          className={`absolute top-6 z-50 rounded-lg bg-white-smoke p-4 shadow-xl w-64 ${position === "right" ? "right-0" : "left-0"} ${className ?? ""}`}
+        >
           <p className="text-sm text-chinese-black leading-relaxed">{text}</p>
         </div>
       )}

@@ -163,7 +163,7 @@ export default function Settings() {
             <div className="w-full sm:w-auto">
               <label className="text-sm text-white-smoke flex items-center gap-1.5 mb-2">
                 Birth date
-                <InfoPopover text="The date of birth you provided at sign-up." className="w-64" />
+                <InfoPopover text="The date of birth you provided at sign-up" className="w-78" />
               </label>
               <div className="flex items-center gap-2">
                 <Select

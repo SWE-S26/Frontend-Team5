@@ -1,18 +1,16 @@
-    'use client'
-    import { useEffect } from 'react'
-    import { Avatar } from 'antd'
-    import Link from 'next/link'
-    import { useSelector } from 'react-redux'
-    import { RootState } from '@/store/store'
-    import { useGetFollowers } from '@/hooks/useSocial'
-    import { useParams } from 'next/navigation'
-    import ProfilePopover from '@/components/layout/track-cards/ProfilePopover'
-    import { PopoverProvider } from '@/components/layout/track-cards/PopoverContext'
+'use client'
+import { useEffect } from 'react'
+import { Avatar } from 'antd'
+import Link from 'next/link'
+import { useSelector } from 'react-redux'
+import { RootState } from '@/store/store'
+import { useGetFollowers } from '@/hooks/useSocial'
+import ProfilePopover from '@/components/layout/track-cards/ProfilePopover'
+import { PopoverProvider } from '@/components/layout/track-cards/PopoverContext'
 
-    export default function FollowersList() {
+export default function FollowersList() {
     const profileUserId    = useSelector((state: RootState) => state.profile.userId)
     const followersCount   = useSelector((state: RootState) => state.profile.followersCount)
-    const { username }     = useParams<{ username: string }>()
 
     const { getFollowers, followers, loading } = useGetFollowers()
 
@@ -26,7 +24,6 @@
 
     // Show only first 6 followers in one line with smaller avatars
     const displayedFollowers = followers?.slice(0, 9) ?? []
-    const hasMore = (followers?.length ?? 0) > 6
 
     return (
         <section className="flex flex-col gap-3 mb-8 mt-5">
@@ -75,4 +72,4 @@
         )}
         </section>
     )
-    }
+}

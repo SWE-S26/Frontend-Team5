@@ -12,55 +12,41 @@ export interface SocialUser {
   isFollowed?:     boolean
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// (1) GET /api/social/v1/followers/{userId}
 
-// ─────────────────────────────────────────────────────────────────────────────
+/* (1) GET /api/public/social/v1/followers/{userId} */
+/* (3) GET /api/social/v1/followers/{userId}        */
 export type GetFollowersResponse = SocialUser[]
 
-// ─────────────────────────────────────────────────────────────────────────────
-// (2) GET /api/social/v1/following/{userId}
-// ─────────────────────────────────────────────────────────────────────────────
+
+/* (2) GET /api/public/social/v1/following/{userId} */
+/* (4) GET /api/social/v1/following/{userId}        */
 export type GetFollowingResponse = SocialUser[]
 
-// ─────────────────────────────────────────────────────────────────────────────
-// (3) GET /api/social/v1/suggested
 
-// ─────────────────────────────────────────────────────────────────────────────
+/* (5) GET /api/social/v1/suggested */
 export type GetSuggestedUsersResponse = SocialUser[]
-
 // Query params for suggested (offset + limit drive the refresh button)
 export interface SuggestedParams {
   offset?: number
   limit?:  number
 }
 
-// ─────────────────────────────────────────────────────────────────────────────
-// (4) GET /api/social/v1/blocked
 
-// ─────────────────────────────────────────────────────────────────────────────
+/* (6) GET /api/social/v1/blocked */
 export type GetBlockedUsersResponse = SocialUser[]
 
-// ─────────────────────────────────────────────────────────────────────────────
-// (5) POST /api/social/v1/follow/{userId}
 
-// ─────────────────────────────────────────────────────────────────────────────
+/* (7) POST /api/social/v1/follow/{userId} */
 export type FollowUserResponse = SocialUser
 
-// ─────────────────────────────────────────────────────────────────────────────
-// (6) POST /api/social/v1/unfollow/{userId}
 
-// ─────────────────────────────────────────────────────────────────────────────
+/* (8) POST /api/social/v1/unfollow/{userId} */
 export type UnfollowUserResponse = SocialUser
 
-// ─────────────────────────────────────────────────────────────────────────────
-// (7) POST /api/social/v1/block/{userId}
 
-// ─────────────────────────────────────────────────────────────────────────────
+/* (9) POST /api/social/v1/block/{userId} */
 export type BlockUserResponse = SocialUser
 
-// ─────────────────────────────────────────────────────────────────────────────
-// (8) POST /api/social/v1/unblock/{userId}
 
-// ─────────────────────────────────────────────────────────────────────────────
+/* (10) POST /api/social/v1/unblock/{userId} */
 export type UnblockUserResponse = SocialUser
