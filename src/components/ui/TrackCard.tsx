@@ -9,7 +9,7 @@ import { ListStart } from "lucide-react";
 import MoreDropdown from "./MoreDropdown";
 
 import { useSelector, useDispatch } from "react-redux";
-import { RootState, store } from "@/store/store";
+import { RootState } from "@/store/store";
 import { play, pause, playAudio, playNext } from "@/store/slices/playerSlice";
 
 import { useLikeTrackOptimistic } from "@/hooks/useLikes";
@@ -103,8 +103,6 @@ export default function TrackCard({
         },
       }),
     );
-
-    console.log(store.getState().player.tracks);
   }
 
   return (

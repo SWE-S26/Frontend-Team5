@@ -17,6 +17,10 @@ import { Track as ApiTrack } from "@/types/tracks.types";
 import { PlaylistDetail } from "@/types/playlists.types";
 import { Track } from "@/store/slices/playerSlice";
 
+import { useDispatch, useSelector } from "react-redux";
+import { RootState } from "@/store/store";
+import { playAudio } from "@/store/slices/playerSlice";
+
 const PAGE_SIZE = 10;
 
 export default function Feed() {
@@ -28,11 +32,17 @@ export default function Feed() {
   const [hasFetched, setHasFetched] = useState(false);
   const [includeReposts, setIncludeReposts] = useState(true);
 
+  const dispatch = useDispatch();
+  const currentTrackId = useSelector(
+    (state: RootState) => state.player.currentTrackId,
+  );
+
   const sentinelRef = useRef<HTMLDivElement>(null);
   const seenIds = useRef<Set<string>>(new Set());
   const seenPlaylistIds = useRef<Set<string>>(new Set());
   const offsetRef = useRef(0);
   const isFetchingRef = useRef(false);
+  const prevQueueLengthRef = useRef(0);
 
   const loadNextPage = useCallback(
     async (currentIncludeReposts: boolean) => {
@@ -55,6 +65,7 @@ export default function Feed() {
     setResolving(true);
     offsetRef.current = 0;
     isFetchingRef.current = false;
+    prevQueueLengthRef.current = 0;
     loadNextPage(includeReposts);
   }, [includeReposts]);
 
@@ -167,20 +178,44 @@ export default function Feed() {
     return () => observer.disconnect();
   }, []);
 
-  const reduxTracks: Track[] = useMemo(
-    () =>
-      allTracks
-        .filter((t) => !!t.trackId)
-        .map((t) => ({
-          id: t.trackId!,
-          url: t.audio?.audioLink ?? "",
-          title: t.basicInfo?.title,
-          artist: t.basicInfo?.mainArtists?.[0],
-          img: t.image?.imgLink,
-          duration: t.durationInSeconds,
-        })),
-    [allTracks],
-  );
+  const fullQueue = useMemo(() => {
+    const queue: Track[] = [];
+    for (const item of items) {
+      if (item.type === "track") {
+        const track = allTracks.find((t) => t.trackId === item.id);
+        if (track?.trackId)
+          queue.push({
+            id: track.trackId,
+            url: track.audio?.audioLink ?? "",
+            title: track.basicInfo?.title,
+            artist: track.basicInfo?.mainArtists?.[0],
+            img: track.image?.imgLink,
+            duration: track.durationInSeconds,
+          });
+      } else if (item.type === "playlist") {
+        const playlist = allPlaylists.find((p) => p._id === item.id);
+        playlist?.tracks?.forEach((t) =>
+          queue.push({
+            id: t._id,
+            url: t.audio.audioLink,
+            title: t.basicInfo.title,
+            artist: t.basicInfo.mainArtists[0],
+            img: t.image.imgLink,
+            duration: t.durationInSeconds,
+          }),
+        );
+      }
+    }
+    return queue;
+  }, [items, allTracks, allPlaylists]);
+
+  useEffect(() => {
+    if (fullQueue.length <= prevQueueLengthRef.current) return;
+    prevQueueLengthRef.current = fullQueue.length;
+    if (!currentTrackId) return;
+    if (!fullQueue.some((t) => t.id === currentTrackId)) return;
+    dispatch(playAudio({ tracks: fullQueue, startId: currentTrackId }));
+  }, [fullQueue]);
 
   const orderedItems = useMemo(() => {
     const seen = new Set<string>();
@@ -253,7 +288,7 @@ export default function Feed() {
                   <FeedHeader
                     artistName={item.feedItem?.displayName || "Unknown Artist"}
                     actorId={item.feedItem?.actorId || "unknown"}
-                    followCount={Math.floor(Math.random() * 10000)}
+                    followCount={item.feedItem?.followCount ?? 0}
                     profileImgLink={
                       item.feedItem?.imgLink ||
                       "https://xsgames.co/randomusers/avatar.php?g=pixel&f=male"
@@ -286,7 +321,7 @@ export default function Feed() {
                     commentsCount={item.data.numComments}
                     isLikedByUser={item.data.isLikedByUser}
                     isRepostedByUser={item.data.isRepostedByUser}
-                    allTracks={reduxTracks}
+                    allTracks={fullQueue}
                     enableDirectDownload={
                       item.data.permissions?.enableDirectDownload ?? false
                     }
@@ -295,7 +330,7 @@ export default function Feed() {
                   <PlaylistWaveformCard
                     img={item.data.image?.imgLink}
                     title={item.data.title}
-                    artist={item.data.description}
+                    artist={item.data.owner?.name || "Unknown Artist"}
                     playlistId={item.data._id}
                     tag={item.data.genre}
                     likeCount={item.data.numOfLikes}
@@ -304,6 +339,7 @@ export default function Feed() {
                     isRepostedByUser={item.data.isReposted}
                     preloadedTracks={item.data.tracks}
                     totalTracks={item.data.totalTracks}
+                    feedQueue={fullQueue}
                   />
                 )}
               </div>

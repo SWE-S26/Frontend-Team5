@@ -1,10 +1,10 @@
-"use client"
+"use client";
 import AuthGuard from "@/components/layout/AuthGuard";
 import NotificationToast from "@/components/notifications/NotificationToast";
 import { NotificationsProvider } from "@/components/notifications/NotificationsContext";
 import { useNotificationsContext } from "@/components/notifications/NotificationsContext";
 import { useSocket } from "@/hooks/sockets/useSocket";
-import { toastBus } from "@/lib/sockets/toastBus";
+import { toastBus } from "@/lib/toasts/toastBus";
 
 function SocketInitializer() {
   const { incrementUnread, addIncoming } = useNotificationsContext();
@@ -23,7 +23,11 @@ function SocketInitializer() {
   return null;
 }
 
-export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+export default function ProtectedLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <NotificationsProvider>
       <SocketInitializer />
