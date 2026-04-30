@@ -1,6 +1,7 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { InsightsIcon, CoinIcon, GoldenHeartIcon, PurpleHeartIcon } from "../ArtistStudioContent";
-
+import { artistService } from "@/services/artist.service";
+import { ArtistAnalyticsResponse } from "@/types/artist.types";
 
 function StatItem({ label, value, hasBorder }: { label: string; value: string; hasBorder: boolean }) {
   return (
@@ -55,10 +56,41 @@ function IconItem({
   );
 }
 
-export function ArtistStudioHeader({ stats, isArtistPro }: {
+export function ArtistStudioHeader({ stats: propStats, isArtistPro }: {
   stats: { plays: number; reposts: number; downloads: number; likes: number; comments: number };
   isArtistPro: boolean;
 }) {
+  const [analytics, setAnalytics] = useState<ArtistAnalyticsResponse | null>(null);
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+
+  useEffect(() => {
+    const fetchAnalytics = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+        const response = await artistService.getArtistAnalytics();
+        setAnalytics(response.data);
+      } catch (err) {
+        setError(err instanceof Error ? err.message : "Failed to fetch analytics");
+        console.error("Error fetching analytics:", err);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchAnalytics();
+  }, []);
+
+  const stats = analytics ? {
+    plays: analytics.totalPlays,
+    reposts: analytics.totalReposts,
+    downloads: analytics.totalDownloads,
+    likes: analytics.totalLikes,
+    comments: analytics.totalComments,
+    //playthroughrate: analytics.totalplayrate,
+  } : propStats;
+
   return (
     <div className="mb-6 w-full rounded-lg border border-[#2a2a2a] bg-chinese-black p-4 sm:p-5 lg:p-6">
       <div className="mb-4 flex flex-col gap-1 sm:flex-row sm:items-center sm:gap-2">
@@ -67,11 +99,12 @@ export function ArtistStudioHeader({ stats, isArtistPro }: {
       </div>
       <div className="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
         <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-3">
-          <StatItem label="SC plays"  value={String(stats.plays)}     hasBorder={false} />
-          <StatItem label="Reposts"   value={String(stats.reposts)}   hasBorder={true} />
-          {isArtistPro && <StatItem label="Downloads" value={String(stats.downloads)} hasBorder={true} />}
-          <StatItem label="Likes"     value={String(stats.likes)}     hasBorder={true} />
-          <StatItem label="Comments"  value={String(stats.comments)}  hasBorder={true} />
+          <StatItem label="SC plays"  value={stats.plays.toString()}     hasBorder={false} />
+          <StatItem label="Reposts"   value={stats.reposts.toString()}   hasBorder={true} />
+          {isArtistPro && <StatItem label="Downloads" value={stats.downloads.toString()} hasBorder={true} />}
+          <StatItem label="Likes"     value={stats.likes.toString()}     hasBorder={true} />
+          <StatItem label="Comments"  value={stats.comments.toString()}  hasBorder={true} />
+          <StatItem label="Playthrough Rate"  value={"0"}  hasBorder={true} />
         </div>
         <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-4 lg:gap-8">
           <IconItem label="Insights" tooltip="Limited"  tooltipColor="text-white-smoke"    icon={InsightsIcon} />

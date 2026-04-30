@@ -14,6 +14,7 @@ import {
   Playlist,
   PlaylistDetail,
   PlaylistCreatorInfo,
+  GetRepostedPlaylistsResponse,
 } from "@/types/playlists.types";
 
 export function useCreatePlaylist() {
@@ -574,4 +575,37 @@ export function useCreatePlaylistWithImage() {
   );
 
   return { createPlaylistWithImage, loading, error, success };
+}
+
+export function useGetRepostedPlaylists() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [playlists, setPlaylists] = useState<GetRepostedPlaylistsResponse["playlists"]>([]);
+  const [total, setTotal] = useState(0);
+  const [offset, setOffset] = useState(1);
+  const [limit, setLimit] = useState(20);
+
+  const getRepostedPlaylists = useCallback(async (userId: string, offset = 1, limit = 20) => {
+    if (!userId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await playlistsService.getRepostedPlaylists(userId, offset, limit);
+      setPlaylists(res.data.playlists ?? []);
+      setTotal(res.data.total ?? 0);
+      setOffset(res.data.offset ?? offset);
+      setLimit(res.data.limit ?? limit);
+      return res.data;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Failed to fetch reposted playlists");
+      } else {
+        setError("Something went wrong");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { getRepostedPlaylists, loading, error, playlists, total, offset, limit };
 }

@@ -13,7 +13,7 @@ import {
   GetTrackDetailedResponse,
   TrackPlaylist,
   GetTrackPlaylistsResponse,
-  TrackFan, GetTrackStatsResponse,
+  TrackFan, GetTrackStatsResponse, GetRepostedTracksResponse,
 } from "@/types/tracks.types";
 import { GetTrackByIdResponse } from "@/types/tracks.types";
 
@@ -458,10 +458,6 @@ export function useGetTrackAlbums() {
   return { getTrackAlbums, loading, error, albums }
 }
 
-
-
-
-
 export function useGetTrackByPermalink() {
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState<string | null>(null)
@@ -546,4 +542,33 @@ export function useGetTrackStats() {
   }, [isAuthenticated]);
 
   return { getTrackStats, loading, error, topFans, firstFans };
+}
+
+export function useGetRepostedTracks() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [tracks, setTracks] = useState<GetRepostedTracksResponse["tracks"]>([]);
+  const [total, setTotal] = useState(0);
+  const [offset, setOffset] = useState(1);
+  const [limit, setLimit] = useState(20);
+
+  const getRepostedTracks = useCallback(async (userId: string, offset = 1, limit = 20) => {
+    if (!userId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await tracksService.getRepostedTracks(userId, offset, limit);
+      setTracks(res.data.tracks ?? []);
+      setTotal(res.data.total ?? 0);
+      setOffset(res.data.offset ?? offset);
+      setLimit(res.data.limit ?? limit);
+      return res.data;
+    } catch (err) {
+      setError(getTrackErrorMessage(err, "Failed to fetch reposted tracks"));
+    } finally {
+      setLoading(false);
+    }
+  }, []);
+
+  return { getRepostedTracks, loading, error, tracks, total, offset, limit };
 }

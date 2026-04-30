@@ -331,3 +331,10 @@ export interface GetTrackStatsResponse {
     firstFans: TrackFan[];
   };
 }
+
+export interface GetRepostedTracksResponse {
+  total: number;
+  offset: number;
+  limit: number;
+  tracks: Track[];
+}
