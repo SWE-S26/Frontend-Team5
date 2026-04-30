@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useRef, useState } from "react"
 import { useParams } from "next/navigation"
 
 import TrackHeader from "@/components/track/TrackHeader"
@@ -15,13 +15,16 @@ import { PopoverProvider } from "@/components/layout/track-cards/PopoverContext"
 
 export default function Track() {
   const { trackid } = useParams<{ trackid: string }>()
-
+  const [currentTime, setCurrentTime] = useState(0)
   const { getTrackById, track, loading, error } = useGetTrackById()
   const {
     comments, total, loading: commentsLoading,
     loadComments, loadMore, submitComment,
     toggleLike, postReply, deleteCommentById
   } = useStatelessComments()
+
+
+  const repeatFnRef = useRef<(() => void) | null>(null)
 
   useEffect(() => {
     if (!trackid) return
@@ -31,7 +34,12 @@ export default function Track() {
 
   return (
     <div>
-      <TrackHeader track={track} loading={loading} />
+      <TrackHeader
+        track={track}
+        loading={loading}
+        onTimeUpdate={setCurrentTime}
+        onRepeat={(fn) => { repeatFnRef.current = fn }}
+      />
 
       <div className="flex w-full justify-between gap-8 mx-auto">
         <div className="flex-1">
@@ -44,6 +52,7 @@ export default function Track() {
                 trackId={trackid}
                 submitComment={submitComment}
                 loading={commentsLoading}
+                currentTime={currentTime}
               />
 
               <div className="flex gap-4">
@@ -74,7 +83,11 @@ export default function Track() {
 
         <div className="w-[340px] shrink-0">
           <PopoverProvider>
-            <TrackSidebar trackId={trackid} track={track} />
+            <TrackSidebar
+              trackId={trackid}
+              track={track}
+              onRepeatPlay={() => repeatFnRef.current?.()}
+            />
           </PopoverProvider>
         </div>
       </div>

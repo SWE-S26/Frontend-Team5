@@ -8,10 +8,11 @@ import { PostCommentPayload } from "@/types/comments.types"
 interface CommentInputProps {
   trackId: string
   loading: boolean
+  currentTime: number
   submitComment: (trackId: string, payload: PostCommentPayload, meta?: { displayName: string; avatarUrl: string }) => Promise<any>
 }
 
-export default function CommentInput({ trackId, submitComment, loading }: CommentInputProps) {
+export default function CommentInput({ trackId, submitComment, loading, currentTime }: CommentInputProps) {
 
   const [comment, setComment] = useState("")
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
@@ -21,7 +22,7 @@ export default function CommentInput({ trackId, submitComment, loading }: Commen
     if (!comment.trim() || loading) return
     await submitComment(trackId, {
       content: comment,
-      timestamp: 0,
+      timestamp: Math.floor(currentTime), // use waveform time
     }, {
       displayName: displayName ?? "",
       avatarUrl:   profileImgLink ?? "",

@@ -12,11 +12,12 @@ import FanCard from "./FanCard";
 import LeaderboardActions from "./LeaderboardActions";
 
 interface TrackSidebarProps {
-  trackId: string,
+  trackId: string;
   track: any;
+  onRepeatPlay?: () => void;
 }
 
-export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
+export default function TrackSidebar({ trackId, track, onRepeatPlay }: TrackSidebarProps) {
   const [activeTab, setActiveTab] = useState("top");
 
   const { users, total: LikesCount, loadLikes } = useLikeTrack()
@@ -25,7 +26,6 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
   const { albums: trackAlbums, getTrackAlbums } = useGetTrackAlbums()
   const { topFans, firstFans, loading: fansLoading, getTrackStats } = useGetTrackStats()
 
-  // Single useEffect — all sidebar data fetched together once
   useEffect(() => {
     if (!trackId) return
     void getTrackPlaylists(trackId)
@@ -33,7 +33,7 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
     loadLikes(trackId)
     loadReposts()
     void getTrackStats(trackId)
-  }, [trackId]) // no function refs in deps
+  }, [trackId])
 
   const SideTabs = [
     { href: "", label: "Top",   value: "top"   },
@@ -87,7 +87,9 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
 
       <section>
         <LeaderboardActions
+          onPlay={onRepeatPlay ?? (() => {})}
           trackId={trackId}
+          trackUrl={track?.audio?.audioLink ?? ""}
           isLikedByUser={track?.isLikedByUser ?? false}
           posterId={track?.posterId ?? ""}
         />
