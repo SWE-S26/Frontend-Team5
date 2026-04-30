@@ -44,6 +44,7 @@ export function useUpdateProfile() {
     } catch (err: any) {
       const message = err.response?.data?.message || "Something went wrong"
       setError(message)
+      throw err
     } finally {
       setLoading(false)
     }

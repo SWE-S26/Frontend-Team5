@@ -66,31 +66,32 @@ const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
   const [formLinks,   setFormLinks]   = useState<LinkItem[]>([])
   const [linkErrors,  setLinkErrors]  = useState<Record<string, boolean>>({})
 
-  const [avatarImage,     setAvatarImage]     = useState<string | null>(null)
-  const [formDisplayName, setFormDisplayName] = useState("")
-  const [formProfileLink, setFormProfileLink] = useState("")
-  const [formFirstName,   setFormFirstName]   = useState("")
-  const [formLastName,    setFormLastName]     = useState("")
-  const [formCity,        setFormCity]         = useState("")
-  const [formCountry,     setFormCountry]      = useState("")
-  const [formBio,         setFormBio]          = useState("")
+  const [avatarImage,     setAvatarImage]         = useState<string | null>(null)
+  const [formDisplayName, setFormDisplayName]     = useState("")
+  const [formProfileLink, setFormProfileLink]     = useState("")
+  const [formFirstName,   setFormFirstName]       = useState("")
+  const [formLastName,    setFormLastName]        = useState("")
+  const [formCity,        setFormCity]            = useState("")
+  const [formCountry,     setFormCountry]         = useState("")
+  const [formBio,         setFormBio]             = useState("")
   const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null)
 
   const [rawImageUrl,   setRawImageUrl]   = useState<string | null>(null)
-const [rawFile,       setRawFile]       = useState<File | null>(null)
-const [isCropping,    setIsCropping]    = useState(false)
-const [crop,          setCrop]          = useState({ x: 0, y: 0 })
-const [zoom,          setZoom]          = useState(1)
-const [croppedArea,   setCroppedArea]   = useState<Area | null>(null)
-const fileInputRef = useRef<HTMLInputElement>(null)
+  const [rawFile,       setRawFile]       = useState<File | null>(null)
+  const [isCropping,    setIsCropping]    = useState(false)
+  const [crop,          setCrop]          = useState({ x: 0, y: 0 })
+  const [zoom,          setZoom]          = useState(1)
+  const [croppedArea,   setCroppedArea]   = useState<Area | null>(null)
+  const fileInputRef = useRef<HTMLInputElement>(null)
 
 
   const [formSupportLink,     setFormSupportLink]     = useState<string | null>(null)
   const [showSupportLinkInfo, setShowSupportLinkInfo] = useState(false)
 
-  const [displayNameError, setDisplayNameError] = useState(false)
-  const [profileLinkError, setProfileLinkError] = useState(false)
-  const [showLinksInfo,    setShowLinksInfo]    = useState(false)
+  const [displayNameError, setDisplayNameError]           = useState(false)
+  const [profileLinkError, setProfileLinkError]           = useState(false)
+  const [showLinksInfo,    setShowLinksInfo]              = useState(false)
+  const [profileLinkTakenError, setProfileLinkTakenError] = useState(false)
   const [isDirty, setIsDirty] = useState(false)
 
   const dispatch = useAppDispatch()
@@ -213,7 +214,7 @@ const handleCancelCrop = () => {
     setFormSupportLink(reduxSupportLinkRef.current || null)
     setLinkErrors({})
     setPendingAvatarFile(null)
-
+    setProfileLinkTakenError(false)
     setIsDirty(false)
   }, [isOpen])
 
@@ -288,78 +289,89 @@ const handleCancelCrop = () => {
     setProfileLinkError(false)
     setPendingAvatarFile(null)
     setLinkErrors({})
+    setProfileLinkTakenError(false)
     onClose()
   }
 
-const handleSave = async () => {
-  let hasError = false
+  const handleSave = async () => {
+    let hasError = false
 
-  if (!formDisplayName.trim()) { setDisplayNameError(true); hasError = true }
-  if (!formProfileLink.trim()) { setProfileLinkError(true); hasError = true }
-  if (hasError) return
+    if (!formDisplayName.trim()) { setDisplayNameError(true); hasError = true }
+    if (!formProfileLink.trim()) { setProfileLinkError(true); hasError = true }
+    if (hasError) return
 
-  const formattedLinks = formLinks
-    .filter((l) => l.link.trim())
-    .map(({ linkId, name, link }) => {
-      let finalLink = link.trim()
-      if (finalLink.includes("@") && !finalLink.startsWith("http")) {
-        finalLink = `mailto:${finalLink}`
-      } else if (!finalLink.startsWith("http")) {
-        finalLink = `https://${finalLink}`
-      }
-      return { linkId, name, link: finalLink }
-    })
-    .filter((l, index, self) => index === self.findIndex((x) => x.link === l.link))
+    setProfileLinkTakenError(false)
 
-  const updateData: any = {
-    displayName: formDisplayName,
-    profileLink: formProfileLink,
-    firstName:   formFirstName.trim()  || null,
-    lastName:    formLastName.trim()   || null,
-    city:        formCity.trim()       || null,
-    country:     formCountry.trim()    || null,
-    bio:         formBio.trim()        || null,
-    links:       formattedLinks,
-    bannerLinks: formattedLinks,
-    supportLink: formSupportLink?.trim() || null,
-  }
+    const formattedLinks = formLinks
+      .filter((l) => l.link.trim())
+      .map(({ linkId, name, link }) => {
+        let finalLink = link.trim()
+        if (finalLink.includes("@") && !finalLink.startsWith("http")) {
+          finalLink = `mailto:${finalLink}`
+        } else if (!finalLink.startsWith("http")) {
+          finalLink = `https://${finalLink}`
+        }
+        return { linkId, name, link: finalLink }
+      })
+      .filter((l, index, self) => index === self.findIndex((x) => x.link === l.link))
 
-  try {
-    // 1. Upload avatar if one is pending — do this BEFORE updateProfile
-    //    so finalAvatarUrl holds the real Cloudinary URL, not a blob URL
-    let finalAvatarUrl = profileImgLinkRef.current ?? null
-
-    if (pendingAvatarFile) {
-      const updated = await updateProfileImages({ profileImg: pendingAvatarFile })
-      if (updated?.profileImgLink) {
-        finalAvatarUrl = updated.profileImgLink
-        setAvatarImage(finalAvatarUrl)
-      }
-      setPendingAvatarFile(null)
+    const updateData: any = {
+      displayName: formDisplayName,
+      profileLink: formProfileLink,
+      firstName:   formFirstName.trim()  || null,
+      lastName:    formLastName.trim()   || null,
+      city:        formCity.trim()       || null,
+      country:     formCountry.trim()    || null,
+      bio:         formBio.trim()        || null,
+      links:       formattedLinks,
+      bannerLinks: formattedLinks,
+      supportLink: formSupportLink?.trim() || null,
     }
 
-    // 2. Save text fields
-    const res = await updateProfile(updateData)
-    if (res) {
-      dispatch(setProfile({
-        displayName:    res.displayName,
-        profileLink:    res.profileLink,
-        firstName:      res.firstName,
-        lastName:       res.lastName,
-        city:           res.city,
-        country:        res.country,
-        bio:            res.bio,
-        bannerLinks:    res.bannerLinks?.length ? res.bannerLinks : [],
-        profileImgLink: finalAvatarUrl,  // always the real URL, never a blob
-        links:          res.links,
-        supportLink:    res.supportLink,
-      }))
-      onClose()
+    try {
+      // 1. Upload avatar if one is pending — do this BEFORE updateProfile
+      //    so finalAvatarUrl holds the real Cloudinary URL, not a blob URL
+      let finalAvatarUrl = profileImgLinkRef.current ?? null
+
+      if (pendingAvatarFile) {
+        const updated = await updateProfileImages({ profileImg: pendingAvatarFile })
+        if (updated?.profileImgLink) {
+          finalAvatarUrl = updated.profileImgLink
+          setAvatarImage(finalAvatarUrl)
+        }
+        setPendingAvatarFile(null)
+      }
+
+      // 2. Save text fields
+      const res = await updateProfile(updateData)
+      if (res) {
+        dispatch(setProfile({
+          displayName:    res.displayName,
+          profileLink:    res.profileLink,
+          firstName:      res.firstName,
+          lastName:       res.lastName,
+          city:           res.city,
+          country:        res.country,
+          bio:            res.bio,
+          bannerLinks:    res.bannerLinks?.length ? res.bannerLinks : [],
+          profileImgLink: finalAvatarUrl,
+          links:          res.links,
+          supportLink:    res.supportLink,
+        }))
+        onClose()
+      }
+    } catch (err: any) {
+      console.log("error status:", err?.response?.status)
+      console.log("error message:", err?.response?.data)
+      const status  = err?.response?.status
+      const message = (err?.response?.data?.message ?? "").toLowerCase()
+      if (status === 409 || message.includes("taken") || message.includes("already")) {
+        setProfileLinkTakenError(true)
+      } else {
+        console.error("Failed to save profile:", err)
+      }
     }
-  } catch (err) {
-    console.error("Failed to save profile:", err)
   }
-}
 
   return (
     <AnimatePresence>
@@ -493,7 +505,7 @@ const handleSave = async () => {
                     Profile URL <span className="text-red-500">*</span>
                   </p>
                   <div className={`flex items-center bg-off-black rounded border ${
-                    profileLinkError ? "border-red-500" : "border-transparent"
+                    profileLinkError || profileLinkTakenError ? "border-red-500" : "border-transparent"
                   }`}>
                     <span className="text-silver px-3 py-2 whitespace-nowrap border-r border-zinc-700 select-none">
                       beatza.me/
@@ -503,7 +515,10 @@ const handleSave = async () => {
                       onChange={(e) => {
                         setFormProfileLink(e.target.value)
                         setIsDirty(true)
-                        if (e.target.value.trim()) setProfileLinkError(false)
+                        if (e.target.value.trim()) {
+                          setProfileLinkError(false)
+                          setProfileLinkTakenError(false)
+                        }
                       }}
                       className="flex-1 bg-transparent px-3 py-2 text-white-smoke outline-none"
                       placeholder="your-profile-link"
@@ -512,6 +527,11 @@ const handleSave = async () => {
                   {profileLinkError && (
                     <p className="text-red-500 text-sm mt-1">
                       Enter your profile URL. You can change it later.
+                    </p>
+                  )}
+                  {profileLinkTakenError && (
+                    <p className="text-red-500 text-sm mt-1">
+                      This profile URL is already taken. Please choose a different one.
                     </p>
                   )}
                 </div>
