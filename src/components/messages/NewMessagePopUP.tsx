@@ -1,62 +1,64 @@
-"use client"
-import { useState, useEffect } from 'react'
-import { motion, AnimatePresence } from 'framer-motion'
+"use client";
+import { useState, useEffect } from "react";
+import { motion, AnimatePresence } from "framer-motion";
 import { IoClose } from "react-icons/io5";
-import { useSendMessage } from '@/hooks/sockets/useMessaging'
-import { messageToastBus } from '@/lib/sockets/messageToastBus'
-import Button from '@/components/ui/Button'
+import { useSendMessage } from "@/hooks/sockets/useMessaging";
+import { messageToast } from "@/lib/toasts/messageToast";
+import Button from "@/components/ui/Button";
 
 interface PrefilledUser {
-  userId:      string
-  displayName: string
-  photoUrl:    string
+  userId: string;
+  displayName: string;
+  photoUrl: string;
 }
 
 interface NewMessagePopUPProps {
-  isOpen:         boolean
-  onClose:        () => void
-  prefilledUser?: PrefilledUser
+  isOpen: boolean;
+  onClose: () => void;
+  prefilledUser?: PrefilledUser;
 }
 
-const NewMessagePopUP = ({ isOpen, onClose, prefilledUser }: NewMessagePopUPProps) => {
-  const [content,   setContent]   = useState('')
-  const [recipient, setRecipient] = useState<PrefilledUser | null>(prefilledUser ?? null)
+const NewMessagePopUP = ({
+  isOpen,
+  onClose,
+  prefilledUser,
+}: NewMessagePopUPProps) => {
+  const [content, setContent] = useState("");
+  const [recipient, setRecipient] = useState<PrefilledUser | null>(
+    prefilledUser ?? null,
+  );
 
   // Sync recipient every time the popup opens — handles reopen after send
   useEffect(() => {
     if (isOpen) {
-      setRecipient(prefilledUser ?? null)
-      setContent('')
+      setRecipient(prefilledUser ?? null);
+      setContent("");
     }
-  }, [isOpen, prefilledUser?.userId])
+  }, [isOpen, prefilledUser?.userId]);
 
   const { send, isSending } = useSendMessage(() => {
     if (recipient) {
-      messageToastBus.emit({
-        type:           'sent',
-        recipientName:  recipient.displayName,
-        recipientPhoto: recipient.photoUrl,
-      })
+      messageToast.sent(recipient.displayName, recipient.photoUrl);
     }
-    setContent('')
-    setRecipient(null)
-    onClose()
-  })
+    setContent("");
+    setRecipient(null);
+    onClose();
+  });
 
   const handleSend = async () => {
-    if (!recipient || !content.trim()) return
-    await send(recipient.userId, content)
-  }
+    if (!recipient || !content.trim()) return;
+    await send(recipient.userId, content);
+  };
 
   return (
     <AnimatePresence>
       {isOpen && (
         <div
-          className='fixed inset-0 bg-white-smoke/30 z-1001 flex items-start pt-25 justify-center'
+          className="fixed inset-0 bg-white-smoke/30 z-1001 flex items-start pt-25 justify-center"
           onClick={onClose}
         >
           <button
-            className='fixed top-4 right-4 text-white-smoke text-2xl font-bold bg-off-black rounded-full w-11 h-11 flex items-center justify-center hover:text-silver cursor-pointer z-1002'
+            className="fixed top-4 right-4 text-white-smoke text-2xl font-bold bg-off-black rounded-full w-11 h-11 flex items-center justify-center hover:text-silver cursor-pointer z-1002"
             onClick={onClose}
           >
             ✕
@@ -66,44 +68,48 @@ const NewMessagePopUP = ({ isOpen, onClose, prefilledUser }: NewMessagePopUPProp
             initial={{ opacity: 0, y: -60 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -60 }}
-            transition={{ duration: 0.3, ease: 'easeInOut' }}
-            className='flex flex-col w-200 p-6 bg-chinese-black rounded-md relative'
+            transition={{ duration: 0.3, ease: "easeInOut" }}
+            className="flex flex-col w-200 p-6 bg-chinese-black rounded-md relative"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className='text-xl text-white-smoke font-bold mb-8'>New message</p>
+            <p className="text-xl text-white-smoke font-bold mb-8">
+              New message
+            </p>
 
-            <div className='flex flex-col gap-3 mb-7'>
-              <p className='text-md font-bold text-white-smoke'>
-                To<span className='text-red-500'>*</span>
+            <div className="flex flex-col gap-3 mb-7">
+              <p className="text-md font-bold text-white-smoke">
+                To<span className="text-red-500">*</span>
               </p>
-              <div className='w-full min-h-12 bg-off-black px-3 py-2 rounded flex items-center flex-wrap gap-2'>
+              <div className="w-full min-h-12 bg-off-black px-3 py-2 rounded flex items-center flex-wrap gap-2">
                 {recipient ? (
-                  <div className='flex items-center gap-2 bg-chinese-black rounded px-2 py-1'>
+                  <div className="flex items-center gap-2 bg-chinese-black rounded px-2 py-1">
                     <img
                       src={recipient.photoUrl}
                       alt={recipient.displayName}
-                      className='w-6 h-6 rounded-full object-cover'
+                      className="w-6 h-6 rounded-full object-cover"
                     />
-                    <span className='text-white-smoke text-sm font-bold'>
+                    <span className="text-white-smoke text-sm font-bold">
                       {recipient.displayName}
                     </span>
                     <button
                       onClick={() => setRecipient(null)}
-                      className='text-silver hover:text-white-smoke text-xs ml-1 cursor-pointer'
+                      className="text-silver hover:text-white-smoke text-xs ml-1 cursor-pointer"
                     >
                       ✕
                     </button>
                   </div>
                 ) : (
-                  <span className='text-silver text-sm'>No recipient selected</span>
+                  <span className="text-silver text-sm">
+                    No recipient selected
+                  </span>
                 )}
               </div>
             </div>
 
-            <div className='flex flex-col gap-3 mb-5'>
-              <p className='text-md font-bold text-white-smoke'>
+            <div className="flex flex-col gap-3 mb-5">
+              <p className="text-md font-bold text-white-smoke">
                 Write your message and add tracks or playlists
-                <span className='text-red-500'>*</span>
+                <span className="text-red-500">*</span>
               </p>
               <textarea
                 className="w-full h-29 bg-off-black px-3 py-3 text-white-smoke rounded resize-y caret-crusta text-md"
@@ -113,20 +119,20 @@ const NewMessagePopUP = ({ isOpen, onClose, prefilledUser }: NewMessagePopUPProp
               />
             </div>
 
-            <div className='ml-auto'>
+            <div className="ml-auto">
               <Button
                 onClick={handleSend}
                 disabled={!recipient || !content.trim() || isSending}
-                className='text-chinese-black text-sm bg-white-smoke disabled:opacity-50'
+                className="text-chinese-black text-sm bg-white-smoke disabled:opacity-50"
               >
-                {isSending ? 'Sending...' : 'Send'}
+                {isSending ? "Sending..." : "Send"}
               </Button>
             </div>
           </motion.div>
         </div>
       )}
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export default NewMessagePopUP
+export default NewMessagePopUP;

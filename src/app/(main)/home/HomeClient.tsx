@@ -9,7 +9,6 @@ import { useGetPlaylists, useGetPlaylistById } from "@/hooks/usePlaylists";
 import { useGetFollowing } from "@/hooks/useSocial";
 
 import { useAppSelector } from "@/store/hooks";
-import PlaylistWaveformCard from "@/components/layout/track-cards/WaveformPlaylist";
 import ArtistTools from "@/components/home/ArtistTools";
 
 export default function HomeClient() {
@@ -61,36 +60,18 @@ export default function HomeClient() {
           playlists={newPlaylists ?? undefined}
           loading={newPlaylistsLoading}
         />
-
-        <PlaylistWaveformCard
-          img={playlist?.image.imgLink}
-          title={playlist?.title}
-          artist={playlist?.description}
-          playlistId={playlist?._id}
-          tag={playlist?.genre}
-          likeCount={playlist?.numOfLikes}
-          repostCount={playlist?.numOfReposts}
-          isLikedByUser={playlist?.isLiked}
-          isRepostedByUser={playlist?.isReposted}
-          totalTracks={playlist?.totalTracks ?? playlist?.tracks?.length ?? 0}
-          preloadedTracks={playlist?.tracks}
-        />
-
-        <MediaCardCarousel
-          title="Discover our newest playlists!"
-          type="playlists"
-          playlists={newPlaylists ?? undefined}
-          loading={newPlaylistsLoading}
-        />
       </div>
       <div className="hidden md:block md:w-[27.75%]">
         <div className="w-full">
-        <div className="w-full flex flex-col items-center mb-5 ">
-            <div className="w-full"> <ArtistTools /> </div>
-            <div className="w-full"> <SuggestedWrapper /> </div>
+          <div className="w-full flex flex-col items-center mb-5 ">
+            <div className="w-full">
+              <ArtistTools />
+            </div>
+            <div className="w-full">
+              <SuggestedWrapper />
+            </div>
+          </div>
         </div>
-        
-    </div>
       </div>
     </div>
   );

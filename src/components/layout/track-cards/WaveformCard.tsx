@@ -44,6 +44,9 @@ import {
   playNext,
   Track,
 } from "@/store/slices/playerSlice";
+import { interactionToast } from "@/lib/toasts/interactionToast";
+import { toastBus } from "@/lib/toasts/toastBus";
+import { getBaseUrl } from "@/utilities/getBaseUrl";
 
 type CardProps = {
   img?: string;
@@ -343,6 +346,7 @@ export default function WaveformCard({
       setLikeCountState((c) => c - 1);
     } else {
       setLikeCountState((c) => c + 1);
+      interactionToast.liked(title ?? "the track", img ?? "");
     }
   }
 
@@ -353,8 +357,24 @@ export default function WaveformCard({
       setRepostCountState((c) => c - 1);
     } else {
       setRepostCountState((c) => c + 1);
+      interactionToast.reposted(title ?? "the track", img ?? "");
     }
   }
+
+  const handleCopyLink = () => {
+    if (!trackId) return;
+
+    const url = `${getBaseUrl()}/track/${trackId}`;
+
+    navigator.clipboard.writeText(url);
+    toastBus.emit({
+      category: "interaction",
+      type: "copied",
+    });
+  };
+
+  const allTracksRef = useRef(allTracks);
+  allTracksRef.current = allTracks ?? [];
 
   function handlePlayClick(e: React.MouseEvent) {
     e.stopPropagation();
@@ -366,8 +386,8 @@ export default function WaveformCard({
     }
     dispatch(
       playAudio({
-        tracks: allTracks?.length
-          ? allTracks
+        tracks: allTracksRef.current?.length
+          ? allTracksRef.current
           : [{ id: trackId, url: trackUrl ?? "", title, artist, img }],
         startId: trackId,
       }),
@@ -380,8 +400,8 @@ export default function WaveformCard({
     stopPreview();
     dispatch(
       playAudio({
-        tracks: allTracks?.length
-          ? allTracks
+        tracks: allTracksRef.current?.length
+          ? allTracksRef.current
           : [{ id: trackId, url: trackUrl ?? "", title, artist, img }],
         startId: trackId,
       }),
@@ -395,6 +415,8 @@ export default function WaveformCard({
   function handlePlayNextClick(e: React.MouseEvent) {
     e.stopPropagation();
     if (!trackId || !trackUrl) return;
+
+    interactionToast.queued(title ?? "the track", img ?? "");
 
     dispatch(
       playNext({
@@ -589,7 +611,7 @@ export default function WaveformCard({
           </div>
 
           <div
-            className="w-full max-w-158 h-15 shrink-0 cursor-pointer"
+            className="w-full h-15 shrink-0 cursor-pointer"
             onClick={handleOpenCommentBox}
           >
             <SausageWaveform
@@ -706,6 +728,7 @@ export default function WaveformCard({
                 <Button
                   className="bg-off-black"
                   icon={<TbCopy className="text-xl" />}
+                  onClick={handleCopyLink}
                 />
               </Tooltip>
               {onEdit && canEdit && (
@@ -738,6 +761,7 @@ export default function WaveformCard({
                   {
                     label: "Add to Next up",
                     icon: <ListStart size={19} className="scale-x-[-1]" />,
+                    onClick: (e) => handlePlayNextClick(e),
                   },
                   {
                     label: "Add to Playlist",
