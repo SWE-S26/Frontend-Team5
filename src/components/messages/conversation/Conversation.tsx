@@ -4,6 +4,7 @@ import ConversationInput from "./ConversationInput"
 import MessageBubble from "./MessageBubble"
 import { useMessages, useSendMessage } from '@/hooks/sockets/useMessaging'
 import { useChatRoom } from '@/hooks/sockets/useSocket'
+import { useMessagesContext } from '@/components/messages/MessagesContext'
 import { useAppSelector } from '@/store/hooks'
 
 interface ConversationProps {
@@ -22,7 +23,11 @@ const Conversation = ({ chatId, receiverId, displayName, photoUrl, isUnread, mar
   const bottomRef     = useRef<HTMLDivElement>(null)
 
   const { messages, isReceiverBlocked, addMessage } = useMessages(chatId)
-  const { send, isSending }                         = useSendMessage(addMessage)
+  const { updateFromLocalSend }                     = useMessagesContext()
+  const { send, isSending }                         = useSendMessage(({ message, conversation }) => {
+    addMessage(message)
+    updateFromLocalSend(conversation)
+  })
 
   // useChatRoom handles join/leave/message:send — lives in useSocket.ts
   useChatRoom(chatId, addMessage)
