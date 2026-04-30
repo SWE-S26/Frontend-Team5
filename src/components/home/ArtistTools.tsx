@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import { ChevronDown, ChevronUp } from 'lucide-react'
+import { useAppSelector } from '@/store/hooks'
 import UnlockArtistBanner from './UnlockArtistBanner'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -10,6 +11,7 @@ import UnlockArtistBanner from './UnlockArtistBanner'
 interface ArtistTool {
   name: string
   icon: React.ReactNode
+  proHoverColor: string   // icon tint when Pro user hovers
 }
 
 // ─── Custom SVG Icons ─────────────────────────────────────────────────────────
@@ -73,14 +75,14 @@ const CommentsIcon = () => (
 // ─── Tool data ────────────────────────────────────────────────────────────────
 
 const ARTIST_TOOLS: ArtistTool[] = [
-  { name: 'Amplify',    icon: <AmplifyIcon /> },
-  { name: 'Replace',   icon: <ReplaceIcon /> },
-  { name: 'Distribute',icon: <DistributeIcon /> },
-  { name: 'Master',    icon: <MasterIcon /> },
-  { name: 'Monetize',  icon: <MonetizeIcon /> },
-  { name: 'Spotlight', icon: <SpotlightIcon /> },
-  { name: 'Top fans',  icon: <TopFansIcon /> },
-  { name: 'Comments',  icon: <CommentsIcon /> },
+  { name: 'Amplify',    icon: <AmplifyIcon />,    proHoverColor: '#6D28D9' }, // dark purple
+  { name: 'Replace',   icon: <ReplaceIcon />,    proHoverColor: '#3B82F6' }, // medium blue
+  { name: 'Distribute',icon: <DistributeIcon />, proHoverColor: '#9D174D' }, // dark pink
+  { name: 'Master',    icon: <MasterIcon />,     proHoverColor: '#5B21B6' }, // dark purple
+  { name: 'Monetize',  icon: <MonetizeIcon />,   proHoverColor: '#065F46' }, // dark green
+  { name: 'Spotlight', icon: <SpotlightIcon />,  proHoverColor: '#1E40AF' }, // dark blue
+  { name: 'Top fans',  icon: <TopFansIcon />,    proHoverColor: '#7C3AED' }, // light purple
+  { name: 'Comments',  icon: <CommentsIcon />,   proHoverColor: '#C2410C' }, // orange
 ]
 
 // ─── Star badge ───────────────────────────────────────────────────────────────
@@ -99,11 +101,14 @@ function StarBadge() {
 
 interface ToolCardProps {
   tool: ArtistTool
+  isPro: boolean
   onClick: () => void
 }
 
-function ToolCard({ tool, onClick }: ToolCardProps) {
+function ToolCard({ tool, isPro, onClick }: ToolCardProps) {
   const [hovered, setHovered] = useState(false)
+
+  const showProHover = isPro && hovered
 
   return (
     <button
@@ -113,26 +118,55 @@ function ToolCard({ tool, onClick }: ToolCardProps) {
       className="
         relative flex flex-col items-center
         rounded-lg overflow-hidden w-full
-        bg-chinese-black
-        border border-off-black
+        bg-chinese-black border border-off-black
         focus:outline-none pb-[10px]
       "
-      aria-label={`${tool.name} – upgrade required`}
+      aria-label={isPro ? tool.name : `${tool.name} – upgrade required`}
     >
       <StarBadge />
 
-      <div className="flex items-center justify-center w-full pt-[16px] pb-[8px] text-white-smoke">
+      {/* ── Icon — tints to proHoverColor when Pro user hovers ── */}
+      <div
+        className="flex items-center justify-center w-full pt-[16px] pb-[8px] transition-colors duration-200"
+        style={{ color: showProHover ? tool.proHoverColor : 'var(--fg)' }}
+      >
         {tool.icon}
       </div>
 
-      {hovered ? (
-        <span className="px-4  bg-[#7B61FF] text-chinese-black text-[10px] font-bold  select-none">
-          Upgrade
-        </span>
+      {/* ── Label area — always h-[28px], inner column slides up on hover ── */}
+      {isPro ? (
+        <div className="h-[28px] overflow-hidden w-full flex justify-center">
+          <div
+            className="flex flex-col items-center transition-transform duration-200 ease-in-out"
+            style={{ transform: hovered ? 'translateY(0px)' : 'translateY(14px)' }}
+          >
+            {/* Tool name — starts at bottom of container, slides to top on hover */}
+            <div className="h-[14px] flex items-center justify-center">
+              <span className="text-white-smoke text-[10px] font-bold select-none leading-none">
+                {tool.name}
+              </span>
+            </div>
+            {/* Unlimited — hidden below clip, revealed when column slides up */}
+            <div className="h-[14px] flex items-center justify-center">
+              <span className="text-silver text-[9px] font-semibold select-none leading-none">
+                Unlimited
+              </span>
+            </div>
+          </div>
+        </div>
       ) : (
-        <span className="text-white-smoke text-[10px] font-bold select-none">
-          {tool.name}
-        </span>
+        /* Free user label — same h-[28px] container as Pro for consistent card height */
+        <div className="h-[28px] w-full flex items-center justify-center">
+          {hovered ? (
+            <span className="px-4 bg-[#7B61FF] text-chinese-black text-[10px] font-bold  select-none">
+              Upgrade
+            </span>
+          ) : (
+            <span className="text-white-smoke text-[10px] font-bold select-none">
+              {tool.name}
+            </span>
+          )}
+        </div>
       )}
     </button>
   )
@@ -142,7 +176,11 @@ function ToolCard({ tool, onClick }: ToolCardProps) {
 
 export default function ArtistTools() {
   const [expanded, setExpanded] = useState(false)
-  const router = useRouter()
+  const router   = useRouter()
+
+  // ── Read role from Redux auth state ──────────────────────────────────────────
+  const role  = useAppSelector((state) => state.auth.role)
+  const isPro = role === 'Pro'
 
   const visibleTools = expanded ? ARTIST_TOOLS : ARTIST_TOOLS.slice(0, 4)
 
@@ -164,7 +202,7 @@ export default function ArtistTools() {
         </span>
       </button>
 
-      {/* ── Divider line under header ── */}
+      {/* ── Divider ── */}
       <div className="w-full border-t border-off-black mb-3" />
 
       {/* ── Grid ── */}
@@ -176,14 +214,18 @@ export default function ArtistTools() {
           <ToolCard
             key={tool.name}
             tool={tool}
-            onClick={() => router.push('/artist')}
+            isPro={isPro}
+            onClick={() => router.push(isPro ? '/artists' : '/artist')}
           />
         ))}
       </div>
 
-      <div className="mt-2">
-        <UnlockArtistBanner />
-      </div>
+      {/* ── Banner — hidden for Pro users ── */}
+      {!isPro && (
+        <div className="mt-2">
+          <UnlockArtistBanner />
+        </div>
+      )}
 
     </section>
   )
