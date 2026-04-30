@@ -8,7 +8,7 @@ import AntProviders from "@/components/AntProviders";
 import "./globals.css";
 import AudioBridge from "@/components/AudioBridge";
 import GlobalAudioDropOverlay from "@/components/GlobalAudioDropOverlay";
-
+import Toasts from "@/components/ui/Toasts";
 const inter = Inter({
   variable: "--font-sans",
   subsets: ["latin"],
@@ -37,6 +37,7 @@ export default function RootLayout({
                 <AuthGoogle />
                 <AudioBridge />
                 <GlobalAudioDropOverlay />
+                <Toasts />
                 {children}
               </ThemeProvider>
             </MockProvider>
