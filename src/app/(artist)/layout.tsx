@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import AuthGuard from "@/components/layout/AuthGuard";
 import NotificationToast from "@/components/notifications/NotificationToast";
 import { NotificationsProvider } from "@/components/notifications/NotificationsContext";
@@ -23,7 +23,11 @@ function SocketInitializer() {
   return null;
 }
 
-export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
+export default function ProtectedLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <NotificationsProvider>
       <SocketInitializer />

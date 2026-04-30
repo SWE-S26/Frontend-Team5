@@ -15,7 +15,7 @@ import { SocketProvider } from "@/lib/sockets/SocketContext";
 
 function SocketInitializer() {
   const { incrementUnread, addIncoming } = useNotificationsContext();
-  const { updateFromSocket }             = useMessagesContext();
+  const { updateFromSocket } = useMessagesContext();
 
   useSocket({
     onNotification: (data) => {
@@ -27,10 +27,10 @@ function SocketInitializer() {
       updateFromSocket(data);
       // Show received message toast
       messageToastBus.emit({
-        type:        "received",
-        senderName:  data.sender?.displayName ?? "Someone",
-        senderPhoto: data.sender?.photoUrl    ?? "",
-        content:     data.lastMessage?.content ?? "",
+        type: "received",
+        senderName: data.sender?.displayName ?? "Someone",
+        senderPhoto: data.sender?.photoUrl ?? "",
+        content: data.lastMessage?.content ?? "",
       });
     },
   });
@@ -38,23 +38,27 @@ function SocketInitializer() {
   return null;
 }
 
-export default function MainLayout({ children }: { children: React.ReactNode }) {
+export default function MainLayout({
+  children,
+}: {
+  children: React.ReactNode;
+}) {
   return (
     <SocketProvider>
-    <NotificationsProvider>
-      <MessagesProvider>
-        <SocketInitializer />
-        <AuthGuard>
-          <Navbar className="fixed top-0 w-full z-1000 bg-chinese-black" />
-          <main className="sm:mt-18 flex justify-center md:mb-11.75 pb-32 md:pb-0 pt-14 md:pt-0 overflow-x-hidden md:overflow-x-visible">
-            <div className="w-full max-w-302">{children}</div>
-          </main>
-          <PlayerBar />
-          <NotificationToast />
-          <MessageToast />
-        </AuthGuard>
-      </MessagesProvider>
-    </NotificationsProvider>
+      <NotificationsProvider>
+        <MessagesProvider>
+          <SocketInitializer />
+          <AuthGuard>
+            <Navbar className="fixed top-0 w-full z-1000 bg-chinese-black" />
+            <main className="sm:mt-18 flex justify-center md:mb-11.75 pb-32 md:pb-0 pt-14 md:pt-0 overflow-x-hidden md:overflow-x-visible">
+              <div className="w-full max-w-302">{children}</div>
+            </main>
+            <PlayerBar />
+            <NotificationToast />
+            <MessageToast />
+          </AuthGuard>
+        </MessagesProvider>
+      </NotificationsProvider>
     </SocketProvider>
   );
 }

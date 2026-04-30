@@ -3,7 +3,13 @@
 import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import { play, pause, playAudio, playNext } from "@/store/slices/playerSlice";
+import {
+  play,
+  pause,
+  playAudio,
+  playNext,
+  Track,
+} from "@/store/slices/playerSlice";
 import { useAudioProgress } from "@/hooks/useAudioProgress";
 import { useIsVisible } from "@/hooks/useIsVisible";
 import {
@@ -23,6 +29,10 @@ import { HiHeart } from "react-icons/hi";
 import { LuRepeat2, LuShare } from "react-icons/lu";
 import { TbCopy } from "react-icons/tb";
 import { ListStart } from "lucide-react";
+import MoreDropdown from "@/components/ui/MoreDropdown";
+import { BiStation } from "react-icons/bi";
+import { RiPlayListAddLine } from "react-icons/ri";
+import { getBaseUrl } from "@/utilities/getBaseUrl";
 
 type PlaylistTrack = {
   _id: string;
@@ -48,6 +58,7 @@ type Props = {
   isRepostedByUser?: boolean;
   preloadedTracks?: PlaylistTrack[];
   totalTracks?: number;
+  feedQueue?: Track[];
 };
 
 function formatPlays(n: number): string {
@@ -83,6 +94,8 @@ export function TrackRow({
   );
   const [isReposted, setIsReposted] = useState(track.isReposted);
 
+  const dispatch = useDispatch();
+
   const indexColor = isCurrent ? "text-inferno" : "text-silver";
   const titleColor = isCurrent
     ? "text-inferno"
@@ -93,11 +106,48 @@ export function TrackRow({
   function handleLikeClick() {
     likeTrack();
     setIsLiked((l) => !l);
+    if (!isLiked) {
+      // interactionToast.liked(track.basicInfo.title, track.image.imgLink);
+    }
   }
   function handleRepostClick() {
     repostTrack();
     setIsReposted((r) => !r);
+    if (!isReposted) {
+      // interactionToast.reposted(track.basicInfo.title, track.image.imgLink);
+    }
   }
+
+  function handlePlayNextClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!track._id || !track.audio) return;
+
+    // interactionToast.queued(track.basicInfo.title, track.image.imgLink);
+
+    dispatch(
+      playNext({
+        tracks: {
+          id: track._id,
+          url: track.audio.audioLink,
+          title: track.basicInfo.title,
+          artist: track.basicInfo.mainArtists[0],
+          img: track.image.imgLink,
+        },
+      }),
+    );
+  }
+
+  const handleCopyLink = () => {
+    if (!track._id) return;
+
+    const url = `${getBaseUrl()}/track/${track._id}`;
+
+    navigator.clipboard.writeText(url);
+    // toastBus.emit({
+    //   category: "interaction",
+    //   type: "copied",
+    // });
+  };
 
   return (
     <div
@@ -195,14 +245,33 @@ export function TrackRow({
               <Button
                 className={isPlaying ? "bg-off-black" : "bg-transparent"}
                 icon={<TbCopy className="text-[15px]" />}
+                onClick={handleCopyLink}
               />
             </Tooltip>
-            <Tooltip label="More">
-              <Button
-                className={isPlaying ? "bg-off-black" : "bg-transparent"}
-                icon={<IoIosMore className="text-[16px]" />}
-              />
-            </Tooltip>
+            <MoreDropdown
+              trigger={
+                <Button
+                  className={isPlaying ? "bg-off-black" : "bg-transparent"}
+                  icon={<IoIosMore className="text-[15px]" />}
+                />
+              }
+              tooltipLabel="More"
+              items={[
+                {
+                  label: "Add to Next up",
+                  icon: <ListStart size={19} className="scale-x-[-1]" />,
+                  onClick: handlePlayNextClick,
+                },
+                {
+                  label: "Add to Playlist",
+                  icon: (
+                    <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
+                  ),
+                  // onClick: handleOpenAddToPlaylistModal,
+                },
+                { label: "Station", icon: <BiStation className="text-lg" /> },
+              ]}
+            />
           </div>
         ) : (
           <div className="flex items-center gap-1 text-silver text-[11px]">
@@ -227,6 +296,7 @@ export default function PlaylistWaveformCard({
   isRepostedByUser = false,
   preloadedTracks,
   totalTracks,
+  feedQueue,
 }: Props) {
   const dispatch = useDispatch();
   const { currentTrackId, isPlaying } = useSelector(
@@ -301,15 +371,19 @@ export default function PlaylistWaveformCard({
     }
     const tracks = await ensureTracks();
     if (!tracks.length) return;
-    const mapped = tracks.map((t) => ({
-      id: t._id,
-      url: t.audio.audioLink,
-      title: t.basicInfo.title,
-      artist: t.basicInfo.mainArtists[0],
-      img: t.image.imgLink,
-      duration: t.durationInSeconds,
-    }));
-    dispatch(playAudio({ tracks: mapped, startId: mapped[0].id }));
+
+    const queue = feedQueue?.length
+      ? feedQueue
+      : tracks.map((t) => ({
+          id: t._id,
+          url: t.audio.audioLink,
+          title: t.basicInfo.title,
+          artist: t.basicInfo.mainArtists[0],
+          img: t.image.imgLink,
+          duration: t.durationInSeconds,
+        }));
+
+    dispatch(playAudio({ tracks: queue, startId: tracks[0]._id }));
     setTimeout(() => dispatch(play()), 0);
   }
 
@@ -335,13 +409,31 @@ export default function PlaylistWaveformCard({
     likePlaylist();
     setLikeCountState((c) => (isLiked ? (c ?? 0) - 1 : (c ?? 0) + 1));
     setIsLiked((l) => !l);
+    if (!isLiked) {
+      // interactionToast.liked(title ?? "this playlist", img ?? "");
+    }
   }
 
   function handleRepostClick() {
     repostPlaylist();
     setRepostCountState((c) => (isReposted ? (c ?? 0) - 1 : (c ?? 0) + 1));
     setIsReposted((r) => !r);
+    if (!isReposted) {
+      // interactionToast.reposted(title ?? "this playlist", img ?? "");
+    }
   }
+
+  const handleCopyLink = () => {
+    if (!playlistId) return;
+
+    const url = `${getBaseUrl()}/playlist/${playlistId}`;
+
+    navigator.clipboard.writeText(url);
+    // toastBus.emit({
+    //   category: "interaction",
+    //   type: "copied",
+    // });
+  };
 
   return (
     <div className="flex items-stretch" ref={ref}>
@@ -382,11 +474,11 @@ export default function PlaylistWaveformCard({
         </div>
 
         {/* Waveform */}
-        <div className="w-full max-w-158 h-15 shrink-0">
+        <div className="w-full h-15 shrink-0">
           <SausageWaveform
             trackId={currentTrack?._id ?? playlistId}
             samplesUrl={currentTrack?.audio.waveformLink ?? "/waveform.json"}
-            externalProgress={isThisPlaying ? progress : 0}
+            externalProgress={progress}
             onSeek={seekToPercentage}
             onPlay={() => handlePlayClick()}
             isPlaying={isThisPlaying}
@@ -477,12 +569,19 @@ export default function PlaylistWaveformCard({
             <Button
               className="bg-off-black"
               icon={<TbCopy className="text-xl" />}
+              onClick={handleCopyLink}
             />
           </Tooltip>
           <Tooltip label="Add to Next up">
             <Button
               className="bg-off-black"
               onClick={async () => {
+                // toastBus.emit({
+                //   category: "interaction",
+                //   type: "queued",
+                //   name: title ?? "this playlist",
+                //   image: img ?? "",
+                // });
                 const rawTracks = await ensureTracks();
                 const mappedTracks = rawTracks.map((t) => ({
                   id: t._id,
