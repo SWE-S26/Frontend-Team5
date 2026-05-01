@@ -9,6 +9,8 @@ import { GripVertical } from "lucide-react";
 
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { clearQueue, play, playAudio, reorderQueue, type Track } from "@/store/slices/playerSlice";
+import { useLikeTrackOptimistic, useLikeStatus } from "@/hooks/useLikes";
+import { setTrackLiked } from "@/store/slices/playerSlice";
 
 type PlayerNextUpProps = {
   hasTrackInfo?: boolean;
@@ -132,27 +134,43 @@ export default function PlayerNextUp({
 }: PlayerNextUpProps) {
   const dispatch = useAppDispatch();
   const panelRef = useRef<HTMLDivElement | null>(null);
-  const [liked, setLiked] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [added, setAdded] = useState(false);
   const [isQueueOpen, setIsQueueOpen] = useState(false);
+
   const queue = useAppSelector((state) => state.player.tracks);
   const currentTrackId = useAppSelector((state) => state.player.currentTrackId);
+
+  // Like — synced with current track
+  const { isCurrentTrackLiked: isLiked, currentTrackLikeCount } = useAppSelector(
+    (state) => state.player
+  );
+  const { likeTrack, loading: likeLoading } = useLikeTrackOptimistic(currentTrackId ?? "");
+
+
+  const handleLike = async () => {
+    if (!currentTrackId || likeLoading) return;
+    try {
+      await likeTrack();
+      const nextLiked = !isLiked;
+      dispatch(setTrackLiked({
+        liked: nextLiked,
+        likeCount: nextLiked ? currentTrackLikeCount + 1 : currentTrackLikeCount - 1,
+      }));
+      if (nextLiked) {
+        setShowToast(true);
+        setTimeout(() => setShowToast(false), 6000);
+      }
+    } catch (err) {
+      console.error(err);
+    }
+  };
 
   function handlePlayTrack(trackId: string) {
     dispatch(playAudio({ tracks: queue, startId: trackId }));
     setTimeout(() => dispatch(play()), 0);
     setIsQueueOpen(false);
   }
-
-  const handleLike = () => {
-    const newLiked = !liked;
-    setLiked(newLiked);
-    if (newLiked) {
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 6000);
-    }
-  };
 
   useEffect(() => {
     if (!isQueueOpen) return;
@@ -212,7 +230,8 @@ export default function PlayerNextUp({
 
       <button
         onClick={handleLike}
-        className={`${liked ? "text-anger" : "text-white-smoke"} cursor-pointer hover:text-silver`}
+        disabled={likeLoading || !currentTrackId}
+        className={`${isLiked ? "text-anger" : "text-white-smoke"} cursor-pointer hover:text-silver disabled:opacity-40 disabled:cursor-not-allowed transition`}
       >
         <IoIosHeart size={16} />
       </button>

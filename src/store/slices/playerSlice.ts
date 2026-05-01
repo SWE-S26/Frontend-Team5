@@ -23,6 +23,8 @@ type PlayerState = {
   shuffleQueue: string[];
   shuffleIndex: number;
   loop: "none" | "one" | "all";
+  isCurrentTrackLiked: boolean;
+  currentTrackLikeCount: number;
 };
 
 const initialState: PlayerState = {
@@ -39,6 +41,8 @@ const initialState: PlayerState = {
   shuffleQueue: [],
   shuffleIndex: -1,
   loop: "none",
+  isCurrentTrackLiked: false,
+  currentTrackLikeCount: 0,
 };
 
 function applyTrackMetadata(state: PlayerState, track: Track) {
@@ -48,6 +52,8 @@ function applyTrackMetadata(state: PlayerState, track: Track) {
   state.currentTrackArtist = track.artist ?? null;
   state.currentTrackImage = track.img ?? null;
   state.currentTrackDuration = track.duration ?? 0;
+  state.isCurrentTrackLiked = false;
+  state.currentTrackLikeCount = 0;
 }
 
 function buildShuffleQueue(tracks: Track[], currentId: string): string[] {
@@ -194,6 +200,12 @@ const playerSlice = createSlice({
       state.currentTrackDuration = action.payload;
     },
 
+    setTrackLiked(state, action: PayloadAction<{ liked: boolean; likeCount: number }>) {
+      state.isCurrentTrackLiked = action.payload.liked;
+      state.currentTrackLikeCount = action.payload.likeCount;
+    },
+
+
     addToQueue(state, action: PayloadAction<Track>) {
       const exists = state.tracks.some((t) => t.id === action.payload.id);
       if (!exists) state.tracks.push(action.payload);
@@ -259,6 +271,7 @@ export const {
   setVolume,
   toggleShuffle,
   cycleLoop,
+  setTrackLiked,
   setTrackDuration,
   addToQueue,
   playNext,

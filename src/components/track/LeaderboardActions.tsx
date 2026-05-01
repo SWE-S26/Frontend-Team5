@@ -5,10 +5,10 @@ import { useAppSelector } from "@/store/hooks";
 import { Avatar } from "antd";
 import LeaderboardFollowButton from "./LeaderboardFollowButton";
 import { useLikeTrackOptimistic } from "@/hooks/useLikes";
-import { useState, useEffect } from "react";
+import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
-import { cycleLoop } from "@/store/slices/playerSlice";
+import { cycleLoop, setTrackLiked } from "@/store/slices/playerSlice";
 
 interface Props {
   trackId: string;
@@ -16,7 +16,6 @@ interface Props {
   isLikedByUser: boolean;
   posterId: string;
   onPlay: () => void;
-  // sync these from track data
   title?: string;
   artist?: string;
   img?: string;
@@ -37,40 +36,33 @@ export default function LeaderboardActions({
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
   const isFollowed = useAppSelector((state) => state.profile.isFollowed);
   const hasAvatar = !!profileImgLink;
-  
 
-  // Like — synced with optimistic update like WaveformCard
-  const [isLiked, setIsLiked] = useState(isLikedByUser ?? false);
-  const [likeCountState, setLikeCountState] = useState(likeCount);
+  const dispatch = useDispatch();
+  const { currentTrackId, isPlaying, loop, isCurrentTrackLiked, currentTrackLikeCount } =
+    useSelector((state: RootState) => state.player);
+  const isThisTrackPlaying = currentTrackId === trackId && isPlaying;
+  const isActive = loop === "one" && currentTrackId === trackId;
+
   const { likeTrack, loading } = useLikeTrackOptimistic(trackId);
 
+  // Seed Redux with the prop values when the component mounts or props change
+  // Only seed if this is the currently loaded track to avoid overwriting
   useEffect(() => {
-    setIsLiked(isLikedByUser);
-  }, [isLikedByUser]);
+    if (currentTrackId === trackId) {
+      dispatch(setTrackLiked({ liked: isLikedByUser, likeCount }));
+    }
+  }, [isLikedByUser, likeCount, trackId, currentTrackId]);
 
-  useEffect(() => {
-    setLikeCountState(likeCount);
-  }, [likeCount]);
-
-  // Player — synced with redux like WaveformCard/TrackListRow
-  const dispatch = useDispatch();
-  const { currentTrackId, isPlaying, loop } = useSelector((state: RootState) => state.player);
-  const isThisTrackPlaying = currentTrackId === trackId && isPlaying;
-
-  // Repeat active state synced with redux loop state
-  const isActive = loop === "one" && currentTrackId === trackId;
- 
   const handlePlay = () => {
     if (isActive) {
-      // unclick — reset loop back to none
-      dispatch(cycleLoop()); // one -> none
+      dispatch(cycleLoop());
       return;
     }
     if (loop === "none") {
-      dispatch(cycleLoop()); // none -> all
-      dispatch(cycleLoop()); // all -> one
+      dispatch(cycleLoop());
+      dispatch(cycleLoop());
     } else if (loop === "all") {
-      dispatch(cycleLoop()); // all -> one
+      dispatch(cycleLoop());
     }
     onPlay();
   };
@@ -79,11 +71,11 @@ export default function LeaderboardActions({
     if (loading) return;
     try {
       await likeTrack();
-      setIsLiked((prev) => {
-        const next = !prev;
-        setLikeCountState((c) => next ? c + 1 : c - 1);
-        return next;
-      });
+      const nextLiked = !isCurrentTrackLiked;
+      dispatch(setTrackLiked({
+        liked: nextLiked,
+        likeCount: nextLiked ? currentTrackLikeCount + 1 : currentTrackLikeCount - 1,
+      }));
     } catch (err) {
       console.error(err);
     }
@@ -116,20 +108,18 @@ export default function LeaderboardActions({
         {/* Like */}
         <button
           onClick={handleLike}
-          disabled={loading || isLiked}
+          disabled={loading || isCurrentTrackLiked}
           className={`w-17 h-17 rounded-xl flex flex-col items-center justify-center gap-2 transition
-            ${isLiked
+            ${isCurrentTrackLiked
               ? "bg-off-black opacity-40 shadow-inner cursor-not-allowed"
-              : "bg-off-black  active:scale-95 cursor-pointer"
+              : "bg-off-black active:scale-95 cursor-pointer"
             }
             ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
         >
-          <Heart
-            size={20}
-            fill={isLiked ? "currentColor" : "none"}
-          />
+          <Heart size={20} fill={isCurrentTrackLiked ? "currentColor" : "none"} />
           <span className="text-sm text-silver">
-            {isLiked ? "Liked" : "Like"} {likeCountState > 0 && `· ${likeCountState}`}
+            {isCurrentTrackLiked ? "Liked" : "Like"}{" "}
+            {currentTrackLikeCount > 0 && `· ${currentTrackLikeCount}`}
           </span>
         </button>
 
@@ -139,16 +129,16 @@ export default function LeaderboardActions({
           initialIsFollowing={isFollowed}
         />
 
-        {/* Play on repeat — synced with redux loop */}
+        {/* Play on repeat */}
         <button
           onClick={handlePlay}
           className={`w-17 h-17 rounded-xl flex flex-col items-center justify-center gap-2 transition cursor-pointer
             ${isActive
               ? "bg-off-black opacity-40 shadow-inner cursor-not-allowed"
-              : "bg-off-black  cursor-pointer"
+              : "bg-off-black cursor-pointer"
             }`}
         >
-          <Play size={20} className={ "text-silver"} />
+          <Play size={20} className="text-silver" />
           <span className="text-sm text-silver">
             {isActive ? "Repeating" : "Play"}
           </span>
