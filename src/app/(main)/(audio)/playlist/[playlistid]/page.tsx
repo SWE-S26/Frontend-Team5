@@ -99,9 +99,7 @@ function getFeaturedArtists(tracks: PlaylistTrack[]) {
     });
   });
 
-  return [...artists.values()]
-    .sort((a, b) => b.plays - a.plays)
-    .slice(0, 3);
+  return [...artists.values()].sort((a, b) => b.plays - a.plays).slice(0, 3);
 }
 
 function RecommendedPlaylist({ playlist }: { playlist: Playlist }) {
@@ -116,7 +114,9 @@ function RecommendedPlaylist({ playlist }: { playlist: Playlist }) {
         className="h-12 w-12 shrink-0 rounded-sm object-cover"
       />
       <div className="min-w-0">
-        <p className="truncate text-sm font-bold text-white-smoke">{playlist.title}</p>
+        <p className="truncate text-sm font-bold text-white-smoke">
+          {playlist.title}
+        </p>
         <p className="truncate text-xs text-silver">
           {playlist.listOfTracks?.length ?? 0} tracks
         </p>
@@ -182,6 +182,7 @@ function ReorderableTrackRow({
             isPlaying={isPlaying}
             onPlay={onPlay}
             showArtist
+            onAddToPlaylist={() => void 0}
           />
         </div>
       </div>
@@ -211,7 +212,8 @@ export default function PlaylistPage() {
     useGetRecommendedPlaylists();
   const { addPlaylistToHistory } = useAddPlaylistToHistory();
   const { updatePlaylist, loading: updatingPlaylist } = useUpdatePlaylist();
-  const { updatePlaylistImage, loading: updatingImage } = useUpdatePlaylistImage();
+  const { updatePlaylistImage, loading: updatingImage } =
+    useUpdatePlaylistImage();
   const { deletePlaylist, loading: deletingPlaylist } = useDeletePlaylist();
   const { reorderPlaylistTracks, loading: reorderingTracks } =
     useReorderPlaylistTracks();
@@ -334,7 +336,9 @@ export default function PlaylistPage() {
 
     try {
       await updatePlaylist(playlist._id, { isPrivate: nextPrivate });
-      setStatusMessage(nextPrivate ? "Playlist set to private" : "Playlist set to public");
+      setStatusMessage(
+        nextPrivate ? "Playlist set to private" : "Playlist set to public",
+      );
       void getPlaylistById(playlist._id);
     } catch {
       setIsPrivate(!nextPrivate);
@@ -360,7 +364,9 @@ export default function PlaylistPage() {
 
   async function handleDeletePlaylist() {
     if (!playlist || deletingPlaylist) return;
-    const confirmed = window.confirm(`Delete "${playlist.title}"? This cannot be undone.`);
+    const confirmed = window.confirm(
+      `Delete "${playlist.title}"? This cannot be undone.`,
+    );
     if (!confirmed) return;
 
     setStatusMessage(null);
@@ -373,7 +379,9 @@ export default function PlaylistPage() {
   }
 
   function handleReorderStart(trackId: string) {
-    const oldPosition = localTracksRef.current.findIndex((t) => t._id === trackId);
+    const oldPosition = localTracksRef.current.findIndex(
+      (t) => t._id === trackId,
+    );
     if (oldPosition < 0) return;
 
     dragStartRef.current = {
@@ -396,7 +404,9 @@ export default function PlaylistPage() {
     const { apiTrackId, oldPosition, previousTracks } = dragStartRef.current;
     if (!apiTrackId) return;
     dragStartRef.current = null;
-    const newPosition = localTracksRef.current.findIndex((track) => track._id === trackId);
+    const newPosition = localTracksRef.current.findIndex(
+      (track) => track._id === trackId,
+    );
     if (newPosition < 0 || oldPosition === newPosition) return;
 
     setStatusMessage(null);
@@ -428,7 +438,11 @@ export default function PlaylistPage() {
   }
 
   if (!playlist) {
-    return <div className="px-4 py-16 text-center text-silver">Playlist not found.</div>;
+    return (
+      <div className="px-4 py-16 text-center text-silver">
+        Playlist not found.
+      </div>
+    );
   }
 
   const cover = playlist.image?.imgLink || FALLBACK_COVER;
@@ -476,7 +490,9 @@ export default function PlaylistPage() {
                 <div className="h-20 w-full max-w-lg">
                   <SausageWaveform
                     trackId={waveformTrack?._id}
-                    samplesUrl={waveformTrack?.audio.waveformLink ?? "/waveform.json"}
+                    samplesUrl={
+                      waveformTrack?.audio.waveformLink ?? "/waveform.json"
+                    }
                     externalProgress={progress}
                     currentTime={currentTime}
                     duration={waveformTrack?.durationInSeconds ?? 0}
@@ -491,8 +507,12 @@ export default function PlaylistPage() {
                 </div>
               ) : (
                 <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-white-smoke text-center">
-                  <div className="text-3xl font-bold text-chinese-black leading-none">{trackCount}</div>
-                  <div className="mt-1 text-xs font-bold text-chinese-black uppercase tracking-wide">Tracks</div>
+                  <div className="text-3xl font-bold text-chinese-black leading-none">
+                    {trackCount}
+                  </div>
+                  <div className="mt-1 text-xs font-bold text-chinese-black uppercase tracking-wide">
+                    Tracks
+                  </div>
                   <div className="mt-1 text-sm font-bold text-chinese-black">
                     {formatDuration(playlist.playlistLengthInSeconds)}
                   </div>
@@ -657,7 +677,9 @@ export default function PlaylistPage() {
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1">
-                        <span className="truncate text-lg font-bold">{artist.name}</span>
+                        <span className="truncate text-lg font-bold">
+                          {artist.name}
+                        </span>
                         <BadgeCheck className="h-5 w-5 fill-[#5797ff] text-white-smoke" />
                       </div>
                       <div className="mt-1 flex items-center gap-3 text-sm text-silver">

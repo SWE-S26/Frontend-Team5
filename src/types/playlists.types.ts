@@ -77,8 +77,6 @@ export interface PlaylistDetail extends Playlist {
   tracks: PlaylistTrack[];
 }
 
-// Request Types
-
 export interface CreatePlaylistRequest {
   playlistName: string;
   tracks: string[];

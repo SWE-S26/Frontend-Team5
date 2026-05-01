@@ -35,6 +35,7 @@ import { RiPlayListAddLine } from "react-icons/ri";
 import { getBaseUrl } from "@/utilities/getBaseUrl";
 import { interactionToast } from "@/lib/interactive-toasts/interactiveToast";
 import { interactiveToastBus } from "@/lib/interactive-toasts/interactiveToastBus";
+import AddToPlaylistModal from "@/components/playlists/AddToPlaylistModal";
 
 type PlaylistTrack = {
   _id: string;
@@ -61,6 +62,10 @@ type Props = {
   preloadedTracks?: PlaylistTrack[];
   totalTracks?: number;
   feedQueue?: Track[];
+  artistId?: string;
+  isRepost?: boolean;
+  reposterId?: string;
+  reposterName?: string;
 };
 
 function formatPlays(n: number): string {
@@ -77,6 +82,7 @@ export function TrackRow({
   onPlay,
   rowRef,
   showArtist = false,
+  onAddToPlaylist,
 }: {
   track: PlaylistTrack;
   index: number;
@@ -85,6 +91,7 @@ export function TrackRow({
   onPlay: () => void;
   rowRef?: (el: HTMLDivElement | null) => void;
   showArtist?: boolean;
+  onAddToPlaylist: () => void;
 }) {
   const [hovered, setHovered] = useState(false);
   const { likeTrack } = useLikeTrackOptimistic(track._id);
@@ -195,7 +202,7 @@ export function TrackRow({
         </>
       )}
       <a
-        href="#"
+        href={`/track/${track._id}`}
         onClick={(e) => e.stopPropagation()}
         className={`text-sm font-bold flex-1 truncate min-w-0 no-underline transition-colors ${
           isCurrent
@@ -268,9 +275,13 @@ export function TrackRow({
                   icon: (
                     <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
                   ),
-                  // onClick: handleOpenAddToPlaylistModal,
+                  onClick: () => onAddToPlaylist(),
                 },
-                { label: "Station", icon: <BiStation className="text-lg" /> },
+                {
+                  label: "Station",
+                  disabled: true,
+                  icon: <BiStation className="text-lg" />,
+                },
               ]}
             />
           </div>
@@ -298,7 +309,16 @@ export default function PlaylistWaveformCard({
   preloadedTracks,
   totalTracks,
   feedQueue,
+  artistId,
+  isRepost,
+  reposterId,
+  reposterName,
 }: Props) {
+  const displayArtist = artist?.trim() || artistId?.trim() || "Unknown creator";
+  const artistHref = artistId ? `/profile/${artistId}` : undefined;
+  const [addToPlaylistTrack, setAddToPlaylistTrack] =
+    useState<PlaylistTrack | null>(null);
+
   const dispatch = useDispatch();
   const { currentTrackId, isPlaying } = useSelector(
     (state: RootState) => state.player,
@@ -461,8 +481,38 @@ export default function PlaylistWaveformCard({
             )}
           </div>
           <div className="ml-3">
-            <p className="text-sm font-bold text-silver">{artist}</p>
-            <p className="text-sm font-bold text-white-smoke">{title}</p>
+            <div className="flex items-center gap-1 text-sm font-bold text-silver">
+              {artistHref ? (
+                <a
+                  href={artistHref}
+                  className="text-silver no-underline hover:text-white-smoke transition-colors"
+                  onClick={(e) => e.stopPropagation()}
+                >
+                  {displayArtist}
+                </a>
+              ) : (
+                <span>{displayArtist}</span>
+              )}
+              {isRepost && reposterId && (
+                <>
+                  <LuRepeat2 className="text-[13px] shrink-0" />
+                  <a
+                    href={`/profile/${reposterId}`}
+                    className="text-silver no-underline hover:text-white-smoke transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {reposterName}
+                  </a>
+                </>
+              )}
+            </div>
+            <a
+              href={`/playlist/${playlistId}`}
+              className="block text-sm font-bold text-white-smoke no-underline hover:text-silver transition-colors"
+              onClick={(e) => e.stopPropagation()}
+            >
+              {title}
+            </a>
           </div>
           {tag && (
             <a className="absolute top-0 right-0 cursor-pointer no-underline group">
@@ -501,6 +551,7 @@ export default function PlaylistWaveformCard({
               isCurrent={currentTrackId === track._id}
               isPlaying={currentTrackId === track._id && isPlaying}
               onPlay={() => handleTrackPlay(track)}
+              onAddToPlaylist={() => setAddToPlaylistTrack(track)}
               rowRef={(el) => {
                 if (el) rowRefs.current.set(track._id, el);
                 else rowRefs.current.delete(track._id);
@@ -597,6 +648,14 @@ export default function PlaylistWaveformCard({
           </Tooltip>
         </div>
       </div>
+      <AddToPlaylistModal
+        isOpen={addToPlaylistTrack !== null}
+        onClose={() => setAddToPlaylistTrack(null)}
+        trackId={addToPlaylistTrack?._id ?? ""}
+        trackTitle={addToPlaylistTrack?.basicInfo.title}
+        artistName={addToPlaylistTrack?.basicInfo.mainArtists[0]}
+        trackImage={addToPlaylistTrack?.image.imgLink}
+      />
     </div>
   );
 }
