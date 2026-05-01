@@ -23,10 +23,15 @@ import { playAudio } from "@/store/slices/playerSlice";
 import ArtistTools from "@/components/home/ArtistTools";
 import SuggestedWrapper from "@/components/social-graph/SuggestedWrapper";
 import SidebarFooter from "@/components/ui/SidebarFooter";
+import TrackHistoryWidget from "@/components/home/TrackHistoryWidget";
+import LikedTracksWidget from "@/components/home/LikedTracksWidget";
+import { useAppSelector } from "@/store/hooks";
 
 const PAGE_SIZE = 10;
 
 export default function Feed() {
+  const userId = useAppSelector((state) => state.auth.userId);
+
   const { getFeed, items, loading: feedLoading, hasMore } = useGetFeed();
 
   const [allTracks, setAllTracks] = useState<ApiTrack[]>([]);
@@ -431,6 +436,8 @@ export default function Feed() {
               </div>
               <div className="w-full">
                 <SuggestedWrapper />
+                <LikedTracksWidget userId={userId} />
+                <TrackHistoryWidget />
                 <div className="mt-8">
                   <SidebarFooter />
                 </div>
