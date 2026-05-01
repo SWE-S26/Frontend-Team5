@@ -53,7 +53,7 @@ export default function ConfirmPopover({
 
   return (
     <>
-      {/* Trigger */}
+     
       <span ref={refs.setReference} {...getReferenceProps()}>
         {children}
       </span>
@@ -73,13 +73,13 @@ export default function ConfirmPopover({
                 left: arrowX != null ? `${arrowX}px` : "",
                 top: arrowY != null ? `${arrowY}px` : "",
               }}
-              className="absolute -bottom-1.5 w-3 h-3 bg-[#111] border-r border-b border-white/10 rotate-45"
+              className="absolute -bottom-1.5 w-3 h-3 bg-chinese-black border-r border-b border-white-smoke/10 rotate-45"
             />
 
             {/* Card */}
-            <div className="w-72 rounded-s bg-[#111] border border-white/10 shadow-2xl p-5">
+            <div className="w-72 rounded-s bg-chinese-black border border-white-smoke/10 shadow-2xl p-5">
               {/* Message */}
-              <p className="text-white text-sm font-medium leading-relaxed">
+              <p className="text-white-smoke text-sm font-medium leading-relaxed">
                 {message}
               </p>
 
@@ -87,7 +87,7 @@ export default function ConfirmPopover({
               <div className="flex justify-end gap-3 mt-5">
                 <Button
                   onClick={() => setOpen(false)}
-                  className="px-4 py-1.5 rounded-s text-sm bg-transparent border border-white/20 text-white hover:bg-white/10 transition"
+                  className="text-white-smoke px-4 py-1.5 rounded-s text-sm bg-transparent border border-white-smoke/20 text-white hover:bg-white-smoke/10 transition"
                 >
                   Cancel
                 </Button>
@@ -97,7 +97,7 @@ export default function ConfirmPopover({
                     onConfirm();
                     setOpen(false);
                   }}
-                  className="px-4 py-1.5 rounded-s text-sm bg-white text-black hover:opacity-90 transition"
+                  className="text-chinese-black px-4 py-1.5 rounded-s text-sm bg-white-smoke text-black hover:opacity-90 transition"
                 >
                   Yes
                 </Button>

@@ -11,7 +11,7 @@ import SocialLinks from "./SocialLinks"
 import SupportLink from "./SupportLink"
 import FollowersList from "./FollowersList"
 import LikedTracksWidget from "@/components/home/LikedTracksWidget"
-
+import GoMobile from "@/components/layout/GoMobile"
 
 export default function ProfileSideBar() {
   const bio          = useSelector((state: RootState) => state.profile.bio)
@@ -35,8 +35,20 @@ export default function ProfileSideBar() {
             {showOnTour && <div><OnTourSection /></div>}
             <div className="w-full"><FollowersList /></div>
             <div className="w-full"><Following /></div>
-            <div className="w-full"><ListLatestComments /></div>
-        </div>
+            <GoMobile></GoMobile>
+            <div className=" text-xs text-silver leading-6">
+                  {[
+                    "Legal", "Privacy", "Cookie Policy", "Cookie Manager",
+                    "Imprint", "Artist Resources", "Newsroom", "Charts",
+                    "Transparency Reports",
+                  ].map((label, i, arr) => (
+                    <span key={label}>
+                      <span className="hover:text-white-smoke cursor-pointer">{label}</span>
+                      {i < arr.length - 1 && " · "}
+                    </span>
+                  ))}
+                </div>
+            </div>
         
     </div>
   )

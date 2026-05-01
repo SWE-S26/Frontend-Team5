@@ -37,22 +37,22 @@ export default function SortDropdown({ value, onChange }: SortDropdownProps) {
     <div ref={ref} className="relative">
       <button
         onClick={() => setOpen(!open)}
-        className="flex items-center gap-2 px-4 py-2 bg-white/10 text-white text-sm rounded cursor-pointer hover:bg-white/15 transition"
+        className="flex items-center gap-2 px-4 py-2 bg-white-smoke/10 text-white-smoke text-sm rounded cursor-pointer hover:bg-white-smoke/15 transition"
       >
         Sorted by: {selected}
         <span>{open ? <FaChevronUp /> : <FaChevronDown /> }</span>
       </button>
 
       {open && (
-        <div className="absolute right-0 mt-1 w-44 bg-[#1a1a1a] border border-white/10 rounded shadow-xl z-50">
+        <div className="absolute right-0 mt-1 w-44 bg-chinese-black border border-white-smoke/10 rounded shadow-xl z-50">
           {options.map((option) => (
             <button
               key={option}
               onClick={() => handleSelect(option)}
               className={`w-full text-left px-4 py-3 text-sm cursor-pointer transition
                 ${selected === option
-                  ? "text-white font-bold"
-                  : "text-gray-400 hover:text-white"
+                  ? "text-white-smoke font-bold"
+                  : "text-gray-400 hover:text-white-smoke"
                 }`}
             >
               {option}
