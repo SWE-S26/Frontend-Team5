@@ -40,6 +40,7 @@ import { setProfile } from "@/store/slices/profileSlice"
 import { useGetLikedTracks, useGetPostedTracks} from "@/hooks/useTracks"
 import { Track } from "@/types/tracks.types"
 import type { ArtistTrackRow } from "@/components/artist-studio/ArtistStudioContent"
+import { profileService } from "@/services/profile.service"
 
 interface Props {
   params: { username: string }
@@ -283,11 +284,13 @@ const ProfilePage = ({ params }: Props) => {
                       if (isFollowed) {
                           const res = await unfollowUser(profileUserId)
                           if (res) {
+                            profileService.invalidateProfileCache(profileUserId)
                             dispatch(setProfile({ isFollowed: false }))
                           }
                       } else {
                           const res = await followUser(profileUserId)
                           if (res) {
+                            profileService.invalidateProfileCache(profileUserId)
                             dispatch(setProfile({ isFollowed: true }))
                           }
                       }
