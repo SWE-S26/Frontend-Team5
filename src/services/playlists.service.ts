@@ -21,6 +21,7 @@ import {
   GetArtistPlaylistsResponse,
   GetArtistAlbumsResponse,
   GetPlaylistByPermalinkResponse,
+  GetPlaylistByProfilePermalinkResponse,
   AddPlaylistToHistoryResponse,
   Playlist,
   GetRepostedPlaylistsResponse
@@ -191,6 +192,13 @@ export const playlistsService = {
       `/api/public/playlists/v1/permalink/${permalink}${query ? `?${query}` : ""}`
     );
   },
+
+  // v2 permalink endpoint — used for message link previews
+  // URL structure: /api/public/playlists/v2/permalink/{profileLink}/{permalink}
+  getPlaylistByProfileAndPermalink: (profileLink: string, permalink: string) =>
+    api.get<GetPlaylistByProfilePermalinkResponse>(
+      `/api/public/playlists/v2/permalink/${profileLink}/${permalink}`
+    ),
 
   // Auth required
 
