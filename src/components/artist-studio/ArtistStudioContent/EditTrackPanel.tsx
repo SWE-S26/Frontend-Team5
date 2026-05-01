@@ -876,13 +876,6 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#2a2a2a] px-5 py-3.5">
           <div className="flex items-center gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="text-[#aaa] hover:text-white-smoke transition-colors text-[20px] leading-none cursor-pointer"
-            >
-              <IoClose size={16} />
-            </button>
             <h2 className="text-[15px] font-bold text-white-smoke">Edit Track</h2>
           </div>
           {/* <div className="flex items-center gap-2">

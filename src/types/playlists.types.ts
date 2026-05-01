@@ -268,3 +268,10 @@ export interface GetPublicPlaylistByIdResponse {
     playlist: PlaylistDetail[] | PlaylistDetail | null;
   };
 }
+
+export interface GetRepostedPlaylistsResponse {
+  total: number;
+  offset: number;
+  limit: number;
+  playlists: Playlist[];
+}

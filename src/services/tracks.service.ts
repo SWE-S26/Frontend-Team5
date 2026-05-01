@@ -21,6 +21,7 @@ import {
 	GetUploadQuotaResponse,
   GetLikedTracksResponse,
   AddTrackToHistoryResponse,
+  GetRepostedTracksResponse
 } from "@/types/tracks.types";
 
 const appendTrackMetadata = (
@@ -157,6 +158,10 @@ export const tracksService = {
   getPublicTrackStats: (trackId: string) =>
     api.get<GetTrackStatsResponse>(`/api/public/tracks/v2/stats/${trackId}`),
 
+  getRepostedTracks: (userId: string, offset = 1, limit = 20) =>
+    api.get<GetRepostedTracksResponse>(
+      `/api/public/engagement/tracks/v1/users/${userId}/reposted`,
+      { params: { offset, limit } },
+    ),
+
 };
-
-

@@ -76,22 +76,22 @@ export default function ArtistSidebar({ open = false, onClose }: ArtistSidebarPr
             <Image src="/app-logo/blacklogo.png" alt="Beatza" width={26} height={26} className="h-12 w-12 logo-light object-contain" />
           </button>
 
-          <button onClick={() => navigate("/home")} type="button" data-testid="artist-sidebar-home" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors hover:bg-white/5 cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Home">
+          <button onClick={() => navigate("/home")} type="button" data-testid="artist-sidebar-home" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Home">
             <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1"><GoHome /></span>
             <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">Home</span>
           </button>
 
-          <button onClick={() => navigate("/feed")} type="button" data-testid="artist-sidebar-feed" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors hover:bg-white/5 cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Feed">
+          <button onClick={() => navigate("/feed")} type="button" data-testid="artist-sidebar-feed" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Feed">
             <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1"><BiCollection /></span>
             <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">Feed</span>
           </button>
 
-          <button onClick={() => navigate("/library")} type="button" data-testid="artist-sidebar-library" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors hover:bg-white/5 cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Library">
+          <button onClick={() => navigate("/library")} type="button" data-testid="artist-sidebar-library" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Library">
             <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1"><LuLibraryBig /></span>
             <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">Library</span>
           </button>
 
-          <button onClick={() => navigate("/artist")} type="button" data-testid="artist-sidebar-for-artist" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors hover:bg-white/5 cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="For Artist">
+          <button onClick={() => navigate("/artist")} type="button" data-testid="artist-sidebar-for-artist" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="For Artist">
             <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1"><PiShootingStar /></span>
             <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">For Artist</span>
           </button>

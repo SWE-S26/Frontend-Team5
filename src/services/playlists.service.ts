@@ -23,6 +23,7 @@ import {
   GetPlaylistByPermalinkResponse,
   AddPlaylistToHistoryResponse,
   Playlist,
+  GetRepostedPlaylistsResponse
 } from "@/types/playlists.types";
 
 export const playlistsService = {
@@ -248,5 +249,11 @@ export const playlistsService = {
       const res = await api.get(`/api/tracks/v1/albums/${trackId}`);
       return res.data.data as Playlist[];
     },
-};
 
+    getRepostedPlaylists: (userId: string, offset = 1, limit = 20) =>
+      api.get<GetRepostedPlaylistsResponse>(
+        `/api/public/engagement/playlists/v1/users/${userId}/reposted`,
+        { params: { offset, limit } },
+      ),
+
+};
