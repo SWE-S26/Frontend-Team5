@@ -1,9 +1,14 @@
 "use client";
 
-import { useState } from "react";
-import { IoIosHeart } from "react-icons/io";
-import { MdPersonAddAlt1 } from "react-icons/md";
+import { useEffect, useRef, useState } from "react";
+import { Reorder, useDragControls } from "framer-motion";
 import { BsPersonCheckFill } from "react-icons/bs";
+import { IoIosHeart, IoMdPlay, IoMdPause } from "react-icons/io";
+import { MdPersonAddAlt1 } from "react-icons/md";
+import { GripVertical } from "lucide-react";
+
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { clearQueue, play, playAudio, reorderQueue, type Track } from "@/store/slices/playerSlice";
 
 type PlayerNextUpProps = {
   hasTrackInfo?: boolean;
@@ -22,12 +27,123 @@ const slideRightAnimation = `
   }
 `;
 
+function formatDuration(seconds?: number) {
+  const totalSeconds = Math.max(0, Math.floor(seconds ?? 0));
+  const minutes = Math.floor(totalSeconds / 60);
+  const remainingSeconds = totalSeconds % 60;
+  return `${minutes}:${remainingSeconds.toString().padStart(2, "0")}`;
+}
+
+function QueueItem({
+  track,
+  index,
+  isCurrent,
+  queue,
+  onPlay,
+}: {
+  track: Track;
+  index: number;
+  isCurrent: boolean;
+  queue: Track[];
+  onPlay: (trackId: string) => void;
+}) {
+  const dragControls = useDragControls();
+
+  return (
+    <Reorder.Item
+      value={track}
+      dragListener={false}
+      dragControls={dragControls}
+      className="list-none"
+      whileDrag={{
+        scale: 1.01,
+        zIndex: 20,
+        boxShadow: "0 12px 30px rgba(0,0,0,0.35)",
+      }}
+      transition={{ type: "spring", stiffness: 450, damping: 34 }}
+    >
+      <div
+        className={`flex items-center gap-3 rounded-lg border px-3 py-2 transition-colors ${
+          isCurrent
+            ? "border-white-smoke/20 bg-white-smoke/10"
+            : "border-transparent bg-white-smoke/3 hover:bg-white-smoke/8"
+        }`}
+      >
+        <button
+          type="button"
+          aria-label={`Drag ${track.title ?? "track"} to reorder`}
+          onPointerDown={(event) => dragControls.start(event)}
+          className="flex h-10 w-7 shrink-0 cursor-grab items-center justify-center rounded-md text-silver opacity-60 transition hover:text-white-smoke hover:opacity-100 active:cursor-grabbing"
+        >
+          <GripVertical className="h-5 w-5" />
+        </button>
+
+        <div className="group/play relative h-11 w-11 shrink-0 overflow-hidden rounded-md bg-off-black">
+          {track.img ? (
+            <img src={track.img} alt="" className="h-full w-full object-cover" />
+          ) : (
+            <div className="h-full w-full bg-linear-to-br from-off-black to-crusta/70" />
+          )}
+          <button
+            type="button"
+            onClick={(e) => {
+              e.stopPropagation();
+              onPlay(track.id);
+            }}
+            className="absolute inset-0 flex items-center justify-center bg-chinese-black/40 opacity-0 transition-opacity group-hover/play:opacity-100"
+          >
+            {isCurrent ? (
+              <IoMdPause className="text-chinese-black text-lg" />
+            ) : (
+              <IoMdPlay className="ml-0.5 text-chinese-black text-lg" />
+            )}
+          </button>
+        </div>
+
+        <div className="min-w-0 flex-1">
+          <p className="truncate text-sm font-bold text-white-smoke">
+            {track.title ?? "Unknown track"}
+          </p>
+          <p className="truncate text-xs text-silver">
+            {track.artist ?? "Unknown artist"}
+          </p>
+        </div>
+
+        <div className="flex items-center gap-3">
+          {isCurrent && (
+            <span className="rounded-full bg-white-smoke/10 px-2 py-1 text-[10px] font-bold uppercase tracking-wide text-white-smoke">
+              Now playing
+            </span>
+          )}
+          <span className="text-xs text-silver">
+            {formatDuration(track.duration)}
+          </span>
+          <span className="min-w-4 text-right text-[11px] text-silver/70">
+            {index + 1}
+          </span>
+        </div>
+      </div>
+    </Reorder.Item>
+  );
+}
+
 export default function PlayerNextUp({
   hasTrackInfo = false,
 }: PlayerNextUpProps) {
+  const dispatch = useAppDispatch();
+  const panelRef = useRef<HTMLDivElement | null>(null);
   const [liked, setLiked] = useState(false);
   const [showToast, setShowToast] = useState(false);
   const [added, setAdded] = useState(false);
+  const [isQueueOpen, setIsQueueOpen] = useState(false);
+  const queue = useAppSelector((state) => state.player.tracks);
+  const currentTrackId = useAppSelector((state) => state.player.currentTrackId);
+
+  function handlePlayTrack(trackId: string) {
+    dispatch(playAudio({ tracks: queue, startId: trackId }));
+    setTimeout(() => dispatch(play()), 0);
+    setIsQueueOpen(false);
+  }
 
   const handleLike = () => {
     const newLiked = !liked;
@@ -38,9 +154,52 @@ export default function PlayerNextUp({
     }
   };
 
+  useEffect(() => {
+    if (!isQueueOpen) return;
+
+    const handlePointerDown = (event: PointerEvent) => {
+      if (panelRef.current?.contains(event.target as Node)) return;
+      setIsQueueOpen(false);
+    };
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (event.key === "Escape") setIsQueueOpen(false);
+    };
+
+    document.addEventListener("pointerdown", handlePointerDown);
+    document.addEventListener("keydown", handleEscape);
+
+    return () => {
+      document.removeEventListener("pointerdown", handlePointerDown);
+      document.removeEventListener("keydown", handleEscape);
+    };
+  }, [isQueueOpen]);
+
+  function handleQueueReorder(nextQueue: Track[]) {
+    if (nextQueue.length !== queue.length) return;
+
+    const movedTrack = nextQueue.find(
+      (track, index) => queue[index]?.id !== track.id,
+    );
+    if (!movedTrack) return;
+
+    const from = queue.findIndex((track) => track.id === movedTrack.id);
+    const to = nextQueue.findIndex((track) => track.id === movedTrack.id);
+
+    if (from === -1 || to === -1 || from === to) return;
+
+    dispatch(reorderQueue({ from, to }));
+  }
+
+  function handleClearQueue() {
+    if (queue.length <= 1) return;
+    dispatch(clearQueue());
+  }
+
   return (
     <div
-      className="flex items-center gap-4 sm:gap-6 text-white-smoke shrink-0"
+      ref={panelRef}
+      className="relative flex shrink-0 items-center gap-4 text-white-smoke"
       style={
         hasTrackInfo
           ? {
@@ -58,70 +217,28 @@ export default function PlayerNextUp({
         <IoIosHeart size={16} />
       </button>
 
-      {/* Toast */}
-      <div
-        className={`fixed top-23 right-6 border border-silver bg-off-black text-white-smoke px-2 py-2 rounded shadow-lg flex items-center gap-3 transform transition-all duration-300 ease-out ${showToast ? "opacity-100 translate-x-0" : "opacity-0 translate-x-8 pointer-events-none"}`}
-      >
-        <img
-          src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTF7MG32vJAUlDYjqVgOEN8EQp1MFWX7_dqAw&s"
-          className="w-15 h-15 rounded object-cover"
-        />
-        <div>
-          <p className="font-semibold">ياه - تامر عاشور - Tamer Ashour</p>
-          <p className="text-sm text-gray-400">
-            was saved to{" "}
-            <span className="font-semibold text-white-smoke">
-              your Library.
-            </span>
-          </p>
-        </div>
-      </div>
-
       <button
         onClick={() => setAdded(!added)}
         className="relative group cursor-pointer hover:text-silver"
       >
         {added ? (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            className="w-5 h-5 fill-current text-anger"
-          >
-            {/* Person head */}
-            <circle cx="10" cy="7.5" r="3.5" />
-            {/* Person body */}
-            <path d="M2 20h16c0-4.4-3.6-8-8-8s-8 3.6-8 8z" />
-            {/* Check mark */}
-            <path
-              d="M16 9l2.5 2.5 4-4"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            />
-          </svg>
+          <BsPersonCheckFill className="h-5 w-5 fill-current text-anger" />
         ) : (
-          <svg
-            xmlns="http://www.w3.org/2000/svg"
-            viewBox="0 0 24 24"
-            className="w-5 h-5 fill-current"
-          >
-            {/* Person head */}
-            <circle cx="10" cy="7.5" r="3.5" />
-            {/* Person body */}
-            <path d="M2 20h16c0-4.4-3.6-8-8-8s-8 3.6-8 8z" />
-            {/* Plus sign */}
-            <path d="M19 8v2.5h2.5v1.5H19v2.5h-1.5V12h-2.5v-1.5h2.5V8H19z" />
-          </svg>
+          <MdPersonAddAlt1 className="h-5 w-5 fill-current" />
         )}
       </button>
 
-      <button className="relative group cursor-pointer hover:text-silver">
+      <button
+        type="button"
+        onClick={() => setIsQueueOpen((open) => !open)}
+        aria-haspopup="dialog"
+        aria-expanded={isQueueOpen}
+        className="relative group cursor-pointer hover:text-silver"
+      >
         <svg
           xmlns="http://www.w3.org/2000/svg"
           viewBox="-1 -1 26 26"
-          className="font-bold w-3 h-4 fill-current stroke-current"
+          className="h-4 w-3 fill-current stroke-current font-bold"
         >
           <polygon points="2,2 2,10 8,6" />
           <line
@@ -149,10 +266,64 @@ export default function PlayerNextUp({
             strokeLinecap="round"
           />
         </svg>
-        <span className="absolute top-full mt-1 left-1/2 -translate-x-1/2 px-2 py-0.5 bg-[#f3f3f3] text-chinese-black text-xs border border-gray-400 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity duration-150 pointer-events-none z-50">
+        <span className="absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap border border-gray-400 bg-[#f3f3f3] px-2 py-0.5 text-xs text-chinese-black opacity-0 transition-opacity duration-150 group-hover:opacity-100 pointer-events-none z-50">
           Next Up
         </span>
+        {queue.length > 0 && (
+          <span className="absolute -right-2 -top-2 flex h-4 min-w-4 items-center justify-center rounded-full bg-anger px-1 text-[10px] font-bold text-white-smoke">
+            {queue.length}
+          </span>
+        )}
       </button>
+
+      {isQueueOpen && (
+        <div className="absolute bottom-[calc(100%+0.75rem)] right-0 z-50 w-[min(92vw,25rem)] overflow-hidden rounded-2xl border border-white-smoke/10 bg-chinese-black shadow-[0_24px_80px_rgba(0,0,0,0.45)]">
+          <div className="flex items-start justify-between gap-4 border-b border-white-smoke/10 px-4 py-3">
+            <div>
+              <p className="text-xs font-bold uppercase tracking-[0.22em] text-silver">
+                Play Queue
+              </p>
+              <p className="mt-1 text-sm text-silver">
+                {queue.length} track{queue.length === 1 ? "" : "s"}
+              </p>
+            </div>
+            <button
+              type="button"
+              onClick={handleClearQueue}
+              disabled={queue.length <= 1}
+              className="rounded-full border border-white-smoke/10 px-3 py-1 text-xs font-bold text-white-smoke transition hover:bg-white-smoke/10 disabled:cursor-not-allowed disabled:opacity-40"
+            >
+              Clear
+            </button>
+          </div>
+
+          <div className="max-h-[55vh] overflow-y-auto px-2 py-2">
+            {queue.length > 0 ? (
+              <Reorder.Group
+                axis="y"
+                values={queue}
+                onReorder={handleQueueReorder}
+                className="space-y-1"
+              >
+                {queue.map((track, index) => (
+                  <QueueItem
+                    key={track.id}
+                    track={track}
+                    index={index}
+                    isCurrent={track.id === currentTrackId}
+                    queue={queue}
+                    onPlay={handlePlayTrack}
+                  />
+                ))}
+              </Reorder.Group>
+            ) : (
+              <div className="py-10 text-center text-sm text-silver">
+                Your queue is empty.
+              </div>
+            )}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

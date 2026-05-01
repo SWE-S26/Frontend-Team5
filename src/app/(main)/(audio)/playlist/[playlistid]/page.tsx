@@ -196,7 +196,7 @@ export default function PlaylistPage() {
   const dispatch = useAppDispatch();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { currentTrackId, isPlaying } = useAppSelector((state) => state.player);
-  const authUserId = useAppSelector((state) => state.auth.userId);
+  const authUserId = useAppSelector((state) => (state.auth as any).userId);
   const {
     progress,
     currentTime,
