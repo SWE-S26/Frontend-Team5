@@ -1,14 +1,14 @@
 "use client";
 
-import { useRequireAuth } from "@/hooks/useRequireAuth";
+import { useRequireAuth } from "@/hooks/require-auth/useRequireAuth";
 import { useAppSelector } from "@/store/hooks";
 import { usePathname } from "next/navigation";
-
-const EXCLUDED_ROUTES = ["/home", "/feed", "/library", "/privacy", "/legal", "/privacy-policy", "/copyright", "/goplus", "/artist"];
+import { EXCLUDED_ROUTES, ADMIN_ROUTES } from "@/hooks/require-auth/routes";
 
 export default function AuthGuard({ children }: { children: React.ReactNode }) {
   const hasHydrated = useAppSelector((state) => state.auth.hasHydrated);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
+  const role = useAppSelector((state) => state.auth.role);
   const pathname = usePathname();
 
   useRequireAuth();
@@ -17,8 +17,14 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     (route) => pathname === route || pathname.startsWith(route + "/")
   );
 
+  const isAdminRoute = ADMIN_ROUTES.some(
+    (route) => pathname === route || pathname.startsWith(route + "/")
+  );
+
   if (!hasHydrated) return null
   if (!isAuthenticated && !isExempt) return null
+  if (isAuthenticated && role !== "Admin" && isAdminRoute) return null
+  if (isAuthenticated && role === "Admin" && !isAdminRoute) return null
 
   return <>{children}</>;
 }
