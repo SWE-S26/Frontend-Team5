@@ -1,4 +1,7 @@
 import api from "@/lib/api";
+import { MentionUser } from "@/types/comments.types"
+
+
 import {
   TrackComment,
   CommentsResponse,
@@ -77,3 +80,8 @@ export const postCommentStateless = async (
   );
   return res.data;
 };
+
+export const fetchMentionSuggestions = async (): Promise<MentionUser[]> => {
+  const res = await api.get("/api/engagement/mentions/v1/followers")
+  return res.data
+}

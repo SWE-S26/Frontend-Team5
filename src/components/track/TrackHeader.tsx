@@ -149,7 +149,7 @@ export default function TrackHeader({ track, loading, onTimeUpdate, onRepeat }: 
           <SausageWaveform
             trackId={track.trackId}
             samplesUrl={track.audio.waveformLink}
-            externalProgress={isThisTrackPlaying ? progress : 0}
+            externalProgress={ progress}
             currentTime={currentTime}
             duration={duration}
             isPlaying={isThisTrackPlaying}
