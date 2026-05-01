@@ -11,7 +11,7 @@ export default function PlaylistCard({ playlist }: PlaylistCardProps) {
 
   return (
     <div className="flex gap-3 items-center group cursor-pointer">
-      <div className="w-12 h-12 relative shrink-0 overflow-hidden rounded bg-white/10">
+      <div className="w-12 h-12 relative shrink-0 overflow-hidden rounded bg-white-smoke/10">
         {imgSrc ? (
           <Image
             src={imgSrc}
@@ -29,7 +29,7 @@ export default function PlaylistCard({ playlist }: PlaylistCardProps) {
         <p className="text-sm text-gray-400 truncate">
           {playlist.artistId.displayName}
         </p>
-        <p className="text-sm font-bold text-white truncate">
+        <p className="text-sm font-bold text-white-smoke truncate">
           {playlist.title}
         </p>
       </div>

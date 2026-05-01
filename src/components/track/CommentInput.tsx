@@ -8,10 +8,11 @@ import { PostCommentPayload } from "@/types/comments.types"
 interface CommentInputProps {
   trackId: string
   loading: boolean
+  currentTime: number
   submitComment: (trackId: string, payload: PostCommentPayload, meta?: { displayName: string; avatarUrl: string }) => Promise<any>
 }
 
-export default function CommentInput({ trackId, submitComment, loading }: CommentInputProps) {
+export default function CommentInput({ trackId, submitComment, loading, currentTime }: CommentInputProps) {
 
   const [comment, setComment] = useState("")
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
@@ -21,7 +22,7 @@ export default function CommentInput({ trackId, submitComment, loading }: Commen
     if (!comment.trim() || loading) return
     await submitComment(trackId, {
       content: comment,
-      timestamp: 0,
+      timestamp: Math.floor(currentTime), 
     }, {
       displayName: displayName ?? "",
       avatarUrl:   profileImgLink ?? "",
@@ -34,7 +35,7 @@ export default function CommentInput({ trackId, submitComment, loading }: Commen
   }
 
   return (
-    <div className="flex flex-col w-full border-t border-white/10">
+    <div className="flex flex-col w-full border-t border-white-smoke/10">
       <div className="flex items-center gap-3 w-full py-3">
         <Avatar
           src={profileImgLink ?? undefined}
@@ -43,21 +44,21 @@ export default function CommentInput({ trackId, submitComment, loading }: Commen
         />
 
 
-        <div className="flex-1 flex items-center bg-[#303030] border-none rounded-md h-10">
+        <div className="flex-1 flex items-center bg-off-black border-none rounded-md h-10">
           <input
             type="text"
             value={comment}
             onChange={(e) => setComment(e.target.value)}
             onKeyDown={handleKeyDown}
             placeholder="Write a comment"
-            className="flex-1 bg-transparent text-white text-sm outline-none placeholder-gray-400 px-4 h-full"
+            className="flex-1 bg-transparent text-white-smoke text-sm outline-none placeholder-silver px-4 h-full"
           />
         </div>
 
         <button
           onClick={handleSubmit}
           disabled={!comment.trim() || loading}
-          className="w-10 h-10 flex items-center justify-center bg-[#303030] border-none rounded-md text-gray-100 hover:text-white transition disabled:opacity-30 cursor-pointer"
+          className="w-10 h-10 flex items-center justify-center bg-off-black border-none rounded-md  hover:text-white-smoke transition disabled:opacity-30 cursor-pointer"
         >
           <LuSend size={20} />
         </button>
