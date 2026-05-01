@@ -44,6 +44,7 @@ export interface CreateTrackAdvanced {
   composer?: string;
   ISWC?: string;
   albumTitle?: string;
+  releaseTitle?: string;
 }
 
 export interface CreateTrackRequest {
@@ -53,6 +54,11 @@ export interface CreateTrackRequest {
   permissions?: CreateTrackPermissions;
   license?: CreateTrackLicense;
   advanced?: CreateTrackAdvanced;
+  geoBlocking?: {
+    mode: "worldwide" | "exclusive" | "blocked";
+    regions: string[];
+    countries: string[];
+  };
 }
 
 export interface CreateTrackValidationError {
@@ -128,6 +134,7 @@ export interface Track {
   numPlays: number;
   numReposts: number;
   numComments: number;
+  numDownloads: number;
   releaseDate: string;
   isLikedByUser: boolean;
   isRepostedByUser?: boolean;
@@ -209,6 +216,7 @@ export interface TrackDetailedAdvanced {
   composer?: string;
   ISWC?: string;
   albumTitle?: string;
+  releaseTitle?: string;
 }
 
 export interface TrackDetailed {
@@ -217,11 +225,18 @@ export interface TrackDetailed {
   permissions?: Track["permissions"];
   license?: Track["license"];
   advanced?: TrackDetailedAdvanced;
+  geoBlocking?: TrackDetailsGeoBlocking;
 }
 
 export interface GetTrackDetailedResponse {
   message: string;
   data: TrackDetailed;
+}
+
+export interface TrackDetailsGeoBlocking{
+  mode: "worldwide" | "exclusive" | "blocked";
+  regions: string[];
+  countries: string[];
 }
 
 export interface UpdateTrackRequest {
@@ -231,6 +246,7 @@ export interface UpdateTrackRequest {
   permissions?: CreateTrackPermissions;
   license?: CreateTrackLicense;
   advanced?: CreateTrackAdvanced;
+  geoBlocking?: TrackDetailsGeoBlocking;
 }
 
 export interface UpdateTrackResponse {

@@ -65,31 +65,45 @@ export function ArtistStudioHeader({ stats: propStats, isArtistPro }: {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    const fetchAnalytics = async () => {
+    const fetchAnalytics = async (silent = false) => {
       try {
-        setLoading(true);
-        setError(null);
+        if (!silent) {
+          setLoading(true);
+          setError(null);
+        }
         const response = await artistService.getArtistAnalytics();
         setAnalytics(response.data);
       } catch (err) {
-        setError(err instanceof Error ? err.message : "Failed to fetch analytics");
+        if (!silent) setError(err instanceof Error ? err.message : "Failed to fetch analytics");
         console.error("Error fetching analytics:", err);
       } finally {
-        setLoading(false);
+        if (!silent) setLoading(false);
       }
     };
 
-    fetchAnalytics();
+    // initial fetch
+    fetchAnalytics(false);
+
+    // silent polling every 15s and on window focus
+    const intervalId = window.setInterval(() => void fetchAnalytics(true), 15000);
+    const handleFocus = () => void fetchAnalytics(true);
+    window.addEventListener("focus", handleFocus);
+    return () => {
+      window.clearInterval(intervalId);
+      window.removeEventListener("focus", handleFocus);
+    };
   }, []);
 
-  const stats = analytics ? {
-    plays: analytics.totalPlays,
-    reposts: analytics.totalReposts,
-    downloads: analytics.totalDownloads,
-    likes: analytics.totalLikes,
-    comments: analytics.totalComments,
-    //playthroughrate: analytics.totalplayrate,
-  } : propStats;
+  const stats = analytics
+    ? {
+        plays: analytics.totalPlays,
+        reposts: analytics.totalReposts,
+        downloads: analytics.totalDownloads,
+        likes: analytics.totalLikes,
+        comments: analytics.totalComments,
+        playthroughrate: analytics.totalplayrate,
+      }
+    : { ...propStats, playthroughrate: 0 };
 
   return (
     <div className="mb-6 w-full rounded-lg border border-[#2a2a2a] bg-chinese-black p-4 sm:p-5 lg:p-6">
@@ -104,7 +118,7 @@ export function ArtistStudioHeader({ stats: propStats, isArtistPro }: {
           {isArtistPro && <StatItem label="Downloads" value={stats.downloads.toString()} hasBorder={true} />}
           <StatItem label="Likes"     value={stats.likes.toString()}     hasBorder={true} />
           <StatItem label="Comments"  value={stats.comments.toString()}  hasBorder={true} />
-          <StatItem label="Playthrough Rate"  value={"0"}  hasBorder={true} />
+          <StatItem label="Playthrough Rate"  value={stats.playthroughrate.toString()}  hasBorder={true} />
         </div>
         <div className="grid grid-cols-2 gap-2 sm:flex sm:flex-wrap sm:items-center sm:gap-4 lg:gap-8">
           <IconItem label="Insights" tooltip="Limited"  tooltipColor="text-white-smoke"    icon={InsightsIcon} />

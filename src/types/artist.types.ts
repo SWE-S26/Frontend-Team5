@@ -4,5 +4,5 @@ export interface ArtistAnalyticsResponse {
     totalDownloads: number,
     totalLikes: number,
     totalComments: number,
-    //totalplayrate: number
+    totalplayrate: number
 }
