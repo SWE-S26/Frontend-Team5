@@ -1,11 +1,12 @@
 "use client"
 
-import { useState } from "react"
-import { useEffect} from "react"
+import { useState, useEffect } from "react"
 import { useParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import TabsButton from "../ui/TabsButton"
 import SendButton from "../messages/SendButton"
+import { useAppSelector } from "@/store/hooks"
+import { profileService } from "@/services/profile.service"
 
 
 import { FaTwitter } from "react-icons/fa";
@@ -24,36 +25,26 @@ const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
     const [activeTab, setActiveTab] = useState<"share" | "message">("share")
     const params = useParams()
     const userId = params.username as string
+    const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
     const [profile, setProfile] = useState<any>(null)
 
     
       useEffect(() => {
         if (!userId) return
-    
+
         const fetchProfile = async () => {
-      try {
-        const res = await fetch(`https://beatza.me/api/profile/v1/${userId}`, {
-          cache: "no-store",
-           headers: {
-           Authorization: `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJfaWQiOiI2OWJlZmFkMjVlMTM5NjliMTY1Yjg5NTIiLCJyb2xlIjoiTGlzdGVuZXIiLCJwYXltZW50SW5mbyI6eyJzdWJzY3JpcHRpb25UeXBlIjoiZnJlZSIsInF1b3RhIjp7InVubGltaXRlZCI6ZmFsc2UsInVzZWRTZWNvbmRzIjowLCJsZWZ0U2Vjb25kcyI6MTIwfX0sImlhdCI6MTc3NDEyMzg4MywiZXhwIjoxNzc0MTI3NDgzfQ.vvkwnbgAEKoXyAhVr8lnUlaUz60NnCtSIKUpAw8Gn38`
+          try {
+            const data = isAuthenticated
+              ? await profileService.getProfileAuthCached(userId)
+              : await profileService.getProfileCached(userId)
+            setProfile(data)
+          } catch (err) {
+            console.error("Failed to fetch profile", err)
+          }
         }
-        })
-    
-        const data = await res.json()
-    
-        console.log("FULL RESPONSE:", data)
-    
-       
-        setProfile(data)
-    
-       
-      } catch (err) {
-        console.error("Failed to fetch profile", err)
-      }
-    }
-    
+
         fetchProfile()
-      }, [userId])
+      }, [userId, isAuthenticated])
 
 
     const [shortLink, setShortLink] = useState<string>("")

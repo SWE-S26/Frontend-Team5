@@ -1,7 +1,7 @@
 "use client"
 import { PiInfo } from "react-icons/pi";
 import TabsNavbar from "@/components/layout/navbar/TabsNavbar"
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Avatar } from "antd";
 import { useLikeTrack } from "@/hooks/useLikes";
 import { useTrackRepostsList } from "@/hooks/useReposts";
@@ -11,6 +11,8 @@ import PlaylistCard from "@/components/track/PlaylistCard";
 import FanCard from "./FanCard";
 import LeaderboardActions from "./LeaderboardActions";
 
+import { profileService } from "@/services/profile.service";
+import { GetProfileResponse } from "@/types/profile.types";
 interface TrackSidebarProps {
   trackId: string,
   track: any;
@@ -24,6 +26,8 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
   const { playlists: trackPlaylists, getTrackPlaylists, loading: playlistsLoading } = useGetTrackPlaylists()
   const { albums: trackAlbums, getTrackAlbums } = useGetTrackAlbums()
   const { topFans, firstFans, loading: fansLoading, getTrackStats } = useGetTrackStats()
+  const [userProfiles, setUserProfiles] = useState<Record<string, GetProfileResponse>>({})
+  const inFlightIdsRef = useRef<Set<string>>(new Set())
 
   // Single useEffect — all sidebar data fetched together once
   useEffect(() => {
@@ -34,6 +38,67 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
     loadReposts()
     void getTrackStats(trackId)
   }, [trackId]) // no function refs in deps
+
+  const sidebarUserIds = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          ...users.map((user) => user.userId),
+          ...repostUsers.map((user) => user.userId),
+        ].filter(Boolean)),
+      ),
+    [users, repostUsers],
+  )
+
+  useEffect(() => {
+    const missingIds = sidebarUserIds.filter(
+      (id) => !userProfiles[id] && !inFlightIdsRef.current.has(id),
+    )
+    if (missingIds.length === 0) return
+
+    missingIds.forEach((id) => inFlightIdsRef.current.add(id))
+
+    let cancelled = false
+
+    void (async () => {
+      const BATCH_SIZE = 3
+      const delay = (ms: number) =>
+        new Promise((resolve) => setTimeout(resolve, ms))
+      for (let start = 0; start < missingIds.length; start += BATCH_SIZE) {
+        const batch = missingIds.slice(start, start + BATCH_SIZE)
+        const results = await Promise.all(
+          batch.map(async (id) => {
+            try {
+              const data = await profileService.getProfileAuthCached(id)
+              return data
+            } catch {
+              return null
+            }
+          }),
+        )
+
+        if (cancelled) return
+
+        setUserProfiles((prev) => {
+          const next = { ...prev }
+          batch.forEach((id, index) => {
+            const profile = results[index]
+            if (profile) next[id] = profile
+            inFlightIdsRef.current.delete(id)
+          })
+          return next
+        })
+
+        if (start + BATCH_SIZE < missingIds.length) {
+          await delay(250)
+        }
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [sidebarUserIds, userProfiles])
 
   const SideTabs = [
     { href: "", label: "Top",   value: "top"   },
@@ -150,6 +215,8 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
               artistName={user.displayName}
               followCount={user.followersCount}
               profileImgLink={user.avatarUrl}
+              userId={user.userId}
+              isFollowing={userProfiles[user.userId]?.isFollowed ?? false}
             >
               <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
             </ProfilePopover>
@@ -170,6 +237,8 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
               artistName={user.displayName}
               followCount={user.followersCount}
               profileImgLink={user.avatarUrl}
+              userId={user.userId}
+              isFollowing={userProfiles[user.userId]?.isFollowed ?? false}
             >
               <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
             </ProfilePopover>

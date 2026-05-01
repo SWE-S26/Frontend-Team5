@@ -92,9 +92,9 @@ export default function TrackUploader({ posterId, onUnfollow }: Props) {
 
       {/* Follow Button */}
       <FollowButton
-        userId={profile.userId ?? undefined}
+        userId={posterId}
         initialIsFollowing={profile.isFollowed ?? false}
-        onUnfollow={() => onUnfollow?.(profile.userId!)}
+        onUnfollow={() => onUnfollow?.(posterId)}
       />
 
       {/* Report */}

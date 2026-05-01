@@ -2,6 +2,7 @@
 import { useState, useEffect } from "react"
 import { useFollowUser } from "@/hooks/useSocial"
 import { useUnfollowUser } from "@/hooks/useSocial"
+import { profileService } from "@/services/profile.service"
 import { useAppDispatch, useAppSelector } from '@/store/hooks'
 import { decrementFollowedCount, incrementFollowedCount } from '@/store/slices/profileSlice'
 
@@ -30,6 +31,7 @@ const FollowButton = ({ userId, initialIsFollowing = false, onUnfollow }: Follow
                 if (isFollowing) {
                         const res = await unfollowUser(userId)
                         if (res) {
+                            profileService.invalidateProfileCache(userId)
                             setIsFollowing(false)
                             if (isOwnProfile) {
                                 dispatch(decrementFollowedCount())
@@ -39,6 +41,7 @@ const FollowButton = ({ userId, initialIsFollowing = false, onUnfollow }: Follow
                     } else {
                         const res = await followUser(userId)
                         if (res) {
+                            profileService.invalidateProfileCache(userId)
                             setIsFollowing(true)
                             if (isOwnProfile) {
                                 dispatch(incrementFollowedCount())
