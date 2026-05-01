@@ -47,6 +47,7 @@ import { playlistsService } from "@/services/playlists.service"
 import { Track as StoreTrack } from "@/store/slices/playerSlice"
 import { PlaylistDetail } from "@/types/playlists.types"
 import { Playlist } from "@/types/playlists.types"
+import { profileService } from "@/services/profile.service"
 
 interface Props {
   params: { username: string }
@@ -481,11 +482,13 @@ const ProfilePage = ({ params }: Props) => {
                       if (isFollowed) {
                           const res = await unfollowUser(profileUserId)
                           if (res) {
+                            profileService.invalidateProfileCache(profileUserId)
                             dispatch(setProfile({ isFollowed: false }))
                           }
                       } else {
                           const res = await followUser(profileUserId)
                           if (res) {
+                            profileService.invalidateProfileCache(profileUserId)
                             dispatch(setProfile({ isFollowed: true }))
                           }
                       }

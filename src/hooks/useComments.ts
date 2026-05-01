@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 
 import {
   
@@ -10,7 +10,8 @@ import {
   postCommentStateless,
 } from "@/services/comment.service";
 import { PostCommentPayload, TrackComment } from "@/types/comments.types";
-
+import { fetchMentionSuggestions } from "@/services/comment.service"
+import { MentionUser } from "@/types/comments.types"
 
 
 
@@ -64,6 +65,7 @@ export const useStatelessComments = () => {
       setComments((prev) => [
         {
           ...comment,
+          mentionedUserId: payload.mentionedUserId,
           displayName: comment.displayName || meta?.displayName || "",
           avatarUrl:   comment.avatarUrl   || meta?.avatarUrl   || "",
           timestamp:   comment.timestamp   ?? payload.timestamp,
@@ -184,3 +186,36 @@ export const useReplies = () => {
     deleteReply,
   };
 };
+
+export const useMentions = () => {
+  const [suggestions, setSuggestions] = useState<MentionUser[]>([])
+  const [allFollowers, setAllFollowers] = useState<MentionUser[]>([])
+  const [loading, setLoading] = useState(false)
+
+  const loadSuggestions = useCallback(async () => {
+    if (allFollowers.length > 0) return
+    setLoading(true)
+    try {
+      const data = await fetchMentionSuggestions()
+      setAllFollowers(data)
+    } catch {
+    } finally {
+      setLoading(false)
+    }
+  }, [allFollowers])
+
+  const filterSuggestions = useCallback((query: string) => {
+    if (!query) {
+      setSuggestions([])
+      return
+    }
+    const filtered = allFollowers.filter((u) =>
+      u.displayName.toLowerCase().includes(query.toLowerCase())
+    )
+    setSuggestions(filtered)
+  }, [allFollowers])
+
+  const clearSuggestions = useCallback(() => setSuggestions([]), [])
+
+  return { suggestions, loading, loadSuggestions, filterSuggestions, clearSuggestions }
+}

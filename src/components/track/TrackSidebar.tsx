@@ -1,7 +1,7 @@
 "use client"
 import { PiInfo } from "react-icons/pi";
 import TabsNavbar from "@/components/layout/navbar/TabsNavbar"
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Avatar } from "antd";
 import { useLikeTrack } from "@/hooks/useLikes";
 import { useTrackRepostsList } from "@/hooks/useReposts";
@@ -11,13 +11,16 @@ import PlaylistCard from "@/components/track/PlaylistCard";
 import FanCard from "./FanCard";
 import LeaderboardActions from "./LeaderboardActions";
 
+import { profileService } from "@/services/profile.service";
+import { GetProfileResponse } from "@/types/profile.types";
+
 interface TrackSidebarProps {
   trackId: string;
   track: any;
   onRepeatPlay?: () => void;
 }
 
-export default function TrackSidebar({ trackId, track, onRepeatPlay }: TrackSidebarProps) {
+export default function TrackSidebar({ trackId,   track, onRepeatPlay }: TrackSidebarProps) {
   const [activeTab, setActiveTab] = useState("top");
 
   const { users, total: LikesCount, loadLikes } = useLikeTrack()
@@ -25,6 +28,9 @@ export default function TrackSidebar({ trackId, track, onRepeatPlay }: TrackSide
   const { playlists: trackPlaylists, getTrackPlaylists, loading: playlistsLoading } = useGetTrackPlaylists()
   const { albums: trackAlbums, getTrackAlbums } = useGetTrackAlbums()
   const { topFans, firstFans, loading: fansLoading, getTrackStats } = useGetTrackStats()
+  const [userProfiles, setUserProfiles] = useState<Record<string, GetProfileResponse>>({})
+  const [followOverrides, setFollowOverrides] = useState<Record<string, boolean>>({})
+  const inFlightIdsRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
     if (!trackId) return
@@ -35,15 +41,77 @@ export default function TrackSidebar({ trackId, track, onRepeatPlay }: TrackSide
     void getTrackStats(trackId)
   }, [trackId])
 
+  const sidebarUserIds = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          ...users.map((user) => user.userId),
+          ...repostUsers.map((user) => user.userId),
+        ].filter(Boolean)),
+      ),
+    [users, repostUsers],
+  )
+
+  useEffect(() => {
+    const missingIds = sidebarUserIds.filter(
+      (id) => !userProfiles[id] && !inFlightIdsRef.current.has(id),
+    )
+    if (missingIds.length === 0) return
+
+    missingIds.forEach((id) => inFlightIdsRef.current.add(id))
+
+    let cancelled = false
+
+    void (async () => {
+      const BATCH_SIZE = 3
+      const delay = (ms: number) =>
+        new Promise((resolve) => setTimeout(resolve, ms))
+      for (let start = 0; start < missingIds.length; start += BATCH_SIZE) {
+        const batch = missingIds.slice(start, start + BATCH_SIZE)
+        const results = await Promise.all(
+          batch.map(async (id) => {
+            try {
+              const data = await profileService.getProfileAuthCached(id)
+              return data
+            } catch {
+              return null
+            }
+          }),
+        )
+
+        if (cancelled) return
+
+        setUserProfiles((prev) => {
+          const next = { ...prev }
+          batch.forEach((id, index) => {
+            const profile = results[index]
+            if (profile) next[id] = profile
+            inFlightIdsRef.current.delete(id)
+          })
+          return next
+        })
+
+        if (start + BATCH_SIZE < missingIds.length) {
+          await delay(250)
+        }
+      }
+    })()
+
+    return () => {
+      cancelled = true
+    }
+  }, [sidebarUserIds, userProfiles])
+
+  
   const SideTabs = [
-    { href: "", label: "Top",   value: "top"   },
+    { href: "", label: "Top", value: "top" },
     { href: "", label: "First", value: "first" },
   ]
 
   const activeFans = activeTab === "top" ? topFans : firstFans
 
   return (
-    <aside className="w-85 sticky top-20 h-fit flex flex-col gap-10 text-white-smoke">
+    <aside className="w-85 sticky top-20 h-fit flex flex-col gap-10 text-white">
 
       <section className="flex flex-col gap-3 mt-5">
         <div className="flex">
@@ -145,17 +213,27 @@ export default function TrackSidebar({ trackId, track, onRepeatPlay }: TrackSide
           
         </div>
         <Avatar.Group className="w-100">
-          {users.map((user) => (
+          {users.map((user) => {
+            const profile = userProfiles[user.userId]
+            const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false
+
+            return (
             <ProfilePopover
               key={user.userId}
               id={`like-${user.userId}`}
               artistName={user.displayName}
               followCount={user.followersCount}
               profileImgLink={user.avatarUrl}
+              userId={user.userId}
+              isFollowing={isFollowing}
+              onFollowChange={(next) =>
+                setFollowOverrides((prev) => ({ ...prev, [user.userId]: next }))
+              }
             >
               <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
             </ProfilePopover>
-          ))}
+            )
+          })}
         </Avatar.Group>
       </section>
 
@@ -165,20 +243,30 @@ export default function TrackSidebar({ trackId, track, onRepeatPlay }: TrackSide
  
         </div>
         <Avatar.Group className="w-100">
-          {repostUsers.map((user) => (
+          {repostUsers.map((user) => {
+            const profile = userProfiles[user.userId]
+            const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false
+
+            return (
             <ProfilePopover
               key={user.userId}
               id={`repost-${user.userId}`}
               artistName={user.displayName}
               followCount={user.followersCount}
               profileImgLink={user.avatarUrl}
+              userId={user.userId}
+              isFollowing={isFollowing}
+              onFollowChange={(next) =>
+                setFollowOverrides((prev) => ({ ...prev, [user.userId]: next }))
+              }
             >
               <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
             </ProfilePopover>
-          ))}
+            )
+          })}
         </Avatar.Group>
       </section>
-
     </aside>
   );
 }
+

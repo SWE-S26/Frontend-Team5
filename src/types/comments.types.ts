@@ -10,6 +10,7 @@ export interface TrackComment {
   isLikedByUser: boolean
   isOwnComment:  boolean
   mentionedUserProfileLink?: string
+  mentionedUserId?:         string
   createdAt:     string
 }
 
@@ -31,9 +32,17 @@ export interface PostCommentPayload {
   content:          string
   timestamp:        number
   parentCommentId?: string
+  mentionedUserId?: string
 }
 
 export interface LikeCommentResponse {
   liked:    boolean
   numLikes: number
+}
+
+export interface MentionUser {
+  userId:      string
+  displayName: string
+  avatarUrl:   string
+  profileLink: string
 }

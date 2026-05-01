@@ -48,12 +48,15 @@ export const useCheckout = () => {
     try {
       // Step 1: Register as Stripe customer — ignore if already registered
       try {
-        await paymentService.registerStripeCustomer({ paymentMethodId })
+          await paymentService.registerStripeCustomer({ paymentMethodId })
       } catch (err: any) {
-        const message = err?.response?.data?.message || ''
-        if (!message.includes('already has a Stripe customer ID')) {
-          throw err
-        }
+          const message = err?.response?.data?.message || ''
+          if (message.includes('already has a Stripe customer ID')) {
+              // returning customer with valid card — continue
+          } else {
+              // card declined or any other error — show to user
+              throw err
+          }
       }
 
       // Step 2: Create subscription

@@ -58,6 +58,8 @@ export default function FollowersList() {
                                 profileImgLink={user.profileImgLink ?? ''}
                                 profileHref={`/profile/${user.userId}`}
                                 followersHref={`/profile/${user.userId}/followers`}
+                                userId={user.userId}
+                                isFollowing={user.isFollowed}
                             >
                                 <Avatar
                                     src={user.profileImgLink ?? undefined}
