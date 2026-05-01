@@ -7,9 +7,13 @@ import { useGetTracks } from "@/hooks/useTracks";
 import { useGetPlaylists, useGetPlaylistById } from "@/hooks/usePlaylists";
 
 import { useGetFollowing } from "@/hooks/useSocial";
-
 import { useAppSelector } from "@/store/hooks";
 import ArtistTools from "@/components/home/ArtistTools";
+import LikedTracksWidget from "@/components/home/LikedTracksWidget";
+import TrackHistoryWidget from "@/components/home/TrackHistoryWidget";
+
+
+
 
 export default function HomeClient() {
   const userId = useAppSelector((state) => state.auth.userId);
@@ -63,13 +67,26 @@ export default function HomeClient() {
       </div>
       <div className="hidden md:block md:w-[27.75%]">
         <div className="w-full">
-          <div className="w-full flex flex-col items-center mb-5 ">
+          <div className="w-full flex flex-col items-center mb-5 gap-4 ">
+
             <div className="w-full">
               <ArtistTools />
             </div>
+
+
             <div className="w-full">
               <SuggestedWrapper />
             </div>
+
+
+            <div className="w-full">
+              <LikedTracksWidget userId={userId} />
+              </div>
+
+            <div className="w-full">
+              <TrackHistoryWidget />
+              </div>
+
           </div>
         </div>
       </div>
