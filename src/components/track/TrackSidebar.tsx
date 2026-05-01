@@ -20,7 +20,7 @@ interface TrackSidebarProps {
   onRepeatPlay?: () => void;
 }
 
-export default function TrackSidebar({ trackId,  track, onRepeatPlay }: TrackSidebarProps) {
+export default function TrackSidebar({ trackId,   track, onRepeatPlay }: TrackSidebarProps) {
   const [activeTab, setActiveTab] = useState("top");
 
   const { users, total: LikesCount, loadLikes } = useLikeTrack()
@@ -111,7 +111,8 @@ export default function TrackSidebar({ trackId,  track, onRepeatPlay }: TrackSid
   const activeFans = activeTab === "top" ? topFans : firstFans
 
   return (
-    <aside className="w-85 sticky top-20 h-fit flex flex-col gap-10 text-white-smoke">
+    <aside className="w-85 sticky top-20 h-fit flex flex-col gap-10 text-white">
+
       <section className="flex flex-col gap-3 mt-5">
         <div className="flex">
           <h2 className="text-sm font-bold uppercase tracking-wide text-white-smoke">Fans</h2>
@@ -268,3 +269,4 @@ export default function TrackSidebar({ trackId,  track, onRepeatPlay }: TrackSid
     </aside>
   );
 }
+
