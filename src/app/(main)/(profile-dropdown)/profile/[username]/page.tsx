@@ -1,5 +1,5 @@
 "use client"
-import { useMemo, useState } from "react"
+import { useMemo, useState, useRef } from "react"
 import { useRouter, useSearchParams } from "next/navigation"
 
 import { useAppSelector, useAppDispatch } from "@/store/hooks"
@@ -14,7 +14,7 @@ import { MdOutlineEdit } from "react-icons/md"
 import { BsThreeDots } from "react-icons/bs"
 import { IoRadio } from "react-icons/io5"
 import { FaRegEnvelope } from "react-icons/fa6"
-import { useRef, useEffect } from "react"
+import { useEffect } from "react"
 import { AiOutlineStop } from "react-icons/ai";
 import { BsExclamationCircle } from "react-icons/bs";
 
@@ -40,6 +40,13 @@ import { setProfile } from "@/store/slices/profileSlice"
 import { useGetLikedTracks, useGetPostedTracks} from "@/hooks/useTracks"
 import { Track } from "@/types/tracks.types"
 import type { ArtistTrackRow } from "@/components/artist-studio/ArtistStudioContent"
+import { useGetRepostedTracks } from "@/hooks/useTracks"
+import { useGetRepostedPlaylists, useGetMyPlaylists } from "@/hooks/usePlaylists"
+import { tracksService } from "@/services/tracks.service"
+import { playlistsService } from "@/services/playlists.service"
+import { Track as StoreTrack } from "@/store/slices/playerSlice"
+import { PlaylistDetail } from "@/types/playlists.types"
+import { Playlist } from "@/types/playlists.types"
 import { profileService } from "@/services/profile.service"
 
 interface Props {
@@ -55,7 +62,6 @@ const profileTabs = [
   { href: "", label: "Reposts",        value: "reposts"        },
 ]
 
-const emptyCollections: any[] = []
 
 const ProfilePage = ({ params }: Props) => {
   const router       = useRouter()
@@ -94,6 +100,14 @@ const ProfilePage = ({ params }: Props) => {
   const { getPostedTracks, tracks: postedTracks, loading: postedTracksLoading } = useGetPostedTracks()
   const { getLikedTracks, tracks: likedTracks, loading: likedTracksLoading } = useGetLikedTracks()
   const artist = role === "Artist"
+  const { getRepostedTracks, tracks: repostedTracks, loading: repostedTracksLoading } = useGetRepostedTracks()
+  const { getRepostedPlaylists, playlists: repostedPlaylists, loading: repostedPlaylistsLoading } = useGetRepostedPlaylists()
+  const { getMyPlaylists, playlists: myPlaylists, loading: myPlaylistsLoading } = useGetMyPlaylists()
+  const [playlistDetails, setPlaylistDetails] = useState<PlaylistDetail[]>([])
+  const [resolvedRepostedTracks, setResolvedRepostedTracks] = useState<Track[]>([])
+  const fetchedPlaylistIds = useRef(new Set<string>())
+  const fetchedRepostedTrackIds = useRef(new Set<string>())
+  const [creatorMap, setCreatorMap] = useState<Record<string, string>>({})
 
    
   
@@ -123,15 +137,129 @@ const ProfilePage = ({ params }: Props) => {
     if (activeTab === "all") {
       void getLikedTracks(profileUserId)
     }
-    if (activeTab === "reposts") {
+    if (activeTab === "all" || activeTab === "reposts") {
+      void getRepostedTracks(profileUserId)
+      void getRepostedPlaylists(profileUserId)
     }
-  }, [activeTab, profileUserId, getPostedTracks, getLikedTracks, isLoading])
+    if (activeTab === "playlists") {
+      void getMyPlaylists()
+    }
+  }, [activeTab, profileUserId, getPostedTracks, getLikedTracks, getRepostedTracks, getRepostedPlaylists, getMyPlaylists, isLoading])
+
+  useEffect(() => {
+    const trackIds = Array.from(
+      new Set(
+        (repostedTracks ?? [])
+          .map((track) => track.trackId ?? (track as any)._id)
+          .filter((id): id is string => Boolean(id) && !fetchedRepostedTrackIds.current.has(id)),
+      ),
+    )
+
+    if (!trackIds.length) return
+
+    const resolve = async () => {
+      const results = await Promise.allSettled(
+        trackIds.map((id) => tracksService.getTrackById(id)),
+      )
+
+      const resolved: Track[] = []
+      ;(results as PromiseSettledResult<any>[]).forEach((result, index) => {
+        if (result.status === "fulfilled") {
+          const track = result.value.data?.data ?? result.value.data
+          if (track) {
+            resolved.push(track)
+            fetchedRepostedTrackIds.current.add(trackIds[index])
+          }
+        }
+      })
+
+      if (resolved.length) {
+        setResolvedRepostedTracks((previous) => {
+          const byId = new Map(previous.map((track) => [track.trackId ?? (track as any)._id, track]))
+          resolved.forEach((track) => {
+            const id = track.trackId ?? (track as any)._id
+            if (id) byId.set(id, track)
+          })
+          return Array.from(byId.values())
+        })
+      }
+    }
+
+    void resolve()
+  }, [repostedTracks])
+
+  useEffect(() => {
+    const ids = new Set<string>()
+    ;(repostedPlaylists ?? []).forEach((playlist) => {
+      if (playlist._id) ids.add(playlist._id)
+    })
+    ;(myPlaylists ?? []).forEach((playlist) => {
+      if (playlist._id) ids.add(playlist._id)
+    })
+
+    const toFetch = Array.from(ids).filter(
+      (id) => !fetchedPlaylistIds.current.has(id),
+    )
+    if (!toFetch.length) return
+
+    const resolve = async () => {
+      const results = await Promise.allSettled(
+        toFetch.map((id) => playlistsService.getPlaylistById(id)),
+      )
+
+      const resolved: PlaylistDetail[] = []
+      ;(results as PromiseSettledResult<any>[]).forEach((result, index) => {
+        if (result.status === "fulfilled") {
+          const pl = result.value.data?.data?.playlist
+          const detail = Array.isArray(pl) ? pl[0] : pl
+          if (detail) {
+            resolved.push(detail)
+            fetchedPlaylistIds.current.add(toFetch[index])
+          }
+        }
+      })
+
+      if (resolved.length) {
+        setPlaylistDetails((previous) => [...previous, ...resolved])
+      }
+    }
+
+    void resolve()
+  }, [repostedPlaylists, myPlaylists])
+
+  useEffect(() => {
+    const artistIds = new Set<string>()
+    ;(repostedPlaylists ?? []).forEach((p) => { if (p.artistId) artistIds.add(p.artistId) })
+    ;(myPlaylists ?? []).forEach((p) => { if (p.artistId) artistIds.add(p.artistId) })
+
+    const toFetch = Array.from(artistIds).filter((id) => !creatorMap[id])
+    if (!toFetch.length) return
+
+    const resolve = async () => {
+      const results = await Promise.allSettled(
+        toFetch.map((id) => playlistsService.getPlaylistCreator(id)),
+      )
+
+      const updates: Record<string, string> = {}
+      ;(results as PromiseSettledResult<any>[]).forEach((result, idx) => {
+        const id = toFetch[idx]
+        if (result.status === 'fulfilled') {
+          const artist = result.value.data?.data?.artist
+          const a = Array.isArray(artist) ? artist[0] : artist
+          if (a && a.displayName) updates[id] = a.displayName
+        }
+      })
+
+      if (Object.keys(updates).length) setCreatorMap((prev) => ({ ...prev, ...updates }))
+    }
+
+    void resolve()
+  }, [repostedPlaylists, myPlaylists, creatorMap])
 
   const getTrackSortTime = (track: { releaseDate?: string; _id?: string }) => {
     const releaseTime = track.releaseDate ? new Date(track.releaseDate).getTime() : NaN
     if (Number.isFinite(releaseTime)) return releaseTime
 
-    // Fallback for MongoDB ObjectId-like ids (first 8 hex chars are seconds timestamp)
     const objectIdPrefix = track._id?.slice(0, 8)
     if (objectIdPrefix && /^[0-9a-fA-F]{8}$/.test(objectIdPrefix)) {
       return parseInt(objectIdPrefix, 16) * 1000
@@ -149,7 +277,7 @@ const ProfilePage = ({ params }: Props) => {
       artist: track.basicInfo.mainArtists?.length
         ? track.basicInfo.mainArtists.join(", ")
         : "Unknown Artist",
-      img: track.image?.imgLink || "/Graduation.jpg",
+      img: track.image?.imgLink,
       trackUrl: track.audio?.audioLink,
       downloadUrl: track.audio?.downloadLink,
       duration: track.durationInSeconds,
@@ -209,24 +337,94 @@ const ProfilePage = ({ params }: Props) => {
     [postedTrackItems],
   )
 
-  const allTabItems = useMemo(() => {
-    const seen = new Set<string>()
-    const merged = [...postedTrackItems, ...likedTrackItems]
-    const deduped = merged.filter((item) => {
-      if (seen.has(item.id)) return false
-      seen.add(item.id)
-      return true
-    })
-    return deduped.sort((a, b) => {
-      const at = a.releaseDate ? new Date(a.releaseDate).getTime() : 0
-      const bt = b.releaseDate ? new Date(b.releaseDate).getTime() : 0
+  const trackCount = postedTrackItems.length
+
+  
+
+  const mapPlaylistToProfileItem = (playlist: Playlist, fallbackIndex: number) => {
+    const stableId = playlist._id ?? `playlist-${fallbackIndex}`
+    const rawArtistId = (playlist as any).artistId || (playlist as any).creatorId || (playlist as any).ownerId
+    const artistFromObj = (playlist as any).artistDisplayName || (playlist as any).artistName || (playlist as any).creator?.displayName || (playlist as any).creator?.displayName
+    const artistName = artistFromObj || (rawArtistId ? creatorMap[rawArtistId] ?? rawArtistId : "Unknown Creator")
+    return {
+      id: stableId,
+      title: playlist.title,
+      artist: artistName,
+      img: playlist.image?.imgLink,
+      numLikes: playlist.numOfLikes,
+      numReposts: playlist.numOfReposts,
+      isLikedByUser: playlist.isLiked,
+      releaseDate: playlist.createdAt,
+    }
+  }
+
+  const repostedTrackItems = [...(resolvedRepostedTracks.length ? resolvedRepostedTracks : (repostedTracks ?? []))]
+    .sort((a, b) => getTrackSortTime(b) - getTrackSortTime(a))
+    .map((track, index) => mapTrackToProfileItem(track, index + 20000, false))
+
+  const repostedPlaylistItems = [...(repostedPlaylists ?? [])]
+    .sort((a, b) => {
+      const at = a.createdAt ? new Date(a.createdAt).getTime() : 0
+      const bt = b.createdAt ? new Date(b.createdAt).getTime() : 0
       return bt - at
     })
-  }, [postedTrackItems, likedTrackItems])
+    .map((playlist, index) => {
+      const base = mapPlaylistToProfileItem(playlist, index + 10000)
+      const detail = playlistDetails.find((d) => d._id === playlist._id)
+      return {
+        ...base,
+        type: 'playlist' as const,
+        playlistTracks: detail?.tracks,
+        totalTracks: detail?.totalTracks,
+      }
+    })
 
-  const repostedTrackItems: typeof postedTrackItems = []
+  const allRepostItems = [
+    ...repostedTrackItems.map(item => ({ ...item, type: 'track' as const })),
+    ...repostedPlaylistItems,
+  ].sort((a, b) => {
+    const at = a.releaseDate ? new Date(a.releaseDate).getTime() : 0
+    const bt = b.releaseDate ? new Date(b.releaseDate).getTime() : 0
+    return bt - at
+  })
 
-  const trackCount = postedTrackItems.length
+    const userPlaylistItems = [...(myPlaylists ?? [])]
+      .sort((a, b) => {
+        const at = a.createdAt ? new Date(a.createdAt).getTime() : 0
+        const bt = b.createdAt ? new Date(b.createdAt).getTime() : 0
+        return bt - at
+      })
+      .map((playlist, index) => {
+        const base = mapPlaylistToProfileItem(playlist, index)
+        const detail = playlistDetails.find((d) => d._id === (playlist._id))
+        return {
+          ...base,
+          playlistTracks: detail?.tracks,
+          totalTracks: detail?.totalTracks,
+        }
+      })
+  
+    const allTabItems = useMemo(() => {
+      const seen = new Set<string>()
+      const merged = [
+        ...postedTrackItems.map(item => ({ ...item, type: 'track' as const })),
+        ...likedTrackItems.map(item => ({ ...item, type: 'track' as const })),
+        ...repostedTrackItems.map(item => ({ ...item, type: 'track' as const })),
+        ...repostedPlaylistItems,
+      ]
+      const deduped = merged.filter((item) => {
+        if (seen.has(item.id)) return false
+        seen.add(item.id)
+        return true
+      })
+      return deduped.sort((a, b) => {
+        const at = a.releaseDate ? new Date(a.releaseDate).getTime() : 0
+        const bt = b.releaseDate ? new Date(b.releaseDate).getTime() : 0
+        return bt - at
+      })
+    }, [postedTrackItems, likedTrackItems, repostedTrackItems, repostedPlaylistItems])
+
+  const emptyCollections: any[] = []
   const hasKnownNoTracks = !isLoading && profileTrackCount <= 0
   const shouldShowTracksSkeleton = (postedTracksLoading || likedTracksLoading) && profileTrackCount > 0
 
@@ -370,11 +568,6 @@ const ProfilePage = ({ params }: Props) => {
                               <AiOutlineStop className="h-4 w-4 font-bold " />
                               {isBlocked ? 'Blocked' : 'Block'} {displayName}
                             </button>
-
-
-
-
-
                             
                             <button data-testid="Report-button"
                             onClick={() => setIsOpenReport(true)}
@@ -454,23 +647,23 @@ const ProfilePage = ({ params }: Props) => {
             )}
 
             {activeTab === "playlists" && (
-              emptyCollections.length === 0 ? (
+              userPlaylistItems.length === 0 && !myPlaylistsLoading ? (
                 <h2 className="font-bold text-lg flex items-center justify-center text-center">
                   You haven't created any playlists.
                 </h2>
               ) : (
-                <Playlists items={emptyCollections} />
+                <Playlists items={userPlaylistItems} />
               )
             )}
 
             {activeTab === "reposts" && (
-              repostedTrackItems.length === 0 ? (
+              allRepostItems.length === 0 && !repostedTracksLoading && !repostedPlaylistsLoading ? (
                 <h2 className="font-bold text-lg flex items-center justify-center text-center">
                   You haven't reposted any sounds.
                 </h2>
               ) : (
                 <Reposts
-                  items={repostedTrackItems}
+                  items={allRepostItems}
                   onEditTrack={(item) => setEditingTrack(buildEditTrackRow(item))}
                   onAddToPlaylist={() => setOpenAddToPlaylist(true)}
                 />
