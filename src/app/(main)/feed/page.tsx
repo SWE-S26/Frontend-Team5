@@ -26,6 +26,7 @@ import SidebarFooter from "@/components/ui/SidebarFooter";
 import TrackHistoryWidget from "@/components/home/TrackHistoryWidget";
 import LikedTracksWidget from "@/components/home/LikedTracksWidget";
 import { useAppSelector } from "@/store/hooks";
+import Suggested from "@/components/social-graph/Suggested";
 
 const PAGE_SIZE = 10;
 
@@ -417,9 +418,29 @@ export default function Feed() {
           )}
 
           {!isLoading && hasFetched && orderedItems.length === 0 && (
-            <p className="text-center text-silver text-sm py-8">
-              Nothing to show here yet — follow some artists to see their posts.
-            </p>
+            <div>
+              <p className="text-center font-extrabold text-md py-8 max-w-150 mx-auto">
+                Your feed is currently empty. Go to{" "}
+                <a
+                  href="/search"
+                  className="text-blue-500 hover:text-blue-400 transition"
+                >
+                  search
+                </a>
+                ,{" "}
+                <a
+                  href="/home"
+                  className="text-blue-500 hover:text-blue-400 transition"
+                >
+                  home
+                </a>{" "}
+                or use the suggestions below to find creators to follow. Refresh
+                the page to see tracks they are posting.
+              </p>
+              <div className="mx-auto max-w-100">
+                <Suggested DISPLAY_COUNT={10} />
+              </div>
+            </div>
           )}
 
           {!hasMore && !isLoading && orderedItems.length > 0 && (
