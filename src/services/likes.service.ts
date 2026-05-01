@@ -6,7 +6,6 @@ import {
 } from "@/types/likes.types";
 
 export const likeService = {
-  /* (1) */
   likeTrack: (trackId: string) =>
     api.post<LikeTrackResponse>(`/api/engagement/tracks/v1/${trackId}/like`),
 
@@ -26,6 +25,19 @@ export const fetchTrackLikes = async (
 ): Promise<TrackLikesResponse> => {
   const res = await api.get(
     `/api/public/engagement/tracks/v1/${trackId}/likes`,
+    { params: { offset, limit } },
+  );
+  return res.data;
+};
+
+// NEW — playlist likes list (different endpoint from track likes)
+export const fetchPlaylistLikes = async (
+  playlistId: string,
+  offset = 1,
+  limit = 20,
+): Promise<TrackLikesResponse> => {
+  const res = await api.get(
+    `/api/public/engagement/playlists/v1/${playlistId}/likes`,
     { params: { offset, limit } },
   );
   return res.data;
