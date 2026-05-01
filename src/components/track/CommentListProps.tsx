@@ -77,7 +77,7 @@ const renderReplyContent = (
   return parts.map((part, i) => {
     if (!/^@[\w-]+$/.test(part)) return part
 
-    // Strategy 1: name-based matching (most reliable)
+    
     if (mentionedUserId && mentionedDisplayName) {
       const firstName = mentionedDisplayName.split(" ")[0].toLowerCase()
       if (part.toLowerCase() === `@${firstName}:`) {
@@ -226,7 +226,7 @@ function ReplySection({
         <div className="flex gap-5 items-center">
           <button
             onClick={() => {
-              setReplyInput(`@${comment.displayName.split(" ")[0]} `)
+              setReplyInput(`@${comment.displayName.split(" ")[0]}: `)
               setShowInput((prev) => !prev)
             }}
             className="text-white-smoke font-semibold text-sm hover:text-white-smoke w-fit cursor-pointer"
@@ -237,7 +237,7 @@ function ReplySection({
           {comment.isOwnComment && (
             <ConfirmPopover onConfirm={() => onDeleteComment(comment.commentId)}>
               <button
-                className="text-[#303030] hover:text-red-500 transition cursor-pointer"
+                className="text-off-black hover:text-red-500 transition cursor-pointer"
                 aria-label="Delete comment"
               >
                 <CgTrash size={16} className="text-white-smoke mt-2" />
@@ -269,7 +269,7 @@ function ReplySection({
               onChange={handleReplyChange}
               onKeyDown={(e) => e.key === "Enter" && handleSubmitReply()}
               placeholder="Write a reply..."
-              className="w-full bg-[#303030] text-white-smoke text-sm outline-none placeholder-silver px-3 py-2 pr-8 rounded-md"
+              className="w-full bg-off-black text-white-smoke text-sm outline-none placeholder-silver px-3 py-2 pr-8 rounded-md"
             />
             <button
               onClick={() => { setShowInput(false); setReplyInput(""); clearSuggestions() }}
@@ -286,7 +286,7 @@ function ReplySection({
           <button
             onClick={handleSubmitReply}
             disabled={!replyInput.trim()}
-            className="text-sm text-white-smoke bg-[#444] px-3 py-2 rounded-md hover:bg-[#555] disabled:opacity-30 cursor-pointer"
+            className="text-sm  bg-off-black px-3 py-2 rounded-md hover: disabled:opacity-30 cursor-pointer"
           >
             <LuSend size={20} />
           </button>
@@ -391,13 +391,13 @@ export default function CommentList({
   return (
     <div className="flex flex-col w-full mt-4">
       <div className="flex items-center justify-between mb-6 w-full">
-        <h2 className="text-white font-bold text-lg whitespace-nowrap">
+        <h2 className="text-white-smoke font-bold text-lg whitespace-nowrap">
           {total.toLocaleString()} comments
         </h2>
         <SortDropdown value={sortBy} onChange={setSortBy} />
       </div>
 
-      <div className="flex flex-col divide-y divide-white/0">
+      <div className="flex flex-col divide-y divide-white-smoke/10">
         {sortedComments.map((comment) => (
           <div key={comment.commentId} className="flex gap-4 py-5">
             <Avatar src={comment.avatarUrl || undefined} size={48} style={{ flexShrink: 0 }} />
