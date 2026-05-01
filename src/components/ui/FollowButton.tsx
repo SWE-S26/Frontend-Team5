@@ -10,9 +10,10 @@ interface FollowButtonProps {
     userId?:             string
     initialIsFollowing?: boolean
     onUnfollow?:         () => void
+    onFollowChange?:     (isFollowing: boolean) => void
 }
 
-const FollowButton = ({ userId, initialIsFollowing = false, onUnfollow }: FollowButtonProps) => {
+const FollowButton = ({ userId, initialIsFollowing = false, onUnfollow, onFollowChange }: FollowButtonProps) => {
     const [isFollowing, setIsFollowing] = useState(initialIsFollowing)
     const { followUser,   loading: followLoading   } = useFollowUser()
     const { unfollowUser, loading: unfollowLoading } = useUnfollowUser()
@@ -33,6 +34,7 @@ const FollowButton = ({ userId, initialIsFollowing = false, onUnfollow }: Follow
                         if (res) {
                             profileService.invalidateProfileCache(userId)
                             setIsFollowing(false)
+                            onFollowChange?.(false)
                             if (isOwnProfile) {
                                 dispatch(decrementFollowedCount())
                             }
@@ -43,6 +45,7 @@ const FollowButton = ({ userId, initialIsFollowing = false, onUnfollow }: Follow
                         if (res) {
                             profileService.invalidateProfileCache(userId)
                             setIsFollowing(true)
+                            onFollowChange?.(true)
                             if (isOwnProfile) {
                                 dispatch(incrementFollowedCount())
                             }

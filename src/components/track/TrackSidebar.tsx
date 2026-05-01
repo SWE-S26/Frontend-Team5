@@ -13,13 +13,14 @@ import LeaderboardActions from "./LeaderboardActions";
 
 import { profileService } from "@/services/profile.service";
 import { GetProfileResponse } from "@/types/profile.types";
+
 interface TrackSidebarProps {
   trackId: string;
   track: any;
   onRepeatPlay?: () => void;
 }
 
-export default function TrackSidebar({ trackId, track, onRepeatPlay }: TrackSidebarProps) {
+export default function TrackSidebar({ trackId,  track, onRepeatPlay }: TrackSidebarProps) {
   const [activeTab, setActiveTab] = useState("top");
 
   const { users, total: LikesCount, loadLikes } = useLikeTrack()
@@ -28,6 +29,7 @@ export default function TrackSidebar({ trackId, track, onRepeatPlay }: TrackSide
   const { albums: trackAlbums, getTrackAlbums } = useGetTrackAlbums()
   const { topFans, firstFans, loading: fansLoading, getTrackStats } = useGetTrackStats()
   const [userProfiles, setUserProfiles] = useState<Record<string, GetProfileResponse>>({})
+  const [followOverrides, setFollowOverrides] = useState<Record<string, boolean>>({})
   const inFlightIdsRef = useRef<Set<string>>(new Set())
 
   useEffect(() => {
@@ -101,7 +103,7 @@ export default function TrackSidebar({ trackId, track, onRepeatPlay }: TrackSide
   }, [sidebarUserIds, userProfiles])
 
   const SideTabs = [
-    { href: "", label: "Top",   value: "top"   },
+    { href: "", label: "Top", value: "top" },
     { href: "", label: "First", value: "first" },
   ]
 
@@ -109,7 +111,6 @@ export default function TrackSidebar({ trackId, track, onRepeatPlay }: TrackSide
 
   return (
     <aside className="w-85 sticky top-20 h-fit flex flex-col gap-10 text-white-smoke">
-
       <section className="flex flex-col gap-3 mt-5">
         <div className="flex">
           <h2 className="text-sm font-bold uppercase tracking-wide text-white-smoke">Fans</h2>
@@ -210,7 +211,11 @@ export default function TrackSidebar({ trackId, track, onRepeatPlay }: TrackSide
           
         </div>
         <Avatar.Group className="w-100">
-          {users.map((user) => (
+          {users.map((user) => {
+            const profile = userProfiles[user.userId]
+            const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false
+
+            return (
             <ProfilePopover
               key={user.userId}
               id={`like-${user.userId}`}
@@ -218,11 +223,15 @@ export default function TrackSidebar({ trackId, track, onRepeatPlay }: TrackSide
               followCount={user.followersCount}
               profileImgLink={user.avatarUrl}
               userId={user.userId}
-              isFollowing={userProfiles[user.userId]?.isFollowed ?? false}
+              isFollowing={isFollowing}
+              onFollowChange={(next) =>
+                setFollowOverrides((prev) => ({ ...prev, [user.userId]: next }))
+              }
             >
               <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
             </ProfilePopover>
-          ))}
+            )
+          })}
         </Avatar.Group>
       </section>
 
@@ -232,7 +241,11 @@ export default function TrackSidebar({ trackId, track, onRepeatPlay }: TrackSide
  
         </div>
         <Avatar.Group className="w-100">
-          {repostUsers.map((user) => (
+          {repostUsers.map((user) => {
+            const profile = userProfiles[user.userId]
+            const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false
+
+            return (
             <ProfilePopover
               key={user.userId}
               id={`repost-${user.userId}`}
@@ -240,14 +253,17 @@ export default function TrackSidebar({ trackId, track, onRepeatPlay }: TrackSide
               followCount={user.followersCount}
               profileImgLink={user.avatarUrl}
               userId={user.userId}
-              isFollowing={userProfiles[user.userId]?.isFollowed ?? false}
+              isFollowing={isFollowing}
+              onFollowChange={(next) =>
+                setFollowOverrides((prev) => ({ ...prev, [user.userId]: next }))
+              }
             >
               <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
             </ProfilePopover>
-          ))}
+            )
+          })}
         </Avatar.Group>
       </section>
-
     </aside>
   );
 }

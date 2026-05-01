@@ -32,6 +32,7 @@ interface ProfilePopoverProps {
   followersHref?: string;
   userId?: string;         
   isFollowing?: boolean;
+  onFollowChange?: (isFollowing: boolean) => void;
 }
 
 export default function ProfilePopover({
@@ -45,6 +46,7 @@ export default function ProfilePopover({
   followersHref,
   userId,
   isFollowing = false,
+  onFollowChange,
 }: ProfilePopoverProps) {
   const { openId, setOpenId, scheduleClose, cancelClose } = usePopover();
   const isOpen = openId === id;
@@ -141,6 +143,7 @@ export default function ProfilePopover({
               <FollowButton
                 userId={userId}
                 initialIsFollowing={isFollowing}
+                onFollowChange={onFollowChange}
               />
             </div>
           </div>
