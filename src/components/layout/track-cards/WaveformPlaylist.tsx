@@ -63,6 +63,33 @@ type Props = {
   feedQueue?: Track[];
 };
 
+function normalizePlaylistTrack(track: any, fallbackId: string): PlaylistTrack {
+  const imageLink = track?.image?.imgLink ?? track?.img ?? "/app-logo/blacklogo.png";
+  const audioLink = track?.audio?.audioLink ?? "";
+  const waveformLink = track?.audio?.waveformLink ?? "/waveform.json";
+
+  return {
+    _id: track?._id ?? fallbackId,
+    basicInfo: {
+      title: track?.basicInfo?.title ?? track?.title ?? "Unknown Title",
+      mainArtists: track?.basicInfo?.mainArtists ?? [track?.artist ?? "Unknown Artist"],
+      permalink: track?.basicInfo?.permalink ?? "",
+    },
+    audio: {
+      audioLink,
+      waveformLink,
+    },
+    image: {
+      imgLink: imageLink,
+    },
+    durationInSeconds: track?.durationInSeconds ?? track?.duration ?? 0,
+    numOfPlays: track?.numOfPlays ?? 0,
+    numOfLikes: track?.numOfLikes ?? 0,
+    isLiked: track?.isLiked ?? false,
+    isReposted: track?.isReposted ?? false,
+  };
+}
+
 function formatPlays(n: number): string {
   if (n >= 1_000_000) return `${(n / 1_000_000).toFixed(1)}M`;
   if (n >= 1_000) return `${(n / 1_000).toFixed(1)}K`;
@@ -308,7 +335,7 @@ export default function PlaylistWaveformCard({
   const { getPlaylistById } = useGetPlaylistById();
 
   const [cachedTracks, setCachedTracks] = useState<PlaylistTrack[]>(
-    preloadedTracks ?? [],
+    (preloadedTracks ?? []).map((track, index) => normalizePlaylistTrack(track, track?._id ?? `${playlistId ?? "playlist"}-track-${index}`)),
   );
   const [tracksExpanded, setTracksExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(isLikedByUser);
@@ -340,7 +367,11 @@ export default function PlaylistWaveformCard({
 
   useEffect(() => {
     if (preloadedTracks && preloadedTracks.length > 0)
-      setCachedTracks(preloadedTracks);
+      setCachedTracks(
+        preloadedTracks.map((track, index) =>
+          normalizePlaylistTrack(track, track?._id ?? `${playlistId ?? "playlist"}-track-${index}`),
+        ),
+      );
   }, [preloadedTracks]);
 
   useEffect(() => {
@@ -360,7 +391,9 @@ export default function PlaylistWaveformCard({
     const res = await getPlaylistById(playlistId);
     const pl = res?.data?.playlist;
     const detail = Array.isArray(pl) ? pl[0] : pl;
-    const tracks = detail?.tracks ?? [];
+    const tracks = (detail?.tracks ?? []).map((track: any, index: number) =>
+      normalizePlaylistTrack(track, track?._id ?? `${playlistId}-track-${index}`),
+    );
     setCachedTracks(tracks);
     return tracks;
   }
@@ -477,7 +510,7 @@ export default function PlaylistWaveformCard({
         <div className="w-full h-15 shrink-0">
           <SausageWaveform
             trackId={currentTrack?._id ?? playlistId}
-            samplesUrl={currentTrack?.audio.waveformLink ?? "/waveform.json"}
+            samplesUrl={currentTrack?.audio?.waveformLink ?? "/waveform.json"}
             externalProgress={progress}
             onSeek={seekToPercentage}
             onPlay={() => handlePlayClick()}

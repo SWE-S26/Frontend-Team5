@@ -26,6 +26,8 @@ const PUBLIC_ROUTES = [
   "/api/public/playlists/v1",
   "/api/playlists/v1",
   "/api/v1/playlists",
+  "/api/public/feed/v1",
+  "/api/feed/v1/search",
 ]
 
 const api = axios.create({
@@ -46,7 +48,7 @@ api.interceptors.response.use(
     if (error.response?.status === 401 && !isPublic && !originalRequest._retry) {
       originalRequest._retry = true
 
-      await axios.get( 
+      await axios.get(
         `${process.env.NEXT_PUBLIC_API_URL}/api/auth/v1/refresh-token`,
         { withCredentials: true }
       )

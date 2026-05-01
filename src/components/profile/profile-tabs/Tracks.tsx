@@ -44,8 +44,8 @@ export default function Tracks({ items, isLoading = false, onEditTrack, onAddToP
                    canEdit={item.canEdit}
                    onEdit={onEditTrack ? () => onEditTrack(item) : undefined}
                    onAddToPlaylist={onAddToPlaylist ? () => onAddToPlaylist(item) : undefined}
-                   playsCount={item.numPlays}
-                   commentsCount={item.numComments}
+                   playsCount={item.numPlays ?? 0}
+                   commentsCount={item.numComments ?? 0}
                  />
                ))}
          </div>
