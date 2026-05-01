@@ -2,7 +2,7 @@
 
 import TrackCard from "@/components/ui/TrackCard";
 import PlaylistCard from "@/components/ui/PlaylistCard";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { HiOutlineChevronLeft, HiOutlineChevronRight } from "react-icons/hi";
 
 type TrackItem = {
@@ -20,6 +20,8 @@ type PlaylistItem = {
   description: string;
   image: { imgLink: string };
   isLiked?: boolean;
+  playlistType: string;
+  artistId?: string;
 };
 
 type Props = {
@@ -42,6 +44,7 @@ export default function MediaCardCarousel({
 
   const [isAtStart, setIsAtStart] = useState<boolean>(true);
   const [isAtEnd, setIsAtEnd] = useState<boolean>(false);
+  const [hasOverflow, setHasOverflow] = useState<boolean>(false);
   const [isMoving, setIsMoving] = useState<"left" | "right" | false>(false);
 
   function scroll(direction: "left" | "right") {
@@ -53,9 +56,23 @@ export default function MediaCardCarousel({
   function handleButtonsVisiblity() {
     if (!carouselRef.current) return;
     const { scrollLeft, scrollWidth, clientWidth } = carouselRef.current;
+    setHasOverflow(scrollWidth > clientWidth + 5);
     setIsAtStart(scrollLeft <= 5);
     setIsAtEnd(scrollLeft + clientWidth >= scrollWidth - 5);
   }
+
+  useEffect(() => {
+    handleButtonsVisiblity();
+    if (!carouselRef.current) return;
+
+    const carousel = carouselRef.current;
+    const observer = new ResizeObserver(() => {
+      handleButtonsVisiblity();
+    });
+
+    observer.observe(carousel);
+    return () => observer.disconnect();
+  }, [tracks, playlists, loading]);
 
   function handleMouseEnter(direction: "left" | "right") {
     if (isMoving || lockAnimationRef.current) return;
@@ -133,27 +150,29 @@ export default function MediaCardCarousel({
                         artist={playlist.description}
                         playlistId={playlist._id}
                         isLikedByUser={playlist.isLiked}
+                        type={playlist.playlistType}
+                        artistId={playlist.artistId}
                       />
                     </div>
                   ))}
           </div>
         </div>
 
-        {!isAtEnd && (
+        {hasOverflow && !isAtEnd && (
           <button
             onClick={() => scroll("right")}
             onMouseEnter={() => handleMouseEnter("right")}
-            className="flex group/right items-center justify-center absolute right-2 top-[105px] -translate-y-1/2 w-[33px] h-[33px] bg-off-black rounded-full z-10 cursor-pointer"
+            className="flex group/right items-center justify-center absolute right-2 top-26.25 -translate-y-1/2 w-8.25 h-8.25 bg-off-black rounded-full z-10 cursor-pointer"
           >
             <HiOutlineChevronRight className="text-white-smoke text-l group-hover/right:text-[#838383]" />
           </button>
         )}
 
-        {!isAtStart && (
+        {hasOverflow && !isAtStart && (
           <button
             onClick={() => scroll("left")}
             onMouseEnter={() => handleMouseEnter("left")}
-            className="flex group/left items-center justify-center absolute left-2 top-[105px] -translate-y-1/2 w-[33px] h-[33px] bg-off-black rounded-full z-10 cursor-pointer"
+            className="flex group/left items-center justify-center absolute left-2 top-26.25 -translate-y-1/2 w-8.25 h-8.25 bg-off-black rounded-full z-10 cursor-pointer"
           >
             <HiOutlineChevronLeft className="text-white-smoke text-l group-hover/left:text-[#838383]" />
           </button>
