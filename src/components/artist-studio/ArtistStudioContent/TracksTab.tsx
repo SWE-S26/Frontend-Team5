@@ -440,7 +440,7 @@ export function TracksTab({
           (track as { _id?: string })._id) as string;
         const base: ArtistTrackRow = {
           id: trackId,
-          title: track.basicInfo.title,
+          title: track.basicInfo?.title ?? "",
           label: track.basicInfo.mainArtists?.length
             ? track.basicInfo.mainArtists.join(", ")
             : "Unknown Artist",
@@ -452,6 +452,7 @@ export function TracksTab({
           likes: track.numLikes ?? 0,
           comments: track.numComments ?? 0,
           reposts: track.numReposts ?? 0,
+          numDownloads: (track as any).numDownloads ?? 0,
           hd: false,
           cover: track.image?.imgLink || "/test.jpg",
           url: track.audio?.audioLink,
@@ -531,6 +532,31 @@ export function TracksTab({
   const handleDownload = (id: string) => {
     const row = rows.find((r) => r.id === id);
     if (!row?.downloadUrl) return;
+    // get or create a session id to avoid duplicate increments
+    const getDownloadSessionId = (): string => {
+      try {
+        const key = "downloadSessionId";
+        const stored = localStorage.getItem(key);
+        const id = stored ?? (typeof crypto !== "undefined" && typeof (crypto as any).randomUUID === "function"
+          ? (crypto as any).randomUUID()
+          : `sess-${Math.random().toString(36).slice(2)}`);
+        localStorage.setItem(key, id);
+        return id;
+      } catch {
+        return `sess-${Math.random().toString(36).slice(2)}`;
+      }
+    };
+
+    const sessionId = getDownloadSessionId();
+    // fire-and-forget increment request
+    try {
+      import("@/services/tracks.service").then(({ tracksService }) => {
+        void tracksService.incrementDownloadCount({ trackId: id, sessionIdDownload: sessionId }).catch(() => undefined);
+      });
+    } catch {
+      // ignore
+    }
+
     window.open(row.downloadUrl, "_blank", "noopener,noreferrer");
   };
 

@@ -314,6 +314,7 @@ const ProfilePage = ({ params }: Props) => {
     plays: item.numPlays ?? 0,
     likes: item.numLikes ?? 0,
     comments: 0,
+    numDownloads: (item as any).numDownloads ?? 0,
     reposts: item.numReposts ?? 0,
     hd: false,
     cover: item.img,

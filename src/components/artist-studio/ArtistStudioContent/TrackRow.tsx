@@ -112,7 +112,7 @@ export function TrackRow({
           <span className="inline-flex items-center gap-1"><IoHeartOutline /> {track.likes > 0 ? track.likes : "-"}</span>
           <span className="inline-flex items-center gap-1"><FiMessageSquare /> {track.comments > 0 ? track.comments : "-"}</span>
           <span className="inline-flex items-center gap-1"><TbRepeat /> {track.reposts > 0 ? track.reposts : "-"}</span>
-          {isArtistPro && <span className="inline-flex items-center gap-1"><MdOutlineDownloadForOffline /> 0</span>}
+          {isArtistPro && <span className="inline-flex items-center gap-1"><MdOutlineDownloadForOffline /> {track.numDownloads > 0 ? track.numDownloads : "-"}</span>}
           <span className="font-semibold">{track.plays} plays</span>
         </div>
 
@@ -153,7 +153,7 @@ export function TrackRow({
         <span className="inline-flex items-center gap-1"><IoHeartOutline />   {track.likes    > 0 ? track.likes    : "-"}</span>
         <span className="inline-flex items-center gap-1"><FiMessageSquare /> {track.comments > 0 ? track.comments : "-"}</span>
         <span className="inline-flex items-center gap-1"><TbRepeat />        {track.reposts  > 0 ? track.reposts  : "-"}</span>
-        {isArtistPro && <span className="inline-flex items-center gap-1"><MdOutlineDownloadForOffline /> 0</span>}
+        {isArtistPro && <span className="inline-flex items-center gap-1"><MdOutlineDownloadForOffline /> {track.numDownloads > 0 ? track.numDownloads : "-"}</span>}
       </div>
 
       <div className="text-center text-[13px] font-semibold text-white-smoke">{track.plays}</div>
