@@ -13,6 +13,7 @@ import LeaderboardActions from "./LeaderboardActions";
 
 import { profileService } from "@/services/profile.service";
 import { GetProfileResponse } from "@/types/profile.types";
+
 interface TrackSidebarProps {
   trackId: string;
   track: any;
