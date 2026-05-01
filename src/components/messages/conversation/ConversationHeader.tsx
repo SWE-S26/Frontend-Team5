@@ -18,6 +18,7 @@ interface ConversationHeaderProps {
   initialIsBlocked: boolean
   markAsUnread:     (chatId: string) => Promise<void>
   markAsRead:       (chatId: string) => Promise<void>
+  onBack?:          () => void
 }
 
 const ConversationHeader = ({
@@ -28,6 +29,7 @@ const ConversationHeader = ({
   initialIsBlocked,
   markAsUnread,
   markAsRead,
+  onBack,
 }: ConversationHeaderProps) => {
   const { archiveConversation }                  = useMessagesContext()
   const { blockUser,   loading: blockLoading   } = useBlockUser()
@@ -60,8 +62,16 @@ const ConversationHeader = ({
   }
 
   return (
-    <div className='flex justify-between mb-4'>
-      <div className='flex'>
+    <div className='flex flex-col gap-3 mb-4 sm:flex-row sm:items-center sm:justify-between'>
+      <div className='flex flex-wrap items-center gap-2'>
+        {onBack && (
+          <Button
+            onClick={onBack}
+            className='bg-off-black text-white-smoke md:hidden'
+          >
+            Back
+          </Button>
+        )}
         <Link
           href={`/profile/${receiverId}`}
           className='text-md font-bold text-white-smoke px-2 py-2 hover:text-silver'
@@ -99,7 +109,7 @@ const ConversationHeader = ({
         username={displayName}
       />
 
-      <div className='flex items-center gap-2'>
+      <div className='flex flex-wrap items-center gap-2'>
         <Button
           className='font-bold bg-off-black'
           onClick={() => isUnread ? markAsRead(chatId) : markAsUnread(chatId)}

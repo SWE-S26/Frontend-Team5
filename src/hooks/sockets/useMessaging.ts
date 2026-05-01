@@ -2,6 +2,7 @@ import { useState, useEffect, useCallback, useRef } from "react";
 import { messageService } from "@/services/message.service";
 import { useAppSelector } from "@/store/hooks";
 import { messageToastBus } from "@/lib/sockets/messageToastBus";
+import { messageLocalBus } from "@/lib/sockets/messageLocalBus";
 import type {
   Conversation,
   Message,
@@ -226,24 +227,49 @@ export function useSendMessage(
   const [isSending, setIsSending] = useState(false);
 
   const send = useCallback(
-    async (receiverId: string, content: string) => {
+    async (
+      receiverId: string,
+      content: string,
+      options?: { clientId?: string; chatId?: string },
+    ) => {
       if (!content.trim()) return;
       setIsSending(true);
       try {
         const res = await messageService.sendMessage({ receiverId, content });
         const last = res.data.data.lastMessage;
+        const payload = {
+          _id: last._id,
+          chatId: res.data.data.chat,
+          senderId: last.senderId,
+          content: last.content,
+          seenBy: last.seenBy,
+          createdAt: last.createdAt,
+        }
+        messageLocalBus.emit({
+          type: "final",
+          chatId: res.data.data.chat,
+          clientId: options?.clientId,
+          message: payload,
+        })
         onSuccess?.({
           message: {
-            _id: last._id,
-            chatId: res.data.data.chat,
-            senderId: last.senderId,
-            content: last.content,
-            seenBy: last.seenBy,
-            createdAt: last.createdAt,
+            _id: payload._id,
+            chatId: payload.chatId,
+            senderId: payload.senderId,
+            content: payload.content,
+            seenBy: payload.seenBy,
+            createdAt: payload.createdAt,
           },
           conversation: res.data.data,
         });
       } catch (err: any) {
+        if (options?.clientId && options?.chatId) {
+          messageLocalBus.emit({
+            type: "rollback",
+            chatId: options.chatId,
+            clientId: options.clientId,
+          })
+        }
         if (err?.response?.status === 403) {
           messageToastBus.emit({
             type: "error",
