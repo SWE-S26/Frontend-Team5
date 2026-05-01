@@ -13,12 +13,13 @@ import LeaderboardActions from "./LeaderboardActions";
 
 import { profileService } from "@/services/profile.service";
 import { GetProfileResponse } from "@/types/profile.types";
+
 interface TrackSidebarProps {
-  trackId: string,
-  track: any;
+  trackId: string
+  track: any
 }
 
-export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
+export default function TrackSidebar({ trackId, track }: TrackSidebarProps) {
   const [activeTab, setActiveTab] = useState("top");
 
   const { users, total: LikesCount, loadLikes } = useLikeTrack()
@@ -27,9 +28,9 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
   const { albums: trackAlbums, getTrackAlbums } = useGetTrackAlbums()
   const { topFans, firstFans, loading: fansLoading, getTrackStats } = useGetTrackStats()
   const [userProfiles, setUserProfiles] = useState<Record<string, GetProfileResponse>>({})
+  const [followOverrides, setFollowOverrides] = useState<Record<string, boolean>>({})
   const inFlightIdsRef = useRef<Set<string>>(new Set())
 
-  // Single useEffect — all sidebar data fetched together once
   useEffect(() => {
     if (!trackId) return
     void getTrackPlaylists(trackId)
@@ -37,7 +38,7 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
     loadLikes(trackId)
     loadReposts()
     void getTrackStats(trackId)
-  }, [trackId]) // no function refs in deps
+  }, [trackId])
 
   const sidebarUserIds = useMemo(
     () =>
@@ -101,7 +102,7 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
   }, [sidebarUserIds, userProfiles])
 
   const SideTabs = [
-    { href: "", label: "Top",   value: "top"   },
+    { href: "", label: "Top", value: "top" },
     { href: "", label: "First", value: "first" },
   ]
 
@@ -109,7 +110,6 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
 
   return (
     <aside className="w-85 sticky top-20 h-fit flex flex-col gap-10 text-white">
-
       <section className="flex flex-col gap-3 mt-5">
         <div className="flex">
           <h2 className="text-sm font-bold uppercase tracking-wide text-white">Fans</h2>
@@ -208,7 +208,11 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
           <button className="text-xs text-gray-500 hover:text-white cursor-pointer">View all</button>
         </div>
         <Avatar.Group className="w-100">
-          {users.map((user) => (
+          {users.map((user) => {
+            const profile = userProfiles[user.userId]
+            const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false
+
+            return (
             <ProfilePopover
               key={user.userId}
               id={`like-${user.userId}`}
@@ -216,11 +220,15 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
               followCount={user.followersCount}
               profileImgLink={user.avatarUrl}
               userId={user.userId}
-              isFollowing={userProfiles[user.userId]?.isFollowed ?? false}
+              isFollowing={isFollowing}
+              onFollowChange={(next) =>
+                setFollowOverrides((prev) => ({ ...prev, [user.userId]: next }))
+              }
             >
               <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
             </ProfilePopover>
-          ))}
+            )
+          })}
         </Avatar.Group>
       </section>
 
@@ -230,7 +238,11 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
           <button className="text-xs text-gray-500 hover:text-white cursor-pointer">View all</button>
         </div>
         <Avatar.Group className="w-100">
-          {repostUsers.map((user) => (
+          {repostUsers.map((user) => {
+            const profile = userProfiles[user.userId]
+            const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false
+
+            return (
             <ProfilePopover
               key={user.userId}
               id={`repost-${user.userId}`}
@@ -238,14 +250,17 @@ export default function TrackSidebar({ trackId,track }: TrackSidebarProps) {
               followCount={user.followersCount}
               profileImgLink={user.avatarUrl}
               userId={user.userId}
-              isFollowing={userProfiles[user.userId]?.isFollowed ?? false}
+              isFollowing={isFollowing}
+              onFollowChange={(next) =>
+                setFollowOverrides((prev) => ({ ...prev, [user.userId]: next }))
+              }
             >
               <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
             </ProfilePopover>
-          ))}
+            )
+          })}
         </Avatar.Group>
       </section>
-
     </aside>
   );
 }
