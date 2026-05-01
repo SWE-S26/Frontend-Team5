@@ -107,14 +107,20 @@ export default function HomeClient() {
   const followedPlaylistsLoading = newPlaylistsLoading || loading;
 
   useEffect(() => {
-    getTracks(1, 100);
+    getTracks(1, 20);
     getPlaylists();
     if (isAuthenticated) getFollowing(userId ?? "");
   }, [getTracks, getPlaylists, getFollowing, userId, isAuthenticated]);
 
   return (
-    <div className="flex justify-between">
-      <div className="w-full md:w-[68%]">
+    <div className="flex flex-col md:flex-row justify-between gap-4 md:gap-6 px-4 sm:px-6 md:px-0">
+      {isAuthenticated && (
+        <div className="order-first md:hidden w-full mb-2">
+          <ArtistTools />
+        </div>
+      )}
+
+      <div className="w-full md:w-[68%] space-y-4 md:space-y-6">
         <MediaCardCarousel
           title="Hear our freshly released tracks"
           type="tracks"
@@ -152,22 +158,20 @@ export default function HomeClient() {
           ))}
       </div>
 
-      <div className="hidden md:block md:w-[27.75%]">
-        <div className="w-full">
-          <div className="w-full flex flex-col items-center mb-5">
-            <div className="w-full">
-              {isAuthenticated && (
-                <div className="mb-8">
-                  <ArtistTools />
-                  <SuggestedWrapper />
-                  <LikedTracksWidget userId={userId} />
-                  <TrackHistoryWidget />
-                </div>
-              )}
-
-              <SidebarFooter />
+      <div className="w-full md:w-[27.75%]">
+        <div className="w-full sticky top-4 md:top-20">
+          {isAuthenticated && (
+            <div className="space-y-4 md:space-y-6 mb-6 md:mb-8">
+              <div className="hidden md:block">
+                <ArtistTools />
+              </div>
+              <SuggestedWrapper />
+              <LikedTracksWidget userId={userId} />
+              <TrackHistoryWidget />
             </div>
-          </div>
+          )}
+
+          <SidebarFooter />
         </div>
       </div>
     </div>

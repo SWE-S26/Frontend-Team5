@@ -90,6 +90,7 @@ export default function PlaylistCard({
     isPlaying &&
     cachedTracks.length > 0 &&
     cachedTracks.some((t) => t.id === currentTrackId);
+  const playlistHref = playlistId ? `/playlist/${playlistId}` : "#";
 
   const handleLikeClick = (e: React.MouseEvent) => {
     e.stopPropagation();
@@ -122,6 +123,7 @@ export default function PlaylistCard({
         img: t.image.imgLink,
         duration: t.durationInSeconds,
       }));
+
       setCachedTracks(tracks);
     }
 
@@ -170,7 +172,7 @@ export default function PlaylistCard({
             <div className="absolute inset-0 rounded overflow-hidden">
               <div
                 className={`absolute inset-0 rounded overflow-hidden ${
-                  !img ? "bg-gradient-to-br from-off-black to-crusta/70" : ""
+                  !img ? "bg-linear-to-br from-off-black to-crusta/70" : ""
                 }`}
               ></div>
 
@@ -207,7 +209,7 @@ export default function PlaylistCard({
             {/* Like Button */}
             {img && (
               <div
-                className={`absolute bottom-3.25 z-30 group/tooltip flex flex-col items-center w-10 ${type === "album" ? "right-[86px]" : "right-[48.5px]"}`}
+                className={`absolute bottom-3.25 z-30 group/tooltip flex flex-col items-center w-10 ${type === "album" ? "right-21.5" : "right-12"}`}
               >
                 <HiHeart
                   className={`text-[16px] font-bold opacity-0 group-hover:opacity-100 group-hover/tooltip:opacity-50 transition-all duration-200 cursor-pointer ${
@@ -280,23 +282,27 @@ export default function PlaylistCard({
 
           {/* Title */}
           <a
-            href="#"
-            className="text-white-smoke no-underline hover:text-gray-300 text-[14px] font-bold tracking-tight pl-1 truncate"
+            href={playlistHref}
+            className="block text-white-smoke no-underline hover:text-gray-300 text-[14px] font-bold tracking-tight pl-1 truncate"
+            onClick={(e) => e.stopPropagation()}
           >
             {title}
           </a>
 
-          {/* Artist */}
-          <p className="text-silver text-[14px] font-bold pl-1 truncate">
+          <a
+            href={playlistHref}
+            className="block text-silver text-[14px] font-bold pl-1 truncate no-underline hover:text-white-smoke transition-colors"
+            onClick={(e) => e.stopPropagation()}
+          >
             {artist}
-          </p>
+          </a>
         </div>
       ) : (
         <div className="relative w-40 aspect-square rounded group cursor-pointer bg-off-black m-1 mb-1.75">
           <div className="absolute inset-0 rounded overflow-hidden">
             <div
               className={`absolute inset-0 rounded overflow-hidden ${
-                !img ? "bg-gradient-to-br from-off-black to-crusta/70" : ""
+                !img ? "bg-linear-to-br from-off-black to-crusta/70" : ""
               }`}
             ></div>
 
