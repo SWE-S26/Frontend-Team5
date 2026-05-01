@@ -204,10 +204,10 @@ var SoundCloudWaveform = {
     var dividerY = Math.floor(canvasHeight * 0.55);
 
     var normalized = h / canvasHeight;
-    var curved = Math.pow(normalized, 1.2);
+    // var curved = Math.pow(normalized, 1.3);
 
-    var topH = Math.min(curved * dividerY * 1, dividerY);
-    var bottomH = Math.min(topH * 0.35, canvasHeight - dividerY);
+    var topH = Math.min(normalized * dividerY * 1, dividerY);
+    var bottomH = Math.min(topH * 0.45, canvasHeight - dividerY);
 
     var drawTop = this.settings.half !== "bottom";
     var drawBottom = this.settings.half !== "top";

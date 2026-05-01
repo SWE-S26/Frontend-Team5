@@ -20,14 +20,25 @@ import { Track } from "@/store/slices/playerSlice";
 import { useDispatch, useSelector } from "react-redux";
 import { RootState } from "@/store/store";
 import { playAudio } from "@/store/slices/playerSlice";
+import ArtistTools from "@/components/home/ArtistTools";
+import SuggestedWrapper from "@/components/social-graph/SuggestedWrapper";
+import SidebarFooter from "@/components/ui/SidebarFooter";
+import TrackHistoryWidget from "@/components/home/TrackHistoryWidget";
+import LikedTracksWidget from "@/components/home/LikedTracksWidget";
+import { useAppSelector } from "@/store/hooks";
 
 const PAGE_SIZE = 10;
 
 export default function Feed() {
+  const userId = useAppSelector((state) => state.auth.userId);
+
   const { getFeed, items, loading: feedLoading, hasMore } = useGetFeed();
 
   const [allTracks, setAllTracks] = useState<ApiTrack[]>([]);
   const [allPlaylists, setAllPlaylists] = useState<PlaylistDetail[]>([]);
+  const [playlistCreators, setPlaylistCreators] = useState<
+    Record<string, string>
+  >({});
   const [resolving, setResolving] = useState(true);
   const [hasFetched, setHasFetched] = useState(false);
   const [includeReposts, setIncludeReposts] = useState(true);
@@ -61,6 +72,7 @@ export default function Feed() {
     seenPlaylistIds.current.clear();
     setAllTracks([]);
     setAllPlaylists([]);
+    setPlaylistCreators({});
     setHasFetched(false);
     setResolving(true);
     offsetRef.current = 0;
@@ -131,10 +143,39 @@ export default function Feed() {
           },
         );
 
+        const uniqueArtistIds = Array.from(
+          new Set(
+            resolvedPlaylists
+              .map((playlist) => playlist.artistId)
+              .filter(Boolean),
+          ),
+        );
+        const creatorResults = await Promise.allSettled(
+          uniqueArtistIds.map(async (artistId) => {
+            const response =
+              await playlistsService.getPublicPlaylistCreator(artistId);
+            const artist = response.data.data.artist;
+            const creator = Array.isArray(artist)
+              ? (artist[0] ?? null)
+              : artist;
+            return creator ? ([artistId, creator.displayName] as const) : null;
+          }),
+        );
+
+        const nextCreators: Record<string, string> = {};
+        creatorResults.forEach((result) => {
+          if (result.status !== "fulfilled" || !result.value) return;
+          const [artistId, displayName] = result.value;
+          nextCreators[artistId] = displayName;
+        });
+
         if (resolvedTracks.length)
           setAllTracks((prev) => [...prev, ...resolvedTracks]);
         if (resolvedPlaylists.length)
           setAllPlaylists((prev) => [...prev, ...resolvedPlaylists]);
+        if (Object.keys(nextCreators).length) {
+          setPlaylistCreators((prev) => ({ ...prev, ...nextCreators }));
+        }
       } finally {
         setResolving(false);
       }
@@ -304,33 +345,44 @@ export default function Feed() {
                 </PopoverProvider>
 
                 {item.type === "track" ? (
-                  <WaveformCard
-                    img={item.data.image?.imgLink}
-                    title={item.data.basicInfo?.title}
-                    artist={item.data.basicInfo?.mainArtists?.[0]}
-                    trackId={item.data.trackId ?? ""}
-                    trackUrl={item.data.audio?.audioLink}
-                    wfLink={item.data.audio?.waveformLink}
-                    duration={item.data.durationInSeconds}
-                    tag={item.data.basicInfo?.tags?.[0]}
-                    audioClipStart={item.data.audioClip?.start}
-                    audioClipEnd={item.data.audioClip?.end}
-                    likeCount={item.data.numLikes}
-                    repostCount={item.data.numReposts}
-                    playsCount={item.data.numPlays}
-                    commentsCount={item.data.numComments}
-                    isLikedByUser={item.data.isLikedByUser}
-                    isRepostedByUser={item.data.isRepostedByUser}
-                    allTracks={fullQueue}
-                    enableDirectDownload={
-                      item.data.permissions?.enableDirectDownload ?? false
-                    }
-                  />
+                  <PopoverProvider>
+                    <WaveformCard
+                      img={item.data.image?.imgLink}
+                      title={item.data.basicInfo?.title}
+                      artist={item.data.basicInfo?.mainArtists?.[0]}
+                      artistId={item.data.posterId}
+                      trackId={item.data.trackId ?? ""}
+                      trackUrl={item.data.audio?.audioLink}
+                      wfLink={item.data.audio?.waveformLink}
+                      duration={item.data.durationInSeconds}
+                      tag={item.data.basicInfo?.tags?.[0]}
+                      audioClipStart={item.data.audioClip?.start}
+                      audioClipEnd={item.data.audioClip?.end}
+                      likeCount={item.data.numLikes}
+                      repostCount={item.data.numReposts}
+                      playsCount={item.data.numPlays}
+                      commentsCount={item.data.numComments}
+                      isLikedByUser={item.data.isLikedByUser}
+                      isRepostedByUser={item.data.isRepostedByUser}
+                      allTracks={fullQueue}
+                      enableDirectDownload={
+                        item.data.permissions?.enableDirectDownload ?? false
+                      }
+                      isRepost={item.feedItem?.isRepost ?? false}
+                      reposterId={item.feedItem?.actorId}
+                      reposterName={item.feedItem?.displayName}
+                    />
+                  </PopoverProvider>
                 ) : (
                   <PlaylistWaveformCard
                     img={item.data.image?.imgLink}
                     title={item.data.title}
-                    artist={item.data.owner?.name || "Unknown Artist"}
+                    artist={
+                      playlistCreators[item.data.artistId] ??
+                      item.data.artistId ??
+                      "Unknown creator"
+                    }
+                    artistId={item.data.artistId}
                     playlistId={item.data._id}
                     tag={item.data.genre}
                     likeCount={item.data.numOfLikes}
@@ -340,6 +392,9 @@ export default function Feed() {
                     preloadedTracks={item.data.tracks}
                     totalTracks={item.data.totalTracks}
                     feedQueue={fullQueue}
+                    isRepost={item.feedItem?.isRepost ?? false}
+                    reposterId={item.feedItem?.actorId}
+                    reposterName={item.feedItem?.displayName}
                   />
                 )}
               </div>
@@ -373,7 +428,23 @@ export default function Feed() {
             </p>
           )}
         </div>
-        <div className="hidden md:block md:w-[27.75%]" />
+        <div className="hidden md:block md:w-[27.75%]">
+          <div className="w-full">
+            <div className="w-full flex flex-col items-center mb-5 ">
+              <div className="w-full">
+                <ArtistTools />
+              </div>
+              <div className="w-full">
+                <SuggestedWrapper />
+                <LikedTracksWidget userId={userId} />
+                <TrackHistoryWidget />
+                <div className="mt-8">
+                  <SidebarFooter />
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
       </div>
     </FeedGuard>
   );

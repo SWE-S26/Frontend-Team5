@@ -60,7 +60,9 @@ export default function FeedHeader({
           profileImgLink={profileImgLink}
           location={location}
         >
-          <Avatar src={profileImgLink} />
+          <a href={`/profile/${actorId}`}>
+            <Avatar src={profileImgLink} />{" "}
+          </a>
         </ProfilePopover>
 
         <div className="flex items-center text-sm text-silver cursor-text pl-3">
@@ -71,7 +73,10 @@ export default function FeedHeader({
             profileImgLink={profileImgLink}
             location={location}
           >
-            <a className="text-white-smoke hover:text-silver font-bold transition-colors duration-200 ease-in-out cursor-pointer mr-1">
+            <a
+              href={`/profile/${actorId}`}
+              className="text-white-smoke hover:text-silver font-bold transition-colors duration-200 ease-in-out cursor-pointer mr-1"
+            >
               {artistName}
             </a>
           </ProfilePopover>

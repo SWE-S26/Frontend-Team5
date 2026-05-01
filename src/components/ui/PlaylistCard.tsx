@@ -11,6 +11,11 @@ import { HiHeart } from "react-icons/hi";
 import { RiPlayListAddLine } from "react-icons/ri";
 import { ListStart } from "lucide-react";
 import MoreDropdown from "./MoreDropdown";
+import { interactionToast } from "@/lib/interactive-toasts/interactiveToastBus";
+import { FiUserPlus } from "react-icons/fi";
+import { useFollowUser, useUnfollowUser } from "@/hooks/useSocial";
+import AddToPlaylistModal from "@/components/playlists/AddToPlaylistModal";
+import { createPortal } from "react-dom";
 
 type Props = {
   img?: string;
@@ -19,6 +24,8 @@ type Props = {
   playlistId?: string;
   isLikedByUser?: boolean;
   appearance?: "interactive" | "static";
+  type?: string;
+  artistId?: string;
   tracks?: {
     id: string;
     url: string;
@@ -36,6 +43,8 @@ export default function PlaylistCard({
   playlistId,
   isLikedByUser = false,
   appearance = "interactive",
+  type = "playlist",
+  artistId,
 }: Props) {
   const dispatch = useDispatch();
   const { currentTrackId, isPlaying } = useSelector(
@@ -45,7 +54,26 @@ export default function PlaylistCard({
 
   const [isLiked, setIsLiked] = useState(isLikedByUser);
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const [isAddToPlaylistOpen, setIsAddToPlaylistOpen] = useState(false);
   const { likePlaylist } = useLikePlaylistOptimistic(playlistId ?? "");
+
+  const [isFollowing, setIsFollowing] = useState(false);
+  const { followUser } = useFollowUser();
+  const { unfollowUser } = useUnfollowUser();
+
+  async function handleFollowClick(e: React.MouseEvent) {
+    e.stopPropagation();
+    if (!artistId) return;
+
+    const next = !isFollowing;
+    setIsFollowing(next);
+
+    if (next) {
+      await followUser(artistId);
+    } else {
+      await unfollowUser(artistId);
+    }
+  }
 
   const [cachedTracks, setCachedTracks] = useState<
     {
@@ -69,6 +97,9 @@ export default function PlaylistCard({
 
     likePlaylist();
     setIsLiked(!isLiked);
+    if (!isLiked) {
+      interactionToast.liked(title ?? "playlist", img ?? "");
+    }
   };
 
   const handlePlayNextClick = async (e: React.MouseEvent) => {
@@ -94,6 +125,7 @@ export default function PlaylistCard({
       setCachedTracks(tracks);
     }
 
+    interactionToast.queued(title ?? "playlist", img ?? "");
     dispatch(playNext({ tracks }));
   };
 
@@ -143,14 +175,15 @@ export default function PlaylistCard({
               ></div>
 
               {img && (
-                <div
+                <a
+                  href={`/playlist/${playlistId}`}
                   className="absolute inset-0 bg-cover bg-center overflow-hidden rounded opacity-100 animate-fade-in"
                   style={{ backgroundImage: `url(${img})` }}
                 />
               )}
 
               {img && (
-                <div className="absolute inset-0 transition-all duration-200 bg-white/50 opacity-0 group-hover:opacity-100" />
+                <div className="absolute inset-0 transition-all duration-200 bg-white/50 pointer-events-none opacity-0 group-hover:opacity-100" />
               )}
             </div>
 
@@ -173,7 +206,9 @@ export default function PlaylistCard({
 
             {/* Like Button */}
             {img && (
-              <div className="absolute bottom-3.25 right-[48.5px] z-30 group/tooltip flex flex-col items-center w-10">
+              <div
+                className={`absolute bottom-3.25 z-30 group/tooltip flex flex-col items-center w-10 ${type === "album" ? "right-[86px]" : "right-[48.5px]"}`}
+              >
                 <HiHeart
                   className={`text-[16px] font-bold opacity-0 group-hover:opacity-100 group-hover/tooltip:opacity-50 transition-all duration-200 cursor-pointer ${
                     isLiked ? "text-inferno" : "text-chinese-black"
@@ -183,6 +218,22 @@ export default function PlaylistCard({
 
                 <div className="absolute top-full mt-2 px-2 py-1 bg-off-black text-white-smoke text-[11px] rounded opacity-0 group-hover/tooltip:opacity-100 pointer-events-none whitespace-nowrap z-50">
                   {isLiked ? "Unlike" : "Like"}
+                  <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-off-black" />
+                </div>
+              </div>
+            )}
+
+            {/* Follow Button */}
+            {img && type === "album" && (
+              <div className="absolute bottom-3.25 right-[48.5px] z-30 group/tooltip flex flex-col items-center w-10">
+                <FiUserPlus
+                  className={`text-[16px] font-bold opacity-0 group-hover:opacity-100 group-hover/tooltip:opacity-50 transition-all duration-200 cursor-pointer ${
+                    isFollowing ? "text-inferno" : "text-chinese-black"
+                  }`}
+                  onClick={handleFollowClick}
+                />
+                <div className="absolute top-full mt-2 px-2 py-1 bg-off-black text-white-smoke text-[11px] rounded opacity-0 group-hover/tooltip:opacity-100 pointer-events-none whitespace-nowrap z-50">
+                  {isFollowing ? "Unfollow" : "Follow"}
                   <div className="absolute left-1/2 -translate-x-1/2 bottom-full w-0 h-0 border-l-4 border-l-transparent border-r-4 border-r-transparent border-b-4 border-b-off-black" />
                 </div>
               </div>
@@ -219,7 +270,7 @@ export default function PlaylistCard({
                       icon: (
                         <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
                       ),
-                      onClick: () => console.log("playlist"),
+                      onClick: () => setIsAddToPlaylistOpen(true),
                     },
                   ]}
                 />
@@ -250,14 +301,28 @@ export default function PlaylistCard({
             ></div>
 
             {img && (
-              <div
-                className="absolute inset-0 bg-cover bg-center overflow-hidden rounded cursor-pointer"
+              <a
+                href={`/playlist/${playlistId}`}
+                className="absolute inset-0 bg-cover bg-center overflow-hidden rounded opacity-100 animate-fade-in"
                 style={{ backgroundImage: `url(${img})` }}
               />
             )}
           </div>
         </div>
       )}
+
+      {isAddToPlaylistOpen &&
+        createPortal(
+          <AddToPlaylistModal
+            isOpen={isAddToPlaylistOpen}
+            onClose={() => setIsAddToPlaylistOpen(false)}
+            trackId={playlistId ?? ""}
+            trackTitle={title}
+            artistName={artist}
+            trackImage={img}
+          />,
+          document.body,
+        )}
     </>
   );
 }

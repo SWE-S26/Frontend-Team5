@@ -47,11 +47,14 @@ import {
 import { getBaseUrl } from "@/utilities/getBaseUrl";
 import { interactionToast } from "@/lib/interactive-toasts/interactiveToast";
 import { interactiveToastBus } from "@/lib/interactive-toasts/interactiveToastBus";
+import ProfilePopover from "./ProfilePopover";
+import { useGetProfile } from "@/hooks/useProfile";
 
 type CardProps = {
   img?: string;
   title?: string;
   artist?: string;
+  artistId?: string;
   trackId: string;
   trackUrl?: string;
   duration?: number;
@@ -71,6 +74,9 @@ type CardProps = {
   onEdit?: () => void;
   onAddToPlaylist?: () => void;
   allTracks?: Track[];
+  isRepost?: boolean;
+  reposterId?: string;
+  reposterName?: string;
 };
 
 const FLASH_DURATION = 3000;
@@ -81,6 +87,7 @@ export default function WaveformCard({
   img,
   title,
   artist,
+  artistId,
   trackId,
   trackUrl,
   duration,
@@ -100,6 +107,9 @@ export default function WaveformCard({
   onEdit,
   onAddToPlaylist,
   allTracks,
+  isRepost = false,
+  reposterId,
+  reposterName,
 }: CardProps) {
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
@@ -115,6 +125,17 @@ export default function WaveformCard({
   const [isAddToPlaylistOpen, setIsAddToPlaylistOpen] = useState(false);
 
   const [isMoreOpen, setIsMoreOpen] = useState(false);
+  const { getProfile, profile: artistProfile } = useGetProfile();
+  const { getProfile: getReposterProfile, profile: reposterProfile } =
+    useGetProfile();
+
+  useEffect(() => {
+    if (artistId) getProfile(artistId);
+  }, [artistId]);
+
+  useEffect(() => {
+    if (isRepost && reposterId) getReposterProfile(reposterId);
+  }, [isRepost, reposterId]);
 
   useEffect(() => {
     if (!isMoreOpen) return;
@@ -596,8 +617,43 @@ export default function WaveformCard({
               )}
             </div>
             <div>
-              <p className="text-sm font-bold text-silver ml-3">{artist}</p>
-              <p className="text-sm font-bold text-white-smoke ml-3">{title}</p>
+              {isRepost && reposterId ? (
+                <div className="flex items-center gap-1 text-sm font-bold text-silver ml-3">
+                  <a
+                    href={`/profile/${artistId}`}
+                    className="text-silver hover:text-white-smoke no-underline transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {artist}
+                  </a>
+                  <LuRepeat2 className="text-[13px] shrink-0" />
+
+                  <a
+                    href={`/profile/${reposterId}`}
+                    className="text-silver hover:text-white-smoke no-underline transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {reposterName}
+                  </a>
+                </div>
+              ) : (
+                <div className="flex items-center gap-1 text-sm font-bold text-silver ml-3">
+                  <a
+                    href={`/profile/${artistId}`}
+                    className="text-silver hover:text-white-smoke no-underline transition-colors"
+                    onClick={(e) => e.stopPropagation()}
+                  >
+                    {artist}
+                  </a>
+                </div>
+              )}
+              <a
+                href={`/track/${trackId}`}
+                className="text-sm font-bold text-white-smoke ml-3 no-underline hover:text-silver transition-colors truncate"
+                onClick={(e) => e.stopPropagation()}
+              >
+                {title}
+              </a>{" "}
             </div>
 
             {tag && (
@@ -769,7 +825,11 @@ export default function WaveformCard({
                     ),
                     onClick: handleOpenAddToPlaylistModal,
                   },
-                  { label: "Station", icon: <BiStation className="text-lg" /> },
+                  {
+                    label: "Station",
+                    disabled: true,
+                    icon: <BiStation className="text-lg" />,
+                  },
                 ]}
               />
 
