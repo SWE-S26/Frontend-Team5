@@ -60,7 +60,7 @@ export default function TrackUploader({ posterId, onUnfollow }: Props) {
   }, [posterId, hasHydrated])
 
   return (
-    <div className="w-[260px] bg-[#111] rounded-xl p-4 flex flex-col items-center gap-3 text-white shadow-lg">
+    <div className="w-[260px] bg-chinese-black rounded-xl p-4 flex flex-col items-center gap-3 text-white-smoke ">
 
       {/* Avatar */}
       <img
@@ -73,13 +73,13 @@ export default function TrackUploader({ posterId, onUnfollow }: Props) {
         <h2 className="text-sm font-semibold">
           {profile.displayName || "Unknown"}
         </h2>
-        <p className="text-xs text-gray-400">
+        <p className="text-xs text-silver">
           {profile.bio}
         </p>
       </div>
 
       {/* Stats */}
-      <div className="flex items-center gap-4 text-xs text-gray-300">
+      <div className="flex items-center gap-4 text-xs text-silver">
         <div className="flex items-center gap-1">
           <FaUser />
           <span>{profile.followersCount || 0}</span>
@@ -98,7 +98,7 @@ export default function TrackUploader({ posterId, onUnfollow }: Props) {
       />
 
       {/* Report */}
-      <Button className=" text-white hover:text-gray-300">
+      <Button className=" text-white-smoke hover:text-silver">
         Report
       </Button>
     </div>

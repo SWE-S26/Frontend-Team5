@@ -22,13 +22,13 @@ export default function FanCard({ fan, index, activeTab }: FanCardProps) {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        <span className="text-white text-xs w-4 shrink-0">{index + 1}</span>
+        <span className="text-white-smoke text-xs w-4 shrink-0">{index + 1}</span>
         <Avatar
           src={fan.userId.profileImg?.imgLink || undefined}
           size={28}
           className="shrink-0"
         />
-        <span className="text-xs font-bold text-white flex-1 truncate">
+        <span className="text-xs font-bold text-white-smoke flex-1 truncate">
           {fan.userId.displayName}
         </span>
 
@@ -36,17 +36,17 @@ export default function FanCard({ fan, index, activeTab }: FanCardProps) {
           {hovered ? (
             <div className="flex gap-3">
               <UserAddOutlined
-                className="text-gray-400 hover:text-white cursor-pointer transition-colors"
+                className="text-silver hover:text-white-smoke cursor-pointer transition-colors"
                 style={{ fontSize: 15 }}
               />
               <GoMail
-                className="text-gray-400 hover:text-white cursor-pointer transition-colors"
+                className="text-silver hover:text-white-smoke cursor-pointer transition-colors"
                 style={{ fontSize: 15 }}
                 onClick={() => setMessageOpen(true)}
               />
             </div>
           ) : (
-            <span className="text-xs text-gray-400">
+            <span className="text-xs text-silver">
               {activeTab === "top"
                 ? `${fan.totalNumberOfPlay} plays`
                 : `${fan.firstWeekNumPlays} plays`}

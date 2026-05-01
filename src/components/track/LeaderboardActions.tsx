@@ -90,7 +90,7 @@ export default function LeaderboardActions({
   };
 
   return (
-    <div className="w-fit text-white">
+    <div className="w-fit text-white-smoke">
       <div className="mb-4 flex gap-2">
         <Avatar src={profileImgLink ?? undefined} size={30} />
         <div>
@@ -105,8 +105,8 @@ export default function LeaderboardActions({
           disabled={hasAvatar}
           className={`w-17 h-17 rounded-xl flex flex-col items-center justify-center text-gray-400 gap-1 transition
             ${hasAvatar
-              ? "bg-[#1a1a1a] opacity-40 shadow-inner cursor-not-allowed"
-              : "bg-[#1a1a1a] hover:bg-[#262626] active:scale-95 cursor-pointer"
+              ? "bg-off-black opacity-40 shadow-inner cursor-not-allowed"
+              : "bg-off-black hover:bg-[#262626] active:scale-95 cursor-pointer"
             }`}
         >
           <Avatar src={profileImgLink ?? undefined} size={30} />
@@ -119,8 +119,8 @@ export default function LeaderboardActions({
           disabled={loading || isLiked}
           className={`w-17 h-17 rounded-xl flex flex-col items-center justify-center gap-2 transition
             ${isLiked
-              ? "bg-[#1a1a1a] opacity-40 shadow-inner cursor-not-allowed"
-              : "bg-[#1a1a1a] hover:bg-[#262626] active:scale-95 cursor-pointer"
+              ? "bg-off-black opacity-40 shadow-inner cursor-not-allowed"
+              : "bg-off-black  active:scale-95 cursor-pointer"
             }
             ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
         >
@@ -128,7 +128,7 @@ export default function LeaderboardActions({
             size={20}
             fill={isLiked ? "currentColor" : "none"}
           />
-          <span className="text-sm text-gray-200">
+          <span className="text-sm text-silver">
             {isLiked ? "Liked" : "Like"} {likeCountState > 0 && `· ${likeCountState}`}
           </span>
         </button>
@@ -144,12 +144,12 @@ export default function LeaderboardActions({
           onClick={handlePlay}
           className={`w-17 h-17 rounded-xl flex flex-col items-center justify-center gap-2 transition cursor-pointer
             ${isActive
-              ? "bg-[#1a1a1a] opacity-40 shadow-inner cursor-not-allowed"
-              : "bg-[#1a1a1a] hover:bg-[#262626] cursor-pointer"
+              ? "bg-off-black opacity-40 shadow-inner cursor-not-allowed"
+              : "bg-off-black  cursor-pointer"
             }`}
         >
-          <Play size={20} className={ "text-gray-300"} />
-          <span className="text-sm text-gray-200">
+          <Play size={20} className={ "text-silver"} />
+          <span className="text-sm text-silver">
             {isActive ? "Repeating" : "Play"}
           </span>
         </button>
