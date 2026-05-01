@@ -14,9 +14,10 @@ interface FloatingInputProps {
   errorMessage?: string
   maxLength?: number
   numbersOnly?: boolean
+  lettersOnly?: boolean
 }
 
-export default function FloatingInput({ placeholder, type = 'text', value, onChange, className = '', format, required, errorMessage, maxLength, numbersOnly }: FloatingInputProps) {
+export default function FloatingInput({ placeholder, type = 'text', value, onChange, className = '', format, required, errorMessage, maxLength, numbersOnly, lettersOnly }: FloatingInputProps) {
   const [focused, setFocused] = useState(false)
   const [touched, setTouched] = useState(false)
   const [internalValue, setInternalValue] = useState('')
@@ -26,12 +27,15 @@ export default function FloatingInput({ placeholder, type = 'text', value, onCha
   const hasError = touched && required && val.length === 0
 
   const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    if (numbersOnly) {
-      e.target.value = e.target.value.replace(/\D/g, '')
-    }
-    if (onChange) onChange(e)
-    else setInternalValue(e.target.value)
-  }
+      if (numbersOnly) {
+          e.target.value = e.target.value.replace(/\D/g, '')
+      }
+      if (lettersOnly) {
+          e.target.value = e.target.value.replace(/[^a-zA-Z\s]/g, '')
+      }
+      if (onChange) onChange(e)
+      else setInternalValue(e.target.value)
+}
 
   const handleBlur = () => {
     setFocused(false)
