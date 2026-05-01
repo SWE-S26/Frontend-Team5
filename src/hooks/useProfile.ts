@@ -15,9 +15,9 @@ export function useGetProfile() {
     setLoading(true)
     setError(null)
     try {
-      const res = await profileService.getProfile(userId)
-      setProfile(res.data)
-      return res.data
+      const data = await profileService.getProfileAuthCached(userId)
+      setProfile(data)
+      return data
     } catch (err: any) {
       const message = err.response?.data?.message || "Something went wrong"
       setError(message)

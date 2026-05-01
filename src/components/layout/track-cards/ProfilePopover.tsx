@@ -6,6 +6,8 @@ import { Avatar } from "antd";
 import { FaUser } from "react-icons/fa6";
 import Button from "@/components/ui/Button";
 import { usePopover } from "./PopoverContext";
+import FollowButton from "@/components/ui/FollowButton";
+
 import {
   useFloating,
   useHover,
@@ -24,10 +26,12 @@ interface ProfilePopoverProps {
   children: React.ReactNode;
   artistName: string;
   followCount: number;
-  profileImgLink: string;
+  profileImgLink?: string;
   location?: string;
   profileHref?: string;
   followersHref?: string;
+  userId?: string;         
+  isFollowing?: boolean;
 }
 
 export default function ProfilePopover({
@@ -39,10 +43,12 @@ export default function ProfilePopover({
   location,
   profileHref,
   followersHref,
+  userId,
+  isFollowing = false,
 }: ProfilePopoverProps) {
   const { openId, setOpenId, scheduleClose, cancelClose } = usePopover();
   const isOpen = openId === id;
-  const [isFollowing, setIsFollowing] = useState(false);
+ 
   const arrowRef = useRef(null);
 
   const { refs, floatingStyles, context, middlewareData } = useFloating({
@@ -102,7 +108,7 @@ export default function ProfilePopover({
 
             {/* Content */}
             <div className="relative z-10 flex flex-col items-center p-4 bg-chinese-black rounded">
-              <Avatar size={96} src={profileImgLink} />
+              <Avatar size={96} src={profileImgLink || undefined} />
               {profileHref ? (
                 <Link
                   className="font-bold mt-2 text-white-smoke hover:text-silver transition-colors duration-100 ease-in-out"
@@ -132,16 +138,10 @@ export default function ProfilePopover({
                   {location}
                 </p>
               )}
-              <Button
-                className={`mt-2 w-full flex items-center justify-center text-center ${
-                  isFollowing
-                    ? "bg-off-black text-white-smoke"
-                    : "bg-white-smoke text-chinese-black"
-                }`}
-                onClick={() => setIsFollowing((prev) => !prev)}
-              >
-                {isFollowing ? "Following" : "Follow"}
-              </Button>
+              <FollowButton
+                userId={userId}
+                initialIsFollowing={isFollowing}
+              />
             </div>
           </div>
         )}

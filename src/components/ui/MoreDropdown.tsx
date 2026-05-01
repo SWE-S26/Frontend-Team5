@@ -19,7 +19,7 @@ import {
 
 export interface DropdownItem {
   type?: "separator";
-  label?: string;
+  label?: React.ReactNode;
   icon?: React.ReactNode;
   onClick?: (e: React.MouseEvent<HTMLButtonElement>) => void;
   disabled?: boolean;
