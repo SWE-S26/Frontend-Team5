@@ -13,7 +13,6 @@ import LeaderboardActions from "./LeaderboardActions";
 
 import { profileService } from "@/services/profile.service";
 import { GetProfileResponse } from "@/types/profile.types";
-
 interface TrackSidebarProps {
   trackId: string;
   track: any;
@@ -102,6 +101,7 @@ export default function TrackSidebar({ trackId,  track, onRepeatPlay }: TrackSid
     }
   }, [sidebarUserIds, userProfiles])
 
+  
   const SideTabs = [
     { href: "", label: "Top", value: "top" },
     { href: "", label: "First", value: "first" },
