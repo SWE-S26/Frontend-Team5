@@ -1,5 +1,5 @@
 "use client";
-import AuthGuard from "@/components/layout/AuthGuard";
+import AuthGuard from "@/components/layout/guards/AuthGuard";
 import NotificationToast from "@/components/notifications/NotificationToast";
 import { NotificationsProvider } from "@/components/notifications/NotificationsContext";
 import { useNotificationsContext } from "@/components/notifications/NotificationsContext";

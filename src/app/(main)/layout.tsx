@@ -1,5 +1,5 @@
 "use client";
-import AuthGuard from "@/components/layout/AuthGuard";
+import AuthGuard from "@/components/layout/guards/AuthGuard";
 import Navbar from "@/components/layout/navbar/main-navbar/Navbar";
 import PlayerBar from "@/components/layout/player/PlayerBar";
 import NotificationToast from "@/components/notifications/NotificationToast";

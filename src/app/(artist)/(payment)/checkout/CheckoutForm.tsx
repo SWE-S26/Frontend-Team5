@@ -309,6 +309,7 @@ const stripe = useStripe()
                                         onChange={(e) => setCardHolderFirstName(e.target.value)}
                                         required
                                         errorMessage="Enter a first name"
+                                        lettersOnly
                                     />
                                     <FloatingInput
                                         placeholder="Surname"
@@ -316,6 +317,7 @@ const stripe = useStripe()
                                         onChange={(e) => setCardHolderSurname(e.target.value)}
                                         required
                                         errorMessage="Enter a surname"
+                                        lettersOnly
                                     />
 
                                     {/* Card number */}
@@ -414,7 +416,7 @@ const stripe = useStripe()
 
                                     {showBillingAddress && (
                                         <div className="space-y-3">
-                                            <FloatingInput placeholder="Full name (optional)" />
+                                            <FloatingInput placeholder="Full name (optional)" lettersOnly/>
                                             <FloatingInput placeholder="Company (optional)" />
                                             <FloatingInput placeholder="Street Address (optional)" />
                                             <FloatingInput placeholder="City (optional)" />
