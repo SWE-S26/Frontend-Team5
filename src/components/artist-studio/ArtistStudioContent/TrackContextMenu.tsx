@@ -61,7 +61,7 @@ export function TrackContextMenu({
   });
 
   const click = useClick(context);
-  const dismiss = useDismiss(context);
+  const dismiss = useDismiss(context, { outsidePressEvent: 'click' });
   const role = useRole(context, { role: "menu" });
   const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
@@ -117,6 +117,8 @@ export function TrackContextMenu({
             />
             {/* Bottom sheet */}
             <div
+              ref={refs.setFloating}
+              onPointerDown={(e) => e.stopPropagation()}
               className="fixed inset-x-0 bottom-0 z-1100 rounded-t-2xl border-t border-[#2a2a2a] bg-chinese-black pb-[env(safe-area-inset-bottom)] shadow-2xl"
               role="menu"
             >
