@@ -34,6 +34,12 @@ const STRIPE_ELEMENT_STYLE = {
 
 type BillingInterval = 'monthly' | 'yearly'
 
+const PROMO_CODES: Record<string, number> = {
+    'JU1CY': 67,
+    'E1OZO': 70,
+    'C0CK5': 69,
+}
+
 // ── Component ────────────────────────────────────────────────────
 
 export function CheckoutForm() {
@@ -92,12 +98,6 @@ const stripe = useStripe()
     const [discountPercent, setDiscountPercent] = useState<number | null>(null)
     const [couponError, setCouponError] = useState<string | null>(null)
     const [showBillingAddress, setShowBillingAddress] = useState(false)
-
-    const PROMO_CODES: Record<string, number> = {
-        'JU1CY': 67,
-        'E1OZO': 70,
-        'C0CK5': 69,
-    }
 
     // ── Form state ───────────────────────────────────────────────
     const [cardHolderFirstName, setCardHolderFirstName] = useState('')
@@ -168,7 +168,7 @@ const stripe = useStripe()
             return
         }
 
-        const success = await checkout(paymentMethod.id, selectedPlan.priceId, couponCode || undefined)
+        const success = await checkout(paymentMethod.id, selectedPlan.priceId, couponCode.toUpperCase() || undefined)
         if (success) {
             await refreshToken()
             router.push(`/success?plan=${selectedInterval}&price=${discountedPrice.toFixed(2)}&currency=${CURRENCY}&from=checkout${discountPercent ? `&discount=${discountPercent}` : ''}`)
