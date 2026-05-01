@@ -1,6 +1,6 @@
 "use client"
 
-import { useEffect } from "react"
+import { useEffect, useState } from "react"
 import { useAppDispatch, useAppSelector } from "@/store/hooks"
 import { setProfile, clearProfile } from "@/store/slices/profileSlice"
 import { useGetProfile } from "@/hooks/useProfile"
@@ -8,18 +8,23 @@ import FollowButton from "../ui/FollowButton"
 import Button from "../ui/Button"
 import { FaUser } from "react-icons/fa"
 import { PiWaveformBold } from "react-icons/pi"
+import TrackReportPopUp from "@/components/report/TrackReportPopUp"
 
 interface Props {
   posterId: string
+  trackId: string
+  trackTitle: string
   onUnfollow?: (userId: string) => void
 }
 
-export default function TrackUploader({ posterId, onUnfollow }: Props) {
+export default function TrackUploader({ posterId, trackId, trackTitle, onUnfollow }: Props) {
   const dispatch = useAppDispatch()
   const { getProfile } = useGetProfile()
   const hasHydrated = useAppSelector((state) => state.auth.hasHydrated)
   const authUserId  = useAppSelector((state) => state.auth.userId)
   const profile     = useAppSelector((s) => s.profile)
+
+  const [isReportOpen, setIsReportOpen] = useState(false)
 
   useEffect(() => {
     if (!hasHydrated || !posterId) return
@@ -60,7 +65,7 @@ export default function TrackUploader({ posterId, onUnfollow }: Props) {
   }, [posterId, hasHydrated])
 
   return (
-    <div className="w-[260px] bg-chinese-black rounded-xl p-4 flex flex-col items-center gap-3 text-white-smoke ">
+    <div className="w-[260px] bg-chinese-black rounded-xl p-4 flex flex-col items-center gap-3 text-white-smoke">
 
       {/* Avatar */}
       <img
@@ -98,9 +103,19 @@ export default function TrackUploader({ posterId, onUnfollow }: Props) {
       />
 
       {/* Report */}
-      <Button className=" text-white-smoke hover:text-silver">
+      <Button
+        onClick={() => setIsReportOpen(true)}
+        className="text-white-smoke hover:text-silver"
+      >
         Report
       </Button>
+
+      <TrackReportPopUp
+        isOpen={isReportOpen}
+        onClose={() => setIsReportOpen(false)}
+        trackTitle={trackTitle}
+        violatorId={trackId}
+      />
     </div>
   )
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect, useCallback } from "react";
-import { AdminUser, AdminUsersParams } from "@/types/admin";
+import { AdminUser, AdminUsersParams } from "@/types/admin-dash/adminUser.types";
 import { adminUsersService } from "@/services/admin-dash/adminUsers.service";
 
 export function useAdminUsers(params?: AdminUsersParams) {

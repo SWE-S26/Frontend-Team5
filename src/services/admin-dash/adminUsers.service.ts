@@ -4,7 +4,7 @@ import {
   AdminUsersParams,
   AdminUsersResponse,
   SuspendUserPayload,
-} from "@/types/admin";
+} from "@/types/admin-dash/adminUser.types";
 
 export const adminUsersService = {
   listUsers: async (params?: AdminUsersParams): Promise<AdminUsersResponse> => {

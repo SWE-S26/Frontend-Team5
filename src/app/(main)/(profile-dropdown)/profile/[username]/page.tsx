@@ -32,8 +32,7 @@ import Albums from "@/components/profile/profile-tabs/Albums"
 import Playlists from "@/components/profile/profile-tabs/Playlists"
 import Reposts from "@/components/profile/profile-tabs/Reposts"
 import BlockPopUp from "@/components/messages/conversation/BlockPopUp"
-import ReportPopUp from "@/components/messages/conversation/ReportPopUp"
-import SpamPopUp from "@/components/messages/conversation/SpamPopUp"
+import ReportPopUp from "@/components/report/ReportPopUp"
 import Button from "@/components/ui/Button"
 import { useBlockUser, useUnblockUser } from "@/hooks/useSocial"
 import { setProfile } from "@/store/slices/profileSlice"
@@ -75,7 +74,6 @@ const ProfilePage = ({ params }: Props) => {
   const [openAddToPlaylist, setOpenAddToPlaylist] = useState(false)
   const [editingTrack, setEditingTrack] = useState<ArtistTrackRow | null>(null)
   const[OpenReport, setIsOpenReport] = useState(false)
-  const [isSpamOpen, setIsSpamOpen] = useState(false)
   const [OpenBlock, setOpenBlock] = useState(false)
   const moreMenuRef = useRef<HTMLDivElement>(null)
   const isFollowed                          = useAppSelector((state) => state.profile.isFollowed)
@@ -592,19 +590,13 @@ const ProfilePage = ({ params }: Props) => {
                     setOpenBlock(false)
                 }} />
 
-            <ReportPopUp 
-                    isOpen={OpenReport} 
-                    onClose={() => setIsOpenReport(false)} 
-                    onSpam={() => {
-                        setIsOpenReport(false)
-                        setIsSpamOpen(true)
-                    }}
-                />
-                <SpamPopUp 
-                    isOpen={isSpamOpen} 
-                    onClose={() => setIsSpamOpen(false)} 
-                    username={displayName  || ''} 
-                />
+      <ReportPopUp 
+        isOpen={OpenReport} 
+        onClose={() => setIsOpenReport(false)}
+        username={displayName || ''}
+        violatorId={profileUserId || ''}
+        violatorType="user"
+      />
 
       <div className="flex justify-between">
         <div className="w-[68%]">

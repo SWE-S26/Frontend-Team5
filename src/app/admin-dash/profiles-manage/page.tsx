@@ -4,10 +4,13 @@ import { useState, useMemo } from "react";
 import { Search, UserX, ShieldOff, Eye, ShieldCheck } from "lucide-react";
 import { useAdminUsers } from "@/hooks/admin-dash/useAdminUsers";
 import { useAdminUserActions } from "@/hooks/admin-dash/useAdminUserActions";
-import { AdminUser } from "@/types/admin";
+import { AdminUser } from "@/types/admin-dash/adminUser.types";
 import { useDebounce } from "@/hooks/useDebounce";
 
 const LIMIT = 20;
+
+type RoleFilter = "all" | "Listener" | "Pro";
+type StatusFilter = "all" | "active" | "suspended";
 
 const SuspendedBadge = ({ suspended }: { suspended: boolean }) => (
   <span
@@ -35,6 +38,8 @@ const RoleBadge = ({ role }: { role: AdminUser["role"] }) => {
 export default function ProfilesManagement() {
   const [search, setSearch] = useState("");
   const [offset, setOffset] = useState(1);
+  const [roleFilter, setRoleFilter] = useState<RoleFilter>("all");
+  const [statusFilter, setStatusFilter] = useState<StatusFilter>("all");
 
   const debouncedSearch = useDebounce(search, 400);
 
@@ -43,8 +48,10 @@ export default function ProfilesManagement() {
       offset,
       limit: LIMIT,
       ...(debouncedSearch ? { query: debouncedSearch } : {}),
+      ...(roleFilter !== "all" ? { role: roleFilter } : {}),
+      ...(statusFilter !== "all" ? { suspended: statusFilter === "suspended" } : {}),
     }),
-    [offset, debouncedSearch]
+    [offset, debouncedSearch, roleFilter, statusFilter]
   );
 
   const { users, total, loading, error, refetch } = useAdminUsers(params);
@@ -61,6 +68,10 @@ export default function ProfilesManagement() {
     }),
     [users, total]
   );
+
+  const resetFilters = () => {
+    setOffset(1);
+  };
 
   return (
     <div className="space-y-6">
@@ -81,24 +92,64 @@ export default function ProfilesManagement() {
         ))}
       </div>
 
-      {/* Search */}
-      <div className="relative max-w-sm">
-        <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-silver" />
-        <input
-          value={search}
-          onChange={(e) => {
-            setSearch(e.target.value);
-            setOffset(1);
-          }}
-          placeholder="Search by username or email..."
-          className="w-full bg-off-black border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm text-white-smoke placeholder:text-silver focus:outline-none focus:border-brilliant-orange"
-        />
+      {/* Search + Filters */}
+      <div className="flex gap-3 items-center flex-wrap">
+        <div className="relative max-w-sm flex-1">
+          <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-silver" />
+          <input
+            value={search}
+            onChange={(e) => {
+              setSearch(e.target.value);
+              setOffset(1);
+            }}
+            placeholder="Search by username or email..."
+            className="w-full bg-off-black border border-white/10 rounded-lg pl-9 pr-4 py-2 text-sm text-white-smoke placeholder:text-silver focus:outline-none focus:border-brilliant-orange"
+          />
+        </div>
+
+        {/* Role filter */}
+        <div className="flex gap-1 bg-off-black border border-white/10 rounded-lg p-1">
+          {(["all", "Listener", "Pro"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => {
+                setRoleFilter(f);
+                resetFilters();
+              }}
+              className={`px-3 py-1 rounded-md text-sm capitalize transition-colors ${
+                roleFilter === f
+                  ? "bg-brilliant-orange text-white"
+                  : "text-silver hover:text-white-smoke"
+              }`}
+            >
+              {f === "all" ? "All Roles" : f}
+            </button>
+          ))}
+        </div>
+
+        {/* Status filter */}
+        <div className="flex gap-1 bg-off-black border border-white/10 rounded-lg p-1">
+          {(["all", "active", "suspended"] as const).map((f) => (
+            <button
+              key={f}
+              onClick={() => {
+                setStatusFilter(f);
+                resetFilters();
+              }}
+              className={`px-3 py-1 rounded-md text-sm capitalize transition-colors ${
+                statusFilter === f
+                  ? "bg-brilliant-orange text-white"
+                  : "text-silver hover:text-white-smoke"
+              }`}
+            >
+              {f === "all" ? "All Status" : f}
+            </button>
+          ))}
+        </div>
       </div>
 
       {/* Error */}
-      {error && (
-        <p className="text-anger text-sm">{error}</p>
-      )}
+      {error && <p className="text-anger text-sm">{error}</p>}
 
       {/* Table */}
       <div className="bg-off-black rounded-xl border border-white/5 overflow-hidden">
