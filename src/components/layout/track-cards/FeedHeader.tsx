@@ -51,49 +51,31 @@ export default function FeedHeader({
   }
 
   return (
-    <PopoverProvider>
-      <div className="flex items-center py-4">
-        <ProfilePopover
-          id={actorId}
-          artistName={artistName}
-          followCount={followCount}
-          profileImgLink={profileImgLink}
-          location={location}
-        >
-          <a href={`/profile/${actorId}`}>
-            <Avatar src={profileImgLink} />{" "}
-          </a>
-        </ProfilePopover>
+    <div className="flex items-center py-4">
+      <a href={`/profile/${actorId}`}>
+        <Avatar src={profileImgLink} />{" "}
+      </a>
 
-        <div className="flex items-center text-sm text-silver cursor-text pl-3">
-          <ProfilePopover
-            id="avatar"
-            artistName={artistName}
-            followCount={followCount}
-            profileImgLink={profileImgLink}
-            location={location}
-          >
-            <a
-              href={`/profile/${actorId}`}
-              className="text-white-smoke hover:text-silver font-bold transition-colors duration-200 ease-in-out cursor-pointer mr-1"
-            >
-              {artistName}
-            </a>
-          </ProfilePopover>
-          <span className="inline-flex items-center gap-1">
-            {isRepost ? (
-              <>
-                {" "}
-                <LuRepeat2 className="text-[16px]" />
-                reposted
-              </>
-            ) : (
-              " posted"
-            )}
-          </span>
-          {releaseDate && <span className="ml-1">{timeAgo(releaseDate)}</span>}
-        </div>
+      <div className="flex items-center text-sm text-silver cursor-text pl-3">
+        <a
+          href={`/profile/${actorId}`}
+          className="text-white-smoke hover:text-silver font-bold transition-colors duration-200 ease-in-out cursor-pointer mr-1"
+        >
+          {artistName}
+        </a>
+        <span className="inline-flex items-center gap-1">
+          {isRepost ? (
+            <>
+              {" "}
+              <LuRepeat2 className="text-[16px]" />
+              reposted
+            </>
+          ) : (
+            " posted"
+          )}
+        </span>
+        {releaseDate && <span className="ml-1">{timeAgo(releaseDate)}</span>}
       </div>
-    </PopoverProvider>
+    </div>
   );
 }

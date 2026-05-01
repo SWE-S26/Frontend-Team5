@@ -187,15 +187,15 @@ export function TrackRow({
   return (
     <div
       ref={rowRef}
-      className="flex items-center gap-2 px-2 py-2 rounded hover:bg-white/5 transition-colors cursor-pointer group/row h-13"
+      className="flex items-center gap-2 px-2 py-2 rounded hover:bg-white/5 transition-colors cursor-pointer group/row h-13 sm:h-13"
       onMouseEnter={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
       onClick={onPlay}
     >
-      <div className="relative w-9 h-9 shrink-0">
+      <div className="relative w-12 sm:w-9 h-12 sm:h-9 shrink-0">
         <img
           src={track.image.imgLink}
-          className="w-9 h-9 rounded object-cover"
+          className="w-12 sm:w-9 h-12 sm:h-9 rounded object-cover"
         />
         {(hovered || isPlaying) && (
           <div
@@ -489,8 +489,11 @@ export default function PlaylistWaveformCard({
   };
 
   return (
-    <div className="flex items-stretch" ref={ref}>
-      <div className="h-full overflow-hidden -m-1 -mb-1.75">
+    <div
+      className="flex flex-col sm:flex-row items-stretch gap-3 sm:gap-0 px-4 sm:px-0"
+      ref={ref}
+    >
+      <div className="hidden sm:block h-full overflow-hidden -m-1 -mb-1.75 sm:shrink-0">
         <PlaylistCard
           img={img}
           title={title}
@@ -500,7 +503,7 @@ export default function PlaylistWaveformCard({
         />
       </div>
 
-      <div className="flex flex-col flex-1 ml-6">
+      <div className="flex flex-col flex-1 sm:ml-6">
         {/* Header row */}
         <div className="flex items-center mb-4 relative">
           <div
@@ -557,7 +560,7 @@ export default function PlaylistWaveformCard({
         </div>
 
         {/* Waveform */}
-        <div className="w-full h-15 shrink-0">
+        <div className="w-full h-20 sm:h-15 shrink-0">
           <SausageWaveform
             trackId={currentTrack?._id ?? playlistId}
             samplesUrl={currentTrack?.audio?.waveformLink ?? "/waveform.json"}
