@@ -249,12 +249,12 @@ export default function CommentList({
   return (
     <div className="flex flex-col w-full mt-4">
 
-      <div className="flex items-center justify-end gap-55 mb-6 ">
-        <h2 className="text-white font-bold text-lg">
-          {total.toLocaleString()} comments
-        </h2>
-        <SortDropdown value={sortBy} onChange={setSortBy} />
-      </div>
+      <div className="flex items-center justify-between mb-6 w-full">
+  <h2 className="text-white font-bold text-lg whitespace-nowrap">
+    {total.toLocaleString()} comments
+  </h2>
+  <SortDropdown value={sortBy} onChange={setSortBy} />
+</div>
 
       <div className="flex flex-col divide-y divide-white/0">
         {sortedComments.map((comment) => (

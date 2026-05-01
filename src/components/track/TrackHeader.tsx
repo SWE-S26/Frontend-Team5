@@ -24,25 +24,15 @@ export default function TrackHeader({ track, loading, onTimeUpdate, onRepeat }: 
   const [gradient, setGradient] = useState("linear-gradient(to right, #4f46e5, #a855f7)");
 
   const dispatch = useDispatch();
-  const { currentTrackId, isPlaying, loop } = useSelector((state: RootState) => state.player);
+  const { currentTrackId, isPlaying } = useSelector((state: RootState) => state.player);
   const isThisTrackPlaying = currentTrackId === track?.trackId && isPlaying;
 
   const { progress, currentTime, seekToPercentage, dragStart, dragMove, dragEnd } = useAudioProgress();
 
-  const trackMeta = {
-    id: track?.trackId,
-    url: track?.audio?.audioLink,
-    title: track?.basicInfo?.title,
-    artist: track?.basicInfo?.mainArtists?.join(", "),
-    img: track?.image?.imgLink,
-    duration: track?.durationInSeconds,
-  };
-  // Bubble currentTime up to Track page for CommentInput
   useEffect(() => {
     onTimeUpdate?.(currentTime);
   }, [currentTime]);
 
-  // Register repeat function
   useEffect(() => {
     onRepeat?.(() => {
       if (!track?.trackId || !track?.audio?.audioLink) return;
@@ -54,7 +44,6 @@ export default function TrackHeader({ track, loading, onTimeUpdate, onRepeat }: 
     });
   }, [track?.trackId]);
 
-  // Gradient from track image
   useEffect(() => {
     const imageLink = track?.image?.imgLink;
     if (!imageLink) return;
@@ -81,10 +70,8 @@ export default function TrackHeader({ track, loading, onTimeUpdate, onRepeat }: 
       return;
     }
     if (currentTrackId === track.trackId) {
-      // same track, just resume
       dispatch(play());
     } else {
-      // new track — load it
       dispatch(playAudio({
         tracks: [{ id: track.trackId, url: track.audio.audioLink, title: track.basicInfo?.title, artist: track.basicInfo?.mainArtists?.join(", "), img: track.image?.imgLink }],
         startId: track.trackId,
@@ -94,8 +81,7 @@ export default function TrackHeader({ track, loading, onTimeUpdate, onRepeat }: 
   };
 
   const handleWaveformPlay = (seekPct?: number) => {
-    if (!track?.trackId || !track?.audio?.audioLink) return;
-    if (isThisTrackPlaying) return;
+    if (!track?.trackId || !track?.audio?.audioLink || isThisTrackPlaying) return;
     dispatch(playAudio({
       tracks: [{ id: track.trackId, url: track.audio.audioLink, title: track.basicInfo?.title, artist: track.basicInfo?.mainArtists?.join(", "), img: track.image?.imgLink }],
       startId: track.trackId,
@@ -108,7 +94,7 @@ export default function TrackHeader({ track, loading, onTimeUpdate, onRepeat }: 
 
   const duration = track?.durationInSeconds ?? 0;
 
-  if (loading) return <div className="w-full h-100 bg-gray-900 animate-pulse" />;
+  if (loading) return <div className="w-full h-48 sm:h-64 md:h-80 lg:h-100 bg-gray-900 animate-pulse" />;
   if (!track) return null;
 
   const timeAgo = track.releaseDate
@@ -116,35 +102,43 @@ export default function TrackHeader({ track, loading, onTimeUpdate, onRepeat }: 
     : "";
 
   return (
-    <div className="w-full mx-auto h-100 p-13 flex gap-12 shadow-lg" style={{ background: gradient }}>
-      <div className="flex-1 text--smoke flex flex-col">
-        <div className="flex items-center gap-3 mb-6">
+        <div
+      className="w-full mx-auto p-4 sm:p-6 md:p-10 lg:p-13 flex flex-row gap-4 sm:gap-6 lg:gap-12 shadow-lg min-h-48 sm:min-h-64 md:min-h-80 lg:min-h-100"
+      style={{ background: gradient }}
+    >
+      {/* Left — info + waveform */}
+      <div className="flex-1 min-w-0 text-white-smoke flex flex-col">
+        <div className="flex items-start gap-3 mb-4 sm:mb-6">
           <button
             onClick={togglePlay}
-            className="relative group w-14 h-14 bg-chinese-black rounded-full flex items-center justify-center transition hover:scale-105 cursor-pointer"
+            className="relative group shrink-0 w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 bg-chinese-black rounded-full flex items-center justify-center transition hover:scale-105 cursor-pointer"
           >
             <div className="absolute inset-0 rounded-full bg-chinese-black opacity-0 group-hover:opacity-10 transition" />
             {isThisTrackPlaying
-              ? <GiPauseButton className="relative text-white-smoke w-7 h-7" />
-              : <IoIosPlay className="relative text-white-smoke w-10 h-10 ml-0.5" />
+              ? <GiPauseButton className="relative text-white-smoke w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7" />
+              : <IoIosPlay className="relative text-white-smoke w-7 h-7 sm:w-8 sm:h-8 lg:w-10 lg:h-10 ml-0.5" />
             }
           </button>
 
-          <div className="flex flex-col">
-            <div className="flex items-center gap-25">
-              <h1 className="text-3xl font-bold text-white-smoke bg-chinese-black px-3 py-2 w-auto">
+          <div className="flex flex-col min-w-0 flex-1">
+            <div className="flex flex-wrap items-start gap-2 sm:gap-4">
+              <h1 className="text-lg sm:text-2xl lg:text-3xl font-bold text-white-smoke bg-chinese-black px-2 sm:px-3 py-1 sm:py-2 truncate max-w-full">
                 {track.basicInfo?.title}
               </h1>
-              <div className="flex flex-col items-center justify-center mb-6 text-center">
-                {timeAgo && <p className="text-m text-white-smoke px-2 py-2 whitespace-nowrap">{timeAgo}</p>}
-                <div className="flex flex-wrap gap-1 justify-center">
+              <div className="flex flex-col items-start justify-center">
+                {timeAgo && (
+                  <p className="text-xs sm:text-sm text-white-smoke px-2 py-1 whitespace-nowrap">{timeAgo}</p>
+                )}
+                <div className="flex flex-wrap gap-1">
                   {(track.basicInfo?.tags ?? []).map((tag: string) => (
-                    <p key={tag} className="text-s bg-off-black text-white-smoke px-2 py-1 rounded-full w-fit">#{tag}</p>
+                    <p key={tag} className="text-xs bg-off-black text-white-smoke px-2 py-1 rounded-full w-fit">
+                      #{tag}
+                    </p>
                   ))}
                 </div>
               </div>
             </div>
-            <p className="text-silver font-bold bg-chinese-black px-3 py-1 w-max">
+            <p className="text-silver font-bold bg-chinese-black px-2 sm:px-3 py-1 w-max text-sm sm:text-base mt-1 truncate max-w-full">
               {(track.basicInfo?.mainArtists ?? []).join(", ")}
             </p>
           </div>
@@ -169,7 +163,8 @@ export default function TrackHeader({ track, loading, onTimeUpdate, onRepeat }: 
         </div>
       </div>
 
-      <div className="w-81.25 h-81.25 relative rounded-xl overflow-hidden">
+      {/* Right — cover image always visible, scales down on small screens */}
+      <div className="w-20 h-20 sm:w-48 sm:h-48 md:w-64 md:h-64 lg:w-81.25 lg:h-81.25 relative rounded-xl overflow-hidden shrink-0 self-center sm:self-start">
         <Image
           src={track.image?.imgLink || "/default-track.png"}
           alt="track cover"
