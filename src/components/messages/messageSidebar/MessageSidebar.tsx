@@ -34,7 +34,14 @@ const MessageSidebar = ({ onSelect, selectedChatId, conversations, markAsRead }:
           </Button>
         </div>
 
-        <NewMessagePopUP isOpen={isOpen} onClose={() => setIsOpen(false)} />
+        <NewMessagePopUP
+          isOpen={isOpen}
+          onClose={() => setIsOpen(false)}
+          onSent={(chatId) => {
+            markAsRead(chatId)
+            onSelect(chatId)
+          }}
+        />
 
         {sortedConversations.map((conversation) => (
           <MessagePerview

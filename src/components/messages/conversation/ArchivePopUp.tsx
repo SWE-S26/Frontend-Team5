@@ -32,11 +32,11 @@ const ArchivePopUp = ({ isOpen, onClose, onConfirm }: ArchivePopUpProps) => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -8 }}
             transition={{ duration: 0.2, ease: 'easeInOut' }}
-            className='absolute right-0 top-12 z-50 w-82 p-5 bg-chinese-black rounded-md shadow-2xl'
+            className='fixed left-3 right-3 top-20 z-50 w-auto p-5 bg-chinese-black rounded-md shadow-2xl sm:absolute sm:right-0 sm:left-auto sm:top-12 sm:w-82'
             onClick={(e) => e.stopPropagation()}
           >
             {/* Arrow pointing up toward the trash icon */}
-            <div className='absolute -top-2 right-3 w-4 h-4 bg-chinese-black rotate-45' />
+            <div className='absolute -top-2 right-3 hidden h-4 w-4 bg-chinese-black rotate-45 sm:block' />
 
             <p className='text-white-smoke font-bold text-base mb-2'>Are you sure?</p>
             <p className='text-white-smoke text-xs mb-5 leading-snug'>
