@@ -47,8 +47,8 @@ import {
 import { getBaseUrl } from "@/utilities/getBaseUrl";
 import { interactionToast } from "@/lib/interactive-toasts/interactiveToast";
 import { interactiveToastBus } from "@/lib/interactive-toasts/interactiveToastBus";
-import ProfilePopover from "./ProfilePopover";
 import { useGetProfile } from "@/hooks/useProfile";
+import { clearProfile, setProfile } from "@/store/slices/profileSlice";
 
 type CardProps = {
   img?: string;
@@ -94,7 +94,7 @@ export default function WaveformCard({
   permalink,
   trackUrl,
   duration,
-  isAvailable = false,
+  isAvailable = true,
   tag,
   audioClipStart,
   audioClipEnd,
@@ -127,11 +127,54 @@ export default function WaveformCard({
   const [likeCountState, setLikeCountState] = useState(likeCount);
   const [repostCountState, setRepostCountState] = useState(repostCount);
   const [isAddToPlaylistOpen, setIsAddToPlaylistOpen] = useState(false);
+  const hasHydrated = useAppSelector((state) => state.auth.hasHydrated);
 
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const { getProfile, profile: artistProfile } = useGetProfile();
   const { getProfile: getReposterProfile, profile: reposterProfile } =
     useGetProfile();
+
+  useEffect(() => {
+    if (!hasHydrated || !artistId) return;
+
+    dispatch(setProfile({ isLoading: true }));
+    getProfile(artistId)
+      .then((data) => {
+        if (!data) return;
+        dispatch(
+          setProfile({
+            userId: data.userId,
+            displayName: data.displayName,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            bio: data.bio,
+            profileLink: data.profileLink,
+            profileImgLink: data.profileImgLink,
+            bannerImgLink: data.bannerImgLink,
+            city: data.city,
+            country: data.country,
+            links: data.links,
+            bannerLinks: data.bannerLinks,
+            supportLink: data.supportLink,
+            favoriteGenres: data.favoriteGenres,
+            followersCount: data.followersCount,
+            followedCount: data.followedCount,
+            trackCount: data.trackCount,
+            isFollowed: data.isFollowed,
+            isBlocked: data.isBlocked,
+            amIBlocked: data.amIBlocked,
+            role: data.role,
+          }),
+        );
+      })
+      .finally(() => {
+        dispatch(setProfile({ isLoading: false }));
+      });
+
+    return () => {
+      dispatch(clearProfile());
+    };
+  }, [artistId, hasHydrated]);
 
   useEffect(() => {
     if (artistId) getProfile(artistId);
@@ -170,6 +213,7 @@ export default function WaveformCard({
   } | null> | null>(null);
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
+  const profileLink = useAppSelector((state) => state.profile.profileLink);
   const authRole = useAppSelector((state) => state.auth.role);
   const isAuthenticated = useAppSelector(
     (state) => state.auth.isAuthenticated && state.auth.hasHydrated,
@@ -392,7 +436,7 @@ export default function WaveformCard({
   const handleCopyLink = () => {
     if (!isAvailable || !trackId) return;
 
-    const url = `${getBaseUrl()}/track/${permalink ?? trackId}`;
+    const url = `${getBaseUrl()}/${profileLink}/${permalink}`;
 
     navigator.clipboard.writeText(url);
     interactiveToastBus.emit({
