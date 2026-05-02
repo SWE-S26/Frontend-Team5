@@ -292,7 +292,7 @@ export default function Feed() {
 
   return (
     <FeedGuard>
-      <div className="flex justify-between">
+      <div className="flex justify-between px-4 md:px-0">
         <div className="w-full md:w-[68%]">
           <div className="flex items-center mb-4 justify-between">
             <h2 className="text-sm sm:text-[22px] font-bold text-white-smoke text-tracking-[-0.02em] text-center sm:text-left flex-1">
