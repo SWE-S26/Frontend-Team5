@@ -8,6 +8,7 @@ import { useRouter, usePathname, useParams } from 'next/navigation'
 import { useAppSelector, useAppDispatch } from '@/store/hooks'
 import { useGetProfile } from '@/hooks/useProfile'
 import { setProfile, clearProfile } from '@/store/slices/profileSlice'
+import ProfileImage from "@/components/ui/ProfileImage"
 
 export default function ProfileLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter()
@@ -94,10 +95,12 @@ useEffect(() => {
   return (
     <div className="px-3 pt-3 sm:px-0 sm:pt-0">
       <div className="flex items-center gap-7 mb-4">
-        <img 
-          src={profileImgLink ?? "/ethan.jpg"} 
-          alt="avatar" 
-          className="w-20 h-20 rounded-full object-cover" 
+        <ProfileImage
+          src={profileImgLink}
+          alt="avatar"
+          width={26}
+          height={26}
+          className="w-20 h-20 rounded-full object-cover"
         />
         <h2 className="text-2xl font-bold">{getTitleNode()}</h2>
       </div>

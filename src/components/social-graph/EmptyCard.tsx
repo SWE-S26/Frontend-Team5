@@ -1,5 +1,3 @@
-
-
 const EmptyCard = () => {
   return (
     <div>
@@ -7,5 +5,4 @@ const EmptyCard = () => {
     </div>
   )
 }
-
 export default EmptyCard

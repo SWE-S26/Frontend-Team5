@@ -1,11 +1,9 @@
 "use client"
 
 import { useState, useEffect, useRef, useCallback } from "react"
-import { useParams } from "next/navigation"
 import { motion, AnimatePresence } from "framer-motion"
 import TabsButton from "../ui/TabsButton"
 import { useAppSelector } from "@/store/hooks"
-import { profileService } from "@/services/profile.service"
 import { useSendMessage } from "@/hooks/sockets/useMessaging"
 import { useMessagesContext } from "@/components/messages/MessagesContext"
 import { messageToastBus } from "@/lib/sockets/messageToastBus"
@@ -67,33 +65,16 @@ interface SharePopupProps {
 
 const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
   const [activeTab, setActiveTab] = useState<"share" | "message">("share")
-  const params      = useParams()
-  const userId      = params.username as string
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated)
-  const [profile, setProfile] = useState<any>(null)
+  const reduxProfileLink = useAppSelector((state) => state.profile.profileLink)
 
   // ── Share tab state ──
   const [shortLink, setShortLink]   = useState("")
   const [isShortened, setIsShortened] = useState(false)
 
-  const fullProfileUrl = profile?.profileLink?.startsWith("http")
-    ? profile?.profileLink
-    : `https://beatza.me/${profile?.profileLink || ""}`
-
-  useEffect(() => {
-    if (!userId) return
-    const fetchProfile = async () => {
-      try {
-        const data = isAuthenticated
-          ? await profileService.getProfileAuthCached(userId)
-          : await profileService.getProfileCached(userId)
-        setProfile(data)
-      } catch (err) {
-        console.error("Failed to fetch profile", err)
-      }
-    }
-    fetchProfile()
-  }, [userId, isAuthenticated])
+  const fullProfileUrl = reduxProfileLink?.startsWith("http")
+    ? reduxProfileLink
+    : `https://beatza.me/${reduxProfileLink || ""}`
 
   const shortenLink = async () => {
     try {

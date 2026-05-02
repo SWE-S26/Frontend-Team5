@@ -30,6 +30,34 @@ export interface GetProfileResponse {
   amIBlocked: boolean
 }
 
+export interface GetProfileByLinkResponse {
+  userId:          string
+  displayName:     string
+  firstName:       string | null
+  lastName:        string | null
+  profileLink:     string
+  profileImgLink:  string | null
+  bannerImgLink:   string | null
+  bio:             string | null
+  city:            string | null
+  country:         string | null
+  links:           ProfileLink[]
+  bannerLinks:     ProfileLink[]
+  supportLink:     string | null
+  role:            string
+  isPaid:          boolean
+  isPrivate:       boolean
+  favoriteGenres:  string[]
+  followersCount:   number
+  followingsCount?: number   // returned by profile-link endpoint per spec
+  followedCount?:   number   // returned by some backend versions
+  trackCount:       number
+  isFollowed:       boolean
+  isBlocked:        boolean
+  blockingMe?:      boolean   // returned by profile-link endpoint per spec
+  amIBlocked?:      boolean   // returned by some backend versions
+}
+
 export interface GetProfileErrorResponse {
   success: boolean
   message: string

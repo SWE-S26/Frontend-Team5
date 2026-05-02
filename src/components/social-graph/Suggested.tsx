@@ -3,7 +3,6 @@
 import { useEffect, useState } from "react";
 import { useGetSuggestedUsers } from "@/hooks/useSocial";
 import User from "@/components/layout/User";
-import { Spin } from "antd";
 
 export default function Suggested({
   DISPLAY_COUNT = 3,

@@ -24,7 +24,6 @@ import { FaUserCheck, FaUserPlus } from "react-icons/fa6"
 import { BiSolidCopy } from "react-icons/bi"
 import { HiMiniSignal } from "react-icons/hi2"
 import { PiWaveformBold } from "react-icons/pi"
-import { ImStatsBars } from "react-icons/im"
 
 interface NavbarRightProps {
   isLoggedIn: boolean

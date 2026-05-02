@@ -3,6 +3,7 @@ import { FaUser } from "react-icons/fa"
 import FollowButton from "../ui/FollowButton"
 import { SocialUser } from "@/types/social.types"
 import Link from "next/link"
+import ProfileImage from "@/components/ui/ProfileImage"
 
 interface UserCardProps {
   user: SocialUser
@@ -13,11 +14,13 @@ const UserCard = ({ user }: UserCardProps) => {
     <div className="cursor-pointer group/usercard">
       <div className="flex gap-2 flex-col items-center">
         <Link href={`/profile/${user.userId}`} className="w-full">
-          <img
-            src={user.profileImgLink ?? "/testp1.jpeg"}
-            alt="User"
-            className="w-full aspect-square rounded-full object-cover"
-          />
+        <ProfileImage
+          src={user.profileImgLink}
+          alt="User"
+          width={26}
+          height={26}
+          className="w-full aspect-square rounded-full object-cover"
+        />
         </Link>
         <Link href={`/profile/${user.userId}`}>
           <div className="text-xs sm:text-sm font-bold hover:text-silver text-center truncate max-w-full">
