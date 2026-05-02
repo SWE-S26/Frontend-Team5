@@ -5,6 +5,7 @@ import { useParams } from "next/navigation"
 import ColorThief from "color-thief-browser"
 import AvatarPositionModal from "./Avatarpositionmodal"
 import AvatarPopup from "./AvatarPopup"
+import { FaUpload } from "react-icons/fa6";
 
 import Button from "@/components/ui/Button"
 import AvatarUpload, { AvatarUploadHandle } from "./AvatarUpload"
@@ -217,7 +218,7 @@ export default function ProfileHeader() {
         {/* Cover upload button */}
         <div
           ref={coverMenuRef}
-          className="absolute top-4 sm:top-8 right-3 sm:right-6 flex flex-col gap-3"
+          className="absolute top-14 sm:top-8 right-3 sm:right-6 flex flex-col gap-3"
         >
           <CoverPhotoUpload
             ref={coverRef}
@@ -238,14 +239,14 @@ export default function ProfileHeader() {
           </CoverPhotoUpload>
 
           {showCoverMenu && (
-            <div className="absolute right-0 top-[110%] z-50 w-48 bg-[#111] border border-white/10 rounded-sm shadow-2xl overflow-hidden">
+            <div className="absolute right-0 top-[110%] z-50 w-28 sm:w-48 bg-[#111] border border-white/10 rounded-sm shadow-2xl overflow-hidden">
               <button
                 data-testid="Replace image-button-menuCover"
                 onClick={() => {
                   setShowCoverMenu(false)
                   coverRef.current?.openFilePicker()
                 }}
-                className="w-full text-left px-4 py-3 text-sm font-semibold text-white hover:bg-white/5 transition-colors border-b border-white/5"
+                className="w-full text-left px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold text-white hover:bg-white/5 transition-colors border-b border-white/5"
               >
                 Replace image
               </button>
@@ -253,7 +254,7 @@ export default function ProfileHeader() {
                 <button
                   data-testid="Delete image-button-menuCover"
                   onClick={handleDeleteCover}
-                  className="w-full text-left px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
+                  className="w-full text-left px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
                 >
                   Delete image
                 </button>
@@ -282,7 +283,7 @@ export default function ProfileHeader() {
             {isOwn && (
               <Button
                 data-testid="Upload image-button-AvatarUpload"
-                className={`bg-chinese-black text-white-smoke absolute bottom-1 right-5 sm:bottom-6 sm:right-6 md:bottom-9 md:right-9 cursor-pointer text-[10px] sm:text-sm px-1.5 py-1 sm:px-3 sm:py-2
+                className={`bg-chinese-black text-white-smoke absolute bottom-2 right-7.75 sm:bottom-6 sm:right-6 md:bottom-9 md:right-9 cursor-pointer text-[10px] sm:text-sm px-1.5 py-1 sm:px-3 sm:py-2
                   ${avatarImage ? "opacity-0 group-hover/avatar:opacity-100" : "opacity-100"}`}
                 onClick={(e) => {
                   e.stopPropagation()
@@ -290,13 +291,13 @@ export default function ProfileHeader() {
                 }}
               >
                 <span className="hidden sm:inline">Upload image</span>
-                <span className="sm:hidden">Upload</span>
+                <span className="sm:hidden"><FaUpload /></span>
               </Button>
             )}
           </AvatarUpload>
 
           {isOwnProfile && showAvatarMenu && (
-            <div className="absolute left-1/2 -translate-x-1/2 top-[85%] z-50 w-48 bg-[#111] border border-white/10 rounded-sm shadow-2xl overflow-hidden">
+            <div className="absolute left-0 top-[105%] z-50 w-28 sm:w-48 bg-[#111] border border-white/10 rounded-sm shadow-2xl overflow-hidden">
               <button
                 data-testid="Replace image-button-menuAvatar"
                 onClick={(e) => {
@@ -306,7 +307,7 @@ export default function ProfileHeader() {
                   avatarRef.current?.openFilePicker()
                   setTimeout(() => { isPickingFile.current = false }, 500)
                 }}
-                className="w-full text-left px-4 py-3 text-sm font-semibold text-white hover:bg-white/5 transition-colors border-b border-white/5"
+                className="w-full text-left px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold text-white hover:bg-white/5 transition-colors border-b border-white/5"
               >
                 Replace image
               </button>
@@ -317,7 +318,7 @@ export default function ProfileHeader() {
                     e.stopPropagation()
                     handleDeleteAvatar()
                   }}
-                  className="w-full text-left px-4 py-3 text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
+                  className="w-full text-left px-3 py-2 sm:px-4 sm:py-3 text-xs sm:text-sm font-semibold text-red-400 hover:bg-red-500/10 transition-colors"
                 >
                   Delete image
                 </button>
