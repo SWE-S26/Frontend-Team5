@@ -443,15 +443,6 @@ export default function CommentList({
         ))}
       </div>
 
-      {hasMore && (
-        <button
-          onClick={() => loadMore(trackId)}
-          disabled={loading}
-          className="mt-4 text-sm text-silver hover:text-white-smoke transition disabled:opacity-40 cursor-pointer"
-        >
-          {loading ? "Loading..." : "Load more comments"}
-        </button>
-      )}
     </div>
   )
 }
