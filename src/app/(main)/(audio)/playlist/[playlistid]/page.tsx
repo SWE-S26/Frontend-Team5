@@ -21,6 +21,7 @@ import {
   AudioLines,
 } from "lucide-react";
 
+
 import {
   useAddPlaylistToHistory,
   useDeletePlaylist,
@@ -39,6 +40,15 @@ import { TrackRow as PlaylistTrackRow } from "@/components/layout/track-cards/Wa
 import { useAppDispatch, useAppSelector } from "@/store/hooks";
 import { pause, play, playAudio, playNext } from "@/store/slices/playerSlice";
 import type { Playlist, PlaylistTrack } from "@/types/playlists.types";
+import { Avatar } from "antd";
+import { usePlaylistLikesList } from "@/hooks/useLikes";
+import { usePlaylistRepostsList } from "@/hooks/useReposts";
+import ProfilePopover from "@/components/layout/track-cards/ProfilePopover";
+import { profileService } from "@/services/profile.service";
+import { GetProfileResponse } from "@/types/profile.types";
+import { PopoverProvider } from "@/components/layout/track-cards/PopoverContext"
+import GoMobile from "@/components/layout/GoMobile";
+
 
 const FALLBACK_COVER = "/test.jpg";
 
@@ -196,7 +206,7 @@ export default function PlaylistPage() {
   const dispatch = useAppDispatch();
   const fileInputRef = useRef<HTMLInputElement | null>(null);
   const { currentTrackId, isPlaying } = useAppSelector((state) => state.player);
-  const authUserId = useAppSelector((state) => state.auth.userId);
+  const authUserId = useAppSelector((state) => (state.auth as any).userId);
   const {
     progress,
     currentTime,
@@ -240,6 +250,24 @@ export default function PlaylistPage() {
     playlist?.numOfReposts,
   );
 
+  const { users: likeUsers,   total: LikesCount,   loadLikes   } = usePlaylistLikesList(playlistid ?? "");
+  const { users: repostUsers, total: RepostsCount, loadReposts } = usePlaylistRepostsList(playlistid ?? "");
+
+  const [userProfiles,    setUserProfiles]   = useState<Record<string, GetProfileResponse>>({});
+  const [followOverrides, setFollowOverrides] = useState<Record<string, boolean>>({});
+  const inFlightIdsRef = useRef<Set<string>>(new Set());
+
+  const sidebarUserIds = useMemo(
+    () =>
+      Array.from(
+        new Set([
+          ...likeUsers.map((u) => u.userId),
+          ...repostUsers.map((u) => u.userId),
+        ].filter(Boolean)),
+      ),
+    [likeUsers, repostUsers],
+  );
+
   const tracks = localTracks;
   const mappedTracks = useMemo(() => mapTracksForPlayer(tracks), [tracks]);
   const featuredArtists = useMemo(() => getFeaturedArtists(tracks), [tracks]);
@@ -248,6 +276,53 @@ export default function PlaylistPage() {
     isPlaying && tracks.some((track) => track._id === currentTrackId);
   const waveformTrack =
     tracks.find((track) => track._id === currentTrackId) ?? tracks[0];
+
+
+  useEffect(() => {
+    const missingIds = sidebarUserIds.filter(
+      (id) => !userProfiles[id] && !inFlightIdsRef.current.has(id),
+    );
+    if (missingIds.length === 0) return;
+
+    missingIds.forEach((id) => inFlightIdsRef.current.add(id));
+    let cancelled = false;
+
+    void (async () => {
+      const BATCH_SIZE = 3;
+      const delay = (ms: number) => new Promise((res) => setTimeout(res, ms));
+      for (let start = 0; start < missingIds.length; start += BATCH_SIZE) {
+        const batch = missingIds.slice(start, start + BATCH_SIZE);
+        const results = await Promise.all(
+          batch.map(async (id) => {
+            try   { return await profileService.getProfileAuthCached(id); }
+            catch { return null; }
+          }),
+        );
+        if (cancelled) return;
+        setUserProfiles((prev) => {
+          const next = { ...prev };
+          batch.forEach((id, i) => {
+            const profile = results[i];
+            if (profile) next[id] = profile;
+            inFlightIdsRef.current.delete(id);
+          });
+          return next;
+        });
+        if (start + BATCH_SIZE < missingIds.length) await delay(250);
+      }
+    })();
+
+    return () => { cancelled = true; };
+  }, [sidebarUserIds, userProfiles]);
+
+
+  useEffect(() => {
+    if (!playlistid) return;
+    loadLikes();
+    loadReposts();
+  }, [playlistid]);
+
+
 
   useEffect(() => {
     localTracksRef.current = localTracks;
@@ -717,15 +792,89 @@ export default function PlaylistPage() {
               </div>
             </section>
           )}
-          <div className="max-w-85 text-sm leading-6 text-silver">
-            Legal {"\u00b7"} Privacy {"\u00b7"} Cookie Policy {"\u00b7"} Cookie
-            Manager {"\u00b7"} Imprint {"\u00b7"} Artist Resources {"\u00b7"}
-            Newsroom {"\u00b7"} Charts {"\u00b7"} Transparency Reports
-          </div>
-          <div className="text-sm">
-            <span className="text-silver">Language: </span>
-            <span className="text-[#5797ff]">English (US)</span>
-          </div>
+
+          <PopoverProvider>
+          {/* Likes */}
+          <section className="flex flex-col gap-3">
+            <h2 className="text-sm font-bold uppercase text-white-smoke">
+              {LikesCount} Likes
+            </h2>
+            {likeUsers.length === 0 ? (
+              <p className="text-xs text-silver">No likes yet</p>
+            ) : (
+              <Avatar.Group className="w-100">
+                {likeUsers.map((user) => {
+                  const profile     = userProfiles[user.userId];
+                  const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false;
+                  return (
+                    <ProfilePopover
+                      key={user.userId}
+                      id={`like-${user.userId}`}
+                      artistName={user.displayName}
+                      followCount={user.followersCount}
+                      profileImgLink={user.avatarUrl}
+                      userId={user.userId}
+                      isFollowing={isFollowing}
+                      onFollowChange={(next) =>
+                        setFollowOverrides((prev) => ({ ...prev, [user.userId]: next }))
+                      }
+                    >
+                      <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
+                    </ProfilePopover>
+                  );
+                })}
+              </Avatar.Group>
+            )}
+          </section>
+
+          {/* Reposts */}
+          <section className="flex flex-col gap-3">
+            <h2 className="text-sm font-bold uppercase text-white-smoke">
+              {RepostsCount} Reposts
+            </h2>
+            {repostUsers.length === 0 ? (
+              <p className="text-xs text-silver">No reposts yet</p>
+            ) : (
+              <Avatar.Group className="w-100">
+                {repostUsers.map((user) => {
+                  const profile     = userProfiles[user.userId];
+                  const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false;
+                  return (
+                    <ProfilePopover
+                      key={user.userId}
+                      id={`repost-${user.userId}`}
+                      artistName={user.displayName}
+                      followCount={user.followersCount}
+                      profileImgLink={user.avatarUrl}
+                      userId={user.userId}
+                      isFollowing={isFollowing}
+                      onFollowChange={(next) =>
+                        setFollowOverrides((prev) => ({ ...prev, [user.userId]: next }))
+                      }
+                    >
+                      <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
+                    </ProfilePopover>
+                  );
+                })}
+              </Avatar.Group>
+            )}
+          </section>
+          </PopoverProvider>
+
+      <GoMobile />
+
+      <div className=" text-xs text-silver leading-6">
+        {[
+          "Legal", "Privacy", "Cookie Policy", "Cookie Manager",
+          "Imprint", "Artist Resources", "Newsroom", "Charts",
+          "Transparency Reports",
+        ].map((label, i, arr) => (
+          <span key={label}>
+            <span className="hover:text-white-smoke cursor-pointer">{label}</span>
+            {i < arr.length - 1 && " · "}
+          </span>
+        ))}
+      </div>
         </aside>
       </section>
     </div>

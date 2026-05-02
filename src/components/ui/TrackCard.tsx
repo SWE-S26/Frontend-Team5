@@ -61,6 +61,7 @@ export default function TrackCard({
   }, [isMoreOpen]);
 
   const isThisCardPlaying = currentTrackId === trackId && isPlaying;
+  const trackHref = trackId ? `/track/${trackId}` : "#";
 
   function handlePlayClick(e: React.MouseEvent) {
     e.stopPropagation();
@@ -116,7 +117,7 @@ export default function TrackCard({
             <div className="absolute inset-0 rounded overflow-hidden">
               <div
                 className={`absolute inset-0 rounded overflow-hidden ${
-                  !img ? "bg-gradient-to-br from-off-black to-crusta/70" : ""
+                  !img ? "bg-linear-to-br from-off-black to-crusta/70" : ""
                 }`}
               ></div>
 
@@ -201,15 +202,20 @@ export default function TrackCard({
           </div>
 
           <a
-            href={`/track/${trackId}`}
-            className="text-white-smoke no-underline hover:text-gray-300 text-[14px] font-bold tracking-tight pl-1 animate-fade-in truncate"
+            href={trackHref}
+            className="block text-white-smoke no-underline hover:text-gray-300 text-[14px] font-bold tracking-tight pl-1 animate-fade-in truncate"
+            onClick={(e) => e.stopPropagation()}
           >
             {title}
           </a>
 
-          <p className="text-silver text-[14px] font-bold pl-1 animate-fade-i truncate">
+          <a
+            href={trackHref}
+            className="block text-silver text-[14px] font-bold pl-1 animate-fade-i truncate no-underline hover:text-white-smoke transition-colors"
+            onClick={(e) => e.stopPropagation()}
+          >
             {artist}
-          </p>
+          </a>
         </div>
       ) : (
         <div className="relative w-40 aspect-square rounded group cursor-pointer bg-off-black m-1 mb-1.75">

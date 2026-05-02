@@ -33,25 +33,13 @@ export default function FanCard({ fan, index, activeTab }: FanCardProps) {
         </span>
 
         <div className="shrink-0 flex items-center gap-2">
-          {hovered ? (
-            <div className="flex gap-3">
-              <UserAddOutlined
-                className="text-silver hover:text-white-smoke cursor-pointer transition-colors"
-                style={{ fontSize: 15 }}
-              />
-              <GoMail
-                className="text-silver hover:text-white-smoke cursor-pointer transition-colors"
-                style={{ fontSize: 15 }}
-                onClick={() => setMessageOpen(true)}
-              />
-            </div>
-          ) : (
+          
             <span className="text-xs text-silver">
               {activeTab === "top"
                 ? `${fan.totalNumberOfPlay} plays`
                 : `${fan.firstWeekNumPlays} plays`}
             </span>
-          )}
+          
         </div>
       </div>
 

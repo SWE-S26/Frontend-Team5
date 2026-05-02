@@ -34,6 +34,7 @@ export type ArtistTrackRow = {
   likes: number;
   comments: number;
   reposts: number;
+  numDownloads: number;
   hd: boolean;
   cover: string;
   url: string;

@@ -294,8 +294,8 @@ export default function Feed() {
     <FeedGuard>
       <div className="flex justify-between">
         <div className="w-full md:w-[68%]">
-          <div className="flex items-center mb-4">
-            <h2 className="flex-1 text-[22px] font-bold text-white-smoke text-tracking-[-0.02em]">
+          <div className="flex items-center mb-4 justify-between">
+            <h2 className="text-sm sm:text-[22px] font-bold text-white-smoke text-tracking-[-0.02em] text-center sm:text-left flex-1">
               Hear the latest posts from the people you're following:
             </h2>
             <div className="flex items-center gap-2">
@@ -326,54 +326,50 @@ export default function Feed() {
           <div>
             {orderedItems.map((item) => (
               <div key={item.feedItem.id} className="flex-none mb-4">
-                <PopoverProvider>
-                  <FeedHeader
-                    artistName={item.feedItem?.displayName || "Unknown Artist"}
-                    actorId={item.feedItem?.actorId || "unknown"}
-                    followCount={item.feedItem?.followCount ?? 0}
-                    profileImgLink={
-                      item.feedItem?.imgLink ||
-                      "https://xsgames.co/randomusers/avatar.php?g=pixel&f=male"
-                    }
-                    location="United States"
-                    releaseDate={
-                      item.type === "track"
-                        ? item.data.releaseDate
-                        : item.data.createdAt
-                    }
-                    isRepost={item.feedItem?.isRepost ?? false}
-                  />
-                </PopoverProvider>
+                <FeedHeader
+                  artistName={item.feedItem?.displayName || "Unknown Artist"}
+                  actorId={item.feedItem?.actorId || "unknown"}
+                  followCount={item.feedItem?.followCount ?? 0}
+                  profileImgLink={
+                    item.feedItem?.imgLink ||
+                    "https://xsgames.co/randomusers/avatar.php?g=pixel&f=male"
+                  }
+                  location="United States"
+                  releaseDate={
+                    item.type === "track"
+                      ? item.data.releaseDate
+                      : item.data.createdAt
+                  }
+                  isRepost={item.feedItem?.isRepost ?? false}
+                />
 
                 {item.type === "track" ? (
-                  <PopoverProvider>
-                    <WaveformCard
-                      img={item.data.image?.imgLink}
-                      title={item.data.basicInfo?.title}
-                      artist={item.data.basicInfo?.mainArtists?.[0]}
-                      artistId={item.data.posterId}
-                      trackId={item.data.trackId ?? ""}
-                      trackUrl={item.data.audio?.audioLink}
-                      wfLink={item.data.audio?.waveformLink}
-                      duration={item.data.durationInSeconds}
-                      tag={item.data.basicInfo?.tags?.[0]}
-                      audioClipStart={item.data.audioClip?.start}
-                      audioClipEnd={item.data.audioClip?.end}
-                      likeCount={item.data.numLikes}
-                      repostCount={item.data.numReposts}
-                      playsCount={item.data.numPlays}
-                      commentsCount={item.data.numComments}
-                      isLikedByUser={item.data.isLikedByUser}
-                      isRepostedByUser={item.data.isRepostedByUser}
-                      allTracks={fullQueue}
-                      enableDirectDownload={
-                        item.data.permissions?.enableDirectDownload ?? false
-                      }
-                      isRepost={item.feedItem?.isRepost ?? false}
-                      reposterId={item.feedItem?.actorId}
-                      reposterName={item.feedItem?.displayName}
-                    />
-                  </PopoverProvider>
+                  <WaveformCard
+                    img={item.data.image?.imgLink}
+                    title={item.data.basicInfo?.title}
+                    artist={item.data.basicInfo?.mainArtists?.[0]}
+                    artistId={item.data.posterId}
+                    trackId={item.data.trackId ?? ""}
+                    trackUrl={item.data.audio?.audioLink}
+                    wfLink={item.data.audio?.waveformLink}
+                    duration={item.data.durationInSeconds}
+                    tag={item.data.basicInfo?.tags?.[0]}
+                    audioClipStart={item.data.audioClip?.start}
+                    audioClipEnd={item.data.audioClip?.end}
+                    likeCount={item.data.numLikes}
+                    repostCount={item.data.numReposts}
+                    playsCount={item.data.numPlays}
+                    commentsCount={item.data.numComments}
+                    isLikedByUser={item.data.isLikedByUser}
+                    isRepostedByUser={item.data.isRepostedByUser}
+                    allTracks={fullQueue}
+                    enableDirectDownload={
+                      item.data.permissions?.enableDirectDownload ?? false
+                    }
+                    isRepost={item.feedItem?.isRepost ?? false}
+                    reposterId={item.feedItem?.actorId}
+                    reposterName={item.feedItem?.displayName}
+                  />
                 ) : (
                   <PlaylistWaveformCard
                     img={item.data.image?.imgLink}
@@ -449,9 +445,10 @@ export default function Feed() {
             </p>
           )}
         </div>
+
         <div className="hidden md:block md:w-[27.75%]">
           <div className="w-full">
-            <div className="w-full flex flex-col items-center mb-5 ">
+            <div className="w-full flex flex-col items-center mb-5">
               <div className="w-full">
                 <ArtistTools />
               </div>

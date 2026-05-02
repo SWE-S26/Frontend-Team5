@@ -27,7 +27,7 @@ export default function PlaylistCard({ playlist }: PlaylistCardProps) {
       </div>
       <div className="flex flex-col min-w-0">
         <p className="text-sm text-gray-400 truncate">
-          {playlist.artistId.displayName}
+          {playlist.artistId?.displayName ?? ""}
         </p>
         <p className="text-sm font-bold text-white-smoke truncate">
           {playlist.title}

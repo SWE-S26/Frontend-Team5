@@ -1,13 +1,12 @@
 import axios from "axios";
 
-import { likeService } from "@/services/likes.service";
+import { likeService, fetchTrackLikes, fetchPlaylistLikes } from "@/services/likes.service";
 import {
   GetTrackLikeStatusErrorResponse,
   LikeTrackErrorResponse,
   LikeUser,
 } from "@/types/likes.types";
 import { useCallback, useEffect, useState } from "react";
-import { fetchTrackLikes } from "@/services/likes.service";
 
 export function useLikeStatus(trackId: string) {
   const [isLiked, setIsLiked] = useState(false);
@@ -95,51 +94,17 @@ export function useLikeTrack() {
 }
 
 export function useLikeTrackOptimistic(trackId: string) {
-  // const { isLiked: initialIsLiked } = useLikeStatus(trackId);
-
-  // const [liked, setLiked] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  // useEffect(() => {
-  //   setLiked(initialIsLiked);
-  // }, [initialIsLiked]);
-
-  // useEffect(() => {
-  //   if (!trackId) return;
-
-  //   const load = async () => {
-  //     try {
-  //       const res = await fetchTrackLikes(trackId, 1, 1);
-  //       setNumOfLikes(res.total);
-  //     } catch {}
-  //   };
-
-  //   load();
-  // }, [trackId]);
-
   const likeTrackOptimistic = useCallback(async () => {
     if (!trackId || loading) return;
-
-    // const prevLiked = liked;
-    // const prevLikes = numOfLikes;
-
-    // const nextLiked = !liked;
-
-    // setLiked(nextLiked);
-    // setNumOfLikes((prev) => (prev ?? 0) + (nextLiked ? 1 : -1));
     setLoading(true);
     setError(null);
 
     try {
-      const res = await likeService.likeTrack(trackId);
-
-      // setLiked(res.data.liked);
-      // setNumOfLikes(res.data.numOfLikes);
+      await likeService.likeTrack(trackId);
     } catch (err) {
-      // setLiked(prevLiked);
-      // setNumOfLikes(prevLikes);
-
       if (axios.isAxiosError<LikeTrackErrorResponse>(err)) {
         setError(err.response?.data?.message || "Something went wrong");
       } else {
@@ -184,5 +149,42 @@ export function useLikePlaylistOptimistic(playlistId: string) {
     likePlaylist: likePlaylistOptimistic,
     loading,
     error,
+  };
+}
+
+// NEW — fetches the list of users who liked a playlist
+export function usePlaylistLikesList(playlistId: string) {
+  const [users, setUsers] = useState<LikeUser[]>([]);
+  const [total, setTotal] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const loadLikes = async (offset = 1, limit = 20) => {
+    if (!playlistId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await fetchPlaylistLikes(playlistId, offset, limit);
+      setUsers((prev) => (offset === 1 ? res.users : [...prev, ...res.users]));
+      setTotal(res.total);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const loadMore = (offset: number, limit?: number) => {
+    loadLikes(offset, limit);
+  };
+
+  return {
+    users,
+    total,
+    hasMore: users.length < total,
+    loading,
+    error,
+    loadLikes,
+    loadMore,
   };
 }

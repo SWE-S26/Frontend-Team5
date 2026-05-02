@@ -31,6 +31,7 @@ const appendTrackMetadata = (
     permissions?: CreateTrackRequest["permissions"] | UpdateTrackRequest["permissions"];
     license?: CreateTrackRequest["license"] | UpdateTrackRequest["license"];
     advanced?: CreateTrackRequest["advanced"] | UpdateTrackRequest["advanced"];
+    geoBlocking?: CreateTrackRequest["geoBlocking"] | UpdateTrackRequest["geoBlocking"];
   },
 ) => {
   formData.append("basicInfo", JSON.stringify(data.basicInfo));
@@ -39,6 +40,13 @@ const appendTrackMetadata = (
   }
   if (data.license) {
     formData.append("license", JSON.stringify(data.license));
+  }
+  if (data.geoBlocking) {
+      formData.append("geoBlocking", JSON.stringify({
+        mode: data.geoBlocking.mode,
+        regions: data.geoBlocking.regions || [],
+        countries: data.geoBlocking.countries || [],
+      }));
   }
   if (data.advanced) {
     formData.append("advanced", JSON.stringify(data.advanced));
@@ -130,6 +138,8 @@ export const tracksService = {
 
   incrementPlayCount: (data: incrementPlayCountRequest) =>
     api.patch<incrementPlayCountResponse>(`/api/tracks/v2/listen`, data),
+  incrementDownloadCount: (data: { trackId: string; sessionIdDownload: string }) =>
+    api.patch<{ message: string }>(`/api/tracks/v2/download`, data),
   addTrackToHistory: (id: string) =>
     api.post<AddTrackToHistoryResponse>(`/api/tracks/v1/played/${id}`),
 

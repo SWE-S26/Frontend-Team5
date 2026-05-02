@@ -29,7 +29,7 @@ import { ProFeatureModal } from "./TrackInfoForm/ProFeatureModal";
 import { ArtworkPanel } from "./TrackInfoForm/ArtworkPanel";
 import { BasicInfoForm } from "./TrackInfoForm/BasicInfoForm";
 import { AdvancedDetailsSection } from "./TrackInfoForm/AdvancedDetailsSection";
-import { PermissionsSection } from "./TrackInfoForm/PermissionsSection";
+import { PermissionsSection, GEOBLOCKING_REGIONS } from "./TrackInfoForm/PermissionsSection";
 import { AudioClipSection } from "./TrackInfoForm/AudioClipSection";
 import { LicensingSection } from "./TrackInfoForm/LicensingSection";
 import { Footer } from "./TrackInfoForm/Footer";
@@ -1011,6 +1011,13 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         audioClipStart: canAttachAudioClip ? audioClipStartValue : undefined,
         audioClipEnd:   canAttachAudioClip ? audioClipEndValue   : undefined,
       },
+      geoBlocking: ((): CreateTrackRequest["geoBlocking"] => {
+        if (geoblockingOption === "worldwide") return { mode: "worldwide", regions: [], countries: [] };
+        const continentNames = new Set(GEOBLOCKING_REGIONS.map((g) => g.continent));
+        const regions = geoblockingRegions.filter((v) => continentNames.has(v));
+        const countries = geoblockingRegions.filter((v) => !continentNames.has(v));
+        return { mode: geoblockingOption as "exclusive" | "blocked", regions, countries };
+      })(),
     };
   };
 

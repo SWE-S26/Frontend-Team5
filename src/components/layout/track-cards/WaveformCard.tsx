@@ -593,9 +593,9 @@ export default function WaveformCard({
 
   return (
     <>
-      <div className="flex items-stretch">
+      <div className="flex flex-col sm:flex-row items-stretch gap-3 sm:gap-0 px-4 sm:px-0">
         <div
-          className="h-full overflow-hidden -m-1 -mb-1.75"
+          className="hidden sm:block h-full overflow-hidden -m-1 -mb-1.75 sm:shrink-0"
           ref={ref}
           onMouseEnter={handleHoverStart}
           onMouseMove={handleHoverMove}
@@ -604,7 +604,7 @@ export default function WaveformCard({
           <Card appearance="static" img={img} />
         </div>
 
-        <div className="flex flex-col flex-1 ml-6">
+        <div className="flex flex-col flex-1 sm:ml-6">
           <div className="flex items-center mb-4 relative">
             <div
               className="w-10 h-10 bg-white-smoke rounded-full flex items-center justify-center cursor-pointer"
@@ -666,7 +666,7 @@ export default function WaveformCard({
           </div>
 
           <div
-            className="w-full h-15 shrink-0 cursor-pointer"
+            className="w-full h-20 sm:h-15 shrink-0 cursor-pointer"
             onClick={handleOpenCommentBox}
           >
             <SausageWaveform
@@ -833,7 +833,7 @@ export default function WaveformCard({
                 ]}
               />
 
-              <div className="ml-auto flex items-center gap-4">
+              <div className="ml-0 sm:ml-auto flex items-center gap-4">
                 <div className="flex items-center gap-1 text-silver">
                   <IoMdPlay className="text-silver text-[12px]" />
                   <span className="text-[12px]">{playsCount}</span>

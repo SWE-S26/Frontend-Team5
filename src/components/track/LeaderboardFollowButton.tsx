@@ -47,9 +47,12 @@ export default function LeaderboardFollowButton({ userId, initialIsFollowing = f
   return (
     <button
       onClick={handleClick}
-      disabled={isLoading}
-      className={`w-17 h-17 rounded-xl flex flex-col items-center justify-center gap-2 transition cursor-pointer disabled:opacity-50
-        ${isFollowing ? "bg-off-black" : "bg-off-black "}`}
+      disabled={isFollowing || isLoading}
+      className={`w-17 h-17 rounded-xl flex flex-col items-center justify-center gap-2 transition text-gray-400
+        ${isFollowing || isLoading
+          ? "bg-off-black opacity-40 shadow-inner cursor-not-allowed"
+          : "bg-off-black hover:bg-[#262626] active:scale-95 cursor-pointer"
+        }`}
     >
       {isFollowing
         ? <UserCheck size={20} className="text-silver" />

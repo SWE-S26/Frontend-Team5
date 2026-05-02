@@ -211,12 +211,19 @@ export interface GetArtistAlbumsResponse {
   };
 }
 
-// Permalink
-
+// Permalink (old v1 — returns array)
 export interface GetPlaylistByPermalinkResponse {
   message: string;
   data: {
     playlists: PlaylistDetail[];
+  };
+}
+
+// Permalink v2 — returns single playlist object (used for message link previews)
+export interface GetPlaylistByProfilePermalinkResponse {
+  message: string;
+  data: {
+    playlist: PlaylistDetail;
   };
 }
 

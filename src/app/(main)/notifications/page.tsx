@@ -120,7 +120,7 @@ export default function NotificationsPage() {
   }
 
   return (
-    <div className="flex justify-between">
+    <div className="flex justify-between px-4 pb-4 md:px-0 md:pb-0">
 
       <div className="w-full md:w-[68%]">
 

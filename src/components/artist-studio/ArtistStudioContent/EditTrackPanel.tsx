@@ -37,7 +37,7 @@ import {
 import { ArtworkPanel }          from "@/components/upload/TrackInfoForm/ArtworkPanel";
 import { BasicInfoForm }         from "@/components/upload/TrackInfoForm/BasicInfoForm";
 import { AdvancedDetailsSection } from "@/components/upload/TrackInfoForm/AdvancedDetailsSection";
-import { PermissionsSection }    from "@/components/upload/TrackInfoForm/PermissionsSection";
+import { PermissionsSection, GEOBLOCKING_REGIONS }    from "@/components/upload/TrackInfoForm/PermissionsSection";
 import { LicensingSection }      from "@/components/upload/TrackInfoForm/LicensingSection";
 import { AudioClipSection }      from "@/components/upload/TrackInfoForm/AudioClipSection";
 
@@ -292,10 +292,15 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
       setIncludeRssFeed(p.includeInRssFeed ?? false);
       setDisplayEmbedCode(p.displayedEmbedCode ?? false);
       setEnableAppPlayback(p.enableAppPlayback ?? false);
-      // setAllowComments(p.allowComments ?? true);
-      // setShowTrackComments(p.showTrackComments ?? true);
-      // setShowTrackInsights(p.showTrackInsights ?? true);
-      // setGeoblockingOption(p.geoblocking ?? "worldwide");
+    }
+
+    if ((fullTrack as any).geoBlocking) {
+      const gb = (fullTrack as any).geoBlocking;
+      setGeoblockingOption(gb.mode ?? "worldwide");
+      const regions = Array.isArray(gb.regions) ? gb.regions : [];
+      const countries = Array.isArray(gb.countries) ? gb.countries : [];
+      setGeoblockingRegions([...regions, ...countries]);
+      setExpandedSections((prev) => ({ ...prev, permissions: true }));
     }
 
     // License
@@ -751,6 +756,24 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
 
   // Save
 
+  const buildGeoBlockingPayload = () => {
+    if (geoblockingOption === "worldwide") {
+      return { mode: "worldwide" as const, regions: [], countries: [] };
+    }
+
+    const continentNames = new Set(
+      GEOBLOCKING_REGIONS.map((group: { continent: string }) => group.continent),
+    );
+    const regions = geoblockingRegions.filter((value) => continentNames.has(value));
+    const countries = geoblockingRegions.filter((value) => !continentNames.has(value));
+
+    return {
+      mode: geoblockingOption as "exclusive" | "blocked",
+      regions,
+      countries,
+    };
+  };
+
   const handleSave = async () => {
     if (saving) return;
     const parsedTitle = trackTitle.trim();
@@ -811,7 +834,6 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
         allowComments,
         showTrackComments,
         showTrackInsights,
-        geoblocking: geoblockingOption,
       },
       license: {
         type: licenseType === "creative-commons" ? "creativeCommons" : "allRightsReserved",
@@ -826,7 +848,12 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
         pLine:          toOptionalTrimmed(pline),
         audioClipStart: canAttachAudioClip ? Number(audioClipStartInput) : undefined,
         audioClipEnd:   canAttachAudioClip ? Number(audioClipEndInput)   : undefined,
+        composer: undefined,
+        ISWC: undefined,
+        albumTitle: undefined,
+        releaseTitle: undefined,
       },
+      geoBlocking: buildGeoBlockingPayload(),
     };
 
     try {

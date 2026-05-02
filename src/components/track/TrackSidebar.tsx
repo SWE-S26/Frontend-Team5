@@ -10,7 +10,7 @@ import { useGetTrackAlbums, useGetTrackPlaylists, useGetTrackStats } from "@/hoo
 import PlaylistCard from "@/components/track/PlaylistCard";
 import FanCard from "./FanCard";
 import LeaderboardActions from "./LeaderboardActions";
-
+import GoMobile from "@/components/layout/GoMobile";
 import { profileService } from "@/services/profile.service";
 import { GetProfileResponse } from "@/types/profile.types";
 
@@ -18,9 +18,10 @@ interface TrackSidebarProps {
   trackId: string;
   track: any;
   onRepeatPlay?: () => void;
+  className?: string;
 }
 
-export default function TrackSidebar({ trackId,   track, onRepeatPlay }: TrackSidebarProps) {
+export default function TrackSidebar({ trackId,   track, onRepeatPlay, className }: TrackSidebarProps) {
   const [activeTab, setActiveTab] = useState("top");
 
   const { users, total: LikesCount, loadLikes } = useLikeTrack()
@@ -111,7 +112,7 @@ export default function TrackSidebar({ trackId,   track, onRepeatPlay }: TrackSi
   const activeFans = activeTab === "top" ? topFans : firstFans
 
   return (
-    <aside className="w-85 sticky top-20 h-fit flex flex-col gap-10 text-white">
+    <aside className="w-85  top-20 h-fit flex flex-col gap-10 text-white">
 
       <section className="flex flex-col gap-3 mt-5">
         <div className="flex">
@@ -163,28 +164,7 @@ export default function TrackSidebar({ trackId,   track, onRepeatPlay }: TrackSi
         />
       </section>
 
-      <section className="flex flex-col gap-3">
-        <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold uppercase text-white-smoke">Related Tracks</h2>
-         
-        </div>
-        <div className="flex flex-col gap-3">
-          <div className="flex gap-3 items-center">
-            <div className="w-10 h-10 bg-white-smoke/10 rounded" />
-            <div className="flex flex-col gap-2 flex-1">
-              <div className="h-3 w-32 bg-white-smoke/10 rounded" />
-              <div className="h-3 w-20 bg-white-smoke/10 rounded" />
-            </div>
-          </div>
-          <div className="flex gap-3 items-center">
-            <div className="w-10 h-10 bg-white-smoke/10 rounded" />
-            <div className="flex flex-col gap-2 flex-1">
-              <div className="h-3 w-32 bg-white-smoke/10 rounded" />
-              <div className="h-3 w-20 bg-white-smoke/10 rounded" />
-            </div>
-          </div>
-        </div>
-      </section>
+      
 
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
@@ -266,6 +246,23 @@ export default function TrackSidebar({ trackId,   track, onRepeatPlay }: TrackSi
           })}
         </Avatar.Group>
       </section>
+
+      <GoMobile />
+
+      <div className=" text-xs text-silver leading-6">
+        {[
+          "Legal", "Privacy", "Cookie Policy", "Cookie Manager",
+          "Imprint", "Artist Resources", "Newsroom", "Charts",
+          "Transparency Reports",
+        ].map((label, i, arr) => (
+          <span key={label}>
+            <span className="hover:text-white-smoke cursor-pointer">{label}</span>
+            {i < arr.length - 1 && " · "}
+          </span>
+        ))}
+      </div>
+
+      
     </aside>
   );
 }

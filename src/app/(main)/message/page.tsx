@@ -44,10 +44,12 @@ const Page = () => {
     }
   }, [selectedConversation?.lastMessageAt, selectedChatId])
 
-  return (
-    <div className='flex justify-between'>
+  const hasSelection = Boolean(selectedConversation)
 
-      <div className='w-[30%]'>
+  return (
+    <div className='flex flex-col gap-4 px-4 pb-4 md:flex-row md:justify-between md:px-0 md:pb-0'>
+
+      <div className={`w-full md:w-[30%] ${hasSelection ? 'hidden md:block' : ''}`}>
         <MessageSidebar
           onSelect={setSelectedChatId}
           selectedChatId={selectedChatId}
@@ -56,7 +58,7 @@ const Page = () => {
         />
       </div>
 
-      <div className='w-[67%]'>
+      <div className={`w-full md:w-[67%] ${!hasSelection ? 'hidden md:block' : ''}`}>
         {selectedConversation ? (
           <Conversation
             chatId={selectedConversation.chatId}
@@ -66,11 +68,19 @@ const Page = () => {
             isUnread={selectedConversation.isUnread}
             markAsUnread={markAsUnread}
             markAsRead={markAsRead}
+            onBack={() => setSelectedChatId(null)}
           />
         ) : (
           <>
             <EmptyMessages onOpenPopup={() => setIsOpen(true)} />
-            <NewMessagePopUP isOpen={isOpen} onClose={() => setIsOpen(false)} />
+            <NewMessagePopUP
+              isOpen={isOpen}
+              onClose={() => setIsOpen(false)}
+              onSent={(chatId) => {
+                setSelectedChatId(chatId)
+                markAsRead(chatId)
+              }}
+            />
           </>
         )}
       </div>

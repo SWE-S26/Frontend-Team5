@@ -59,7 +59,7 @@ export default function Track() {
               />
 
               {/* Uploader + description stack on mobile, row on md+ */}
-              <div className="flex flex-col md:flex-row gap-4 mt-4 w-full">
+              <div className="flex flex-col md:flex-row  mt-4 w-full">
                 {track.posterId && (
                   <div className="w-full md:w-auto shrink-0">
                     <Uploader 
