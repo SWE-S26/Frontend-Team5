@@ -18,6 +18,7 @@ import {
 } from "@/hooks/useLikes";
 import { useRepostTrack, useRepostPlaylist } from "@/hooks/useReposts";
 import { useGetPlaylistById } from "@/hooks/usePlaylists";
+import { useGetProfile } from "@/hooks/useProfile";
 
 import SausageWaveform from "@/components/ui/SausageWaveform";
 import PlaylistCard from "@/components/ui/PlaylistCard";
@@ -39,6 +40,7 @@ import AddToPlaylistModal from "@/components/playlists/AddToPlaylistModal";
 
 type PlaylistTrack = {
   _id: string;
+  poster?: { _id: string; displayName: string; profileLink: string };
   basicInfo: { title: string; mainArtists: string[]; permalink: string };
   audio: { audioLink: string; waveformLink: string };
   image: { imgLink: string };
@@ -78,6 +80,7 @@ function normalizePlaylistTrack(track: any, fallbackId: string): PlaylistTrack {
 
   return {
     _id: track?._id ?? fallbackId,
+    poster: track?.poster ?? undefined,
     basicInfo: {
       title: track?.basicInfo?.title ?? track?.title ?? "Unknown Title",
       mainArtists: track?.basicInfo?.mainArtists ?? [
@@ -181,14 +184,9 @@ export function TrackRow({
   }
 
   const handleCopyLink = () => {
-    if (!isAvailable || !track._id) return;
-
-    const url = `${getBaseUrl()}/track/${track.basicInfo.permalink ?? track._id}`;
-
-    navigator.clipboard.writeText(url);
-    interactiveToastBus.emit({
-      type: "copied",
-    });
+    if (!isAvailable || !track.poster?.profileLink || !track.basicInfo.permalink) return;
+    navigator.clipboard.writeText(`${getBaseUrl()}/${track.poster.profileLink}/${track.basicInfo.permalink}`);
+    interactiveToastBus.emit({ type: "copied" });
   };
 
   return (
@@ -251,7 +249,7 @@ export function TrackRow({
       {showArtist && (
         <>
           <span
-            className="max-w-44 truncate text-sm font-bold text-silver shrink-0"
+            className="max-w-24 sm:max-w-44 truncate text-sm font-bold text-silver shrink-0"
             style={!isAvailable ? { opacity: 0.3 } : undefined}
           >
             {track.basicInfo.mainArtists?.join(", ") || "Unknown artist"}
@@ -270,7 +268,7 @@ export function TrackRow({
         <a
           href={`/track/${track.basicInfo.permalink ?? track._id}`}
           onClick={(e) => e.stopPropagation()}
-          className={`text-sm font-bold truncate min-w-0 no-underline transition-colors ${
+          className={`flex-1 text-sm font-bold truncate min-w-0 no-underline transition-colors ${
             isCurrent
               ? "text-inferno"
               : hovered
@@ -291,84 +289,132 @@ export function TrackRow({
       </div>
 
       <div
-        className="shrink-0 w-48 flex items-center justify-end"
+        className="shrink-0 flex items-center justify-end"
         onClick={(e) => e.stopPropagation()}
       >
-        {isAvailable && (hovered || isPlaying) ? (
-          <div className="flex items-center gap-3">
-            <Tooltip label="Like">
-              <Button
-                className={isPlaying ? "bg-off-black" : "bg-transparent"}
-                onClick={handleLikeClick}
-                icon={
-                  <HiHeart
-                    className={`text-[15px] ${isLiked ? "text-inferno" : ""}`}
-                  />
-                }
-              />
-            </Tooltip>
-            <Tooltip label="Repost">
-              <Button
-                className={isPlaying ? "bg-off-black" : "bg-transparent"}
-                onClick={handleRepostClick}
-                icon={
-                  <LuRepeat2
-                    className={`text-[15px] ${isReposted ? "text-inferno" : ""}`}
-                  />
-                }
-              />
-            </Tooltip>
-            <Tooltip label="Share">
-              <Button
-                className={isPlaying ? "bg-off-black" : "bg-transparent"}
-                icon={<LuShare className="text-[15px]" />}
-              />
-            </Tooltip>
-            <Tooltip label="Copy Link">
-              <Button
-                className={isPlaying ? "bg-off-black" : "bg-transparent"}
-                icon={<TbCopy className="text-[15px]" />}
-                onClick={handleCopyLink}
-              />
-            </Tooltip>
-            <MoreDropdown
-              trigger={
+        {/* Desktop: hover / playing reveals full controls */}
+        <div className="hidden sm:block w-48">
+          {isAvailable && (hovered || isPlaying) ? (
+            <div className="flex items-center gap-3 justify-end">
+              <Tooltip label="Like">
                 <Button
                   className={isPlaying ? "bg-off-black" : "bg-transparent"}
-                  icon={<IoIosMore className="text-[15px]" />}
+                  onClick={handleLikeClick}
+                  icon={
+                    <HiHeart
+                      className={`text-[15px] ${isLiked ? "text-inferno" : ""}`}
+                    />
+                  }
                 />
-              }
-              tooltipLabel="More"
-              items={[
-                {
-                  label: "Add to Next up",
-                  icon: <ListStart size={19} className="scale-x-[-1]" />,
-                  onClick: handlePlayNextClick,
-                },
-                {
-                  label: "Add to Playlist",
-                  icon: (
-                    <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
-                  ),
-                  onClick: () => onAddToPlaylist(),
-                },
-                {
-                  label: "Station",
-                  disabled: true,
-                  icon: <BiStation className="text-lg" />,
-                },
-              ]}
-            />
-          </div>
-        ) : (
-          <div
-            className="flex items-center gap-1 text-silver text-[11px]"
-            style={!isAvailable ? { opacity: 0.3 } : undefined}
+              </Tooltip>
+              <Tooltip label="Repost">
+                <Button
+                  className={isPlaying ? "bg-off-black" : "bg-transparent"}
+                  onClick={handleRepostClick}
+                  icon={
+                    <LuRepeat2
+                      className={`text-[15px] ${isReposted ? "text-inferno" : ""}`}
+                    />
+                  }
+                />
+              </Tooltip>
+              <Tooltip label="Share">
+                <Button
+                  className={isPlaying ? "bg-off-black" : "bg-transparent"}
+                  icon={<LuShare className="text-[15px]" />}
+                />
+              </Tooltip>
+              <Tooltip label="Copy Link">
+                <Button
+                  className={isPlaying ? "bg-off-black" : "bg-transparent"}
+                  icon={<TbCopy className="text-[15px]" />}
+                  onClick={handleCopyLink}
+                />
+              </Tooltip>
+              <MoreDropdown
+                trigger={
+                  <Button
+                    className={isPlaying ? "bg-off-black" : "bg-transparent"}
+                    icon={<IoIosMore className="text-[15px]" />}
+                  />
+                }
+                tooltipLabel="More"
+                items={[
+                  {
+                    label: "Add to Next up",
+                    icon: <ListStart size={19} className="scale-x-[-1]" />,
+                    onClick: handlePlayNextClick,
+                  },
+                  {
+                    label: "Add to Playlist",
+                    icon: (
+                      <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
+                    ),
+                    onClick: () => onAddToPlaylist(),
+                  },
+                  {
+                    label: "Station",
+                    disabled: true,
+                    icon: <BiStation className="text-lg" />,
+                  },
+                ]}
+              />
+            </div>
+          ) : (
+            <div
+              className="flex items-center gap-1 text-silver text-[11px] justify-end"
+              style={!isAvailable ? { opacity: 0.3 } : undefined}
+            >
+              <IoMdPlay className="text-[11px]" />
+              <span>{formatPlays(track.numOfPlays)}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile: always-visible like + more */}
+        <div className="flex sm:hidden items-center gap-2">
+          <button
+            onClick={handleLikeClick}
+            className="p-1"
+            style={!isAvailable ? { opacity: 0.3, pointerEvents: "none" } : undefined}
           >
-            <IoMdPlay className="text-[11px]" />
-            <span>{formatPlays(track.numOfPlays)}</span>
-          </div>
-        )}
+            <HiHeart
+              className={`text-[16px] ${isLiked ? "text-inferno" : "text-white-smoke"}`}
+            />
+          </button>
+          <MoreDropdown
+            trigger={
+              <button className="p-1">
+                <IoIosMore className="text-[16px] text-white-smoke" />
+              </button>
+            }
+            tooltipLabel="More"
+            items={[
+              {
+                label: "Add to Next up",
+                icon: <ListStart size={19} className="scale-x-[-1]" />,
+                onClick: handlePlayNextClick,
+              },
+              {
+                label: "Add to Playlist",
+                icon: (
+                  <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
+                ),
+                onClick: () => onAddToPlaylist(),
+              },
+              {
+                label: "Copy Link",
+                icon: <TbCopy className="text-lg" />,
+                onClick: handleCopyLink,
+              },
+              {
+                label: "Station",
+                disabled: true,
+                icon: <BiStation className="text-lg" />,
+              },
+            ]}
+          />
+        </div>
       </div>
     </div>
   );
@@ -405,6 +451,13 @@ export default function PlaylistWaveformCard({
   const { progress, currentTime, seekToPercentage } = useAudioProgress();
   const { ref, isVisible } = useIsVisible("200px");
   const { getPlaylistById } = useGetPlaylistById();
+  const { getProfile, profile: creatorProfile } = useGetProfile();
+
+  useEffect(() => {
+    if (artistId) getProfile(artistId);
+  }, [artistId]);
+
+  const profileLink = creatorProfile?.profileLink ?? null;
 
   const [cachedTracks, setCachedTracks] = useState<PlaylistTrack[]>(
     (preloadedTracks ?? []).map((track, index) =>
@@ -577,14 +630,9 @@ export default function PlaylistWaveformCard({
   }
 
   const handleCopyLink = () => {
-    if (!playlistId) return;
-
-    const url = `${getBaseUrl()}/playlist/${permalink ?? playlistId}`;
-
-    navigator.clipboard.writeText(url);
-    interactiveToastBus.emit({
-      type: "copied",
-    });
+    if (!profileLink || !permalink) return;
+    navigator.clipboard.writeText(`${getBaseUrl()}/${profileLink}/sets/${permalink}`);
+    interactiveToastBus.emit({ type: "copied" });
   };
 
   return (
@@ -602,7 +650,7 @@ export default function PlaylistWaveformCard({
         />
       </div>
 
-      <div className="flex flex-col flex-1 sm:ml-6">
+      <div className="flex flex-col flex-1 sm:ml-6 min-w-0">
         {/* Header row */}
         <div className="flex items-center mb-4 relative">
           <div
@@ -615,25 +663,25 @@ export default function PlaylistWaveformCard({
               <IoMdPause className="text-chinese-black text-[23px]" />
             )}
           </div>
-          <div className="ml-3">
+          <div className="ml-3 min-w-0 flex-1 overflow-hidden">
             <div className="flex items-center gap-1 text-sm font-bold text-silver">
               {artistHref ? (
                 <a
                   href={artistHref}
-                  className="text-silver no-underline hover:text-white-smoke transition-colors"
+                  className="text-silver no-underline hover:text-white-smoke transition-colors truncate"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {displayArtist}
                 </a>
               ) : (
-                <span>{displayArtist}</span>
+                <span className="truncate">{displayArtist}</span>
               )}
               {isRepost && reposterId && (
                 <>
                   <LuRepeat2 className="text-[13px] shrink-0" />
                   <a
                     href={`/profile/${reposterId}`}
-                    className="text-silver no-underline hover:text-white-smoke transition-colors"
+                    className="text-silver no-underline hover:text-white-smoke transition-colors truncate"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {reposterName}
@@ -643,7 +691,7 @@ export default function PlaylistWaveformCard({
             </div>
             <a
               href={`/playlist/${playlistId}`}
-              className="block text-sm font-bold text-white-smoke no-underline hover:text-silver transition-colors"
+              className="block text-sm font-bold text-white-smoke no-underline hover:text-silver transition-colors truncate"
               onClick={(e) => e.stopPropagation()}
             >
               {title}
@@ -710,7 +758,7 @@ export default function PlaylistWaveformCard({
         )}
 
         {/* Bottom actions */}
-        <div className="flex items-center mt-4 gap-4">
+        <div className="flex flex-wrap items-center mt-4 gap-2 sm:gap-4">
           <Tooltip label="Like">
             <Button
               onClick={handleLikeClick}

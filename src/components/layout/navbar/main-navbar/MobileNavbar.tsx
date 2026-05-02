@@ -187,7 +187,7 @@ export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
             <button onClick={() => navigate("/subscriptions")} className={MENU_LINK_CLASS}>Subscriptions</button>
             <button onClick={() => navigate("/legal")}    className={MENU_LINK_CLASS}>Legal</button>
             <button onClick={() => navigate("/copyright")} className={MENU_LINK_CLASS}>Copyright</button>
-            <button onClick={() => navigate("/artists")}  className={MENU_LINK_CLASS}>About us</button>
+            <button onClick={() => navigate("/about-us")}  className={MENU_LINK_CLASS}>About us</button>
             <button onClick={() => navigate("/need-help")} className={MENU_LINK_CLASS}>Support</button>
 
             <button

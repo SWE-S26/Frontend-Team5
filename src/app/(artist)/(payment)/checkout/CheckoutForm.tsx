@@ -43,7 +43,7 @@ const PROMO_CODES: Record<string, number> = {
 // ── Component ────────────────────────────────────────────────────
 
 export function CheckoutForm() {
-const stripe = useStripe()
+    const stripe = useStripe()
     const elements = useElements()
     const router = useRouter()
 

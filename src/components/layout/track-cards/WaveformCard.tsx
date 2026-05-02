@@ -213,7 +213,7 @@ export default function WaveformCard({
   } | null> | null>(null);
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
-  const profileLink = useAppSelector((state) => state.profile.profileLink);
+  const profileLink = artistProfile?.profileLink ?? null;
   const authRole = useAppSelector((state) => state.auth.role);
   const isAuthenticated = useAppSelector(
     (state) => state.auth.isAuthenticated && state.auth.hasHydrated,
@@ -434,7 +434,7 @@ export default function WaveformCard({
   }
 
   const handleCopyLink = () => {
-    if (!isAvailable || !trackId) return;
+    if (!isAvailable || !trackId || !profileLink) return;
 
     const url = `${getBaseUrl()}/${profileLink}/${permalink}`;
 
@@ -696,12 +696,12 @@ export default function WaveformCard({
                 <IoMdPause className="text-chinese-black text-[23px]" />
               )}
             </div>
-            <div>
+            <div className="flex-1 min-w-0 overflow-hidden">
               {isRepost && reposterId ? (
                 <div className="flex items-center gap-1 text-sm font-bold text-silver ml-3">
                   <a
                     href={`/profile/${artistId}`}
-                    className="text-silver hover:text-white-smoke no-underline transition-colors"
+                    className="text-silver hover:text-white-smoke no-underline transition-colors truncate"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {artist}
@@ -710,7 +710,7 @@ export default function WaveformCard({
 
                   <a
                     href={`/profile/${reposterId}`}
-                    className="text-silver hover:text-white-smoke no-underline transition-colors"
+                    className="text-silver hover:text-white-smoke no-underline transition-colors truncate"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {reposterName}
@@ -720,7 +720,7 @@ export default function WaveformCard({
                 <div className="flex items-center gap-1 text-sm font-bold text-silver ml-3">
                   <a
                     href={`/profile/${artistId}`}
-                    className="text-silver hover:text-white-smoke no-underline transition-colors"
+                    className="text-silver hover:text-white-smoke no-underline transition-colors truncate"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {artist}
@@ -729,11 +729,11 @@ export default function WaveformCard({
               )}
               <a
                 href={`/track/${trackId}`}
-                className="text-sm font-bold text-white-smoke ml-3 no-underline hover:text-silver transition-colors truncate"
+                className="block text-sm font-bold text-white-smoke ml-3 no-underline hover:text-silver transition-colors truncate"
                 onClick={(e) => e.stopPropagation()}
               >
                 {title}
-              </a>{" "}
+              </a>
             </div>
 
             {tag && (
@@ -835,7 +835,7 @@ export default function WaveformCard({
               )}
             </AnimatePresence>
 
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               <Tooltip label="Like">
                 <Button
                   onClick={handleLikeClick}
@@ -932,7 +932,7 @@ export default function WaveformCard({
                 ]}
               />
 
-              <div className="ml-0 sm:ml-auto flex items-center gap-4">
+              <div className="ml-auto flex items-center gap-4">
                 <div className="flex items-center gap-1 text-silver">
                   <IoMdPlay className="text-silver text-[12px]" />
                   <span className="text-[12px]">{playsCount}</span>

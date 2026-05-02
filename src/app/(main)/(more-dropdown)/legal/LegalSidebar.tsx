@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import SidebarFooter from "@/components/ui/SidebarFooter";
 
 const sidebarSections = [
   {
@@ -14,7 +15,7 @@ const sidebarSections = [
       { label: "Moderation and Enforcement Policies", href: "#" },
       { label: "Law Enforcement Guidelines", href: "#" },
       { label: "Transparency Reports", href: "#" },
-      { label: "Report Illegal Content", href: "#" },
+      { label: "Report Illegal Content", href: "/copyright" },
       { label: "Accessibility Statement", href: "#" },
     ],
   },
@@ -28,9 +29,8 @@ const sidebarSections = [
   {
     title: "About",
     links: [
-      { label: "About BeatZa", href: "#" },
-      { label: "Company Information", href: "#" },
-      { label: "Press Information", href: "#" },
+      { label: "About BeatZa", href: "/about-us" },
+      { label: "Company Information", href: "/about-us" },
     ],
   },
 ];
@@ -59,6 +59,7 @@ export default function LegalSidebar() {
             </ul>
           </div>
         ))}
+        <SidebarFooter />
       </div>
     </aside>
   );
