@@ -7,6 +7,7 @@ import Tooltip from "@/components/ui/Tooltip";
 import MoreDropdown from "@/components/ui/MoreDropdown";
 import AddToPlaylistModal from "@/components/playlists/AddToPlaylistModal";
 import PreviewTooltip from "@/components/layout/track-cards/PreviewTooltip";
+import SharePopup from "@/components/profile/SharePopUp";
 
 import { useState, useRef, useEffect } from "react";
 import { Avatar } from "antd";
@@ -128,6 +129,7 @@ export default function WaveformCard({
   const [repostCountState, setRepostCountState] = useState(repostCount);
   const [isAddToPlaylistOpen, setIsAddToPlaylistOpen] = useState(false);
   const hasHydrated = useAppSelector((state) => state.auth.hasHydrated);
+  const [isShareOpen, setIsShareOpen] = useState(false)
 
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const { getProfile, profile: artistProfile } = useGetProfile();
@@ -876,7 +878,9 @@ export default function WaveformCard({
                 <Button
                   className="bg-off-black"
                   icon={<LuShare className="text-xl" />}
+                  onClick={() => setIsShareOpen(true)}
                 />
+
               </Tooltip>
               <Tooltip label="Copy Link">
                 <Button
@@ -965,6 +969,12 @@ export default function WaveformCard({
         artistName={artist}
         trackImage={img}
       />
+      <SharePopup
+      isOpen={isShareOpen}
+      onClose={() => setIsShareOpen(false)}
+      prefilledMessage={profileLink && permalink ? `${getBaseUrl()}/${profileLink}/${permalink}` : undefined}
+    />
+
     </>
   );
 }

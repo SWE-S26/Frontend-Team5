@@ -24,6 +24,7 @@ import SausageWaveform from "@/components/ui/SausageWaveform";
 import PlaylistCard from "@/components/ui/PlaylistCard";
 import Button from "@/components/ui/Button";
 import Tooltip from "@/components/ui/Tooltip";
+import SharePopup from "@/components/profile/SharePopUp";
 
 import { IoMdPlay, IoMdPause, IoIosMore } from "react-icons/io";
 import { HiHeart } from "react-icons/hi";
@@ -130,9 +131,9 @@ export function TrackRow({
   onAddToPlaylist: () => void;
 }) {
   const isAvailable = track.isAvailableForUser !== false;
-  // const isAvailable = false;
 
   const [hovered, setHovered] = useState(false);
+  const [isShareOpen, setIsShareOpen] = useState(false);
   const { likeTrack } = useLikeTrackOptimistic(track._id);
   const [isLiked, setIsLiked] = useState(track.isLiked);
   const { repostTrack } = useRepostTrack(
@@ -201,7 +202,6 @@ export function TrackRow({
       onMouseLeave={() => setHovered(false)}
       onClick={isAvailable ? onPlay : undefined}
     >
-      {/* Hover background only when available */}
       {isAvailable && hovered && (
         <div className="absolute inset-0 rounded bg-white/5 pointer-events-none" />
       )}
@@ -263,7 +263,6 @@ export function TrackRow({
         </>
       )}
 
-      {/* Title + unavailable badge */}
       <div className="flex items-center gap-2 flex-1 min-w-0">
         <a
           href={`/track/${track.basicInfo.permalink ?? track._id}`}
@@ -292,7 +291,6 @@ export function TrackRow({
         className="shrink-0 flex items-center justify-end"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Desktop: hover / playing reveals full controls */}
         <div className="hidden sm:block w-48">
           {isAvailable && (hovered || isPlaying) ? (
             <div className="flex items-center gap-3 justify-end">
@@ -322,6 +320,7 @@ export function TrackRow({
                 <Button
                   className={isPlaying ? "bg-off-black" : "bg-transparent"}
                   icon={<LuShare className="text-[15px]" />}
+                  onClick={() => setIsShareOpen(true)}
                 />
               </Tooltip>
               <Tooltip label="Copy Link">
@@ -371,7 +370,6 @@ export function TrackRow({
           )}
         </div>
 
-        {/* Mobile: always-visible like + more */}
         <div className="flex sm:hidden items-center gap-2">
           <button
             onClick={handleLikeClick}
@@ -416,6 +414,14 @@ export function TrackRow({
           />
         </div>
       </div>
+
+      <SharePopup
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        prefilledMessage={track.poster?.profileLink && track.basicInfo.permalink
+          ? `${getBaseUrl()}/${track.poster.profileLink}/${track.basicInfo.permalink}`
+          : undefined}
+      />
     </div>
   );
 }
@@ -443,6 +449,7 @@ export default function PlaylistWaveformCard({
   const artistHref = artistId ? `/profile/${artistId}` : undefined;
   const [addToPlaylistTrack, setAddToPlaylistTrack] =
     useState<PlaylistTrack | null>(null);
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   const dispatch = useDispatch();
   const { currentTrackId, isPlaying } = useSelector(
@@ -490,7 +497,6 @@ export default function PlaylistWaveformCard({
   const currentTrack =
     cachedTracks.find((t) => t._id === currentTrackId) ?? cachedTracks[0];
 
-  // Skip unavailable tracks when they become current
   useEffect(() => {
     if (!currentTrackId || !isPlaying) return;
     const tracks = cachedTracksRef.current;
@@ -499,7 +505,6 @@ export default function PlaylistWaveformCard({
     const current = tracks[currentIndex];
     if (current.isAvailableForUser !== false) return;
 
-    // Find next available track
     const nextAvailable = tracks
       .slice(currentIndex + 1)
       .find((t) => t.isAvailableForUser !== false);
@@ -573,7 +578,6 @@ export default function PlaylistWaveformCard({
     const tracks = await ensureTracks();
     if (!tracks.length) return;
 
-    // Start from the first available track
     const firstAvailable = tracks.find((t) => t.isAvailableForUser !== false);
     if (!firstAvailable) return;
 
@@ -651,7 +655,6 @@ export default function PlaylistWaveformCard({
       </div>
 
       <div className="flex flex-col flex-1 sm:ml-6 min-w-0">
-        {/* Header row */}
         <div className="flex items-center mb-4 relative">
           <div
             className="w-10 h-10 bg-white-smoke rounded-full flex items-center justify-center cursor-pointer shrink-0"
@@ -706,7 +709,6 @@ export default function PlaylistWaveformCard({
           )}
         </div>
 
-        {/* Waveform */}
         <div className="w-full h-20 sm:h-15 shrink-0">
           <SausageWaveform
             trackId={currentTrack?._id ?? playlistId}
@@ -721,7 +723,6 @@ export default function PlaylistWaveformCard({
           />
         </div>
 
-        {/* Track list */}
         <div
           ref={listRef}
           className={`mt-4 ${tracksExpanded ? "overflow-y-auto max-h-65" : "overflow-hidden"}`}
@@ -757,7 +758,6 @@ export default function PlaylistWaveformCard({
           </button>
         )}
 
-        {/* Bottom actions */}
         <div className="flex flex-wrap items-center mt-4 gap-2 sm:gap-4">
           <Tooltip label="Like">
             <Button
@@ -797,6 +797,7 @@ export default function PlaylistWaveformCard({
             <Button
               className="bg-off-black"
               icon={<LuShare className="text-xl" />}
+              onClick={() => setIsShareOpen(true)}
             />
           </Tooltip>
           <Tooltip label="Copy Link">
@@ -831,6 +832,7 @@ export default function PlaylistWaveformCard({
           </Tooltip>
         </div>
       </div>
+
       <AddToPlaylistModal
         isOpen={addToPlaylistTrack !== null}
         onClose={() => setAddToPlaylistTrack(null)}
@@ -839,6 +841,13 @@ export default function PlaylistWaveformCard({
         artistName={addToPlaylistTrack?.basicInfo.mainArtists[0]}
         trackImage={addToPlaylistTrack?.image.imgLink}
       />
+      <SharePopup
+      isOpen={isShareOpen}
+      onClose={() => setIsShareOpen(false)}
+      prefilledMessage={profileLink && permalink
+        ? `${getBaseUrl()}/${profileLink}/sets/${permalink}`
+        : undefined}
+    />
     </div>
   );
 }

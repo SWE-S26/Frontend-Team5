@@ -353,7 +353,11 @@ export default function TrackListRow({
         artistName={artist}
         trackImage={img}
       />
-      <SharePopup isOpen={isShareOpen} onClose={() => setIsShareOpen(false)} />
+      <SharePopup
+      isOpen={isShareOpen}
+      onClose={() => setIsShareOpen(false)}
+      prefilledMessage={profileLink && permalink ? `${getBaseUrl()}/${profileLink}/${permalink}` : undefined}
+    />
     </>
   );
 }

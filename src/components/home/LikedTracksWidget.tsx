@@ -74,7 +74,6 @@ export default function LikedTracksWidget({ userId }: LikedTracksWidgetProps) {
     [orderedTracks],
   );
 
-  // Stable string dep — always size 1, never causes "array size changed" error
   const previewTrackIds = useMemo(
     () => previewTracks.map((t) => t.posterId).join(","),
     [previewTracks],
@@ -132,7 +131,6 @@ export default function LikedTracksWidget({ userId }: LikedTracksWidgetProps) {
     };
   }, [previewTrackIds, artistProfiles]);
 
-  // Build the full queue so the player knows all liked tracks
   const allPlayerTracks: PlayerTrack[] = orderedTracks.map(mapToPlayerTrack);
 
   return (
@@ -200,6 +198,7 @@ export default function LikedTracksWidget({ userId }: LikedTracksWidgetProps) {
                 artistId={track.posterId}
                 img={track.image?.imgLink}
                 duration={track.durationInSeconds}
+                permalink={track.basicInfo.permalink}
                 playsCount={track.numPlays}
                 likeCount={track.numLikes}
                 repostCount={track.numReposts}
