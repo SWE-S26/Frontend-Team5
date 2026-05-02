@@ -467,17 +467,17 @@ const ProfilePage = ({ params }: Props) => {
     <div>
       <ProfileHeader />
 
-      <div className="flex items-center justify-between mb-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-4 gap-2 sm:gap-0 px-3 sm:px-0">
         <TabsNavbar
           tabs={profileTabs}
           activeTab={activeTab}
           onTabChange={handleTabChange}
           textSize="text-md"
-          className="flex items-center justify-between text-white-smoke py-6 px-1"
-          tabsWrapperClassName="flex space-x-6"
+          className="flex items-center text-white-smoke py-4 sm:py-6 px-1 overflow-x-auto w-full sm:w-auto"
+          tabsWrapperClassName="flex space-x-4 sm:space-x-6 whitespace-nowrap"
         />
 
-        <div className="flex space-x-2">
+        <div className="flex flex-wrap gap-2 pb-2 sm:pb-0 mx-auto sm:mx-0">
           {!isLoading && (
             <>
               {trackCount ? (
@@ -635,8 +635,8 @@ const ProfilePage = ({ params }: Props) => {
         violatorType="user"
       />
 
-      <div className="flex justify-between">
-        <div className="w-[68%]">
+      <div className="flex flex-col lg:flex-row justify-between gap-4 px-3 sm:px-0">
+        <div className="w-full lg:w-[68%]">
           <div >
 
             {activeTab === "all" && (
@@ -702,7 +702,7 @@ const ProfilePage = ({ params }: Props) => {
           </div>
         </div>
 
-        <div className="w-[27.75%]">
+        <div className="w-full lg:w-[27.75%]">
           <ProfileSideBar />
         </div>
       </div>

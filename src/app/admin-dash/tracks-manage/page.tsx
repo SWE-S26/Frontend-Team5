@@ -63,7 +63,6 @@ export default function TracksManagement() {
 
   const { tracks: fetchedTracks, total, loading, error, refetch } = useAdminTracks(params);
 
-  // sync local tracks when fetch completes
   const tracks = localTracks ?? fetchedTracks;
   useMemo(() => {
     setLocalTracks(fetchedTracks);
@@ -105,7 +104,7 @@ export default function TracksManagement() {
     try {
       await deleteTrack(trackId);
     } catch {
-      setLocalTracks(null); // revert to server state on failure
+      setLocalTracks(null);
     }
   };
 
@@ -128,27 +127,48 @@ export default function TracksManagement() {
     [tracks, total]
   );
 
+  const ActionButtons = ({ track }: { track: AdminTrack }) => (
+    <div className="flex gap-2">
+      <button
+        title={track.banned ? "Unban" : "Ban"}
+        disabled={loadingId === track.id}
+        onClick={() => track.banned ? handleUnban(track.id) : handleBan(track.id)}
+        className="p-1.5 rounded-lg text-silver hover:text-brilliant-orange hover:bg-brilliant-orange/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {track.banned ? <ShieldCheck size={15} /> : <ShieldOff size={15} />}
+      </button>
+      <button
+        title="Delete permanently"
+        disabled={loadingId === track.id}
+        onClick={() => handleDelete(track.id)}
+        className="p-1.5 rounded-lg text-silver hover:text-anger hover:bg-anger/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        <Trash2 size={15} />
+      </button>
+    </div>
+  );
+
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-white-smoke">Tracks & Playlists Management</h1>
 
       {/* Stats */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 gap-3 md:gap-4">
         {[
           { label: "Total Items", value: stats.total },
           { label: "Tracks", value: stats.tracks, color: "text-brilliant-orange" },
           { label: "Banned", value: stats.banned, color: "text-anger" },
         ].map(({ label, value, color }) => (
-          <div key={label} className="bg-off-black rounded-xl p-4 border border-white/5">
-            <p className="text-silver text-sm">{label}</p>
-            <p className={`text-3xl font-bold mt-1 ${color ?? "text-white-smoke"}`}>{value}</p>
+          <div key={label} className="bg-off-black rounded-xl p-3 md:p-4 border border-white/5">
+            <p className="text-silver text-xs md:text-sm">{label}</p>
+            <p className={`text-2xl md:text-3xl font-bold mt-1 ${color ?? "text-white-smoke"}`}>{value}</p>
           </div>
         ))}
       </div>
 
       {/* Search + Filters */}
-      <div className="flex gap-3 items-center flex-wrap">
-        <div className="relative max-w-sm flex-1">
+      <div className="flex flex-col gap-3">
+        <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-silver" />
           <input
             value={search}
@@ -161,48 +181,82 @@ export default function TracksManagement() {
           />
         </div>
 
-        {/* Banned filter */}
-        <div className="flex gap-1 bg-off-black border border-white/10 rounded-lg p-1">
-          {(["all", "active", "banned"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => setBannedFilter(f)}
-              className={`px-3 py-1 rounded-md text-sm capitalize transition-colors ${
-                bannedFilter === f
-                  ? "bg-brilliant-orange text-white"
-                  : "text-silver hover:text-white-smoke"
-              }`}
-            >
-              {f === "all" ? "All Status" : f}
-            </button>
-          ))}
-        </div>
+        <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-1 bg-off-black border border-white/10 rounded-lg p-1">
+            {(["all", "active", "banned"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => setBannedFilter(f)}
+                className={`px-2 md:px-3 py-1 rounded-md text-xs md:text-sm capitalize transition-colors ${
+                  bannedFilter === f
+                    ? "bg-brilliant-orange text-white"
+                    : "text-silver hover:text-white-smoke"
+                }`}
+              >
+                {f === "all" ? "All Status" : f}
+              </button>
+            ))}
+          </div>
 
-        {/* Sort filter */}
-        <div className="flex gap-1 bg-off-black border border-white/10 rounded-lg p-1">
-          {(["newest", "oldest", "most_plays", "most_likes"] as const).map((s) => (
-            <button
-              key={s}
-              onClick={() => setSort(s)}
-              className={`px-3 py-1 rounded-md text-sm transition-colors ${
-                sort === s
-                  ? "bg-brilliant-orange text-white"
-                  : "text-silver hover:text-white-smoke"
-              }`}
-            >
-              {SORT_LABELS[s]}
-            </button>
-          ))}
+          <div className="flex gap-1 bg-off-black border border-white/10 rounded-lg p-1">
+            {(["newest", "oldest", "most_plays", "most_likes"] as const).map((s) => (
+              <button
+                key={s}
+                onClick={() => setSort(s)}
+                className={`px-2 md:px-3 py-1 rounded-md text-xs md:text-sm transition-colors ${
+                  sort === s
+                    ? "bg-brilliant-orange text-white"
+                    : "text-silver hover:text-white-smoke"
+                }`}
+              >
+                {SORT_LABELS[s]}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Errors */}
       {(error || actionError) && (
         <p className="text-anger text-sm">{error ?? actionError}</p>
       )}
 
-      {/* Table */}
-      <div className="bg-off-black rounded-xl border border-white/5 overflow-hidden">
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          <p className="text-silver text-center py-10">Loading...</p>
+        ) : processed.length === 0 ? (
+          <p className="text-silver text-center py-10">No tracks found.</p>
+        ) : (
+          processed.map((track) => (
+            <div key={track.id} className="bg-off-black rounded-xl p-4 border border-white/5 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-white-smoke font-medium truncate">{track.title}</p>
+                  <p className="text-silver text-xs mt-0.5 truncate">{track.artistName}</p>
+                </div>
+                <ActionButtons track={track} />
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <span className="flex items-center gap-1 text-silver text-xs">
+                  {track.type === "track" ? <Music size={12} /> : <ListMusic size={12} />}
+                  <span className="capitalize">{track.type}</span>
+                </span>
+                <BannedBadge banned={track.banned} />
+              </div>
+
+              <div className="flex gap-4 text-xs text-silver">
+                <span>{track.numberOfPlays.toLocaleString()} plays</span>
+                <span>{track.numberOfLikes.toLocaleString()} likes</span>
+                <span>{new Date(track.createdAt).toLocaleDateString()}</span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block bg-off-black rounded-xl border border-white/5 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-white/10 text-silver text-left">
@@ -256,24 +310,7 @@ export default function TracksManagement() {
                     {new Date(track.createdAt).toLocaleDateString()}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex gap-2">
-                      <button
-                        title={track.banned ? "Unban" : "Ban"}
-                        disabled={loadingId === track.id}
-                        onClick={() => track.banned ? handleUnban(track.id) : handleBan(track.id)}
-                        className="p-1.5 rounded-lg text-silver hover:text-brilliant-orange hover:bg-brilliant-orange/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        {track.banned ? <ShieldCheck size={15} /> : <ShieldOff size={15} />}
-                      </button>
-                      <button
-                        title="Delete permanently"
-                        disabled={loadingId === track.id}
-                        onClick={() => handleDelete(track.id)}
-                        className="p-1.5 rounded-lg text-silver hover:text-anger hover:bg-anger/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        <Trash2 size={15} />
-                      </button>
-                    </div>
+                    <ActionButtons track={track} />
                   </td>
                 </tr>
               ))
@@ -284,7 +321,7 @@ export default function TracksManagement() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between text-sm flex-wrap gap-2">
           <p className="text-silver">
             Page {offset} of {totalPages} — {total} total items
           </p>
