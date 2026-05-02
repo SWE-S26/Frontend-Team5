@@ -104,6 +104,7 @@ export default function TrackCard({
           title,
           artist,
           img,
+          duration,
         },
       }),
     );

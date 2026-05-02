@@ -31,6 +31,9 @@ export default function Playlists({ items }: Props) {
               }))
             }
             totalTracks={item.totalTracks}
+            isRepost={(item as any).isRepost}
+            reposterId={(item as any).reposterId}
+            reposterName={(item as any).reposterName}
           />
         ))}
       </div>
