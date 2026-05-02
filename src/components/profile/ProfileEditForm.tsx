@@ -377,13 +377,13 @@ const handleCancelCrop = () => {
     <AnimatePresence>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-white/30 z-[1001] flex items-start pt-4 sm:pt-10 justify-center px-2 sm:px-0 overflow-y-auto"
+          className="fixed inset-0 bg-white/30 z-1001 flex items-start pt-4 sm:pt-10 justify-center px-2 sm:px-0 overflow-y-auto"
           onClick={(e) => {
             if (e.target === e.currentTarget) handleCancel()
           }}
         >
           <button data-testid="cancel-button-popup"
-            className="fixed top-4 right-4 text-white-smoke text-2xl font-bold bg-off-black rounded-full w-11 h-11 flex items-center justify-center hover:text-silver cursor-pointer z-[1002]"
+            className="fixed top-4 right-4 text-white-smoke text-2xl font-bold bg-off-black rounded-full w-11 h-11 flex items-center justify-center hover:text-silver cursor-pointer z-1002"
             onClick={handleCancel}
           >
             ✕
@@ -402,7 +402,7 @@ const handleCancelCrop = () => {
             </p>
 
             <div className="flex flex-col sm:flex-row gap-6 mb-4">
-              <div className="flex flex-col items-center gap-2 flex-shrink-0">
+              <div className="flex flex-col items-center gap-2 shrink-0">
   <div className="relative w-40 h-40 group/avatar">
     {isCropping && rawImageUrl ? (
       <div className="relative overflow-hidden rounded-full w-40 h-40">
