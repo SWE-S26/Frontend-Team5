@@ -26,7 +26,7 @@ import Tooltip from "@/components/ui/Tooltip";
 
 import { IoMdPlay, IoMdPause, IoIosMore } from "react-icons/io";
 import { HiHeart } from "react-icons/hi";
-import { LuRepeat2, LuShare } from "react-icons/lu";
+import { LuRepeat2, LuShare, LuMapPin } from "react-icons/lu";
 import { TbCopy } from "react-icons/tb";
 import { ListStart } from "lucide-react";
 import MoreDropdown from "@/components/ui/MoreDropdown";
@@ -47,6 +47,7 @@ type PlaylistTrack = {
   numOfLikes: number;
   isLiked: boolean;
   isReposted: boolean;
+  isAvailableForUser?: boolean;
 };
 
 type Props = {
@@ -96,6 +97,7 @@ function normalizePlaylistTrack(track: any, fallbackId: string): PlaylistTrack {
     numOfLikes: track?.numOfLikes ?? 0,
     isLiked: track?.isLiked ?? false,
     isReposted: track?.isReposted ?? false,
+    isAvailableForUser: track?.isAvailableForUser ?? true,
   };
 }
 
@@ -124,6 +126,9 @@ export function TrackRow({
   showArtist?: boolean;
   onAddToPlaylist: () => void;
 }) {
+  const isAvailable = track.isAvailableForUser !== false;
+  // const isAvailable = false;
+
   const [hovered, setHovered] = useState(false);
   const { likeTrack } = useLikeTrackOptimistic(track._id);
   const [isLiked, setIsLiked] = useState(track.isLiked);
@@ -137,13 +142,9 @@ export function TrackRow({
   const dispatch = useDispatch();
 
   const indexColor = isCurrent ? "text-inferno" : "text-silver";
-  const titleColor = isCurrent
-    ? "text-inferno"
-    : hovered
-      ? "text-silver"
-      : "text-white-smoke";
 
   function handleLikeClick() {
+    if (!isAvailable) return;
     likeTrack();
     setIsLiked((l) => !l);
     if (!isLiked) {
@@ -151,6 +152,7 @@ export function TrackRow({
     }
   }
   function handleRepostClick() {
+    if (!isAvailable) return;
     repostTrack();
     setIsReposted((r) => !r);
     if (!isReposted) {
@@ -160,7 +162,7 @@ export function TrackRow({
 
   function handlePlayNextClick(e: React.MouseEvent) {
     e.stopPropagation();
-    if (!track._id || !track.audio) return;
+    if (!isAvailable || !track._id || !track.audio) return;
 
     interactionToast.queued(track.basicInfo.title, track.image.imgLink);
 
@@ -179,7 +181,7 @@ export function TrackRow({
   }
 
   const handleCopyLink = () => {
-    if (!track._id) return;
+    if (!isAvailable || !track._id) return;
 
     const url = `${getBaseUrl()}/track/${track.basicInfo.permalink ?? track._id}`;
 
@@ -192,17 +194,29 @@ export function TrackRow({
   return (
     <div
       ref={rowRef}
-      className="flex items-center gap-2 px-2 py-2 rounded hover:bg-white/5 transition-colors cursor-pointer group/row h-13 sm:h-13"
-      onMouseEnter={() => setHovered(true)}
+      className="flex items-center gap-2 px-2 py-2 rounded transition-colors h-13 sm:h-13 relative"
+      style={{
+        cursor: isAvailable ? "pointer" : "default",
+        pointerEvents: isAvailable ? undefined : "none",
+      }}
+      onMouseEnter={() => isAvailable && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={onPlay}
+      onClick={isAvailable ? onPlay : undefined}
     >
-      <div className="relative w-12 sm:w-9 h-12 sm:h-9 shrink-0">
+      {/* Hover background only when available */}
+      {isAvailable && hovered && (
+        <div className="absolute inset-0 rounded bg-white/5 pointer-events-none" />
+      )}
+
+      <div
+        className="relative w-12 sm:w-9 h-12 sm:h-9 shrink-0"
+        style={!isAvailable ? { opacity: 0.3 } : undefined}
+      >
         <img
           src={track.image.imgLink}
           className="w-12 sm:w-9 h-12 sm:h-9 rounded object-cover"
         />
-        {(hovered || isPlaying) && (
+        {isAvailable && (hovered || isPlaying) && (
           <div
             className="absolute inset-0 flex items-center justify-center rounded"
             onClick={(e) => {
@@ -221,37 +235,66 @@ export function TrackRow({
         )}
       </div>
 
-      <span className={`${indexColor} text-sm font-normal shrink-0`}>
+      <span
+        className={`${indexColor} text-sm font-normal shrink-0`}
+        style={!isAvailable ? { opacity: 0.3 } : undefined}
+      >
         {index + 1}
       </span>
-      <span className={`${indexColor} text-sm shrink-0`}>{"\u00b7"}</span>
+      <span
+        className={`${indexColor} text-sm shrink-0`}
+        style={!isAvailable ? { opacity: 0.3 } : undefined}
+      >
+        {"\u00b7"}
+      </span>
+
       {showArtist && (
         <>
-          <span className="max-w-44 truncate text-sm font-bold text-silver shrink-0">
+          <span
+            className="max-w-44 truncate text-sm font-bold text-silver shrink-0"
+            style={!isAvailable ? { opacity: 0.3 } : undefined}
+          >
             {track.basicInfo.mainArtists?.join(", ") || "Unknown artist"}
           </span>
-          <span className={`${indexColor} text-sm shrink-0`}>{"\u00b7"}</span>
+          <span
+            className={`${indexColor} text-sm shrink-0`}
+            style={!isAvailable ? { opacity: 0.3 } : undefined}
+          >
+            {"\u00b7"}
+          </span>
         </>
       )}
-      <a
-        href={`/track/${track.basicInfo.permalink ?? track._id}`}
-        onClick={(e) => e.stopPropagation()}
-        className={`text-sm font-bold flex-1 truncate min-w-0 no-underline transition-colors ${
-          isCurrent
-            ? "text-inferno"
-            : hovered
-              ? "text-silver"
-              : "text-white-smoke"
-        }`}
-      >
-        {track.basicInfo.title}
-      </a>
+
+      {/* Title + unavailable badge */}
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        <a
+          href={`/track/${track.basicInfo.permalink ?? track._id}`}
+          onClick={(e) => e.stopPropagation()}
+          className={`text-sm font-bold truncate min-w-0 no-underline transition-colors ${
+            isCurrent
+              ? "text-inferno"
+              : hovered
+                ? "text-silver"
+                : "text-white-smoke"
+          }`}
+          style={!isAvailable ? { opacity: 0.3 } : undefined}
+        >
+          {track.basicInfo.title}
+        </a>
+
+        {!isAvailable && (
+          <span className="flex items-center gap-1 shrink-0 text-silver text-[11px]">
+            <LuMapPin className="text-[11px]" />
+            <span>Not Available</span>
+          </span>
+        )}
+      </div>
 
       <div
         className="shrink-0 w-48 flex items-center justify-end"
         onClick={(e) => e.stopPropagation()}
       >
-        {hovered || isPlaying ? (
+        {isAvailable && (hovered || isPlaying) ? (
           <div className="flex items-center gap-3">
             <Tooltip label="Like">
               <Button
@@ -318,7 +361,10 @@ export function TrackRow({
             />
           </div>
         ) : (
-          <div className="flex items-center gap-1 text-silver text-[11px]">
+          <div
+            className="flex items-center gap-1 text-silver text-[11px]"
+            style={!isAvailable ? { opacity: 0.3 } : undefined}
+          >
             <IoMdPlay className="text-[11px]" />
             <span>{formatPlays(track.numOfPlays)}</span>
           </div>
@@ -376,6 +422,8 @@ export default function PlaylistWaveformCard({
 
   const listRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const cachedTracksRef = useRef(cachedTracks);
+  cachedTracksRef.current = cachedTracks;
 
   const { likePlaylist } = useLikePlaylistOptimistic(playlistId ?? "");
   const { repostPlaylist } = useRepostPlaylist(
@@ -388,6 +436,35 @@ export default function PlaylistWaveformCard({
     isPlaying && cachedTracks.some((t) => t._id === currentTrackId);
   const currentTrack =
     cachedTracks.find((t) => t._id === currentTrackId) ?? cachedTracks[0];
+
+  // Skip unavailable tracks when they become current
+  useEffect(() => {
+    if (!currentTrackId || !isPlaying) return;
+    const tracks = cachedTracksRef.current;
+    const currentIndex = tracks.findIndex((t) => t._id === currentTrackId);
+    if (currentIndex === -1) return;
+    const current = tracks[currentIndex];
+    if (current.isAvailableForUser !== false) return;
+
+    // Find next available track
+    const nextAvailable = tracks
+      .slice(currentIndex + 1)
+      .find((t) => t.isAvailableForUser !== false);
+
+    if (!nextAvailable) return;
+
+    const mapped = tracks.map((t) => ({
+      id: t._id,
+      url: t.audio.audioLink,
+      title: t.basicInfo.title,
+      artist: t.basicInfo.mainArtists[0],
+      img: t.image.imgLink,
+      duration: t.durationInSeconds,
+    }));
+
+    dispatch(playAudio({ tracks: mapped, startId: nextAvailable._id }));
+    setTimeout(() => dispatch(play()), 0);
+  }, [currentTrackId, isPlaying]);
 
   useEffect(() => {
     if (likeCount !== undefined) setLikeCountState(likeCount);
@@ -443,6 +520,10 @@ export default function PlaylistWaveformCard({
     const tracks = await ensureTracks();
     if (!tracks.length) return;
 
+    // Start from the first available track
+    const firstAvailable = tracks.find((t) => t.isAvailableForUser !== false);
+    if (!firstAvailable) return;
+
     const queue = feedQueue?.length
       ? feedQueue
       : tracks.map((t) => ({
@@ -454,11 +535,12 @@ export default function PlaylistWaveformCard({
           duration: t.durationInSeconds,
         }));
 
-    dispatch(playAudio({ tracks: queue, startId: tracks[0]._id }));
+    dispatch(playAudio({ tracks: queue, startId: firstAvailable._id }));
     setTimeout(() => dispatch(play()), 0);
   }
 
   async function handleTrackPlay(track: PlaylistTrack) {
+    if (track.isAvailableForUser === false) return;
     const tracks = await ensureTracks();
     const mapped = tracks.map((t) => ({
       id: t._id,

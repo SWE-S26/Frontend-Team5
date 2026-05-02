@@ -32,6 +32,7 @@ export interface PlaylistTrack {
   durationInSeconds: number;
   numOfPlays: number;
   numOfLikes: number;
+  isAvailableForUser: boolean;
   permissions?: {
     enableDirectDownload?: boolean;
     offlineListening?: boolean;
