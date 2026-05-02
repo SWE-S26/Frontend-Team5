@@ -8,6 +8,7 @@ interface Item {
   trackId?: string
   title: string
   artist: string
+  artistId?: string
   img: string
   trackUrl?: string
   downloadUrl?: string
@@ -21,21 +22,23 @@ interface Item {
   numComments?: number
   playlistTracks?: any[]
   totalTracks?: number
-  // optional extra fields forwarded from mapping
   wfLink?: string
   isRepost?: boolean
   reposterId?: string
   reposterName?: string
+  permalink?: string
+  isAvailableForUser?: boolean
 }
 
 interface Props {
   items: Item[]
+  profileLink?: string | null
   onEditTrack?: (item: Item) => void
   onAddToPlaylist?: (item: Item) => void
   feedQueue?: StoreTrack[]
 }
 
-export default function Reposts({ items, onEditTrack, onAddToPlaylist, feedQueue }: Props) {
+export default function Reposts({ items, profileLink, onEditTrack, onAddToPlaylist, feedQueue }: Props) {
   return (
     <>
       <div className="flex flex-col gap-12">
@@ -46,10 +49,13 @@ export default function Reposts({ items, onEditTrack, onAddToPlaylist, feedQueue
               img={item.img}
               title={item.title}
               artist={item.artist}
+              artistId={item.artistId}
               playlistId={item.id}
               likeCount={item.numLikes ?? 0}
               repostCount={item.numReposts ?? 0}
               isLikedByUser={item.isLikedByUser}
+              permalink={item.permalink}
+              profileLinkOverride={profileLink}
               preloadedTracks={
                 (item.playlistTracks ?? []).map((t, ii) => ({
                   _id: t._id ?? `${item.id}-${ii}`,
@@ -61,6 +67,7 @@ export default function Reposts({ items, onEditTrack, onAddToPlaylist, feedQueue
                   numOfLikes: t.numOfLikes ?? 0,
                   isLiked: t.isLiked ?? false,
                   isReposted: t.isReposted ?? false,
+                  isAvailableForUser: t.isAvailableForUser,
                 }))
               }
               totalTracks={item.totalTracks}
@@ -75,6 +82,7 @@ export default function Reposts({ items, onEditTrack, onAddToPlaylist, feedQueue
               img={item.img}
               title={item.title}
               artist={item.artist}
+              artistId={item.artistId}
               trackId={item.trackId ?? item.id}
               trackUrl={item.trackUrl}
               wfLink={item.wfLink}
@@ -92,6 +100,9 @@ export default function Reposts({ items, onEditTrack, onAddToPlaylist, feedQueue
               onAddToPlaylist={onAddToPlaylist ? () => onAddToPlaylist(item) : undefined}
               playsCount={item.numPlays ?? 0}
               commentsCount={item.numComments ?? 0}
+              permalink={item.permalink}
+              isAvailable={item.isAvailableForUser}
+              profileLinkOverride={profileLink}
             />
           )
         ))}

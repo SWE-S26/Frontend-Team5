@@ -14,6 +14,7 @@ import {
   UpdatePlaylistImageResponse,
   DeletePlaylistResponse,
   AddTrackToPlaylistResponse,
+  RemoveTrackFromPlaylistResponse,
   ReorderPlaylistTracksRequest,
   ReorderPlaylistTracksResponse,
   GetPlaylistCreatorResponse,
@@ -89,27 +90,27 @@ export const playlistsService = {
   updatePlaylist: (playlistId: string, data: UpdatePlaylistRequest) => {
     const formData = new FormData();
 
-    if (data.title) formData.append("title", data.title);
-    if (data.permalink) formData.append("permalink", data.permalink);
-    if (data.additionalTags)
-      data.additionalTags.forEach((tag) => formData.append("additionalTags", tag));
-    if (data.type) formData.append("type", data.type);
-    if (data.playlistType) formData.append("playlistType", data.playlistType);
-    if (data.releaseDate) formData.append("releaseDate", data.releaseDate);
-    if (data.genre) formData.append("genre", data.genre);
-    if (data.tags) data.tags.forEach((tag) => formData.append("tags", tag));
-    if (data.description) formData.append("description", data.description);
-    if (data.isPrivate !== undefined)
-      formData.append("isPrivate", String(data.isPrivate));
-    if (data.audioTracks)
-      data.audioTracks.forEach((id) => formData.append("audioTracks", id));
+    const jsonPayload: Record<string, any> = {};
+    if (data.title !== undefined)        jsonPayload.title        = data.title;
+    if (data.permalink !== undefined)    jsonPayload.permalink    = data.permalink;
+    if (data.type !== undefined)         jsonPayload.type         = data.type;
+    if (data.playlistType !== undefined) jsonPayload.playlistType = data.playlistType;
+    if (data.releaseDate !== undefined)  jsonPayload.releaseDate  = data.releaseDate;
+    if (data.genre !== undefined)        jsonPayload.genre        = data.genre;
+    if (data.description !== undefined)  jsonPayload.description  = data.description;
+    if (data.isPrivate !== undefined)    jsonPayload.isPrivate    = data.isPrivate;
+    if (data.buyLink !== undefined)      jsonPayload.buyLink      = data.buyLink;
+    if (data.recordLabel !== undefined)  jsonPayload.recordLabel  = data.recordLabel;
+    if (data.additionalTags !== undefined) jsonPayload.additionalTags = data.additionalTags;
+    if (data.tags !== undefined)         jsonPayload.tags         = data.tags;
+    if (data.licensing !== undefined)    jsonPayload.licensing    = data.licensing;
     if (data.lengthOfRecievedTracks !== undefined)
-      formData.append("lengthOfRecievedTracks", String(data.lengthOfRecievedTracks));
-    if (data.licensing)
-      formData.append("licensing", JSON.stringify(data.licensing));
-    if (data.buyLink) formData.append("buyLink", data.buyLink);
-    if (data.recordLabel) formData.append("recordLabel", data.recordLabel);
-    if (data.image) formData.append("image", data.image);
+      jsonPayload.lengthOfRecievedTracks = data.lengthOfRecievedTracks;
+
+    const tracks = data.listOfTracks ?? data.audioTracks;
+    if (tracks !== undefined) jsonPayload.listOfTracks = tracks;
+
+    formData.append("data", JSON.stringify(jsonPayload));
 
     return api.put<UpdatePlaylistResponse>(
       `/api/playlists/v1/${playlistId}`,
@@ -123,6 +124,11 @@ export const playlistsService = {
 
   addTrackToPlaylist: (playlistId: string, trackId: string) =>
     api.patch<AddTrackToPlaylistResponse>(
+      `/api/playlists/v1/${playlistId}/tracks/${trackId}`
+    ),
+
+  removeTrackFromPlaylist: (playlistId: string, trackId: string) =>
+    api.delete<RemoveTrackFromPlaylistResponse>(
       `/api/playlists/v1/${playlistId}/tracks/${trackId}`
     ),
 
@@ -193,8 +199,6 @@ export const playlistsService = {
     );
   },
 
-  // v2 permalink endpoint — used for message link previews
-  // URL structure: /api/public/playlists/v2/permalink/{profileLink}/{permalink}
   getPlaylistByProfileAndPermalink: (profileLink: string, permalink: string) =>
     api.get<GetPlaylistByProfilePermalinkResponse>(
       `/api/public/playlists/v2/permalink/${profileLink}/${permalink}`

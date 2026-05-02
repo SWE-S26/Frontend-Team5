@@ -1,9 +1,9 @@
 import WaveformCard from "@/components/layout/track-cards/WaveformCard"
 
-interface Item { id: string; trackId?: string; title: string; artist: string; img: string; trackUrl?: string; downloadUrl?: string; enableDirectDownload?: boolean; duration?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean; numPlays:number; numComments:number; }
-interface Props { items: Item[]; onEditTrack?: (item: Item) => void; onAddToPlaylist?: (item: Item) => void }
+interface Item { id: string; trackId?: string; title: string; artist: string; artistId?: string; img: string; trackUrl?: string; downloadUrl?: string; enableDirectDownload?: boolean; duration?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean; numPlays:number; numComments:number; permalink?: string; isAvailableForUser?: boolean; }
+interface Props { items: Item[]; profileLink?: string | null; onEditTrack?: (item: Item) => void; onAddToPlaylist?: (item: Item) => void }
 
-export default function PopularTracks({ items, onEditTrack, onAddToPlaylist }: Props) {
+export default function PopularTracks({ items, profileLink, onEditTrack, onAddToPlaylist }: Props) {
  return (
      <>
      <div className="flex flex-col gap-12">
@@ -13,6 +13,7 @@ export default function PopularTracks({ items, onEditTrack, onAddToPlaylist }: P
            img={item.img}
            title={item.title}
            artist={item.artist}
+           artistId={item.artistId}
            trackId={item.trackId ?? item.id}
            trackUrl={item.trackUrl}
           wfLink={(item as any).wfLink}
@@ -30,6 +31,9 @@ export default function PopularTracks({ items, onEditTrack, onAddToPlaylist }: P
            onAddToPlaylist={onAddToPlaylist ? () => onAddToPlaylist(item) : undefined}
            playsCount={item.numPlays ?? 0}
            commentsCount={item.numComments ?? 0}
+           permalink={item.permalink}
+           isAvailable={item.isAvailableForUser}
+           profileLinkOverride={profileLink}
          />
        ))}
      </div>

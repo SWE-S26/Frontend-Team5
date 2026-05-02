@@ -84,7 +84,7 @@ export default function PlaylistSidebar({ playlistId, playlist, className }: Pla
 
   // ── render ─────────────────────────────────────────────────────────────────
   return (
-    <aside className={`w-85 top-20 h-fit flex flex-col gap-10 text-white ${className ?? ""}`}>
+    <aside className={`w-full max-w-full top-20 h-fit flex flex-col gap-10 text-white ${className ?? ""} md:max-w-85`}>
 
       {/* Likes */}
       <section className="flex flex-col gap-3">
@@ -97,7 +97,7 @@ export default function PlaylistSidebar({ playlistId, playlist, className }: Pla
         {likeUsers.length === 0 ? (
           <p className="text-xs text-silver">No likes yet</p>
         ) : (
-          <Avatar.Group className="w-100">
+          <Avatar.Group className="w-full max-w-full overflow-x-auto">
             {likeUsers.map((user) => {
               const profile     = userProfiles[user.userId];
               const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false;
@@ -134,7 +134,7 @@ export default function PlaylistSidebar({ playlistId, playlist, className }: Pla
         {repostUsers.length === 0 ? (
           <p className="text-xs text-silver">No reposts yet</p>
         ) : (
-          <Avatar.Group className="w-100">
+          <Avatar.Group className="w-full max-w-full overflow-x-auto">
             {repostUsers.map((user) => {
               const profile     = userProfiles[user.userId];
               const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false;

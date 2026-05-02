@@ -429,6 +429,18 @@ export function TracksTab({
     };
   }, [userId, getPostedTracks, hasHydrated]);
 
+  // Map track IDs to permalinks for copy link feature
+  const permalinkByTrackId = useMemo(() => {
+    const map: Record<string, string> = {};
+    (postedTracks ?? []).forEach((track) => {
+      const trackId = track.trackId ?? (track as { _id?: string })._id;
+      if (trackId && track.basicInfo?.permalink) {
+        map[trackId] = track.basicInfo.permalink;
+      }
+    });
+    return map;
+  }, [postedTracks]);
+
   const rows = useMemo<ArtistTrackRow[]>(() => {
     return (postedTracks ?? [])
       .filter((track) => {
@@ -680,6 +692,7 @@ export function TracksTab({
                     setPendingDeleteTrackId(id);
                   }}
                   isArtistPro={isArtistPro}
+                  permalink={permalinkByTrackId[track.id]}
                 />
               }
               isDeleting={deletingId === track.id}

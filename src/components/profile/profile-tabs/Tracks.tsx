@@ -1,9 +1,9 @@
 import WaveformCard from "@/components/layout/track-cards/WaveformCard"
 
-interface Item { img: string; title: string; artist: string; trackId: string; trackUrl?: string; downloadUrl?: string; enableDirectDownload?: boolean; duration?: number; audioClipStart?: number; audioClipEnd?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean; numPlays:number; numComments:number; }
-interface Props { items: Item[]; isLoading?: boolean; onEditTrack?: (item: Item) => void; onAddToPlaylist?: (item: Item) => void }
+interface Item { img: string; title: string; artist: string; artistId?: string; trackId: string; trackUrl?: string; downloadUrl?: string; enableDirectDownload?: boolean; duration?: number; audioClipStart?: number; audioClipEnd?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean; numPlays:number; numComments:number; permalink?: string; isAvailableForUser?: boolean; }
+interface Props { items: Item[]; profileLink?: string | null; isLoading?: boolean; onEditTrack?: (item: Item) => void; onAddToPlaylist?: (item: Item) => void }
 
-export default function Tracks({ items, isLoading = false, onEditTrack, onAddToPlaylist }: Props) {
+export default function Tracks({ items, profileLink, isLoading = false, onEditTrack, onAddToPlaylist }: Props) {
    const loadingRows = Array.from({ length: 4 })
 
    return (
@@ -31,6 +31,7 @@ export default function Tracks({ items, isLoading = false, onEditTrack, onAddToP
                    img={item.img}
                    title={item.title}
                    artist={item.artist}
+                   artistId={item.artistId}
                    trackId={item.trackId}
                    trackUrl={item.trackUrl}
                    wfLink={(item as any).wfLink}
@@ -50,6 +51,9 @@ export default function Tracks({ items, isLoading = false, onEditTrack, onAddToP
                    onAddToPlaylist={onAddToPlaylist ? () => onAddToPlaylist(item) : undefined}
                    playsCount={item.numPlays ?? 0}
                    commentsCount={item.numComments ?? 0}
+                   permalink={item.permalink}
+                   isAvailable={item.isAvailableForUser}
+                   profileLinkOverride={profileLink}
                  />
                ))}
          </div>
