@@ -377,7 +377,7 @@ const handleCancelCrop = () => {
     <AnimatePresence>
       {isOpen && (
         <div
-          className="fixed inset-0 bg-white/30 z-[1001] flex items-start pt-10 justify-center"
+          className="fixed inset-0 bg-white/30 z-[1001] flex items-start pt-4 sm:pt-10 justify-center px-2 sm:px-0 overflow-y-auto"
           onClick={(e) => {
             if (e.target === e.currentTarget) handleCancel()
           }}
@@ -394,14 +394,14 @@ const handleCancelCrop = () => {
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -60 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="flex flex-col w-200 p-6 bg-chinese-black rounded-md relative overflow-y-auto max-h-[90vh] scrollbar-hide"
+            className="flex flex-col w-full sm:w-200 p-4 sm:p-6 bg-chinese-black rounded-md relative overflow-y-auto max-h-[92vh] sm:max-h-[90vh] scrollbar-hide"
             onClick={(e) => e.stopPropagation()}
           >
             <p className="text-xl text-white-smoke font-bold mb-6">
               Edit your Profile
             </p>
 
-            <div className="flex gap-6 mb-4">
+            <div className="flex flex-col sm:flex-row gap-6 mb-4">
               <div className="flex flex-col items-center gap-2 flex-shrink-0">
   <div className="relative w-40 h-40 group/avatar">
     {isCropping && rawImageUrl ? (
@@ -536,7 +536,7 @@ const handleCancelCrop = () => {
                   )}
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">First name</p>
                     <input data-testid="FirstName-input"
@@ -565,7 +565,7 @@ const handleCancelCrop = () => {
                   </div>
                 </div>
 
-                <div className="flex gap-2">
+                <div className="flex flex-col sm:flex-row gap-2">
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">City</p>
                     <input data-testid="City-input"
@@ -627,40 +627,42 @@ const handleCancelCrop = () => {
             {formLinks.length > 0 && (
               <div className="flex flex-col gap-3 mb-3">
                 {formLinks.map((l) => (
-                  <div key={l.linkId} className="flex items-center gap-2">
-                    <span>{getLinkIcon(l.link)}</span>
+                  <div key={l.linkId} className="flex items-start gap-2">
+                    <span className="mt-2 shrink-0">{getLinkIcon(l.link)}</span>
 
-                    <div className="flex-1 flex flex-col gap-1">
-                      <input data-testid="Link-input"
-                        value={l.link || ""}
+                    <div className="flex-1 flex flex-col sm:flex-row gap-2">
+                      <div className="flex-1 flex flex-col gap-1">
+                        <input data-testid="Link-input"
+                          value={l.link || ""}
+                          onChange={(e) => {
+                            handleLinkChange(l.linkId, "link", e.target.value)
+                            setIsDirty(true)
+                          }}
+                          placeholder="Web or email address *"
+                          className={`w-full bg-off-black px-3 py-2 text-white-smoke rounded border ${
+                            linkErrors[l.linkId] ? "border-red-500" : "border-transparent"
+                          }`}
+                        />
+                        {linkErrors[l.linkId] && (
+                          <p className="text-red-500 text-sm">Enter a web or email address.</p>
+                        )}
+                      </div>
+
+                      <input data-testid="LinkName-input"
+                        maxLength={40}
+                        value={l.name || ""}
                         onChange={(e) => {
-                          handleLinkChange(l.linkId, "link", e.target.value)
+                          handleLinkChange(l.linkId, "name", e.target.value)
                           setIsDirty(true)
                         }}
-                        placeholder="Web or email address *"
-                        className={`w-full bg-off-black px-3 py-2 text-white-smoke rounded border ${
-                          linkErrors[l.linkId] ? "border-red-500" : "border-transparent"
-                        }`}
+                        placeholder="Short title"
+                        className="w-full sm:w-36 bg-off-black px-3 py-2 text-white-smoke rounded border border-transparent"
                       />
-                      {linkErrors[l.linkId] && (
-                        <p className="text-red-500 text-sm">Enter a web or email address.</p>
-                      )}
                     </div>
-
-                    <input data-testid="LinkName-input"
-                      maxLength={40}
-                      value={l.name || ""}
-                      onChange={(e) => {
-                        handleLinkChange(l.linkId, "name", e.target.value)
-                        setIsDirty(true)
-                      }}
-                      placeholder="Short title"
-                      className="w-40 bg-off-black px-3 py-2 text-white-smoke rounded border border-transparent"
-                    />
 
                     <button data-testid="RemoveLink-button-EditForm"
                       onClick={() => handleRemoveLink(l.linkId)}
-                      className="text-silver transition-colors cursor-pointer rounded border border-transparent hover:text-red-400"
+                      className="mt-1 text-silver transition-colors cursor-pointer rounded border border-transparent hover:text-red-400 shrink-0"
                     >
                       <FiTrash2 />
                     </button>
@@ -733,7 +735,7 @@ const handleCancelCrop = () => {
             </div>
 
             {/* Footer buttons */}
-            <div className="flex justify-end gap-3">
+            <div className="flex flex-wrap justify-end gap-3">
               <Button
                 data-testid="cancel-button-EditForm"
                 onClick={handleCancel}

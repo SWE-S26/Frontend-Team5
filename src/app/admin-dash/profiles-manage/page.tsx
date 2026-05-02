@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useMemo } from "react";
-import { Search, UserX, ShieldOff, Eye, ShieldCheck } from "lucide-react";
+import { Search, UserX, ShieldOff, ShieldCheck } from "lucide-react";
 import { useAdminUsers } from "@/hooks/admin-dash/useAdminUsers";
 import { useAdminUserActions } from "@/hooks/admin-dash/useAdminUserActions";
 import { AdminUser } from "@/types/admin-dash/adminUser.types";
@@ -69,32 +69,55 @@ export default function ProfilesManagement() {
     [users, total]
   );
 
-  const resetFilters = () => {
-    setOffset(1);
-  };
+  const resetFilters = () => setOffset(1);
+
+  const ActionButtons = ({ user }: { user: AdminUser }) => (
+    <div className="flex gap-2">
+      <button
+        title={user.suspended ? "Unsuspend" : "Suspend"}
+        disabled={loadingId === user.userId}
+        onClick={() =>
+          user.suspended
+            ? unsuspendUser(user.userId)
+            : suspendUser(user.userId, "Violation of community guidelines.")
+        }
+        className="p-1.5 rounded-lg text-silver hover:text-brilliant-orange hover:bg-brilliant-orange/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        {user.suspended ? <ShieldCheck size={15} /> : <ShieldOff size={15} />}
+      </button>
+      <button
+        title="Delete"
+        disabled={loadingId === user.userId}
+        onClick={() => deleteUser(user.userId)}
+        className="p-1.5 rounded-lg text-silver hover:text-anger hover:bg-anger/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
+      >
+        <UserX size={15} />
+      </button>
+    </div>
+  );
 
   return (
     <div className="space-y-6">
       <h1 className="text-2xl font-bold text-white-smoke">Profiles Management</h1>
 
       {/* Stats */}
-      <div className="grid grid-cols-4 gap-4">
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-3 md:gap-4">
         {[
           { label: "Total Users", value: stats.total },
           { label: "Active", value: stats.active, color: "text-green-400" },
           { label: "Suspended", value: stats.suspended, color: "text-anger" },
           { label: "Artist Pro", value: stats.pro, color: "text-brilliant-orange" },
         ].map(({ label, value, color }) => (
-          <div key={label} className="bg-off-black rounded-xl p-4 border border-white/5">
-            <p className="text-silver text-sm">{label}</p>
-            <p className={`text-3xl font-bold mt-1 ${color ?? "text-white-smoke"}`}>{value}</p>
+          <div key={label} className="bg-off-black rounded-xl p-3 md:p-4 border border-white/5">
+            <p className="text-silver text-xs md:text-sm">{label}</p>
+            <p className={`text-2xl md:text-3xl font-bold mt-1 ${color ?? "text-white-smoke"}`}>{value}</p>
           </div>
         ))}
       </div>
 
       {/* Search + Filters */}
-      <div className="flex gap-3 items-center flex-wrap">
-        <div className="relative max-w-sm flex-1">
+      <div className="flex flex-col gap-3">
+        <div className="relative">
           <Search size={16} className="absolute left-3 top-1/2 -translate-y-1/2 text-silver" />
           <input
             value={search}
@@ -107,52 +130,77 @@ export default function ProfilesManagement() {
           />
         </div>
 
-        {/* Role filter */}
-        <div className="flex gap-1 bg-off-black border border-white/10 rounded-lg p-1">
-          {(["all", "Listener", "Pro"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => {
-                setRoleFilter(f);
-                resetFilters();
-              }}
-              className={`px-3 py-1 rounded-md text-sm capitalize transition-colors ${
-                roleFilter === f
-                  ? "bg-brilliant-orange text-white"
-                  : "text-silver hover:text-white-smoke"
-              }`}
-            >
-              {f === "all" ? "All Roles" : f}
-            </button>
-          ))}
-        </div>
+        <div className="flex gap-2 flex-wrap">
+          <div className="flex gap-1 bg-off-black border border-white/10 rounded-lg p-1">
+            {(["all", "Listener", "Pro"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => { setRoleFilter(f); resetFilters(); }}
+                className={`px-2 md:px-3 py-1 rounded-md text-xs md:text-sm capitalize transition-colors ${
+                  roleFilter === f
+                    ? "bg-brilliant-orange text-white"
+                    : "text-silver hover:text-white-smoke"
+                }`}
+              >
+                {f === "all" ? "All Roles" : f}
+              </button>
+            ))}
+          </div>
 
-        {/* Status filter */}
-        <div className="flex gap-1 bg-off-black border border-white/10 rounded-lg p-1">
-          {(["all", "active", "suspended"] as const).map((f) => (
-            <button
-              key={f}
-              onClick={() => {
-                setStatusFilter(f);
-                resetFilters();
-              }}
-              className={`px-3 py-1 rounded-md text-sm capitalize transition-colors ${
-                statusFilter === f
-                  ? "bg-brilliant-orange text-white"
-                  : "text-silver hover:text-white-smoke"
-              }`}
-            >
-              {f === "all" ? "All Status" : f}
-            </button>
-          ))}
+          <div className="flex gap-1 bg-off-black border border-white/10 rounded-lg p-1">
+            {(["all", "active", "suspended"] as const).map((f) => (
+              <button
+                key={f}
+                onClick={() => { setStatusFilter(f); resetFilters(); }}
+                className={`px-2 md:px-3 py-1 rounded-md text-xs md:text-sm capitalize transition-colors ${
+                  statusFilter === f
+                    ? "bg-brilliant-orange text-white"
+                    : "text-silver hover:text-white-smoke"
+                }`}
+              >
+                {f === "all" ? "All Status" : f}
+              </button>
+            ))}
+          </div>
         </div>
       </div>
 
-      {/* Error */}
       {error && <p className="text-anger text-sm">{error}</p>}
 
-      {/* Table */}
-      <div className="bg-off-black rounded-xl border border-white/5 overflow-hidden">
+      {/* Mobile cards */}
+      <div className="md:hidden space-y-3">
+        {loading ? (
+          <p className="text-silver text-center py-10">Loading...</p>
+        ) : users.length === 0 ? (
+          <p className="text-silver text-center py-10">No profiles found.</p>
+        ) : (
+          users.map((user) => (
+            <div key={user.userId} className="bg-off-black rounded-xl p-4 border border-white/5 space-y-3">
+              <div className="flex items-start justify-between gap-2">
+                <div className="min-w-0">
+                  <p className="text-white-smoke font-medium truncate">{user.displayName}</p>
+                  <p className="text-silver text-xs truncate">{user.email}</p>
+                </div>
+                <ActionButtons user={user} />
+              </div>
+
+              <div className="flex items-center gap-2 flex-wrap">
+                <RoleBadge role={user.role} />
+                <SuspendedBadge suspended={user.suspended} />
+              </div>
+
+              <div className="flex gap-4 text-xs text-silver">
+                <span>{user.uploadedTracksCount} tracks</span>
+                <span>{user.followersCount.toLocaleString()} followers</span>
+                <span>joined {new Date(user.createdAt).toLocaleDateString()}</span>
+              </div>
+            </div>
+          ))
+        )}
+      </div>
+
+      {/* Desktop table */}
+      <div className="hidden md:block bg-off-black rounded-xl border border-white/5 overflow-hidden">
         <table className="w-full text-sm">
           <thead>
             <tr className="border-b border-white/10 text-silver text-left">
@@ -204,28 +252,7 @@ export default function ProfilesManagement() {
                     {user.followersCount.toLocaleString()}
                   </td>
                   <td className="px-4 py-3">
-                    <div className="flex gap-2">
-                      <button
-                        title={user.suspended ? "Unsuspend" : "Suspend"}
-                        disabled={loadingId === user.userId}
-                        onClick={() =>
-                          user.suspended
-                            ? unsuspendUser(user.userId)
-                            : suspendUser(user.userId, "Violation of community guidelines.")
-                        }
-                        className="p-1.5 rounded-lg text-silver hover:text-brilliant-orange hover:bg-brilliant-orange/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        {user.suspended ? <ShieldCheck size={15} /> : <ShieldOff size={15} />}
-                      </button>
-                      <button
-                        title="Delete"
-                        disabled={loadingId === user.userId}
-                        onClick={() => deleteUser(user.userId)}
-                        className="p-1.5 rounded-lg text-silver hover:text-anger hover:bg-anger/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
-                      >
-                        <UserX size={15} />
-                      </button>
-                    </div>
+                    <ActionButtons user={user} />
                   </td>
                 </tr>
               ))
@@ -236,7 +263,7 @@ export default function ProfilesManagement() {
 
       {/* Pagination */}
       {totalPages > 1 && (
-        <div className="flex items-center justify-between text-sm">
+        <div className="flex items-center justify-between text-sm flex-wrap gap-2">
           <p className="text-silver">
             Page {offset} of {totalPages} — {total} total users
           </p>

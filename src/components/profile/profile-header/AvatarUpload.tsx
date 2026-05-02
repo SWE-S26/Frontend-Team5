@@ -47,7 +47,7 @@ const AvatarUpload = forwardRef<AvatarUploadHandle, AvatarProps>(
 
     return (
       <div
-        className={`w-48 h-48 rounded-full bg-linear-to-br from-[#8f6f79] to-[#c3adb4] flex items-center justify-center shadow-lg overflow-hidden ${className}`}
+        className={`w-24 h-24 sm:w-36 sm:h-36 md:w-48 md:h-48 rounded-full bg-linear-to-br from-[#8f6f79] to-[#c3adb4] flex items-center justify-center shadow-lg overflow-hidden ${className}`}
       >
         {avatarImage && (
           <img src={avatarImage} alt="avatar" className="w-full h-full object-cover" />
