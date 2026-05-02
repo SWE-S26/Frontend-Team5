@@ -12,6 +12,7 @@ export const EXCLUDED_ROUTES = [
   "/profile",
   "/track",
   "/playlist",
+  "/search",
 ]
 
 export const ADMIN_ROUTES = [
