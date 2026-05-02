@@ -46,7 +46,7 @@ export default function Tooltip({ label, children }: TooltipProps) {
             ref={refs.setFloating}
             style={floatingStyles}
             {...getFloatingProps()}
-            className="z-[9999] pointer-events-none"
+            className="z-9999 pointer-events-none"
           >
             <FloatingArrow
               ref={arrowRef}

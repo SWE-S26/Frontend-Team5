@@ -189,7 +189,7 @@ export default function TrackListRow({
               className="w-full h-full object-cover"
             />
           ) : (
-            <div className="w-full h-full bg-gradient-to-br from-off-black to-crusta/70" />
+            <div className="w-full h-full bg-linear-to-br from-off-black to-crusta/70" />
           )}
 
           {/* White circle play button — exactly like WaveformCard */}

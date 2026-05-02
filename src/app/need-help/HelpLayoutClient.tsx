@@ -153,7 +153,7 @@ export default function HelpLayoutClient({ children }: { children: React.ReactNo
                   height={26}
                   className="rounded-full w-6.5 h-6.5 object-cover"
                 />
-                <span className="text-white font-bold text-sm truncate max-w-[120px]">
+                <span className="text-white font-bold text-sm truncate max-w-30">
                   {headerName}
                 </span>
                 <IoIosArrowDown className="text-white" />

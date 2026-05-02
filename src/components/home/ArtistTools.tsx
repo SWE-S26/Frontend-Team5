@@ -89,8 +89,8 @@ const ARTIST_TOOLS: ArtistTool[] = [
 
 function StarBadge() {
   return (
-    <span className="absolute top-[5px] right-[5px] z-10 w-[12px] h-[12px] rounded-full bg-[#7B61FF]/20 flex items-center justify-center">
-      <svg viewBox="0 0 24 24" className="w-[7px] h-[7px] fill-[#7B61FF]" xmlns="http://www.w3.org/2000/svg">
+    <span className="absolute top-1.25 right-1.25 z-10 w-3 h-3 rounded-full bg-[#7B61FF]/20 flex items-center justify-center">
+      <svg viewBox="0 0 24 24" className="w-1.75 h-1.75 fill-[#7B61FF]" xmlns="http://www.w3.org/2000/svg">
         <path d="M12 2 L13.8 10.2 L22 12 L13.8 13.8 L12 22 L10.2 13.8 L2 12 L10.2 10.2 Z" />
       </svg>
     </span>
@@ -119,7 +119,7 @@ function ToolCard({ tool, isPro, onClick }: ToolCardProps) {
         relative flex flex-col items-center
         rounded-lg overflow-hidden w-full
         bg-chinese-black border border-off-black
-        focus:outline-none pb-[10px]
+        focus:outline-none pb-2.5
       "
       aria-label={isPro ? tool.name : `${tool.name} – upgrade required`}
     >
@@ -127,7 +127,7 @@ function ToolCard({ tool, isPro, onClick }: ToolCardProps) {
 
       {/* ── Icon — tints to proHoverColor when Pro user hovers ── */}
       <div
-        className="flex items-center justify-center w-full pt-[16px] pb-[8px] transition-colors duration-200"
+        className="flex items-center justify-center w-full pt-4 pb-2 transition-colors duration-200"
         style={{ color: showProHover ? tool.proHoverColor : 'var(--fg)' }}
       >
         {tool.icon}
@@ -135,19 +135,19 @@ function ToolCard({ tool, isPro, onClick }: ToolCardProps) {
 
       {/* ── Label area — always h-[28px], inner column slides up on hover ── */}
       {isPro ? (
-        <div className="h-[28px] overflow-hidden w-full flex justify-center">
+        <div className="h-7 overflow-hidden w-full flex justify-center">
           <div
             className="flex flex-col items-center transition-transform duration-200 ease-in-out"
             style={{ transform: hovered ? 'translateY(0px)' : 'translateY(14px)' }}
           >
             {/* Tool name — starts at bottom of container, slides to top on hover */}
-            <div className="h-[14px] flex items-center justify-center">
+            <div className="h-3.5 flex items-center justify-center">
               <span className="text-white-smoke text-[10px] font-bold select-none leading-none">
                 {tool.name}
               </span>
             </div>
             {/* Unlimited — hidden below clip, revealed when column slides up */}
-            <div className="h-[14px] flex items-center justify-center">
+            <div className="h-3.5 flex items-center justify-center">
               <span className="text-silver text-[9px] font-semibold select-none leading-none">
                 Unlimited
               </span>
@@ -156,7 +156,7 @@ function ToolCard({ tool, isPro, onClick }: ToolCardProps) {
         </div>
       ) : (
         /* Free user label — same h-[28px] container as Pro for consistent card height */
-        <div className="h-[28px] w-full flex items-center justify-center">
+        <div className="h-7 w-full flex items-center justify-center">
           {hovered ? (
             <span className="px-4 bg-[#7B61FF] text-chinese-black text-[10px] font-bold  select-none">
               Upgrade
@@ -208,7 +208,7 @@ export default function ArtistTools() {
       {/* ── Grid ── */}
       <div
         id="artist-tools-grid"
-        className="grid grid-cols-4 gap-[6px]"
+        className="grid grid-cols-4 gap-1.5"
       >
         {visibleTools.map((tool) => (
           <ToolCard

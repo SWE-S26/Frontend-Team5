@@ -65,7 +65,7 @@ export default function TrackUploader({ posterId, trackId, trackTitle, onUnfollo
   }, [posterId, hasHydrated])
 
   return (
-    <div className="w-[260px] bg-chinese-black rounded-xl p-4 flex flex-col items-center gap-3 text-white-smoke">
+    <div className="w-65 bg-chinese-black rounded-xl p-4 flex flex-col items-center gap-3 text-white-smoke">
 
       {/* Avatar */}
       <img

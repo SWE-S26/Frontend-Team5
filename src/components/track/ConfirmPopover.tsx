@@ -87,7 +87,7 @@ export default function ConfirmPopover({
               <div className="flex justify-end gap-3 mt-5">
                 <Button
                   onClick={() => setOpen(false)}
-                  className="text-white-smoke px-4 py-1.5 rounded-s text-sm bg-transparent border border-white-smoke/20 text-white hover:bg-white-smoke/10 transition"
+                  className="text-white-smoke px-4 py-1.5 rounded-s text-sm bg-transparent border border-white-smoke/20 hover:bg-white-smoke/10 transition"
                 >
                   Cancel
                 </Button>
@@ -97,7 +97,7 @@ export default function ConfirmPopover({
                     onConfirm();
                     setOpen(false);
                   }}
-                  className="text-chinese-black px-4 py-1.5 rounded-s text-sm bg-white-smoke text-black hover:opacity-90 transition"
+                  className="text-chinese-black px-4 py-1.5 rounded-s text-sm bg-white-smoke hover:opacity-90 transition"
                 >
                   Yes
                 </Button>
