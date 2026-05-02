@@ -3,6 +3,7 @@
     import { PiWaveformBold } from "react-icons/pi"
     import FollowButton from '../ui/FollowButton'
     import { SocialUser } from '@/types/social.types'
+    import ProfileImage from "@/components/ui/ProfileImage"
 
     interface UserProps {
     user: SocialUser
@@ -15,7 +16,13 @@
         <div className='flex justify-between gap-10 mb-3 hover:cursor-pointer'>
             <div className='flex gap-4 min-w-0 flex-1'>
                 <Link href={`/profile/${user.userId}`} className='rounded-full w-12 h-12 mt-2.5 object-cover shrink-0'>
-                    <img src={user.profileImgLink ?? "https://i.pravatar.cc/40"} alt="User Profile" className="rounded-full w-12 h-12  object-cover shrink-0" />
+                    <ProfileImage
+                        src={user.profileImgLink}
+                        alt="User Profile"
+                        width={50}
+                        height={50}
+                        className="rounded-full w-12 h-12  object-cover shrink-0"
+                    />
                 </Link>
                 <div className='flex flex-col gap-1.5 min-w-0'>
                     <div className='flex gap-1.5 items-center pt-2 mt-1'>

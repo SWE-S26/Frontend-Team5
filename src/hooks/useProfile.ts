@@ -29,6 +29,27 @@ export function useGetProfile() {
   return { getProfile, loading, error, profile }
 }
 
+export function useGetProfileByLink() {
+  const [loading, setLoading] = useState(false)
+  const [error,   setError]   = useState<string | null>(null)
+
+  const getProfileByLink = useCallback(async (profileLink: string) => {
+    setLoading(true)
+    setError(null)
+    try {
+      const data = await profileService.getProfileByLinkAuthCached(profileLink)
+      return data
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Something went wrong"
+      setError(message)
+    } finally {
+      setLoading(false)
+    }
+  }, [])
+
+  return { getProfileByLink, loading, error }
+}
+
 export function useUpdateProfile() {
   const [loading, setLoading] = useState(false)
   const [error,   setError]   = useState<string | null>(null)

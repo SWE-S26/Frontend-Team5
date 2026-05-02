@@ -1,5 +1,5 @@
 import api from "@/lib/api"
-import { GetProfileResponse, UpdateProfileRequest, UpdateProfileResponse, UpdateProfileImagesRequest, UpdateProfileImagesResponse } from "@/types/profile.types";
+import { GetProfileResponse, GetProfileByLinkResponse, UpdateProfileRequest, UpdateProfileResponse, UpdateProfileImagesRequest, UpdateProfileImagesResponse } from "@/types/profile.types";
 
 const PROFILE_CACHE_TTL_MS = 30_000
 
@@ -7,6 +7,40 @@ const profileCache = new Map<string, { data: GetProfileResponse; expiresAt: numb
 const profileInFlight = new Map<string, Promise<GetProfileResponse>>()
 
 const getCacheKey = (scope: "public" | "auth", userId: string) => `${scope}:${userId}`
+
+const profileByLinkCache = new Map<string, { data: GetProfileByLinkResponse; expiresAt: number }>()
+const profileByLinkInFlight = new Map<string, Promise<GetProfileByLinkResponse>>()
+
+const getLinkCacheKey = (scope: "public" | "auth", profileLink: string) => `${scope}:link:${profileLink}`
+
+async function fetchProfileByLinkCached(scope: "public" | "auth", profileLink: string) {
+  const key = getLinkCacheKey(scope, profileLink)
+  const cached = profileByLinkCache.get(key)
+  if (cached && cached.expiresAt > Date.now()) return cached.data
+
+  const inFlight = profileByLinkInFlight.get(key)
+  if (inFlight) return inFlight
+
+  const request = api
+    .get<GetProfileByLinkResponse>(
+      scope === "auth"
+        ? `/api/profile/v1/profile-link/${profileLink}`
+        : `/api/public/profile/v1/profile-link/${profileLink}`,
+    )
+    .then((res) => {
+      profileByLinkCache.set(key, {
+        data: res.data,
+        expiresAt: Date.now() + PROFILE_CACHE_TTL_MS,
+      })
+      return res.data
+    })
+    .finally(() => {
+      profileByLinkInFlight.delete(key)
+    })
+
+  profileByLinkInFlight.set(key, request)
+  return request
+}
 
 function invalidateProfileCache(userId: string) {
   profileCache.delete(getCacheKey("public", userId))
@@ -56,6 +90,12 @@ export const profileService = {
 
   getProfileAuthCached: (userId: string) =>
     fetchProfileCached("auth", userId),
+
+  getProfileByLinkAuthCached: (profileLink: string) =>
+    fetchProfileByLinkCached("auth", profileLink),
+
+  getProfileByLinkCached: (profileLink: string) =>
+    fetchProfileByLinkCached("public", profileLink),
 
   invalidateProfileCache,
 

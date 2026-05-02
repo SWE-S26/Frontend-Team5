@@ -1,6 +1,6 @@
-"use client"
-
-import { useState } from "react"
+// src/components/ui/ProfileImage.tsx
+import Image from "next/image"
+import { DEFAULT_PROFILE_IMAGE_URL, DEFAULT_PROFILE_GRADIENT } from "@/store/slices/authSlice"
 
 interface ProfileImageProps {
   src: string | null
@@ -11,31 +11,15 @@ interface ProfileImageProps {
 }
 
 export default function ProfileImage({ src, className, width, height, alt = "Profile" }: ProfileImageProps) {
-  const [errored, setErrored] = useState(false)
+  const resolvedSrc = src === DEFAULT_PROFILE_IMAGE_URL ? DEFAULT_PROFILE_GRADIENT : src
 
-  if (!src || src.startsWith("linear-gradient") || errored) {
+  if (!resolvedSrc || resolvedSrc.startsWith("linear-gradient")) {
     return (
       <div
-        style={{
-          background: "linear-gradient(to right, #c3adb4, #8f6f79)",
-          width: width,
-          height: height,
-          minWidth: width,
-          minHeight: height,
-        }}
+        style={{ background: resolvedSrc || DEFAULT_PROFILE_GRADIENT }}
         className={className}
       />
     )
   }
-
-  return (
-    <img
-      src={src}
-      alt={alt}
-      width={width}
-      height={height}
-      className={className}
-      onError={() => setErrored(true)}
-    />
-  )
+  return <Image src={resolvedSrc} alt={alt} width={width} height={height} className={className} />
 }

@@ -7,6 +7,7 @@ import { RootState } from '@/store/store'
 import { useGetFollowers } from '@/hooks/useSocial'
 import ProfilePopover from '@/components/layout/track-cards/ProfilePopover'
 import { PopoverProvider } from '@/components/layout/track-cards/PopoverContext'
+import ProfileImage from "@/components/ui/ProfileImage"
 
 export default function FollowersList() {
     const profileUserId    = useSelector((state: RootState) => state.profile.userId)
@@ -61,10 +62,12 @@ export default function FollowersList() {
                                 userId={user.userId}
                                 isFollowing={user.isFollowed}
                             >
-                                <Avatar
-                                    src={user.profileImgLink ?? undefined}
-                                    size={40}
-                                    style={{ cursor: 'pointer' }}
+                                <ProfileImage
+                                    src={user.profileImgLink}
+                                    alt="avatar"
+                                    width={50}
+                                    height={50}
+                                    className="w-10 h-10 rounded-full object-cover cursor-pointer"
                                 />
                             </ProfilePopover>
                         ))}

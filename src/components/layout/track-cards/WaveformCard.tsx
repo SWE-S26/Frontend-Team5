@@ -29,7 +29,6 @@ import { HiHeart, HiOutlinePaperAirplane } from "react-icons/hi";
 import { LuRepeat2, LuShare, LuMapPin } from "react-icons/lu";
 import { TbCopy } from "react-icons/tb";
 import { MdOutlineDownloadForOffline } from "react-icons/md";
-import { FiPlusSquare } from "react-icons/fi";
 import { ListStart } from "lucide-react";
 import { RiPlayListAddLine } from "react-icons/ri";
 import { BiStation } from "react-icons/bi";
@@ -808,7 +807,7 @@ export default function WaveformCard({
                     size="large"
                     icon={
                       profileImgLink ? (
-                        <img src={profileImgLink} alt="Profile" />
+                          <img src={profileImgLink} alt="Profile" />
                       ) : (
                         <UserOutlined />
                       )
