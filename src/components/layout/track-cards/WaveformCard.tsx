@@ -58,6 +58,7 @@ type CardProps = {
   trackId: string;
   trackUrl?: string;
   duration?: number;
+  permalink?: string;
   tag?: string;
   audioClipStart?: number;
   audioClipEnd?: number;
@@ -89,6 +90,7 @@ export default function WaveformCard({
   artist,
   artistId,
   trackId,
+  permalink,
   trackUrl,
   duration,
   tag,
@@ -385,7 +387,7 @@ export default function WaveformCard({
   const handleCopyLink = () => {
     if (!trackId) return;
 
-    const url = `${getBaseUrl()}/track/${trackId}`;
+    const url = `${getBaseUrl()}/track/${permalink ?? trackId}`;
 
     navigator.clipboard.writeText(url);
     interactiveToastBus.emit({
@@ -408,7 +410,16 @@ export default function WaveformCard({
       playAudio({
         tracks: allTracksRef.current?.length
           ? allTracksRef.current
-          : [{ id: trackId, url: trackUrl ?? "", title, artist, img, duration }],
+          : [
+              {
+                id: trackId,
+                url: trackUrl ?? "",
+                title,
+                artist,
+                img,
+                duration,
+              },
+            ],
         startId: trackId,
       }),
     );
@@ -422,7 +433,16 @@ export default function WaveformCard({
       playAudio({
         tracks: allTracksRef.current?.length
           ? allTracksRef.current
-          : [{ id: trackId, url: trackUrl ?? "", title, artist, img, duration }],
+          : [
+              {
+                id: trackId,
+                url: trackUrl ?? "",
+                title,
+                artist,
+                img,
+                duration,
+              },
+            ],
         startId: trackId,
       }),
     );

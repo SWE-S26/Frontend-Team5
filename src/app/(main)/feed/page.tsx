@@ -348,6 +348,7 @@ export default function Feed() {
                     img={item.data.image?.imgLink}
                     title={item.data.basicInfo?.title}
                     artist={item.data.basicInfo?.mainArtists?.[0]}
+                    permalink={item.data.basicInfo?.permalink}
                     artistId={item.data.posterId}
                     trackId={item.data.trackId ?? ""}
                     trackUrl={item.data.audio?.audioLink}
@@ -381,6 +382,7 @@ export default function Feed() {
                     }
                     artistId={item.data.artistId}
                     playlistId={item.data._id}
+                    permalink={item.data.permaLink}
                     tag={item.data.genre}
                     likeCount={item.data.numOfLikes}
                     repostCount={item.data.numOfReposts}
