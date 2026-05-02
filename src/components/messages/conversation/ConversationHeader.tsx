@@ -4,8 +4,7 @@ import { useState, useEffect } from 'react'
 import { FaRegTrashCan } from "react-icons/fa6"
 import Button from '@/components/ui/Button'
 import BlockPopUp from './BlockPopUp'
-import ReportPopUp from './ReportPopUp'
-import SpamPopUp from './SpamPopUp'
+import ReportPopUp from "@/components/report/ReportPopUp"
 import ArchivePopUp from './ArchivePopUp'
 import { useMessagesContext } from '@/components/messages/MessagesContext'
 import { useBlockUser, useUnblockUser } from '@/hooks/useSocial'
@@ -38,7 +37,6 @@ const ConversationHeader = ({
   const [isBlocked,   setIsBlocked]   = useState(initialIsBlocked)
   const [openBlock,   setOpenBlock]   = useState(false)
   const [openReport,  setOpenReport]  = useState(false)
-  const [isSpamOpen,  setIsSpamOpen]  = useState(false)
   const [openArchive, setOpenArchive] = useState(false)
 
   useEffect(() => {
@@ -101,12 +99,9 @@ const ConversationHeader = ({
       <ReportPopUp
         isOpen={openReport}
         onClose={() => setOpenReport(false)}
-        onSpam={() => { setOpenReport(false); setIsSpamOpen(true) }}
-      />
-      <SpamPopUp
-        isOpen={isSpamOpen}
-        onClose={() => setIsSpamOpen(false)}
         username={displayName}
+        violatorId={receiverId}
+        violatorType="user"
       />
 
       <div className='flex flex-wrap items-center gap-2'>

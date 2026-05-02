@@ -8,24 +8,23 @@ import FollowButton from "../ui/FollowButton"
 import Button from "../ui/Button"
 import { FaUser } from "react-icons/fa"
 import { PiWaveformBold } from "react-icons/pi"
-import ReportPopUp from "@/components/messages/conversation/ReportPopUp"
+import TrackReportPopUp from "@/components/report/TrackReportPopUp"
 
 interface Props {
   posterId: string
+  trackId: string
+  trackTitle: string
   onUnfollow?: (userId: string) => void
 }
 
-export default function TrackUploader({ posterId, onUnfollow }: Props) {
+export default function TrackUploader({ posterId, trackId, trackTitle, onUnfollow }: Props) {
   const dispatch = useAppDispatch()
   const { getProfile } = useGetProfile()
   const hasHydrated = useAppSelector((state) => state.auth.hasHydrated)
   const authUserId  = useAppSelector((state) => state.auth.userId)
   const profile     = useAppSelector((s) => s.profile)
 
-
   const [isReportOpen, setIsReportOpen] = useState(false)
-
-  
 
   useEffect(() => {
     if (!hasHydrated || !posterId) return
@@ -66,8 +65,7 @@ export default function TrackUploader({ posterId, onUnfollow }: Props) {
   }, [posterId, hasHydrated])
 
   return (
-    <>
-    <div className="w-[260px] bg-chinese-black rounded-xl p-4 flex flex-col items-center gap-3 text-white-smoke ">
+    <div className="w-[260px] bg-chinese-black rounded-xl p-4 flex flex-col items-center gap-3 text-white-smoke">
 
       {/* Avatar */}
       <img
@@ -111,13 +109,13 @@ export default function TrackUploader({ posterId, onUnfollow }: Props) {
       >
         Report
       </Button>
-    </div>
 
-      <ReportPopUp
+      <TrackReportPopUp
         isOpen={isReportOpen}
         onClose={() => setIsReportOpen(false)}
-        onSpam={() => setIsReportOpen(false)}
+        trackTitle={trackTitle}
+        violatorId={trackId}
       />
-      </>
+    </div>
   )
 }

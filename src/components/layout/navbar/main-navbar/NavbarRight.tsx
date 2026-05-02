@@ -138,7 +138,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
               <div className="relative">
                 <GrMailOption />
                 {unreadCount > 0 && (
-                  <span className="absolute -top-1.5 -right-1.5 min-w-[16px] h-4 px-0.5 flex items-center justify-center rounded-full bg-inferno text-white text-[9px] font-bold leading-none">
+                  <span className="absolute -top-1.5 -right-1.5 min-w-4 h-4 px-0.5 flex items-center justify-center rounded-full bg-inferno text-white text-[9px] font-bold leading-none">
                     {unreadCount > 99 ? "99+" : unreadCount}
                   </span>
                 )}

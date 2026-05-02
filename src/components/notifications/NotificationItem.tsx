@@ -7,7 +7,7 @@ import { formatDistanceToNow } from "date-fns"
 import FollowButton from "@/components/ui/FollowButton"
 import MoreDropdown from "@/components/ui/MoreDropdown"
 import BlockPopUp from "@/components/messages/conversation/BlockPopUp"
-import ReportPopUp from "@/components/messages/conversation/ReportPopUp"
+import ReportPopUp from "@/components/report/ReportPopUp"
 import ProfileImage from "@/components/ui/ProfileImage"
 import { DEFAULT_PROFILE_IMAGE_URL } from "@/store/slices/authSlice"
 import { useBlockUser, useUnblockUser } from "@/hooks/useSocial"
@@ -185,7 +185,9 @@ export default function NotificationItem({
       <ReportPopUp
         isOpen={isReportOpen}
         onClose={() => setIsReportOpen(false)}
-        onSpam={() => { setIsReportOpen(false) }}
+        username={actor.displayName}
+        violatorId={actor.userId}
+        violatorType="user"
       />
     </>
   )

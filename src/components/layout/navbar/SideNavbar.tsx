@@ -4,13 +4,14 @@ import Link from "next/link";
 import Image from "next/image";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect } from "react";
-import { Users, Music, Flag, LogOut } from "lucide-react";
+import { Users, Music, Flag, LogOut, ChartColumn } from "lucide-react";
 import { useLogout } from "@/hooks/useAuth";
 
 const navItems = [
   { href: "/admin-dash/profiles-manage", icon: Users, label: "Profiles" },
   { href: "/admin-dash/tracks-manage", icon: Music, label: "Tracks" },
   { href: "/admin-dash/reports-manage", icon: Flag, label: "Reports" },
+  { href: "/admin-dash/analytics", icon: ChartColumn, label: "Analytics" },
 ];
 
 export default function SideNavbar() {

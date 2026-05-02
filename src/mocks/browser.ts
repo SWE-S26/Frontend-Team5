@@ -6,6 +6,10 @@ import { tracksHandlers } from "./handlers/tracks.handlers";
 import { profileHandlers } from "./handlers/profile.handlers"
 import { socialHandlers } from "./handlers/social.handlers"
 import { paymentHandlers } from "./handlers/payment.handlers"
+import { adminUsersHandlers } from "./handlers/admin-dash/adminUsersHandlers";
+import { adminTracksHandlers } from "./handlers/admin-dash/adminTracksHandlers";
+import { adminAnalyticsHandlers } from "./handlers/admin-dash/adminAnalyticsHandlers";
+import { adminReportsHandlers } from "./handlers/admin-dash/adminReportsHandlers";
 import { 
   privacyHandlers, 
   notificationHandlers, 
@@ -24,4 +28,8 @@ export const worker = setupWorker(
   ...accountHandlers,
   ...contentHandlers,
   ...paymentHandlers,
+  ...adminUsersHandlers,
+  ...adminTracksHandlers,
+  ...adminAnalyticsHandlers,
+  ...adminReportsHandlers,
 );

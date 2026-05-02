@@ -1,5 +1,5 @@
 import { http, HttpResponse } from "msw";
-import { AdminUser, AdminUsersResponse } from "@/types/admin";
+import { AdminUser, AdminUsersResponse } from "@/types/admin-dash/adminUser.types";
 
 const mockUsers: AdminUser[] = [
   {

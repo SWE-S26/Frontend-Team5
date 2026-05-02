@@ -62,7 +62,11 @@ export default function Track() {
               <div className="flex flex-col md:flex-row  mt-4 w-full">
                 {track.posterId && (
                   <div className="w-full md:w-auto shrink-0">
-                    <Uploader posterId={track.posterId} />
+                    <Uploader 
+                      posterId={track.posterId}
+                      trackId={trackid}
+                      trackTitle={track.basicInfo?.title ?? ""}
+                    />
                   </div>
                 )}
 
@@ -90,7 +94,7 @@ export default function Track() {
         </div>
 
         {/* Right — sidebar, moves below on mobile */}
-        <div className="w-full xl:w-[340px] xl:shrink-0">
+        <div className="w-full xl:w-85 xl:shrink-0">
           <PopoverProvider>
             <TrackSidebar
               trackId={trackid}
