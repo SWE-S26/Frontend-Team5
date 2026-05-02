@@ -65,18 +65,19 @@ const Conversation = ({
       if (payload.chatId !== chatId) return;
 
       if (payload.type === "optimistic" && payload.message) {
+        const msg = payload.message;
         setPendingMessages((prev) =>
-          prev.some((m) => m.id === payload.message?._id)
+          prev.some((m) => m.id === msg._id)
             ? prev
             : [
                 ...prev,
                 {
-                  id: payload.message._id,
-                  chatId: payload.message.chatId,
-                  senderId: payload.message.senderId,
-                  content: payload.message.content,
-                  seenBy: payload.message.seenBy,
-                  createdAt: payload.message.createdAt,
+                  id: msg._id,
+                  chatId: msg.chatId,
+                  senderId: msg.senderId,
+                  content: msg.content,
+                  seenBy: msg.seenBy,
+                  createdAt: msg.createdAt,
                 },
               ],
         );
