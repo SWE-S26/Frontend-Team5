@@ -26,6 +26,10 @@ interface SearchResult {
   followersCount?: number
   trackCount?: number
   isFollowed?: boolean
+  isFollowing?: boolean
+  followed?: boolean
+  following?: boolean
+  isFollowedByMe?: boolean
 }
 
 interface SearchCounts {
@@ -49,12 +53,18 @@ interface ResolvedResult {
   playlist?: PlaylistDetail
   artist?: string
   title?: string
+  isRepost?: boolean
+  reposterId?: string
+  reposterName?: string
 }
 
 const isTrackType = (type: string) => type === 'track'
 const isPlaylistType = (type: string) => type === 'playlist'
 const isUserType = (type: string) =>
   !isTrackType(type) && !isPlaylistType(type) && type !== 'album' && type !== 'albums'
+
+const normalizeFollowFlag = (item: Partial<SearchResult>): boolean =>
+  item.isFollowed ?? item.isFollowing ?? item.followed ?? item.following ?? item.isFollowedByMe ?? false
 
 const extractTrackData = (payload: any): ApiTrack | null => {
   const track = payload?.data?.data ?? payload?.data ?? payload
@@ -85,7 +95,7 @@ const buildUserFromSearchItem = (item: SearchResult): SocialUser | null => {
     profileImgLink: item.profileImgLink ?? null,
     trackCount: item.trackCount ?? 0,
     followersCount: item.followersCount ?? 0,
-    isFollowed: item.isFollowed ?? false,
+    isFollowed: normalizeFollowFlag(item),
   }
 }
 
@@ -660,7 +670,14 @@ function SearchPageContent() {
     }
 
     return items.map((it) => {
-      if (isTrackType(it.type)) return { id: it.id, type: 'track', track: trackMap.get(it.id) }
+      if (isTrackType(it.type)) return {
+        id: it.id,
+        type: 'track',
+        track: trackMap.get(it.id),
+        isRepost: (it as any).isRepost ?? (it as any).is_repost ?? false,
+        reposterId: (it as any).actorId ?? (it as any).reposterId ?? (it as any).userId,
+        reposterName: (it as any).displayName ?? (it as any).reposterName ?? undefined,
+      }
       if (isPlaylistType(it.type)) {
         const playlist = playlistMap.get(it.id)
         return {
@@ -668,6 +685,9 @@ function SearchPageContent() {
           type: 'playlist',
           playlist,
           artist: playlist?.artistId ? creatorMap.get(playlist.artistId) : undefined,
+          isRepost: (it as any).isRepost ?? (it as any).is_repost ?? false,
+          reposterId: (it as any).actorId ?? (it as any).reposterId ?? (it as any).userId,
+          reposterName: (it as any).displayName ?? (it as any).reposterName ?? undefined,
         }
       }
 
@@ -680,7 +700,7 @@ function SearchPageContent() {
             profileImgLink: fallbackProfile.profileImgLink,
             trackCount: fallbackProfile.trackCount,
             followersCount: fallbackProfile.followersCount,
-            isFollowed: fallbackProfile.isFollowed,
+            isFollowed: fallbackProfile.isFollowed ?? normalizeFollowFlag(it),
           }
         : undefined
 
@@ -981,6 +1001,9 @@ function ResultCard({ result }: { result: ResolvedResult }) {
         playsCount={result.track.numPlays}
         isLikedByUser={result.track.isLikedByUser}
         isRepostedByUser={result.track.isRepostedByUser}
+        isRepost={result.isRepost}
+        reposterId={result.reposterId}
+        reposterName={result.reposterName}
         enableDirectDownload={result.track.permissions?.enableDirectDownload ?? false}
       />
     )
@@ -1000,8 +1023,31 @@ function ResultCard({ result }: { result: ResolvedResult }) {
         repostCount={result.playlist.numOfReposts}
         isLikedByUser={result.playlist.isLiked}
         isRepostedByUser={result.playlist.isReposted}
-        preloadedTracks={result.playlist.tracks}
+        preloadedTracks={(result.playlist.tracks ?? []).map((track, index) => {
+          const playlistTrack = track as any
+          return {
+            _id: playlistTrack?._id ?? `${result.playlist?._id ?? result.id}-track-${index}`,
+            basicInfo: playlistTrack?.basicInfo ?? {
+              title: playlistTrack?.title ?? 'Unknown Title',
+              mainArtists: playlistTrack?.basicInfo?.mainArtists ?? [playlistTrack?.artist ?? 'Unknown Artist'],
+              permalink: playlistTrack?.basicInfo?.permalink ?? '',
+            },
+            audio: playlistTrack?.audio ?? {
+              audioLink: playlistTrack?.trackUrl ?? playlistTrack?.audioLink ?? '',
+              waveformLink: playlistTrack?.audio?.waveformLink ?? playlistTrack?.wfLink ?? '/waveform.json',
+            },
+            image: playlistTrack?.image ?? { imgLink: playlistTrack?.img ?? undefined },
+            durationInSeconds: playlistTrack?.durationInSeconds ?? playlistTrack?.duration ?? 0,
+            numOfPlays: playlistTrack?.numOfPlays ?? 0,
+            numOfLikes: playlistTrack?.numOfLikes ?? 0,
+            isLiked: playlistTrack?.isLiked ?? playlistTrack?.isLikedByUser ?? false,
+            isReposted: playlistTrack?.isReposted ?? playlistTrack?.isRepostedByUser ?? false,
+          }
+        })}
         totalTracks={result.playlist.totalTracks}
+        isRepost={result.isRepost}
+        reposterId={result.reposterId}
+        reposterName={result.reposterName}
       />
     )
   }
@@ -1015,7 +1061,11 @@ function ResultCard({ result }: { result: ResolvedResult }) {
       followersCount: result.profile?.followersCount ?? 0,
       isFollowed: result.profile?.isFollowed ?? false,
     }
-    return <User user={user} />
+    return (
+      <User
+        user={user}
+      />
+    )
   }
 
   return (

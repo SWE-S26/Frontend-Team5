@@ -408,7 +408,7 @@ export default function WaveformCard({
       playAudio({
         tracks: allTracksRef.current?.length
           ? allTracksRef.current
-          : [{ id: trackId, url: trackUrl ?? "", title, artist, img }],
+          : [{ id: trackId, url: trackUrl ?? "", title, artist, img, duration }],
         startId: trackId,
       }),
     );
@@ -422,7 +422,7 @@ export default function WaveformCard({
       playAudio({
         tracks: allTracksRef.current?.length
           ? allTracksRef.current
-          : [{ id: trackId, url: trackUrl ?? "", title, artist, img }],
+          : [{ id: trackId, url: trackUrl ?? "", title, artist, img, duration }],
         startId: trackId,
       }),
     );
@@ -446,6 +446,7 @@ export default function WaveformCard({
           title,
           artist,
           img,
+          duration,
         },
       }),
     );

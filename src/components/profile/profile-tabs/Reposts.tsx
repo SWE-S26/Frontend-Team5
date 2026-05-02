@@ -21,6 +21,11 @@ interface Item {
   numComments?: number
   playlistTracks?: any[]
   totalTracks?: number
+  // optional extra fields forwarded from mapping
+  wfLink?: string
+  isRepost?: boolean
+  reposterId?: string
+  reposterName?: string
 }
 
 interface Props {
@@ -60,6 +65,9 @@ export default function Reposts({ items, onEditTrack, onAddToPlaylist, feedQueue
               }
               totalTracks={item.totalTracks}
               feedQueue={feedQueue}
+              isRepost={item.isRepost}
+              reposterId={item.reposterId}
+              reposterName={item.reposterName}
             />
           ) : (
             <WaveformCard
@@ -69,6 +77,7 @@ export default function Reposts({ items, onEditTrack, onAddToPlaylist, feedQueue
               artist={item.artist}
               trackId={item.trackId ?? item.id}
               trackUrl={item.trackUrl}
+              wfLink={item.wfLink}
               downloadUrl={item.downloadUrl}
               enableDirectDownload={item.enableDirectDownload}
               duration={item.duration}
@@ -76,6 +85,9 @@ export default function Reposts({ items, onEditTrack, onAddToPlaylist, feedQueue
               repostCount={item.numReposts ?? 0}
               isLikedByUser={item.isLikedByUser}
               canEdit={item.canEdit}
+              isRepost={item.isRepost}
+              reposterId={item.reposterId}
+              reposterName={item.reposterName}
               onEdit={onEditTrack ? () => onEditTrack(item) : undefined}
               onAddToPlaylist={onAddToPlaylist ? () => onAddToPlaylist(item) : undefined}
               playsCount={item.numPlays ?? 0}
