@@ -156,7 +156,6 @@ export default function TracksManagement() {
       <div className="grid grid-cols-3 gap-3 md:gap-4">
         {[
           { label: "Total Items", value: stats.total },
-          { label: "Tracks", value: stats.tracks, color: "text-brilliant-orange" },
           { label: "Banned", value: stats.banned, color: "text-anger" },
         ].map(({ label, value, color }) => (
           <div key={label} className="bg-off-black rounded-xl p-3 md:p-4 border border-white/5">
