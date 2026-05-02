@@ -125,11 +125,11 @@ function VerifyGoogleCodeInner() {
     <main data-testid="Verify-Google-Code" className="min-h-dvh bg-chinese-black px-3 py-6 sm:px-6 sm:py-10">
       <div className="mx-auto flex min-h-[calc(100dvh-3rem)] w-full max-w-105 items-center justify-center">
         <section className="w-full rounded-md border border-white/30 bg-chinese-black px-6 py-8 text-white-smoke shadow-[0_18px_60px_rgba(0,0,0,0.45)] sm:px-7 sm:py-9">
-          <h1 className="text-center text-[48px] font-bold tracking-[-0.03em] text-[#e7e7e7] leading-none sm:text-[32px]">
+          <h1 className="text-center text-[48px] font-bold tracking-[-0.03em] text-white-smoke leading-none sm:text-[32px]">
             Welcome back!
           </h1>
 
-          <p className="mx-auto mt-8 max-w-110 text-center text-[14px] leading-tight text-[#f0f0f0] sm:text-[14px]">
+          <p className="mx-auto mt-8 max-w-110 text-center text-[14px] leading-tight text-white-smoke/90 sm:text-[14px]">
             We found an account for <span className="font-semibold">{email}</span>. Enter the code sent to your email to link your Google login and continue.
           </p>
 
@@ -149,7 +149,7 @@ function VerifyGoogleCodeInner() {
                 onChange={(event) => handleDigitChange(index, event.target.value)}
                 onKeyDown={(event) => handleKeyDown(index, event)}
                 onPaste={index === 0 ? handlePaste : undefined}
-                className="h-16 w-13 rounded-md border border-transparent bg-[#303030] text-center text-[28px] font-semibold text-[#f4f4f4] outline-none transition focus:border-[#dedede] focus:bg-[#2f3135]"
+                className="h-16 w-13 rounded-md border border-transparent bg-off-black text-center text-[28px] font-semibold text-white-smoke outline-none transition focus:border-white-smoke/60 focus:bg-back"
                 aria-label={`Verification digit ${index + 1}`}
               />
             ))}
@@ -168,7 +168,7 @@ function VerifyGoogleCodeInner() {
             type="button"
             onClick={handleVerify}
             disabled={isDisabled}
-            className="mt-7 block h-12 w-full rounded-md bg-white-smoke px-6 text-[20px] font-semibold text-chinese-black disabled:cursor-not-allowed disabled:opacity-70 enabled:cursor-pointer enabled:hover:bg-[#f2f2f2]"
+            className="mt-7 block h-12 w-full rounded-md bg-white-smoke px-6 text-[20px] font-semibold text-chinese-black disabled:cursor-not-allowed disabled:opacity-70 enabled:cursor-pointer enabled:hover:bg-white-smoke/90"
           >
             {loading ? "Verifying..." : "Continue"}
           </button>
@@ -177,12 +177,12 @@ function VerifyGoogleCodeInner() {
             type="button"
             onClick={handleResend}
             disabled={isResendDisabled}
-            className="mt-3 block h-12 w-full rounded-md bg-[#2f3135] px-6 text-[20px] font-semibold text-white-smoke disabled:cursor-not-allowed disabled:opacity-70 enabled:cursor-pointer enabled:hover:bg-[#36383d]"
+            className="mt-3 block h-12 w-full rounded-md bg-off-black px-6 text-[20px] font-semibold text-white-smoke disabled:cursor-not-allowed disabled:opacity-70 enabled:cursor-pointer enabled:hover:bg-back"
           >
             {resendLoading ? "Resending..." : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend"}
           </button>
 
-          <p className="mt-5 text-left text-[14px] text-[#a9aaad]">
+          <p className="mt-5 text-left text-[14px] text-silver">
             Not you?{" "}
             <button
               type="button"

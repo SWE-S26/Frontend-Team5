@@ -15,8 +15,8 @@ import { BsThreeDots } from "react-icons/bs"
 import { IoRadio } from "react-icons/io5"
 import { FaRegEnvelope } from "react-icons/fa6"
 import { useEffect } from "react"
-import { AiOutlineStop } from "react-icons/ai";
-import { BsExclamationCircle } from "react-icons/bs";
+import { AiOutlineStop } from "react-icons/ai"
+import { BsExclamationCircle } from "react-icons/bs"
 
 import SharePopup from "@/components/profile/SharePopUp"
 import ProfileEditForm from "@/components/profile/ProfileEditForm"
@@ -40,13 +40,16 @@ import { useGetLikedTracks, useGetPostedTracks} from "@/hooks/useTracks"
 import { Track } from "@/types/tracks.types"
 import type { ArtistTrackRow } from "@/components/artist-studio/ArtistStudioContent"
 import { useGetRepostedTracks } from "@/hooks/useTracks"
-import { useGetRepostedPlaylists, useGetMyPlaylists } from "@/hooks/usePlaylists"
+import { useGetRepostedPlaylists, useGetMyPlaylists, useGetArtistPlaylists } from "@/hooks/usePlaylists"
 import { tracksService } from "@/services/tracks.service"
 import { playlistsService } from "@/services/playlists.service"
-import { Track as StoreTrack } from "@/store/slices/playerSlice"
 import { PlaylistDetail } from "@/types/playlists.types"
 import { Playlist } from "@/types/playlists.types"
 import { profileService } from "@/services/profile.service"
+
+interface Props {
+  params?: { username: string }
+}
 
 const profileTabs = [
   { href: "", label: "All",            value: "all"            },
@@ -58,10 +61,11 @@ const profileTabs = [
 ]
 
 
-const ProfilePageContent = () => {
+const ProfilePageContent = ({ params }: Props) => {
   const router       = useRouter()
   const searchParams = useSearchParams()
   const activeTab    = searchParams.get("tab") ?? "all"
+  const username = params?.username as string | undefined
 
   const [openEdit,    setOpenEdit]    = useState(false)
   const [openShare,   setOpenShare]   = useState(false)
@@ -88,6 +92,7 @@ const ProfilePageContent = () => {
   const displayName = useAppSelector((state) => state.profile.displayName)
   const profileImgLink = useAppSelector((state) => state.profile.profileImgLink)
   const profileTrackCount = useAppSelector((state) => state.profile.trackCount)
+  const visitedProfileLink = useAppSelector((state) => state.profile.profileLink)
 
 
   const role = useAppSelector((state) => state.profile.role)
@@ -96,7 +101,8 @@ const ProfilePageContent = () => {
   const artist = role === "Artist"
   const { getRepostedTracks, tracks: repostedTracks, loading: repostedTracksLoading } = useGetRepostedTracks()
   const { getRepostedPlaylists, playlists: repostedPlaylists, loading: repostedPlaylistsLoading } = useGetRepostedPlaylists()
-  const { getMyPlaylists, playlists: myPlaylists, loading: myPlaylistsLoading } = useGetMyPlaylists()
+  const { getMyPlaylists, playlists: myPlaylistsOwnProfile, loading: myPlaylistsOwnProfileLoading } = useGetMyPlaylists()
+  const { getArtistPlaylists, playlists: myPlaylists, loading: myPlaylistsLoading } = useGetArtistPlaylists()
   const [playlistDetails, setPlaylistDetails] = useState<PlaylistDetail[]>([])
   const [resolvedRepostedTracks, setResolvedRepostedTracks] = useState<Track[]>([])
   const fetchedPlaylistIds = useRef(new Set<string>())
@@ -124,21 +130,26 @@ const ProfilePageContent = () => {
 }, [openMoreMenu])
 
   useEffect(() => {
-    if (!profileUserId || isLoading) return
+    const userId = profileUserId
+    if (!userId || isLoading) return
     if (activeTab === "tracks" || activeTab === "all" || activeTab === "popular-tracks") {
-      void getPostedTracks(profileUserId)
+      void getPostedTracks(userId)
     }
     if (activeTab === "all") {
-      void getLikedTracks(profileUserId)
+      void getLikedTracks(userId)
     }
     if (activeTab === "all" || activeTab === "reposts") {
-      void getRepostedTracks(profileUserId)
-      void getRepostedPlaylists(profileUserId)
+      void getRepostedTracks(userId)
+      void getRepostedPlaylists(userId)
     }
     if (activeTab === "playlists") {
-      void getMyPlaylists()
+      if (isOwn) {
+        void getMyPlaylists()
+      } else {
+        void getArtistPlaylists(userId, true)
+      }
     }
-  }, [activeTab, profileUserId, getPostedTracks, getLikedTracks, getRepostedTracks, getRepostedPlaylists, getMyPlaylists, isLoading])
+  }, [activeTab, profileUserId, getPostedTracks, getLikedTracks, getRepostedTracks, getRepostedPlaylists, getMyPlaylists, getArtistPlaylists, isOwn, isLoading])
 
   useEffect(() => {
     const trackIds = Array.from(
@@ -190,6 +201,9 @@ const ProfilePageContent = () => {
     ;(myPlaylists ?? []).forEach((playlist) => {
       if (playlist._id) ids.add(playlist._id)
     })
+    ;(myPlaylistsOwnProfile ?? []).forEach((playlist) => {
+      if (playlist._id) ids.add(playlist._id)
+    })
 
     const toFetch = Array.from(ids).filter(
       (id) => !fetchedPlaylistIds.current.has(id),
@@ -219,12 +233,13 @@ const ProfilePageContent = () => {
     }
 
     void resolve()
-  }, [repostedPlaylists, myPlaylists])
+  }, [repostedPlaylists, myPlaylists, myPlaylistsOwnProfile])
 
   useEffect(() => {
     const artistIds = new Set<string>()
     ;(repostedPlaylists ?? []).forEach((p) => { if (p.artistId) artistIds.add(p.artistId) })
     ;(myPlaylists ?? []).forEach((p) => { if (p.artistId) artistIds.add(p.artistId) })
+    ;(myPlaylistsOwnProfile ?? []).forEach((p) => { if (p.artistId) artistIds.add(p.artistId) })
     ;(playlistDetails ?? []).forEach((pd) => { if ((pd as any).artistId) artistIds.add((pd as any).artistId) })
 
     const toFetch = Array.from(artistIds).filter((id) => !creatorMap[id])
@@ -249,7 +264,7 @@ const ProfilePageContent = () => {
     }
 
     void resolve()
-  }, [repostedPlaylists, myPlaylists, playlistDetails, creatorMap])
+  }, [repostedPlaylists, myPlaylists, myPlaylistsOwnProfile, playlistDetails, creatorMap])
 
   const getTrackSortTime = (track: { releaseDate?: string; _id?: string }) => {
     const releaseTime = track.releaseDate ? new Date(track.releaseDate).getTime() : NaN
@@ -272,6 +287,7 @@ const ProfilePageContent = () => {
       artist: track.basicInfo.mainArtists?.length
         ? track.basicInfo.mainArtists.join(", ")
         : "Unknown Artist",
+      artistId: track.posterId,
       img: track.image?.imgLink,
       trackUrl: track.audio?.audioLink,
       wfLink: track.audio?.waveformLink,
@@ -279,11 +295,14 @@ const ProfilePageContent = () => {
       duration: track.durationInSeconds,
       numLikes: track.numLikes,
       numReposts: track.numReposts,
-      isLikedByUser: track.isLikedByUser,
+      isLikedByUser: track.isLikedByUser ?? (track as any).isLiked ?? false,
+      isRepostedByUser: track.isRepostedByUser ?? (track as any).isReposted ?? false,
       numPlays: track.numPlays,
       numComments: track.numComments ?? 0,
       releaseDate: track.releaseDate,
       canEdit,
+      permalink: track.basicInfo?.permalink,
+      isAvailableForUser: track.isAvailableForUser,
     }
   }
 
@@ -339,22 +358,26 @@ const ProfilePageContent = () => {
 
 
   const mapPlaylistToProfileItem = (playlist: Playlist, fallbackIndex: number) => {
-    const stableId = playlist._id ?? `playlist-${fallbackIndex}`;
-    const rawArtistId = (playlist as any).artistId || (playlist as any).creatorId || (playlist as any).ownerId;
-    const artistFromObj = (playlist as any).artistDisplayName || (playlist as any).artistName || (playlist as any).creator?.displayName;
-    const resolvedArtistFromMap = rawArtistId ? creatorMap[rawArtistId] : undefined;
-    const artistName = artistFromObj || resolvedArtistFromMap || "";
+    const stableId = playlist._id ?? `playlist-${fallbackIndex}`
+    const rawArtistId = (playlist as any).artistId || (playlist as any).creatorId || (playlist as any).ownerId
+    const artistFromObj = (playlist as any).artistDisplayName || (playlist as any).artistName || (playlist as any).creator?.displayName
+    const resolvedArtistFromMap = rawArtistId ? creatorMap[rawArtistId] : undefined
+    const artistName = artistFromObj || resolvedArtistFromMap || ""
     return {
       id: stableId,
       title: playlist.title,
       artist: artistName,
+      artistId: rawArtistId,
       img: playlist.image?.imgLink,
       numLikes: playlist.numOfLikes,
       numReposts: playlist.numOfReposts,
-      isLikedByUser: playlist.isLiked,
+      isLikedByUser: (playlist as any).isLikedByUser ?? playlist.isLiked ?? false,
+      isRepostedByUser: (playlist as any).isRepostedByUser ?? (playlist as any).isReposted ?? false,
       releaseDate: playlist.createdAt,
-    };
-  };
+      permalink: (playlist as any).basicInfo?.permalink || (playlist as any).permalink,
+      isAvailableForUser: (playlist as any).isAvailableForUser !== false,
+    }
+  }
 
   const repostedTrackItems = [...(resolvedRepostedTracks.length ? resolvedRepostedTracks : (repostedTracks ?? []))]
     .sort((a, b) => getTrackSortTime(b) - getTrackSortTime(a))
@@ -417,7 +440,7 @@ const ProfilePageContent = () => {
     return bt - at
   })
 
-    const userPlaylistItems = [...(myPlaylists ?? [])]
+    const userPlaylistItems = [...(isOwn ? (myPlaylistsOwnProfile ?? []) : (myPlaylists ?? []))]
       .sort((a, b) => {
         const at = a.createdAt ? new Date(a.createdAt).getTime() : 0
         const bt = b.createdAt ? new Date(b.createdAt).getTime() : 0
@@ -638,6 +661,7 @@ const ProfilePageContent = () => {
                 ? <EmptyTab />
                 : <All
                     items={allTabItems}
+                    profileLink={visitedProfileLink}
                     onEditTrack={(item) => setEditingTrack(buildEditTrackRow(item))}
                     onAddToPlaylist={() => setOpenAddToPlaylist(true)}
                   />
@@ -646,6 +670,7 @@ const ProfilePageContent = () => {
             {activeTab === "popular-tracks" && (
               popularTrackItems.length === 0 ? <EmptyTab /> : <PopularTracks
                 items={popularTrackItems}
+                profileLink={visitedProfileLink}
                 onEditTrack={(item) => setEditingTrack(buildEditTrackRow(item))}
                 onAddToPlaylist={() => setOpenAddToPlaylist(true)}
               />
@@ -660,6 +685,7 @@ const ProfilePageContent = () => {
                   ? <EmptyTab />
                   : <Tracks
                       items={postedTrackItems}
+                      profileLink={visitedProfileLink}
                       onEditTrack={(item) => setEditingTrack(buildEditTrackRow(item))}
                       onAddToPlaylist={() => setOpenAddToPlaylist(true)}
                     />
@@ -670,12 +696,12 @@ const ProfilePageContent = () => {
             )}
 
             {activeTab === "playlists" && (
-              userPlaylistItems.length === 0 && !myPlaylistsLoading ? (
+              userPlaylistItems.length === 0 && !(isOwn ? myPlaylistsOwnProfileLoading : myPlaylistsLoading) ? (
                 <h2 className="font-bold text-lg flex items-center justify-center text-center">
                   You haven't created any playlists.
                 </h2>
               ) : (
-                <Playlists items={userPlaylistItems} />
+                <Playlists items={userPlaylistItems} profileLink={visitedProfileLink} />
               )
             )}
 
@@ -687,6 +713,7 @@ const ProfilePageContent = () => {
               ) : (
                 <Reposts
                   items={allRepostItems}
+                  profileLink={visitedProfileLink}
                   onEditTrack={(item) => setEditingTrack(buildEditTrackRow(item))}
                   onAddToPlaylist={() => setOpenAddToPlaylist(true)}
                 />

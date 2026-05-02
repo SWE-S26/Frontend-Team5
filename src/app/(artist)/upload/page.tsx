@@ -781,7 +781,7 @@ export default function UploadPage() {
           <button
             onClick={() => router.push("/artists")}
             data-testid="upload-nav-close"
-            className="flex h-9 w-9 items-center justify-center rounded-full bg-[#2b2b2f] text-[14px] text-[#ceced0] transition-colors hover:bg-[#38383d] cursor-pointer"
+            className="flex h-9 w-9 items-center justify-center rounded-full bg-off-black text-[14px] text-silver transition-colors hover:bg-back cursor-pointer"
             aria-label="Close upload"
           >
             <CloseOutlined />
@@ -822,7 +822,7 @@ export default function UploadPage() {
             onDrop={handleDrop}
             data-testid="upload-drop-zone"
             className={`mt-6 rounded-md border border-dashed px-5 py-16 transition-colors hover:border-white-smoke sm:px-12 sm:py-20 cursor-pointer
-              ${isDragging ? "border-white-smoke bg-chinese-black" : "border-[#3f4047] bg-chinese-black"}`}
+              ${isDragging ? "border-white-smoke bg-chinese-black" : "border-off-black bg-chinese-black"}`}
           >
             <div onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}

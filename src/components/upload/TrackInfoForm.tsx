@@ -93,18 +93,18 @@ export const TOOLTIP_TEXT = {
 
 // Shared CSS class strings
 export const FIELD_CLS =
-  "w-full bg-transparent border-0 border-b border-[#333] text-[13px] text-white-smoke placeholder-[#555] focus:outline-none focus:border-[#666] pb-2 pt-1 transition-colors";
+  "w-full bg-transparent border-0 border-b border-off-black text-[13px] text-white-smoke placeholder-silver focus:outline-none focus:border-silver pb-2 pt-1 transition-colors";
 export const LABEL_CLS = "mb-1.5 block text-[13px] font-semibold text-white-smoke";
 export const ADV_FIELD_CLS =
-  "w-full bg-transparent border border-white-smoke text-[13px] text-white-smoke pl-4 placeholder-[#555] focus:outline-none focus:border-[#666] pb-2 pt-1 transition-colors";
+  "w-full bg-transparent border border-off-black text-[13px] text-white-smoke pl-4 placeholder-silver focus:outline-none focus:border-silver pb-2 pt-1 transition-colors";
 export const SWITCH_CLS =
-  "shrink-0 [&:not(.ant-switch-checked)]:bg-[#666666]! [&.ant-switch-checked]:bg-[#1db954]!";
+  "shrink-0 [&:not(.ant-switch-checked)]:bg-silver! [&.ant-switch-checked]:bg-[#1db954]!";
 export const COLLAPSIBLE_MOTION_PROPS = {
   initial: { height: 0, opacity: 0, y: -6 },
   animate: { height: "auto", opacity: 1, y: 0 },
   exit: { height: 0, opacity: 0, y: -6 },
   transition: { duration: 0.24, ease: [0.22, 1, 0.36, 1] },
-  className: "overflow-hidden border-b border-[#222]",
+  className: "overflow-hidden border-b border-off-black",
 } as const;
 
 // Types

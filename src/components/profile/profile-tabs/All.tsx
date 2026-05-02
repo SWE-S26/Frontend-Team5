@@ -20,6 +20,7 @@ interface Item {
   numLikes?: number
   numReposts?: number
   isLikedByUser?: boolean
+  isRepostedByUser?: boolean
   canEdit?: boolean
   numPlays?: number
   numComments?: number
@@ -50,6 +51,7 @@ export default function All({ items, profileLink, onEditTrack, onAddToPlaylist }
               likeCount={item.numLikes ?? 0}
               repostCount={item.numReposts ?? 0}
               isLikedByUser={item.isLikedByUser}
+              isRepostedByUser={item.isRepostedByUser}
               permalink={item.permalink}
               profileLinkOverride={profileLink}
               preloadedTracks={
@@ -87,6 +89,7 @@ export default function All({ items, profileLink, onEditTrack, onAddToPlaylist }
           likeCount={item.numLikes ?? 0}
           repostCount={item.numReposts ?? 0}
           isLikedByUser={item.isLikedByUser}
+          isRepostedByUser={item.isRepostedByUser}
           canEdit={item.canEdit}
           onEdit={onEditTrack ? () => onEditTrack(item) : undefined}
           onAddToPlaylist={onAddToPlaylist ? () => onAddToPlaylist(item) : undefined}

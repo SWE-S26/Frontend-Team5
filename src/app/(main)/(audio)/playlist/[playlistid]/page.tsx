@@ -13,6 +13,7 @@ import {
   Lock,
   MoreHorizontal,
   Play,
+  Pause,
   Repeat2,
   Share2,
   ShieldCheck,
@@ -660,10 +661,22 @@ export default function PlaylistPage() {
             type="button"
             onClick={handlePlaylistPlay}
             aria-label={isPlaylistPlaying ? "Pause playlist" : "Play playlist"}
-            className="mt-0 flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-chinese-black text-white-smoke transition-transform hover:scale-105 self-start"
+            className="mt-0 flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-chinese-black text-white-smoke transition-transform hover:scale-105 self-start sm:h-20 sm:w-20"
           >
-            <Play className="h-10 w-10 fill-current" />
+            {isPlaylistPlaying ? (
+              <Pause className="h-10 w-10" />
+            ) : (
+              <Play className="h-10 w-10 fill-current" />
+            )}
           </button>
+
+          <div className="w-full max-w-sm overflow-hidden rounded-lg bg-off-black lg:hidden">
+            <img
+              src={cover}
+              alt={`${playlist.title} cover`}
+              className="h-full w-full object-cover"
+            />
+          </div>
 
           <div className="flex flex-1 flex-col justify-between">
             <div>
@@ -690,7 +703,7 @@ export default function PlaylistPage() {
 
             <div className="flex flex-col gap-4">
               {isPlaylistPlaying ? (
-                <div className="h-20 w-full max-w-full lg:max-w-lg">
+                <div className="h-20 w-full max-w-full sm:max-w-2xl lg:max-w-lg">
                   <SausageWaveform
                     trackId={waveformTrack?._id}
                     samplesUrl={
@@ -709,7 +722,7 @@ export default function PlaylistPage() {
                   />
                 </div>
               ) : (
-                <div className="flex h-32 w-32 flex-col items-center justify-center rounded-full bg-white-smoke text-center">
+                <div className="flex h-24 w-24 flex-col items-center justify-center rounded-full bg-white-smoke text-center sm:h-32 sm:w-32">
                   <div className="text-3xl font-bold text-chinese-black leading-none">
                     {trackCount}
                   </div>
@@ -755,7 +768,7 @@ export default function PlaylistPage() {
         />
       )}
 
-      <section className="mt-8 grid gap-8 px-1 sm:px-0 lg:grid-cols-[minmax(0,1fr)_410px]">
+      <section className="mt-8 grid gap-8 px-3 sm:px-0 lg:grid-cols-[minmax(0,1fr)_410px]">
         <div className="min-w-0">
           <div className="mb-8 flex flex-wrap items-center gap-2">
             <button
@@ -809,18 +822,6 @@ export default function PlaylistPage() {
             >
               <Trash2 className="h-4 w-4" />
             </button>
-
-            {isOwner && (
-              <button
-                type="button"
-                onClick={handlePrivacyToggle}
-                disabled={updatingPlaylist}
-                aria-label={isPrivate ? "Make public" : "Make private"}
-                className="flex h-10 w-10 items-center justify-center rounded-sm bg-off-black text-white-smoke transition-opacity hover:opacity-70 disabled:opacity-30"
-              >
-                <Lock className="h-4 w-4" />
-              </button>
-            )}
           </div>
 
           {(statusMessage || (isOwner && reorderingTracks)) && (
