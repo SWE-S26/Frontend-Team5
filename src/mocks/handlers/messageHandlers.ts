@@ -122,8 +122,9 @@ export const messageHandlers = [
 
   // PATCH /api/messages/v1/chat/read/
   http.patch(`${BASE}/chat/read/`, async ({ request }) => {
-    const body = await request.json() as { chatId: string }
-    const conv = mockConversations.find((c) => c.chat === body.chatId)
+    const body = await request.json() as { id?: string; chatId?: string }
+    const chatId = body.id ?? body.chatId
+    const conv = mockConversations.find((c) => c.chat === chatId)
     if (conv && !conv.lastMessage.seenBy.includes(CURRENT_USER_ID)) {
       conv.lastMessage.seenBy.push(CURRENT_USER_ID)
     }
@@ -132,8 +133,9 @@ export const messageHandlers = [
 
   // PATCH /api/messages/v1/chat/unread/
   http.patch(`${BASE}/chat/unread/`, async ({ request }) => {
-    const body = await request.json() as { chatId: string }
-    const conv = mockConversations.find((c) => c.chat === body.chatId)
+    const body = await request.json() as { id?: string; chatId?: string }
+    const chatId = body.id ?? body.chatId
+    const conv = mockConversations.find((c) => c.chat === chatId)
     if (conv) {
       conv.lastMessage.seenBy = conv.lastMessage.seenBy.filter((id) => id !== CURRENT_USER_ID)
     }
@@ -142,8 +144,9 @@ export const messageHandlers = [
 
   // PATCH /api/messages/v1/archive
   http.patch(`${BASE}/archive`, async ({ request }) => {
-    const body = await request.json() as { chatId: string }
-    const index = mockConversations.findIndex((c) => c.chat === body.chatId)
+    const body = await request.json() as { chatId?: string; id?: string }
+    const chatId = body.chatId ?? body.id
+    const index = mockConversations.findIndex((c) => c.chat === chatId)
     if (index !== -1) mockConversations.splice(index, 1)
     return HttpResponse.json({ message: "Conversation archived" })
   }),

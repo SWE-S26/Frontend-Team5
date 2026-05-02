@@ -10,6 +10,11 @@ import { adminUsersHandlers } from "./handlers/admin-dash/adminUsersHandlers";
 import { adminTracksHandlers } from "./handlers/admin-dash/adminTracksHandlers";
 import { adminAnalyticsHandlers } from "./handlers/admin-dash/adminAnalyticsHandlers";
 import { adminReportsHandlers } from "./handlers/admin-dash/adminReportsHandlers";
+import { adminArtistAnalyticsHandlers } from "./handlers/admin-dash/adminArtistAnalyticsHandlers";
+import { playlistsHandlers } from "./handlers/playlists.handlers";
+import { playbackHandlers } from "./handlers/playback.handlers";
+import { feedSearchHandlers } from "./handlers/feed-search.handlers";
+import { engagementHandlers } from "./handlers/engagement.handlers";
 import { 
   privacyHandlers, 
   notificationHandlers, 
@@ -21,6 +26,10 @@ export const worker = setupWorker(
   ...authHandlers,
   ...messageHandlers,
   ...tracksHandlers,
+  ...playlistsHandlers,
+  ...playbackHandlers,
+  ...feedSearchHandlers,
+  ...engagementHandlers,
   ...profileHandlers,
   ...socialHandlers,
   ...privacyHandlers,
@@ -31,5 +40,6 @@ export const worker = setupWorker(
   ...adminUsersHandlers,
   ...adminTracksHandlers,
   ...adminAnalyticsHandlers,
+  ...adminArtistAnalyticsHandlers,
   ...adminReportsHandlers,
 );
