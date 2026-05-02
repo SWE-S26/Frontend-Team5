@@ -73,7 +73,6 @@ export default function TrackHistoryWidget() {
     void getTrackHistory();
   }, [getTrackHistory]);
 
-  // Deduplicate with newest-first order
   const uniqueTracks = useMemo(
     () => deduplicateByTrackId(tracks ?? []),
     [tracks],
@@ -201,6 +200,7 @@ export default function TrackHistoryWidget() {
                 artistId={track.posterId}
                 img={track.image?.imgLink}
                 duration={track.durationInSeconds}
+                permalink={track.basicInfo.permalink}
                 playsCount={track.numPlays}
                 likeCount={track.numLikes}
                 repostCount={track.numReposts}

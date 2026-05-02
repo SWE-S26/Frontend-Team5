@@ -21,7 +21,6 @@ import { FaPinterest } from "react-icons/fa"
 import { HiOutlineMail } from "react-icons/hi"
 import { IoClose } from "react-icons/io5"
 
-// ── Shared with NewMessagePopUP — resolves photo via useGetProfile ──
 interface PrefilledUser {
   userId: string
   displayName: string
@@ -61,11 +60,12 @@ function UserSuggestionItem({ userId, displayName, onClick }: UserSuggestionItem
 // ── Main component ──────────────────────────────────────────────────────────
 
 interface SharePopupProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen:            boolean
+  onClose:           () => void
+  prefilledMessage?: string   // ← copy link URL pre-filled in the message body
 }
 
-const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
+const SharePopup = ({ isOpen, onClose, prefilledMessage }: SharePopupProps) => {
   const [activeTab, setActiveTab] = useState<"share" | "message">("share")
   const params      = useParams()
   const userId      = params.username as string
@@ -73,7 +73,7 @@ const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
   const [profile, setProfile] = useState<any>(null)
 
   // ── Share tab state ──
-  const [shortLink, setShortLink]   = useState("")
+  const [shortLink, setShortLink]     = useState("")
   const [isShortened, setIsShortened] = useState(false)
 
   const fullProfileUrl = profile?.profileLink?.startsWith("http")
@@ -110,28 +110,35 @@ const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
     }
   }
 
-  // ── Message tab state — same logic as NewMessagePopUP ──
-  const [content, setContent]         = useState("")
+  // ── Message tab state ──
+  const [content, setContent]         = useState(prefilledMessage ?? "")
   const [recipient, setRecipient]     = useState<PrefilledUser | null>(null)
   const [searchQuery, setSearchQuery] = useState("")
   const [results, setResults]         = useState<{ userId: string; displayName: string }[]>([])
   const [status, setStatus]           = useState<SearchStatus>('idle')
 
-  const debouncedQuery              = useDebounce(searchQuery, 350)
-  const { getSuggestions }          = useSearch()
-  const { updateFromLocalSend }     = useMessagesContext()
-  const searchRef                   = useRef<HTMLDivElement>(null)
+  const debouncedQuery          = useDebounce(searchQuery, 350)
+  const { getSuggestions }      = useSearch()
+  const { updateFromLocalSend } = useMessagesContext()
+  const searchRef               = useRef<HTMLDivElement>(null)
 
-  // Reset message form when popup closes or tab switches
+  // Reset when popup closes
   useEffect(() => {
     if (!isOpen) {
-      setContent("")
+      setContent(prefilledMessage ?? "")
       setRecipient(null)
       setSearchQuery("")
       setResults([])
       setStatus('idle')
+      setActiveTab("share")
     }
   }, [isOpen])
+
+  // When Message tab is clicked — pre-fill with the URL if content is empty
+  const handleMessageTabClick = () => {
+    setActiveTab("message")
+    setContent((prev) => prev || (prefilledMessage ?? ""))
+  }
 
   // Close dropdown on outside click
   useEffect(() => {
@@ -246,11 +253,11 @@ const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
                 data-testid="Messages-button-Bar"
                 href="#" label="Message" pathname=""
                 isActiveb={activeTab === "message"}
-                onClick={() => setActiveTab("message")}
+                onClick={handleMessageTabClick}
               />
             </div>
 
-            {/* ── Share tab — unchanged ── */}
+            {/* ── Share tab ── */}
             {activeTab === "share" && (
               <>
                 <div className="flex gap-4 mb-7">
@@ -279,7 +286,7 @@ const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
                 <div className="flex flex-col gap-3 mb-5">
                   <textarea
                     readOnly
-                    value={isShortened ? shortLink : fullProfileUrl}
+                    value={isShortened ? shortLink : (prefilledMessage ?? fullProfileUrl)}
                     className="w-full h-12 bg-off-black px-3 py-3 text-white rounded resize-none caret-crusta text-md whitespace-nowrap overflow-x-auto [&::-webkit-scrollbar]:hidden [&::-webkit-scrollbar]:w-0 border-r-[12px] border-r-transparent border-l-[12px] border-l-transparent"
                   />
                 </div>
@@ -299,12 +306,11 @@ const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
               </>
             )}
 
-            {/* ── Message tab — real NewMessagePopUP form ── */}
+            {/* ── Message tab ── */}
             {activeTab === "message" && (
               <>
                 <p className="text-xl text-white-smoke font-bold mb-8">New message</p>
 
-                {/* To field */}
                 <div className="flex flex-col gap-2 mb-7">
                   <p className="text-md font-bold text-white-smoke">
                     To<span className="text-red-500">*</span>
@@ -353,7 +359,6 @@ const SharePopup = ({ isOpen, onClose }: SharePopupProps) => {
                   )}
                 </div>
 
-                {/* Message textarea */}
                 <div className="flex flex-col gap-3 mb-5">
                   <p className="text-md font-bold text-white-smoke">
                     Write your message and add tracks or playlists
