@@ -1,5 +1,4 @@
 'use client'
-import React from 'react'
 
 interface EmptyMessagesProps {
     onOpenPopup: () => void
@@ -20,5 +19,4 @@ const EmptyMessages = ({ onOpenPopup }: EmptyMessagesProps) => {
         </div>
     )
 }
-
 export default EmptyMessages

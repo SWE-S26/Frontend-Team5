@@ -14,11 +14,11 @@ export default function ProfileLayout({ children }: { children: React.ReactNode 
   const pathname = usePathname()
   const { username } = useParams()
   const dispatch       = useAppDispatch()
-const displayName    = useAppSelector((state) => state.profile.displayName)
-const profileImgLink = useAppSelector((state) => state.profile.profileImgLink)
-const hasHydrated    = useAppSelector((state) => state.auth.hasHydrated)
-const authUserId     = useAppSelector((state) => state.auth.userId)
-const { getProfile } = useGetProfile()
+  const displayName    = useAppSelector((state) => state.profile.displayName)
+  const profileImgLink = useAppSelector((state) => state.profile.profileImgLink)
+  const hasHydrated    = useAppSelector((state) => state.auth.hasHydrated)
+  const authUserId     = useAppSelector((state) => state.auth.userId)
+  const { getProfile } = useGetProfile()
 
 useEffect(() => {
   if (!hasHydrated || !username) return
@@ -92,7 +92,7 @@ useEffect(() => {
 }
 
   return (
-    <div>
+    <div className="px-3 pt-3 sm:px-0 sm:pt-0">
       <div className="flex items-center gap-7 mb-4">
         <img 
           src={profileImgLink ?? "/ethan.jpg"} 
@@ -127,7 +127,7 @@ useEffect(() => {
       `}</style>
 
       <Tabs
-        className="profile-tabs"
+        className="profile-tabs items-center sm:items-start"
         activeKey={getActiveKey()}
         items={items}
         onChange={onChange}

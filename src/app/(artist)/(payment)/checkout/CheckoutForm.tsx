@@ -180,7 +180,7 @@ const stripe = useStripe()
         <div className="w-full min-h-screen bg-white">
 
             {/* Header */}
-            <div className="flex justify-center bg-[#333333] fixed top-0 z-1000 w-full">
+            <div className="flex justify-center bg-[#333333] fixed top-0 z-1000 w-full px-3 sm:px-0">
                 <div className="flex items-center justify-between h-11.5 w-full max-w-291">
                     <div>
                         <Link data-testid="navbar_logo" href={isAuthenticated ? '/home' : '/'} className="flex items-center">

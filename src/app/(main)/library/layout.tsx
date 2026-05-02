@@ -17,8 +17,6 @@ export default function LibraryLayout({ children }: { children: React.ReactNode 
             { href: "/library",           label: "Overview"  },
             { href: "/library/likes",     label: "Likes"     },
             { href: "/library/playlists", label: "Playlists" },
-            { href: "/library/albums",    label: "Albums"    },
-            { href: "/library/stations",  label: "Stations"  },
             { href: "/library/following", label: "Following" },
             { href: "/library/history",   label: "History"   },
           ]}

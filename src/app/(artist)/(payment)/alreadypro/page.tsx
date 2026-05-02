@@ -60,7 +60,7 @@ export default function page() {
         <div className="flex flex-col h-screen overflow-hidden md:overflow-hidden overflow-y-auto">
 
             {/* Header */}
-            <div className="flex justify-center bg-[#333333] w-full shrink-0">
+            <div className="flex justify-center bg-[#333333] w-full shrink-0 px-3 sm:px-0">
                 <div className="flex items-center justify-between h-11.5 w-full max-w-291">
                     <div>
                         <Link data-testid="navbar_logo" href={isAuthenticated ? '/home' : '/'} className="flex items-center">

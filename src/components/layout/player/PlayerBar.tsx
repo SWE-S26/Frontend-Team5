@@ -67,7 +67,7 @@ export default function PlayerBar() {
 
       {/* ── MOBILE BAR (< md) ─────────────────────────────────────────── */}
       <div
-        className="md:hidden fixed bottom-0 left-0 right-0 z-[9999]"
+        className="md:hidden fixed bottom-17 sm:bottom-0 left-0 right-0 z-999"
         style={{ animation: "slideUp 0.4s ease-out forwards" }}
       >
         <div className="flex items-center h-16 bg-off-black px-4 gap-3">

@@ -7,8 +7,8 @@ import UserCardGrid from '@/components/social-graph/UserCardGrid'
 const FollowersPage = () => {
   const profileUserId = useAppSelector((state) => state.profile.userId)
   const { getFollowers, followers, loading } = useGetFollowers()
-  const isOwn        = useAppSelector((state) => state.profile.isOwnProfile)
-  const displayName  = useAppSelector((state) => state.profile.displayName)
+  const isOwn       = useAppSelector((state) => state.profile.isOwnProfile)
+  const displayName = useAppSelector((state) => state.profile.displayName)
 
   useEffect(() => {
     if (profileUserId) {
@@ -17,14 +17,14 @@ const FollowersPage = () => {
   }, [profileUserId])
 
   return (
-    <div>
+    <div className="px-4 sm:px-0">
       <UserCardGrid
-      users={followers ?? []}
-      loading={loading}
-      emptyType="followers"
-      isOwn={isOwn}
-      displayName={displayName ?? ''}
-    />
+        users={followers ?? []}
+        loading={loading}
+        emptyType="followers"
+        isOwn={isOwn}
+        displayName={displayName ?? ''}
+      />
     </div>
   )
 }

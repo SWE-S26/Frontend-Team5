@@ -26,7 +26,7 @@ export default function ProfileSideBar() {
 
   return (
     <div className="w-full">
-        <div className="w-full flex flex-col items-center mb-7 gap-3 ">
+        <div className="w-full flex flex-col mb-7 gap-3 ">
             <div className="w-full"><SupportLink supportLink={supportLink} displayName={displayName} /></div>
             <div className="w-full"><ProfileStats /></div>
             <div className="w-full"><BioSection bio={bio} /></div>

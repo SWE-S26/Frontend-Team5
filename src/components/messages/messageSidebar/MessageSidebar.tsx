@@ -4,6 +4,7 @@ import NewMessagePopUP from '../NewMessagePopUP'
 import MessagePerview from './MessagePerview'
 import Button from '@/components/ui/Button'
 import type { Conversation } from '@/types/message.types'
+import EmptyMessages from '@/components/messages/EmptyMessages'
 
 interface MessageSidebarProps {
   onSelect:       (chatId: string) => void
@@ -56,6 +57,12 @@ const MessageSidebar = ({ onSelect, selectedChatId, conversations, markAsRead }:
             onClick={() => handleSelect(conversation.chatId)}
           />
         ))}
+
+        {!selectedChatId && (
+          <div className="block md:hidden mt-4">
+            <EmptyMessages onOpenPopup={() => setIsOpen(true)} />
+          </div>
+        )}
       </div>
     </>
   )

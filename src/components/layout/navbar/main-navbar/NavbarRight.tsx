@@ -71,10 +71,9 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
     { label: "Playlists",      icon: <BiSolidCopy />,            href: "/library/playlists"                   ,   testId: "playlists-item-link-btn"     },
     { label: "Stations",       icon: <HiMiniSignal />,           href: "/library/stations"                    ,   testId: "stations-item-link-btn"      },
     { label: "Following",      icon: <FaUserCheck />,            href: "/library/following"                   ,   testId: "following-item-link-btn"     },
-    { label: "Who to follow",  icon: <FaUserPlus />,             onClick: () => console.log("done")           ,   testId: "who-to-follow-item-link-btn" },
+    { label: "Who to follow",  icon: <FaUserPlus />,             href: "/home"                                ,   testId: "who-to-follow-item-link-btn" },
     ...(role !== 'Pro' ? [{ label: "Try Artist Pro", icon: <img src="/payment/already-pro-bg-red.svg" alt="Artist Pro" className="w-4.5 h-4.5" />, href: "/artist" }] : []),
     { label: "Tracks",         icon: <PiWaveformBold />,         href: "/artists"                             ,   testId: "tracks-item-link-btn"        },
-    { label: "Insights",       icon: <ImStatsBars />,            onClick: () => console.log("done")           ,   testId: "insights-item-link-btn"      },
   ], [profileTarget, userId])
 
   const moreItems: DropdownItem[] = useMemo(() => [

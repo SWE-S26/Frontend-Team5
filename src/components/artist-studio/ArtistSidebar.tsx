@@ -38,7 +38,7 @@ export default function ArtistSidebar({ open = false, onClose }: ArtistSidebarPr
   };
 
   const FooterLinks = () => (
-    <div className="flex flex-wrap gap-x-2 gap-y-1">
+    <div className="flex flex-wrap justify-between gap-y-1 px-2">
       {footerLinks.map(({ label, path }, index) => (
         <div key={label} className="flex items-center gap-2">
           {index > 0 && <span className="text-[#555]">-</span>}
@@ -89,11 +89,6 @@ export default function ArtistSidebar({ open = false, onClose }: ArtistSidebarPr
           <button onClick={() => navigate("/library")} type="button" data-testid="artist-sidebar-library" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Library">
             <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1"><LuLibraryBig /></span>
             <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">Library</span>
-          </button>
-
-          <button onClick={() => navigate("/artist")} type="button" data-testid="artist-sidebar-for-artist" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="For Artist">
-            <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1"><PiShootingStar /></span>
-            <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">For Artist</span>
           </button>
         </div>
 

@@ -1,13 +1,19 @@
 "use client"
 
 import { useRef, useState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { SlBell } from "react-icons/sl"
 import NotificationPopup from "@/components/notifications/NotificationPopUp"
 import { useNotificationsContext } from "@/components/notifications/NotificationsContext"
 
-export default function NotificationBell() {
+interface NotificationBellProps {
+  routeOnClick?: boolean
+}
+
+export default function NotificationBell({ routeOnClick = false }: NotificationBellProps) {
   const [isOpen, setIsOpen] = useState(false)
   const containerRef        = useRef<HTMLDivElement>(null)
+  const router              = useRouter()
 
   const { notifications, unreadCount, markVisibleAsRead } = useNotificationsContext()
 
@@ -22,6 +28,10 @@ export default function NotificationBell() {
   }, [])
 
   function handleOpen() {
+    if (routeOnClick) {
+      router.push("/notifications")
+      return
+    }
     setIsOpen((prev) => {
       if (!prev) {
         const visibleIds = notifications.slice(0, 5).map((n) => n.notificationId)
@@ -40,14 +50,14 @@ export default function NotificationBell() {
       >
         <SlBell />
         {unreadCount > 0 && (
-          <span className="absolute -top-2 left-1/2 -translate-x-1/2 min-w-[18px] h-[18px] px-1 rounded-full bg-anger border-2 border-chinese-black flex items-center justify-center text-[10px] font-bold text-white">
+          <span className="absolute -top-2 left-1/2 -translate-x-1/2 min-w-4.5 h-4.5 px-1 rounded-full bg-anger border-2 border-chinese-black flex items-center justify-center text-[10px] font-bold text-white">
             {unreadCount > 99 ? "99+" : unreadCount}
           </span>
         )}
       </button>
 
-      {isOpen && (
-        <div className="absolute right-0 top-9 z-[9999]">
+      {isOpen && !routeOnClick && (
+        <div className="absolute right-0 top-9 z-9999">
           <NotificationPopup
             notifications={notifications.slice(0, 5)}
             onClose={() => setIsOpen(false)}

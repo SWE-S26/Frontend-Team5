@@ -113,7 +113,7 @@ export default function HomeClient() {
   }, [getTracks, getPlaylists, getFollowing, userId, isAuthenticated]);
 
   return (
-    <div className="flex flex-col md:flex-row justify-between gap-4 md:gap-6 px-4 sm:px-6 md:px-0">
+    <div className="flex flex-col md:flex-row justify-between gap-4 md:gap-6 px-4 sm:px-6 md:px-0 pb-3">
       {isAuthenticated && (
         <div className="order-first md:hidden w-full mb-2">
           <ArtistTools />
