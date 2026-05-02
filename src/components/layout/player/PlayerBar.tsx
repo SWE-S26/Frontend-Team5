@@ -92,11 +92,25 @@ export default function PlayerBar() {
                 {currentTrackArtist}
               </span>
             )}
-            {/* Progress bar in the middle */}
-            <div className="w-full h-[2px] bg-white-smoke/15 rounded-full mt-1">
+            {/* Interactive progress bar */}
+            <div className="relative w-full h-[2px] bg-white-smoke/15 rounded-full mt-1">
               <div
-                className="h-full rounded-full transition-[width] duration-300 ease-linear"
+                className="h-full rounded-full  pointer-events-none"
                 style={{ width: `${progress}%`, background: "var(--inferno, #ff4500)" }}
+              />
+              <input
+                type="range"
+                min={0}
+                max={duration || 100}
+                step="0.1"
+                value={currentTime || 0}
+                onMouseDown={dragStart}
+                onTouchStart={dragStart}
+                onChange={(e) => dragMove((Number(e.target.value) / (duration || 100)) * 100)}
+                onMouseUp={(e) => dragEnd((Number(e.currentTarget.value) / (duration || 100)) * 100)}
+                onTouchEnd={(e) => dragEnd((Number(e.currentTarget.value) / (duration || 100)) * 100)}
+                className="absolute inset-0 w-full opacity-0 cursor-pointer h-6 -top-2"
+                style={{ touchAction: "none" }}
               />
             </div>
           </div>
