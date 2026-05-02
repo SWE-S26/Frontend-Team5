@@ -11,7 +11,7 @@ export default function FeedGuard({ children }: { children: React.ReactNode }) {
 
   if (!isAuthenticated) {
     return (
-      <div className="mb-5">
+      <div className="mb-5 px-2 sm:px-0">
         <h2 className="text-white-smoke text-xl font-bold text-center mt-3">
             Join BeatZa to hear the latest from people you follow
         </h2>

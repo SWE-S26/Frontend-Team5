@@ -23,7 +23,6 @@ export default function Artists() {
       <main className="mt-14 ml-0 lg:ml-20">
         <ArtistStudioContent key={pathname} activeTab={activeTab} onChangeTab={setActiveTab} />
       </main>
-      <PlayerBar />
     </div>
   );
 }
