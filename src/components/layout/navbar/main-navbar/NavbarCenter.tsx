@@ -55,9 +55,13 @@ export default function NavbarCenter() {
     [q, router]
   )
 
+  const sanitize = (value: string) => value.replace(/[()\[\]{}]/g, '')
+
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    setQ(e.target.value)
-    if (e.target.value.trim()) setShowDropdown(true)
+    const cleaned = sanitize(e.target.value)
+
+    setQ(cleaned)
+    if (cleaned.trim()) setShowDropdown(true)
   }, [])
 
   const handleSuggestionClick = useCallback(

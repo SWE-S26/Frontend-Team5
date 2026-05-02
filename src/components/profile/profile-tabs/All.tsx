@@ -11,6 +11,7 @@ interface Item {
   trackId?: string
   title: string
   artist: string
+  artistId?: string
   img: string
   trackUrl?: string
   downloadUrl?: string
@@ -24,11 +25,13 @@ interface Item {
   numComments?: number
   playlistTracks?: any[]
   totalTracks?: number
+  permalink?: string
+  isAvailableForUser?: boolean
 }
 import { Track as StoreTrack } from "@/store/slices/playerSlice"
-interface Props { items: Item[]; onEditTrack?: (item: Item) => void; onAddToPlaylist?: (item: Item) => void; }
+interface Props { items: Item[]; profileLink?: string | null; onEditTrack?: (item: Item) => void; onAddToPlaylist?: (item: Item) => void; }
 
-export default function All({ items, onEditTrack, onAddToPlaylist }: Props) {
+export default function All({ items, profileLink, onEditTrack, onAddToPlaylist }: Props) {
   const router = useRouter()
   const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
   return (
@@ -42,10 +45,13 @@ export default function All({ items, onEditTrack, onAddToPlaylist }: Props) {
               img={item.img}
               title={item.title}
               artist={item.artist}
+              artistId={item.artistId}
               playlistId={item.id}
               likeCount={item.numLikes ?? 0}
               repostCount={item.numReposts ?? 0}
               isLikedByUser={item.isLikedByUser}
+              permalink={item.permalink}
+              profileLinkOverride={profileLink}
               preloadedTracks={
                 (item.playlistTracks ?? []).map((t, ii) => ({
                   _id: t._id ?? `${item.id}-${ii}`,
@@ -57,6 +63,7 @@ export default function All({ items, onEditTrack, onAddToPlaylist }: Props) {
                   numOfLikes: t.numOfLikes ?? 0,
                   isLiked: t.isLiked ?? false,
                   isReposted: t.isReposted ?? false,
+                  isAvailableForUser: t.isAvailableForUser,
                 }))
               }
               totalTracks={item.totalTracks}
@@ -67,6 +74,7 @@ export default function All({ items, onEditTrack, onAddToPlaylist }: Props) {
           img={item.img}
           title={item.title}
           artist={item.artist}
+          artistId={item.artistId}
           trackId={item.trackId ?? item.id}
           trackUrl={item.trackUrl}
           wfLink={(item as any).wfLink}
@@ -84,6 +92,9 @@ export default function All({ items, onEditTrack, onAddToPlaylist }: Props) {
           onAddToPlaylist={onAddToPlaylist ? () => onAddToPlaylist(item) : undefined}
           playsCount={item.numPlays ?? 0}
           commentsCount={item.numComments ?? 0}
+          permalink={item.permalink}
+          isAvailable={item.isAvailableForUser}
+          profileLinkOverride={profileLink}
           />
         )
       ))}

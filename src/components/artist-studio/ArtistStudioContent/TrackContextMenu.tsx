@@ -16,6 +16,9 @@ import {
 import { FiPlusSquare, FiDownload, FiLink, FiTrash2 } from "react-icons/fi";
 import { PiPencilSimple } from "react-icons/pi";
 import { BsThreeDots } from "react-icons/bs";
+import { useAppSelector } from "@/store/hooks";
+import { getBaseUrl } from "@/utilities/getBaseUrl";
+import { interactiveToastBus } from "@/lib/interactive-toasts/interactiveToastBus";
 
 function useIsMobile(breakpoint = 768) {
   const [isMobile, setIsMobile] = useState(false);
@@ -39,6 +42,7 @@ export function TrackContextMenu({
   canDownload = false,
   onDelete,
   isArtistPro,
+  permalink,
 }: {
   trackId: string;
   onEdit: (id: string) => void;
@@ -47,9 +51,11 @@ export function TrackContextMenu({
   canDownload?: boolean;
   onDelete: (id: string) => void;
   isArtistPro?: boolean;
+  permalink?: string;
 }) {
   const [isOpen, setIsOpen] = useState(false);
   const isMobile = useIsMobile();
+  const profileLink = useAppSelector((state) => state.auth.profileLink);
 
   const { refs, floatingStyles, context } = useFloating({
     open: isOpen,
@@ -65,13 +71,23 @@ export function TrackContextMenu({
   const role = useRole(context, { role: "menu" });
   const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
+  const handleCopyLink = () => {
+    if (!permalink || !profileLink) return;
+    const url = `${getBaseUrl()}/${profileLink}/${permalink}`;
+    navigator.clipboard.writeText(url);
+    interactiveToastBus.emit({
+      type: "copied",
+    });
+    setIsOpen(false);
+  };
+
   const menuItems = [
     { icon: PiPencilSimple, label: "Edit", action: () => { onEdit(trackId); setIsOpen(false); } },
     { icon: FiPlusSquare, label: "Add to playlist", action: () => { onAddToPlaylist(trackId); setIsOpen(false); } },
     ...(isArtistPro
       ? [{ icon: FiDownload, label: "Download file", action: () => { if (canDownload) onDownload(trackId); setIsOpen(false); }, disabled: !canDownload }]
       : []),
-    { icon: FiLink, label: "Copy link", action: () => setIsOpen(false) },
+    { icon: FiLink, label: "Copy link", action: handleCopyLink, disabled: !permalink || !profileLink },
     { icon: FiTrash2, label: "Delete track", action: () => { onDelete(trackId); setIsOpen(false); }, danger: true },
   ];
 

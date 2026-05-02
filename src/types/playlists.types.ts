@@ -105,7 +105,9 @@ export interface UpdatePlaylistRequest {
   tags?: string[];
   description?: string;
   isPrivate?: boolean;
+  /** @deprecated use listOfTracks */
   audioTracks?: string[];
+  listOfTracks?: string[];
   lengthOfRecievedTracks?: number;
   licensing?: object;
   buyLink?: string;
@@ -162,6 +164,10 @@ export interface DeletePlaylistResponse {
 }
 
 export interface AddTrackToPlaylistResponse {
+  message: string;
+}
+
+export interface RemoveTrackFromPlaylistResponse {
   message: string;
 }
 
