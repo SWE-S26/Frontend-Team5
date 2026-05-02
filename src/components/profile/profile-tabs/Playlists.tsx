@@ -1,7 +1,7 @@
 import PlaylistWaveformCard from "@/components/layout/track-cards/WaveformPlaylist"
 import { Track as StoreTrack } from "@/store/slices/playerSlice"
 
-interface Item { id: string; title: string; artist: string; artistId?: string; img: string; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; playlistTracks?: any[]; totalTracks?: number; permalink?: string; isAvailableForUser?: boolean; }
+interface Item { id: string; title: string; artist: string; artistId?: string; img: string; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; isRepostedByUser?: boolean; playlistTracks?: any[]; totalTracks?: number; permalink?: string; isAvailableForUser?: boolean; }
 interface Props { items: Item[]; profileLink?: string | null; }
 export default function Playlists({ items, profileLink }: Props) {
   return (
@@ -18,6 +18,7 @@ export default function Playlists({ items, profileLink }: Props) {
             likeCount={item.numLikes ?? 0}
             repostCount={item.numReposts ?? 0}
             isLikedByUser={item.isLikedByUser}
+            isRepostedByUser={item.isRepostedByUser}
             permalink={item.permalink}
             profileLinkOverride={profileLink}
             preloadedTracks={

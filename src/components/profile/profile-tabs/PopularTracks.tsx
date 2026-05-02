@@ -1,6 +1,6 @@
 import WaveformCard from "@/components/layout/track-cards/WaveformCard"
 
-interface Item { id: string; trackId?: string; title: string; artist: string; artistId?: string; img: string; trackUrl?: string; downloadUrl?: string; enableDirectDownload?: boolean; duration?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; canEdit?: boolean; numPlays:number; numComments:number; permalink?: string; isAvailableForUser?: boolean; }
+interface Item { id: string; trackId?: string; title: string; artist: string; artistId?: string; img: string; trackUrl?: string; downloadUrl?: string; enableDirectDownload?: boolean; duration?: number; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; isRepostedByUser?: boolean; canEdit?: boolean; numPlays:number; numComments:number; permalink?: string; isAvailableForUser?: boolean; }
 interface Props { items: Item[]; profileLink?: string | null; onEditTrack?: (item: Item) => void; onAddToPlaylist?: (item: Item) => void }
 
 export default function PopularTracks({ items, profileLink, onEditTrack, onAddToPlaylist }: Props) {
@@ -26,6 +26,7 @@ export default function PopularTracks({ items, profileLink, onEditTrack, onAddTo
            likeCount={item.numLikes ?? 0}
            repostCount={item.numReposts ?? 0}
            isLikedByUser={item.isLikedByUser}
+           isRepostedByUser={item.isRepostedByUser}
            canEdit={item.canEdit}
            onEdit={onEditTrack ? () => onEditTrack(item) : undefined}
            onAddToPlaylist={onAddToPlaylist ? () => onAddToPlaylist(item) : undefined}

@@ -48,7 +48,10 @@ export default function EditPlaylistModal({
 
   // basic info
   const [title, setTitle] = useState(playlist?.title ?? "");
-  const [permalink, setPermalink] = useState(playlist?.permalink ?? "");
+  const [permalink, setPermalink] = useState(playlist?.permalink ?? (playlist as any)?.permaLink ?? "");
+  const [isPermalinkDirty, setIsPermalinkDirty] = useState(false);
+  const lastPlaylistIdRef = useRef<string | null>(null);
+  const wasOpenRef = useRef(false);
   const [playlistType, setPlaylistType] = useState(() => {
     const pt = (playlist as any)?.playlistType ?? "playlist";
     return pt.charAt(0).toUpperCase() + pt.slice(1);
@@ -76,11 +79,11 @@ export default function EditPlaylistModal({
   const { getPlaylistById, playlist: fetchedPlaylist } = useGetPlaylistById();
   const { getProfile } = useGetProfile();
 
-  function normalizePlaylistPermalink(value?: string | null) {
+  function normalizePlaylistPermalink(value?: string | null, artistId?: string | null) {
     const rawValue = (value ?? "").trim();
     if (!rawValue) return "";
 
-    const normalizedPrefix = (creatorProfileLink || playlist?.artistId || "creator").trim();
+    const normalizedPrefix = (creatorProfileLink || artistId || playlist?.artistId || "creator").trim();
     return rawValue
       .replace(/^https?:\/\/beatza\.me\//i, "")
       .replace(/^beatza\.me\//i, "")
@@ -89,7 +92,8 @@ export default function EditPlaylistModal({
       .replace(/^.*\/sets\//i, "");
   }
 
-  const permalinkPrefix = `https://beatza.me/${creatorProfileLink || playlist?.artistId || "creator"}/sets/`;
+  const playlistArtistId = fetchedPlaylist?.artistId ?? playlist?.artistId;
+  const permalinkPrefix = `https://beatza.me/${creatorProfileLink || playlistArtistId || "creator"}/sets/`;
 
   // release date
   function toInputDate(val?: string | null) {
@@ -121,7 +125,15 @@ export default function EditPlaylistModal({
   useEffect(() => {
     if (!playlist) return;
     setTitle(playlist.title ?? "");
-    setPermalink(normalizePlaylistPermalink(playlist.permalink ?? (playlist as any)?.basicInfo?.permalink ?? ""));
+    setPermalink(
+      normalizePlaylistPermalink(
+        playlist.permalink ??
+          (playlist as any)?.permaLink ??
+          (playlist as any)?.basicInfo?.permalink ??
+          "",
+        playlist.artistId,
+      ),
+    );
     const pt = (playlist as any)?.playlistType ?? "playlist";
     setPlaylistType(pt.charAt(0).toUpperCase() + pt.slice(1));
     const g = (playlist as any)?.genre ?? "None";
@@ -142,22 +154,32 @@ export default function EditPlaylistModal({
   }, [playlist]);
 
   useEffect(() => {
-    if (!playlist?._id) return;
+    if (!playlist?._id || !isOpen) return;
     void getPlaylistById(playlist._id);
-  }, [playlist?._id, getPlaylistById]);
+  }, [playlist?._id, isOpen, getPlaylistById]);
 
   useEffect(() => {
-    if (!playlist) return;
-    const nextPermalink =
-      fetchedPlaylist?.permalink ??
-      (fetchedPlaylist as any)?.basicInfo?.permalink ??
-      playlist.permalink ??
-      (playlist as any)?.basicInfo?.permalink ??
-      "";
-    if (nextPermalink) {
-      setPermalink(normalizePlaylistPermalink(nextPermalink));
+    const source = fetchedPlaylist ?? playlist;
+    if (!source || !isOpen) return;
+    const playlistId = source._id ?? null;
+    const isOpening = !wasOpenRef.current && isOpen;
+    if (isOpening || (playlistId && lastPlaylistIdRef.current !== playlistId)) {
+      lastPlaylistIdRef.current = playlistId;
+      setIsPermalinkDirty(false);
     }
-  }, [playlist, fetchedPlaylist?.permalink]);
+    const nextPermalink =
+      source.permalink ??
+      (source as any)?.permaLink ??
+      (source as any)?.basicInfo?.permalink ??
+      "";
+    if (nextPermalink && (isOpening || !isPermalinkDirty)) {
+      setPermalink(normalizePlaylistPermalink(nextPermalink, source.artistId));
+    }
+  }, [playlist, fetchedPlaylist, creatorProfileLink, isOpen, isPermalinkDirty]);
+
+  useEffect(() => {
+    wasOpenRef.current = isOpen;
+  }, [isOpen]);
 
   useEffect(() => {
     let cancelled = false;
@@ -350,7 +372,10 @@ export default function EditPlaylistModal({
                         </span>
                         <input
                           value={permalink}
-                          onChange={(e) => setPermalink(normalizePlaylistPermalink(e.target.value))}
+                          onChange={(e) => {
+                            setIsPermalinkDirty(true);
+                            setPermalink(normalizePlaylistPermalink(e.target.value, playlistArtistId));
+                          }}
                           placeholder="playlist-slug"
                           className="flex-1 bg-transparent py-2 pr-3 text-sm text-white-smoke outline-none min-w-0"
                         />

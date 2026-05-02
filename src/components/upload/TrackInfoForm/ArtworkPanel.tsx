@@ -113,7 +113,7 @@ export function ArtworkPanel({
 								title="Replace Image"
 								onClick={handleArtworkPick}
 								data-testid="upload-artwork-replace"
-								className="flex h-10 w-10 items-center justify-center rounded-full bg-chinese-black text-white-smoke transition-colors hover:bg-[#2a2b31] cursor-pointer"
+								className="flex h-10 w-10 items-center justify-center rounded-full bg-chinese-black text-white-smoke transition-colors hover:bg-off-black cursor-pointer"
 								aria-label="Replace artwork"
 							>
 								<GrEdit className="text-[18px]" />
@@ -123,7 +123,7 @@ export function ArtworkPanel({
 								title="Remove Image"
 								onClick={handleDeleteArtwork}
 								data-testid="upload-artwork-delete"
-								className="flex h-10 w-10 items-center justify-center rounded-full bg-chinese-black text-white-smoke transition-colors hover:bg-[#2a2b31] cursor-pointer"
+								className="flex h-10 w-10 items-center justify-center rounded-full bg-chinese-black text-white-smoke transition-colors hover:bg-off-black cursor-pointer"
 								aria-label="Delete artwork"
 							>
 								<RiDeleteBinLine className="text-[18px]" />
@@ -133,12 +133,12 @@ export function ArtworkPanel({
 				</div>
 
 				{artworkUrl && (
-					<div className="mt-3 flex items-center gap-3 rounded-md bg-chinese-black px-3 py-2" data-artwork-control="true">
+					<div className="mt-3 flex items-center gap-3 rounded-md bg-back px-3 py-2" data-artwork-control="true">
 						<button
 							type="button"
 							onClick={() => setArtworkZoom((z) => Math.max(1, Number((z - 0.1).toFixed(2))))}
 							data-testid="upload-artwork-zoom-out"
-							className="text-white-smoke/90 hover:text-white"
+							className="text-white-smoke/90 hover:text-white-smoke"
 							aria-label="Zoom out"
 						>
 							<MinusOutlined />
@@ -156,7 +156,7 @@ export function ArtworkPanel({
 							type="button"
 							onClick={() => setArtworkZoom((z) => Math.min(3, Number((z + 0.1).toFixed(2))))}
 							data-testid="upload-artwork-zoom-in"
-							className="text-white-smoke/90 hover:text-white"
+							className="text-white-smoke/90 hover:text-white-smoke"
 							aria-label="Zoom in"
 						>
 							<PlusOutlined />

@@ -54,7 +54,7 @@ export function Header({
 					<button
 						onClick={onGoHome}
 						data-testid="upload-header-home"
-						className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-[#1b1c20] cursor-pointer"
+						className="flex h-10 w-10 items-center justify-center rounded-full hover:bg-off-black cursor-pointer"
 					>
 						<Image src="/app-logo/whitelogo.png" alt="BeatZa" width={52} height={52} className="object-contain logo-dark" priority />
 						<Image src="/app-logo/blacklogo.png" alt="BeatZa" width={52} height={52} className="object-contain logo-light" priority />
@@ -73,7 +73,7 @@ export function Header({
 					{showUploadProgress ? (
 						<div className="flex min-w-0 flex-1 items-center gap-2 sm:gap-3">
 							<span className="truncate text-[12px] text-white-smoke">{currentFileName}</span>
-							<div className="w-24 h-1 bg-[#333] rounded-full overflow-hidden">
+							<div className="w-24 h-1 bg-off-black rounded-full overflow-hidden">
 								<div
 									className={`h-full rounded-full transition-all duration-300 ${roundedUploadProgress > 50 ? "bg-[#1db954]" : "bg-white-smoke"}`}
 									style={{ width: `${roundedUploadProgress}%` }}
@@ -89,7 +89,7 @@ export function Header({
 								<button
 									onClick={togglePlayPause}
 									data-testid="upload-header-play-toggle"
-									className="flex h-7 w-7 items-center justify-center text-white-smoke hover:text-[#f2f2f2] transition-colors cursor-pointer"
+									className="flex h-7 w-7 items-center justify-center text-white-smoke hover:text-white-smoke transition-colors cursor-pointer"
 									aria-label={isPlaying ? "Pause" : "Play"}
 								>
 									{isPlaying ? <PauseCircleOutlined className="text-[16px]" /> : <PlayCircleOutlined className="text-[16px]" />}
@@ -100,7 +100,7 @@ export function Header({
 					)}
 
 					{isTrackDragActive && (
-						<span className="text-[11px] font-semibold text-white/85">Drop audio file to upload</span>
+						<span className="text-[11px] font-semibold text-white-smoke/85">Drop audio file to upload</span>
 					)}
 					{showReplaceTrack && (
 						<button onClick={handleReplaceTrack} data-testid="upload-header-replace-track" className="text-[12px] font-semibold text-white-smoke hover:underline cursor-pointer">
@@ -110,7 +110,7 @@ export function Header({
 					<button
 						onClick={onShowQuitModal}
 						data-testid="upload-header-quit"
-						className="flex h-9 w-9 items-center justify-center rounded-full bg-[#222] text-[#ccc] transition-colors hover:bg-[#333] cursor-pointer"
+						className="flex h-9 w-9 items-center justify-center rounded-full bg-off-black text-silver transition-colors hover:bg-back cursor-pointer"
 					>
 						<CloseOutlined className="text-[14px]" />
 					</button>
