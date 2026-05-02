@@ -79,6 +79,7 @@ type CardProps = {
   reposterId?: string;
   reposterName?: string;
   isAvailable?: boolean;
+  profileLinkOverride?: string | null;
 };
 
 const FLASH_DURATION = 3000;
@@ -114,6 +115,7 @@ export default function WaveformCard({
   isRepost = false,
   reposterId,
   reposterName,
+  profileLinkOverride,
 }: CardProps) {
   const [showCommentBox, setShowCommentBox] = useState(false);
   const [inputFocused, setInputFocused] = useState(false);
@@ -136,7 +138,7 @@ export default function WaveformCard({
     useGetProfile();
 
   useEffect(() => {
-    if (!hasHydrated || !artistId) return;
+    if (!hasHydrated || !artistId || profileLinkOverride !== undefined) return;
 
     dispatch(setProfile({ isLoading: true }));
     getProfile(artistId)
@@ -435,9 +437,10 @@ export default function WaveformCard({
   }
 
   const handleCopyLink = () => {
-    if (!isAvailable || !trackId || !profileLink) return;
+    const resolvedProfileLink = profileLinkOverride ?? profileLink;
+    if (!isAvailable || !trackId || !resolvedProfileLink) return;
 
-    const url = `${getBaseUrl()}/${profileLink}/${permalink}`;
+    const url = `${getBaseUrl()}/${resolvedProfileLink}/${permalink}`;
 
     navigator.clipboard.writeText(url);
     interactiveToastBus.emit({
@@ -843,12 +846,12 @@ export default function WaveformCard({
                   className="bg-off-black"
                   icon={
                     <HiHeart
-                      className={`text-[16px] transition-colors ${isLiked ? "text-inferno" : ""}`}
+                      className={`text-[16px] transition-colors ${isLiked ? "text-inferno" : "text-white-smoke"}`}
                     />
                   }
                 >
                   <span
-                    className={`ml-0.5 inline-block min-w-[1ch] text-left transition-colors ${isLiked ? "text-inferno" : ""}`}
+                    className={`ml-0.5 inline-block min-w-[1ch] text-left transition-colors ${isLiked ? "text-inferno" : "text-white-smoke"}`}
                   >
                     {likeCountState}
                   </span>
@@ -860,12 +863,12 @@ export default function WaveformCard({
                   className="bg-off-black"
                   icon={
                     <LuRepeat2
-                      className={`text-[16px] transition-colors ${isReposted ? "text-inferno" : ""}`}
+                      className={`text-[16px] transition-colors ${isReposted ? "text-inferno" : "text-white-smoke"}`}
                     />
                   }
                 >
                   <span
-                    className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${isReposted ? "text-inferno" : ""} ${
+                    className={`ml-0.5 inline-block min-w-[1ch] text-left transition-opacity ${isReposted ? "text-inferno" : "text-white-smoke"} ${
                       repostLoading ? "opacity-50" : "opacity-100"
                     }`}
                   >

@@ -29,6 +29,7 @@ import {
   useGetPlaylistCreator,
   useGetRecommendedPlaylists,
   useReorderPlaylistTracks,
+  useRemoveTrackFromPlaylist,
   useUpdatePlaylist,
   useUpdatePlaylistImage,
 } from "@/hooks/usePlaylists";
@@ -50,6 +51,7 @@ import { PopoverProvider } from "@/components/layout/track-cards/PopoverContext"
 import GoMobile from "@/components/layout/GoMobile";
 import DeletePlaylistModal from "@/components/artist-studio/DeletePlaylistModal";
 import EditPlaylistModal from "@/components/playlists/EditPlaylistModal";
+import DeleteTrackFromPlaylistModal from "@/components/playlists/DeleteTrackFromPlaylistModal";
 
 
 const FALLBACK_COVER = "/test.jpg";
@@ -146,6 +148,7 @@ function ReorderableTrackRow({
   onPlay,
   onReorderStart,
   onReorderEnd,
+  onRemove,
 }: {
   track: PlaylistTrack;
   index: number;
@@ -155,6 +158,7 @@ function ReorderableTrackRow({
   onPlay: () => void;
   onReorderStart: (trackId: string) => void;
   onReorderEnd: (trackId: string) => void;
+  onRemove?: () => void;
 }) {
   const dragControls = useDragControls();
 
@@ -195,6 +199,7 @@ function ReorderableTrackRow({
             onPlay={onPlay}
             showArtist
             onAddToPlaylist={() => void 0}
+            onRemoveFromPlaylist={onRemove}
           />
         </div>
       </div>
@@ -229,6 +234,8 @@ export default function PlaylistPage() {
   const { deletePlaylist, loading: deletingPlaylist } = useDeletePlaylist();
   const { reorderPlaylistTracks, loading: reorderingTracks } =
     useReorderPlaylistTracks();
+  const { removeTrackFromPlaylist, loading: removingTrack } =
+    useRemoveTrackFromPlaylist();
 
   const [isLiked, setIsLiked] = useState(false);
   const [likeCount, setLikeCount] = useState(0);
@@ -239,6 +246,9 @@ export default function PlaylistPage() {
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
   const [showDeleteModal, setShowDeleteModal] = useState(false);
   const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [showRemoveTrackModal, setShowRemoveTrackModal] = useState(false);
+  const [removeTrackError, setRemoveTrackError] = useState<string | null>(null);
+  const [removeTrackTarget, setRemoveTrackTarget] = useState<PlaylistTrack | null>(null);
   const [showEditModal, setShowEditModal] = useState(false);
   const [editError, setEditError] = useState<string | null>(null);
   const dragStartRef = useRef<{
@@ -378,6 +388,30 @@ export default function PlaylistPage() {
 
     dispatch(playAudio({ tracks: mappedTracks, startId: trackId }));
     setTimeout(() => dispatch(play()), 0);
+  }
+
+  function promptRemoveTrack(track: PlaylistTrack) {
+    if (!isOwner) return;
+    setRemoveTrackError(null);
+    setRemoveTrackTarget(track);
+    setShowRemoveTrackModal(true);
+  }
+
+  async function confirmRemoveTrack() {
+    if (!playlist || !removeTrackTarget || removingTrack) return;
+
+    setRemoveTrackError(null);
+    try {
+      await removeTrackFromPlaylist(playlist._id, removeTrackTarget._id);
+      setLocalTracks((current) =>
+        current.filter((track) => track._id !== removeTrackTarget._id),
+      );
+      setShowRemoveTrackModal(false);
+      setRemoveTrackTarget(null);
+      setStatusMessage("Track removed from playlist");
+    } catch {
+      setRemoveTrackError("Could not remove track from playlist");
+    }
   }
 
   function handleWaveformPlay(seekPercentage?: number) {
@@ -543,6 +577,19 @@ export default function PlaylistPage() {
         onConfirm={confirmDeletePlaylist}
       />
 
+      <DeleteTrackFromPlaylistModal
+        isOpen={showRemoveTrackModal}
+        playlistTitle={playlist.title}
+        trackTitle={removeTrackTarget?.basicInfo.title}
+        isLoading={removingTrack}
+        error={removeTrackError}
+        onClose={() => {
+          setShowRemoveTrackModal(false);
+          setRemoveTrackTarget(null);
+        }}
+        onConfirm={confirmRemoveTrack}
+      />
+
       <EditPlaylistModal
         isOpen={showEditModal}
         playlist={playlist}
@@ -554,67 +601,74 @@ export default function PlaylistPage() {
             setEditError(null);
             if (!playlist) return;
 
-            const payload: any = {
-              title: data?.title ?? playlist.title,
-              permalink: data?.permalink ?? undefined,
-              playlistType: data?.playlistType ?? undefined,
-              releaseDate: data?.releaseDate ?? undefined,
-              genre: data?.genre ?? undefined,
-              description: data?.description ?? undefined,
-              isPrivate: typeof data?.privacy === "string" ? data.privacy === "private" : playlist.isPrivate,
-              buyLink: data?.buyLink ?? undefined,
-              recordLabel: data?.recordLabel ?? undefined,
-            };
+            // Build payload with only defined values — undefined fields are omitted
+            // so the server doesn't receive empty/null overrides.
+            const payload: Record<string, any> = {};
 
+            if (data?.title)       payload.title       = data.title;
+            if (data?.permalink)   payload.permalink   = data.permalink;
+            if (data?.playlistType) payload.playlistType = data.playlistType;
+            if (data?.releaseDate) {
+              // API expects full ISO datetime string
+              const rd = data.releaseDate;
+              payload.releaseDate = rd.includes("T") ? rd : `${rd}T00:00:00.000Z`;
+            }
+            if (data?.genre)       payload.genre       = data.genre;
+            if (data?.description !== undefined) payload.description = data.description;
+            payload.isPrivate = typeof data?.privacy === "string"
+              ? data.privacy === "private"
+              : playlist.isPrivate;
+            if (data?.buyLink)     payload.buyLink     = data.buyLink;
+            if (data?.recordLabel) payload.recordLabel = data.recordLabel;
+
+            // Tags → sent as additionalTags array (API field name)
             if (data?.tags) {
-              payload.tags = data.tags.split(",").map((t: string) => t.trim()).filter(Boolean);
+              payload.additionalTags = data.tags
+                .split(",")
+                .map((t: string) => t.trim())
+                .filter(Boolean);
             }
 
-            payload.listOfTracks = (data?.listOfTracks && Array.isArray(data.listOfTracks))
+            // Always send the full track list to avoid accidental deletions
+            payload.listOfTracks = Array.isArray(data?.listOfTracks)
               ? data.listOfTracks
               : (playlist.tracks ?? []).map((t: any) => t._id);
 
+            // PUT — metadata + tracks (no image)
+            console.log("[EditPlaylist] PUT payload:", JSON.stringify(payload, null, 2));
             await updatePlaylist(playlist._id, payload);
 
+            // PATCH — image only, sent separately
             if (data?.image instanceof File) {
-              const imagePayload: Record<string, any> = {
-                title: payload.title,
-                permalink: payload.permalink,
-                playlistType: payload.playlistType,
-                releaseDate: payload.releaseDate,
-                genre: payload.genre,
-                description: payload.description,
-                isPrivate: payload.isPrivate,
-                listOfTracks: payload.listOfTracks,
-                buyLink: payload.buyLink,
-                recordLabel: payload.recordLabel,
-              };
               await updatePlaylistImage(playlist._id, data.image);
             }
 
             void getPlaylistById(playlist._id);
             setShowEditModal(false);
           } catch (e: any) {
-            const msg = e?.response?.data?.message ?? "Could not save playlist";
-            setEditError(msg);
+            const errData = e?.response?.data;
+            console.error("[EditPlaylist] 400 response:", JSON.stringify(errData, null, 2));
+            const msg = errData?.message ?? e?.message ?? "Could not save playlist";
+            const fieldErrors = errData?.errors?.map((err: any) => `${err.field}: ${err.message}`).join(", ");
+            setEditError(fieldErrors ? `${msg} — ${fieldErrors}` : msg);
           }
         }}
       />
-      <section className="mx-1 min-h-120 bg-chinese-black p-10">
-        <div className="flex min-h-92 gap-8 border-white-smoke">
+      <section className="mx-1 min-h-120 bg-chinese-black p-4 sm:p-6 lg:p-10">
+        <div className="flex min-h-92 flex-col gap-6 border-white-smoke lg:flex-row lg:gap-8">
           <button
             type="button"
             onClick={handlePlaylistPlay}
             aria-label={isPlaylistPlaying ? "Pause playlist" : "Play playlist"}
-            className="mt-0 flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-chinese-black text-white-smoke transition-transform hover:scale-105"
+            className="mt-0 flex h-20 w-20 shrink-0 items-center justify-center rounded-full bg-chinese-black text-white-smoke transition-transform hover:scale-105 self-start"
           >
             <Play className="h-10 w-10 fill-current" />
           </button>
 
           <div className="flex flex-1 flex-col justify-between">
             <div>
-              <div className="inline-block max-w-165 bg-chinese-black/90 px-3 py-2">
-                <h1 className="text-3xl font-bold leading-tight md:text-4xl">
+              <div className="inline-block max-w-full bg-chinese-black/90 px-3 py-2 sm:max-w-165">
+                <h1 className="text-2xl font-bold leading-tight sm:text-3xl md:text-4xl">
                   {playlist.title}
                 </h1>
               </div>
@@ -636,7 +690,7 @@ export default function PlaylistPage() {
 
             <div className="flex flex-col gap-4">
               {isPlaylistPlaying ? (
-                <div className="h-20 w-full max-w-lg">
+                <div className="h-20 w-full max-w-full lg:max-w-lg">
                   <SausageWaveform
                     trackId={waveformTrack?._id}
                     samplesUrl={
@@ -670,7 +724,7 @@ export default function PlaylistPage() {
             </div>
           </div>
 
-          <div className="relative ml-auto hidden h-100 w-100 shrink-0 overflow-hidden rounded-lg bg-off-black md:block">
+          <div className="relative ml-auto hidden h-100 w-100 shrink-0 overflow-hidden rounded-lg bg-off-black lg:block">
             <img
               src={cover}
               alt={`${playlist.title} cover`}
@@ -701,9 +755,9 @@ export default function PlaylistPage() {
         />
       )}
 
-      <section className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_410px]">
+      <section className="mt-8 grid gap-8 px-1 sm:px-0 lg:grid-cols-[minmax(0,1fr)_410px]">
         <div className="min-w-0">
-          <div className="mb-8 flex items-center gap-2">
+          <div className="mb-8 flex flex-wrap items-center gap-2">
             <button
               type="button"
               onClick={() => {}}
@@ -793,6 +847,7 @@ export default function PlaylistPage() {
                   onPlay={() => handleTrackPlay(track._id)}
                   onReorderStart={handleReorderStart}
                   onReorderEnd={handleReorderEnd}
+                  onRemove={isOwner ? () => promptRemoveTrack(track) : undefined}
                 />
               ))}
             </Reorder.Group>
@@ -803,8 +858,8 @@ export default function PlaylistPage() {
           )}
         </div>
 
-        <aside className="min-w-0 space-y-8 pr-4">
-          <div className="text-base font-bold leading-6">
+        <aside className="min-w-0 space-y-8 pr-0 lg:pr-4">
+          <div className="text-base font-bold leading-6 wrap-break-word">
             Based on {tracks[0]?.basicInfo.title ?? playlist.title}
           </div>
 
@@ -815,11 +870,11 @@ export default function PlaylistPage() {
               </h2>
               <div className="space-y-6">
                 {featuredArtists.map((artist) => (
-                  <div key={artist.name} className="flex items-center gap-4">
+                  <div key={artist.name} className="flex flex-col gap-4 rounded-md bg-white-smoke/0 sm:flex-row sm:items-center">
                     <img
                       src={artist.image}
                       alt=""
-                      className="h-15 w-15 rounded-full object-cover"
+                      className="h-15 w-15 rounded-full object-cover shrink-0"
                     />
                     <div className="min-w-0 flex-1">
                       <div className="flex items-center gap-1">
@@ -841,7 +896,7 @@ export default function PlaylistPage() {
                     </div>
                     <button
                       type="button"
-                      className="h-10 rounded-sm bg-white-smoke px-5 text-sm font-bold text-chinese-black hover:opacity-80"
+                      className="h-10 rounded-sm bg-white-smoke px-5 text-sm font-bold text-chinese-black hover:opacity-80 self-start sm:self-auto"
                     >
                       Follow
                     </button>
@@ -873,7 +928,7 @@ export default function PlaylistPage() {
             {likeUsers.length === 0 ? (
               <p className="text-xs text-silver">No likes yet</p>
             ) : (
-              <Avatar.Group className="w-100">
+              <Avatar.Group className="w-full max-w-full overflow-x-auto">
                 {likeUsers.map((user) => {
                   const profile     = userProfiles[user.userId];
                   const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false;
@@ -906,7 +961,7 @@ export default function PlaylistPage() {
             {repostUsers.length === 0 ? (
               <p className="text-xs text-silver">No reposts yet</p>
             ) : (
-              <Avatar.Group className="w-100">
+              <Avatar.Group className="w-full max-w-full overflow-x-auto">
                 {repostUsers.map((user) => {
                   const profile     = userProfiles[user.userId];
                   const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false;
@@ -934,7 +989,7 @@ export default function PlaylistPage() {
 
       <GoMobile />
 
-      <div className=" text-xs text-silver leading-6">
+      <div className="text-xs text-silver leading-6 wrap-break-word">
         {[
           "Legal", "Privacy", "Cookie Policy", "Cookie Manager",
           "Imprint", "Artist Resources", "Newsroom", "Charts",

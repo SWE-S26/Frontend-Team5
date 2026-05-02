@@ -1,9 +1,9 @@
 import PlaylistWaveformCard from "@/components/layout/track-cards/WaveformPlaylist"
 import { Track as StoreTrack } from "@/store/slices/playerSlice"
 
-interface Item { id: string; title: string; artist: string; img: string; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; playlistTracks?: any[]; totalTracks?: number }
-interface Props { items: Item[]; }
-export default function Playlists({ items }: Props) {
+interface Item { id: string; title: string; artist: string; artistId?: string; img: string; numLikes?: number; numReposts?: number; isLikedByUser?: boolean; playlistTracks?: any[]; totalTracks?: number; permalink?: string; isAvailableForUser?: boolean; }
+interface Props { items: Item[]; profileLink?: string | null; }
+export default function Playlists({ items, profileLink }: Props) {
   return (
       <>
       <div className="flex flex-col gap-12">
@@ -13,10 +13,13 @@ export default function Playlists({ items }: Props) {
             img={item.img}
             title={item.title}
             artist={item.artist}
+            artistId={item.artistId}
             playlistId={item.id}
             likeCount={item.numLikes ?? 0}
             repostCount={item.numReposts ?? 0}
             isLikedByUser={item.isLikedByUser}
+            permalink={item.permalink}
+            profileLinkOverride={profileLink}
             preloadedTracks={
               (item.playlistTracks ?? []).map((t, i) => ({
                 _id: t._id ?? `${item.id}-${i}`,
@@ -28,6 +31,7 @@ export default function Playlists({ items }: Props) {
                 numOfLikes: t.numOfLikes ?? 0,
                 isLiked: t.isLiked ?? false,
                 isReposted: t.isReposted ?? false,
+                isAvailableForUser: t.isAvailableForUser,
               }))
             }
             totalTracks={item.totalTracks}

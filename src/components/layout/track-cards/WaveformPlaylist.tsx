@@ -30,6 +30,7 @@ import { IoMdPlay, IoMdPause, IoIosMore } from "react-icons/io";
 import { HiHeart } from "react-icons/hi";
 import { LuRepeat2, LuShare, LuMapPin } from "react-icons/lu";
 import { TbCopy } from "react-icons/tb";
+import { Trash2 } from "lucide-react";
 import { ListStart } from "lucide-react";
 import MoreDropdown from "@/components/ui/MoreDropdown";
 import { BiStation } from "react-icons/bi";
@@ -71,6 +72,7 @@ type Props = {
   isRepost?: boolean;
   reposterId?: string;
   reposterName?: string;
+  profileLinkOverride?: string | null;
 };
 
 function normalizePlaylistTrack(track: any, fallbackId: string): PlaylistTrack {
@@ -120,6 +122,7 @@ export function TrackRow({
   rowRef,
   showArtist = false,
   onAddToPlaylist,
+  onRemoveFromPlaylist,
 }: {
   track: PlaylistTrack;
   index: number;
@@ -129,6 +132,7 @@ export function TrackRow({
   rowRef?: (el: HTMLDivElement | null) => void;
   showArtist?: boolean;
   onAddToPlaylist: () => void;
+  onRemoveFromPlaylist?: () => void;
 }) {
   const isAvailable = track.isAvailableForUser !== false;
 
@@ -351,6 +355,15 @@ export function TrackRow({
                     ),
                     onClick: () => onAddToPlaylist(),
                   },
+                  ...(onRemoveFromPlaylist
+                    ? [
+                        {
+                          label: "Remove from Playlist",
+                          icon: <Trash2 className="text-lg" />,
+                          onClick: onRemoveFromPlaylist,
+                        },
+                      ]
+                    : []),
                   {
                     label: "Station",
                     disabled: true,
@@ -400,6 +413,15 @@ export function TrackRow({
                 ),
                 onClick: () => onAddToPlaylist(),
               },
+              ...(onRemoveFromPlaylist
+                ? [
+                    {
+                      label: "Remove from Playlist",
+                      icon: <Trash2 className="text-lg" />,
+                      onClick: onRemoveFromPlaylist,
+                    },
+                  ]
+                : []),
               {
                 label: "Copy Link",
                 icon: <TbCopy className="text-lg" />,
@@ -444,6 +466,7 @@ export default function PlaylistWaveformCard({
   isRepost,
   reposterId,
   reposterName,
+  profileLinkOverride,
 }: Props) {
   const displayArtist = artist?.trim() || artistId?.trim() || "Unknown creator";
   const artistHref = artistId ? `/profile/${artistId}` : undefined;
@@ -464,7 +487,7 @@ export default function PlaylistWaveformCard({
     if (artistId) getProfile(artistId);
   }, [artistId]);
 
-  const profileLink = creatorProfile?.profileLink ?? null;
+  const profileLink = profileLinkOverride ?? creatorProfile?.profileLink ?? null;
 
   const [cachedTracks, setCachedTracks] = useState<PlaylistTrack[]>(
     (preloadedTracks ?? []).map((track, index) =>
@@ -765,12 +788,12 @@ export default function PlaylistWaveformCard({
               className="bg-off-black"
               icon={
                 <HiHeart
-                  className={`text-[16px] transition-colors ${isLiked ? "text-inferno" : ""}`}
+                  className={`text-[16px] transition-colors ${isLiked ? "text-inferno" : "text-white-smoke"}`}
                 />
               }
             >
               <span
-                className={`ml-0.5 inline-block min-w-[1ch] text-left transition-colors ${isLiked ? "text-inferno" : ""}`}
+                className={`ml-0.5 inline-block min-w-[1ch] text-left transition-colors ${isLiked ? "text-inferno" : "text-white-smoke"}`}
               >
                 {likeCountState}
               </span>
@@ -782,12 +805,12 @@ export default function PlaylistWaveformCard({
               className="bg-off-black"
               icon={
                 <LuRepeat2
-                  className={`text-[16px] transition-colors ${isReposted ? "text-inferno" : ""}`}
+                  className={`text-[16px] transition-colors ${isReposted ? "text-inferno" : "text-white-smoke"}`}
                 />
               }
             >
               <span
-                className={`ml-0.5 inline-block min-w-[1ch] text-left transition-colors ${isReposted ? "text-inferno" : ""}`}
+                className={`ml-0.5 inline-block min-w-[1ch] text-left transition-colors ${isReposted ? "text-inferno" : "text-white-smoke"}`}
               >
                 {repostCountState}
               </span>

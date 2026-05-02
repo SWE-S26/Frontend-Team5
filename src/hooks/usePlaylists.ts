@@ -244,6 +244,39 @@ export function useAddTrackToPlaylist() {
   return { addTrackToPlaylist, loading, error, success };
 }
 
+export function useRemoveTrackFromPlaylist() {
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [success, setSuccess] = useState<boolean | null>(null);
+
+  const removeTrackFromPlaylist = useCallback(
+    async (playlistId: string, trackId: string) => {
+      setLoading(true);
+      setError(null);
+      setSuccess(null);
+      try {
+        const res = await playlistsService.removeTrackFromPlaylist(
+          playlistId,
+          trackId,
+        );
+        setSuccess(true);
+        return res.data;
+      } catch (err: any) {
+        const message =
+          err.response?.data?.message || "Failed to remove track from playlist";
+        setError(message);
+        setSuccess(false);
+        throw err;
+      } finally {
+        setLoading(false);
+      }
+    },
+    [],
+  );
+
+  return { removeTrackFromPlaylist, loading, error, success };
+}
+
 export function useGetPublicPlaylists() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
