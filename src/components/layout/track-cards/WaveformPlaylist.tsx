@@ -54,6 +54,7 @@ type Props = {
   title?: string;
   artist?: string;
   playlistId?: string;
+  permalink?: string;
   tag?: string;
   likeCount?: number;
   repostCount?: number;
@@ -69,7 +70,8 @@ type Props = {
 };
 
 function normalizePlaylistTrack(track: any, fallbackId: string): PlaylistTrack {
-  const imageLink = track?.image?.imgLink ?? track?.img ?? "/app-logo/blacklogo.png";
+  const imageLink =
+    track?.image?.imgLink ?? track?.img ?? "/app-logo/blacklogo.png";
   const audioLink = track?.audio?.audioLink ?? "";
   const waveformLink = track?.audio?.waveformLink ?? "/waveform.json";
 
@@ -77,7 +79,9 @@ function normalizePlaylistTrack(track: any, fallbackId: string): PlaylistTrack {
     _id: track?._id ?? fallbackId,
     basicInfo: {
       title: track?.basicInfo?.title ?? track?.title ?? "Unknown Title",
-      mainArtists: track?.basicInfo?.mainArtists ?? [track?.artist ?? "Unknown Artist"],
+      mainArtists: track?.basicInfo?.mainArtists ?? [
+        track?.artist ?? "Unknown Artist",
+      ],
       permalink: track?.basicInfo?.permalink ?? "",
     },
     audio: {
@@ -177,7 +181,7 @@ export function TrackRow({
   const handleCopyLink = () => {
     if (!track._id) return;
 
-    const url = `${getBaseUrl()}/track/${track._id}`;
+    const url = `${getBaseUrl()}/track/${track.basicInfo.permalink ?? track._id}`;
 
     navigator.clipboard.writeText(url);
     interactiveToastBus.emit({
@@ -230,7 +234,7 @@ export function TrackRow({
         </>
       )}
       <a
-        href={`/track/${track._id}`}
+        href={`/track/${track.basicInfo.permalink ?? track._id}`}
         onClick={(e) => e.stopPropagation()}
         className={`text-sm font-bold flex-1 truncate min-w-0 no-underline transition-colors ${
           isCurrent
@@ -329,6 +333,7 @@ export default function PlaylistWaveformCard({
   title,
   artist,
   playlistId,
+  permalink,
   tag,
   likeCount,
   repostCount,
@@ -356,7 +361,12 @@ export default function PlaylistWaveformCard({
   const { getPlaylistById } = useGetPlaylistById();
 
   const [cachedTracks, setCachedTracks] = useState<PlaylistTrack[]>(
-    (preloadedTracks ?? []).map((track, index) => normalizePlaylistTrack(track, track?._id ?? `${playlistId ?? "playlist"}-track-${index}`)),
+    (preloadedTracks ?? []).map((track, index) =>
+      normalizePlaylistTrack(
+        track,
+        track?._id ?? `${playlistId ?? "playlist"}-track-${index}`,
+      ),
+    ),
   );
   const [tracksExpanded, setTracksExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(isLikedByUser);
@@ -390,7 +400,10 @@ export default function PlaylistWaveformCard({
     if (preloadedTracks && preloadedTracks.length > 0)
       setCachedTracks(
         preloadedTracks.map((track, index) =>
-          normalizePlaylistTrack(track, track?._id ?? `${playlistId ?? "playlist"}-track-${index}`),
+          normalizePlaylistTrack(
+            track,
+            track?._id ?? `${playlistId ?? "playlist"}-track-${index}`,
+          ),
         ),
       );
   }, [preloadedTracks]);
@@ -413,7 +426,10 @@ export default function PlaylistWaveformCard({
     const pl = res?.data?.playlist;
     const detail = Array.isArray(pl) ? pl[0] : pl;
     const tracks = (detail?.tracks ?? []).map((track: any, index: number) =>
-      normalizePlaylistTrack(track, track?._id ?? `${playlistId}-track-${index}`),
+      normalizePlaylistTrack(
+        track,
+        track?._id ?? `${playlistId}-track-${index}`,
+      ),
     );
     setCachedTracks(tracks);
     return tracks;
@@ -481,7 +497,7 @@ export default function PlaylistWaveformCard({
   const handleCopyLink = () => {
     if (!playlistId) return;
 
-    const url = `${getBaseUrl()}/playlist/${playlistId}`;
+    const url = `${getBaseUrl()}/playlist/${permalink ?? playlistId}`;
 
     navigator.clipboard.writeText(url);
     interactiveToastBus.emit({
