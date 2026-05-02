@@ -510,12 +510,14 @@ const handleCancelCrop = () => {
                     <span className="text-silver px-3 py-2 whitespace-nowrap border-r border-zinc-700 select-none">
                       beatza.me/
                     </span>
-                    <input data-testid="ProfileLink-input"
+                    <input
+                      data-testid="ProfileLink-input"
                       value={formProfileLink || ""}
                       onChange={(e) => {
-                        setFormProfileLink(e.target.value)
+                        const sanitized = e.target.value.replace(/[/\\]/g, "")
+                        setFormProfileLink(sanitized)
                         setIsDirty(true)
-                        if (e.target.value.trim()) {
+                        if (sanitized.trim()) {
                           setProfileLinkError(false)
                           setProfileLinkTakenError(false)
                         }
