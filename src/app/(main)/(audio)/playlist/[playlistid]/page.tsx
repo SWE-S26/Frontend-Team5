@@ -48,6 +48,8 @@ import { profileService } from "@/services/profile.service";
 import { GetProfileResponse } from "@/types/profile.types";
 import { PopoverProvider } from "@/components/layout/track-cards/PopoverContext"
 import GoMobile from "@/components/layout/GoMobile";
+import DeletePlaylistModal from "@/components/artist-studio/DeletePlaylistModal";
+import EditPlaylistModal from "@/components/playlists/EditPlaylistModal";
 
 
 const FALLBACK_COVER = "/test.jpg";
@@ -235,6 +237,10 @@ export default function PlaylistPage() {
   const [isPrivate, setIsPrivate] = useState(false);
   const [localTracks, setLocalTracks] = useState<PlaylistTrack[]>([]);
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [editError, setEditError] = useState<string | null>(null);
   const dragStartRef = useRef<{
     trackId: string;
     apiTrackId: string;
@@ -439,17 +445,19 @@ export default function PlaylistPage() {
 
   async function handleDeletePlaylist() {
     if (!playlist || deletingPlaylist) return;
-    const confirmed = window.confirm(
-      `Delete "${playlist.title}"? This cannot be undone.`,
-    );
-    if (!confirmed) return;
+    setDeleteError(null);
+    setShowDeleteModal(true);
+  }
 
-    setStatusMessage(null);
+  async function confirmDeletePlaylist() {
+    if (!playlist || deletingPlaylist) return;
+    setDeleteError(null);
     try {
       await deletePlaylist(playlist._id);
+      setShowDeleteModal(false);
       router.push("/library/playlists");
     } catch {
-      setStatusMessage("Could not delete playlist");
+      setDeleteError("Could not delete playlist");
     }
   }
 
@@ -526,6 +534,72 @@ export default function PlaylistPage() {
 
   return (
     <div className="w-full pb-14 text-white-smoke">
+      <DeletePlaylistModal
+        isOpen={showDeleteModal}
+        playlistTitle={playlist.title}
+        isLoading={deletingPlaylist}
+        error={deleteError}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={confirmDeletePlaylist}
+      />
+
+      <EditPlaylistModal
+        isOpen={showEditModal}
+        playlist={playlist}
+        isSaving={updatingPlaylist}
+        error={editError}
+        onClose={() => setShowEditModal(false)}
+        onSave={async (data?: any) => {
+          try {
+            setEditError(null);
+            if (!playlist) return;
+
+            const payload: any = {
+              title: data?.title ?? playlist.title,
+              permalink: data?.permalink ?? undefined,
+              playlistType: data?.playlistType ?? undefined,
+              releaseDate: data?.releaseDate ?? undefined,
+              genre: data?.genre ?? undefined,
+              description: data?.description ?? undefined,
+              isPrivate: typeof data?.privacy === "string" ? data.privacy === "private" : playlist.isPrivate,
+              buyLink: data?.buyLink ?? undefined,
+              recordLabel: data?.recordLabel ?? undefined,
+            };
+
+            if (data?.tags) {
+              payload.tags = data.tags.split(",").map((t: string) => t.trim()).filter(Boolean);
+            }
+
+            payload.listOfTracks = (data?.listOfTracks && Array.isArray(data.listOfTracks))
+              ? data.listOfTracks
+              : (playlist.tracks ?? []).map((t: any) => t._id);
+
+            await updatePlaylist(playlist._id, payload);
+
+            if (data?.image instanceof File) {
+              const imagePayload: Record<string, any> = {
+                title: payload.title,
+                permalink: payload.permalink,
+                playlistType: payload.playlistType,
+                releaseDate: payload.releaseDate,
+                genre: payload.genre,
+                description: payload.description,
+                isPrivate: payload.isPrivate,
+                listOfTracks: payload.listOfTracks,
+                buyLink: payload.buyLink,
+                recordLabel: payload.recordLabel,
+              };
+              await updatePlaylistImage(playlist._id, data.image);
+            }
+
+            void getPlaylistById(playlist._id);
+            setShowEditModal(false);
+          } catch (e: any) {
+            const msg = e?.response?.data?.message ?? "Could not save playlist";
+            setEditError(msg);
+          }
+        }}
+      />
       <section className="mx-1 min-h-120 bg-chinese-black p-10">
         <div className="flex min-h-92 gap-8 border-white-smoke">
           <button
@@ -629,72 +703,69 @@ export default function PlaylistPage() {
 
       <section className="mt-8 grid gap-10 lg:grid-cols-[minmax(0,1fr)_410px]">
         <div className="min-w-0">
-          <div className="mb-8 flex flex-wrap items-center gap-5">
+          <div className="mb-8 flex items-center gap-2">
             <button
               type="button"
-              onClick={handleLikePlaylist}
-              aria-label={`${isLiked ? "Unlike" : "Like"} playlist with ${formatCount(likeCount)} likes`}
-              className={`inline-flex h-10 items-center gap-2 rounded-sm bg-off-black px-4 text-sm font-bold hover:opacity-80 ${
-                isLiked ? "text-inferno" : "text-white-smoke"
-              }`}
+              onClick={() => {}}
+              aria-label="Share"
+              className="flex h-10 w-10 items-center justify-center rounded-sm bg-off-black text-white-smoke transition-opacity hover:opacity-70"
             >
-              <Heart className="h-4 w-4 fill-current" />
-              {formatCount(likeCount)}
+              <Share2 className="h-4 w-4" />
             </button>
+
             <button
               type="button"
               onClick={handleRepostPlaylist}
-              className={`inline-flex h-10 items-center gap-2 rounded-sm bg-off-black px-4 text-sm font-bold hover:opacity-80 ${
+              aria-label="Repost"
+              className={`flex h-10 w-10 items-center justify-center rounded-sm bg-off-black transition-opacity hover:opacity-70 ${
                 isReposted ? "text-inferno" : "text-white-smoke"
               }`}
             >
               <Repeat2 className="h-4 w-4" />
-              {formatCount(repostCount)}
             </button>
+
             <button
               type="button"
-              className="inline-flex h-10 items-center gap-2 rounded-sm bg-off-black px-4 text-sm font-bold hover:opacity-80"
+              onClick={() => setShowEditModal(true)}
+              aria-label="Edit playlist"
+              className="flex h-10 w-10 items-center justify-center rounded-sm bg-off-black text-white-smoke transition-opacity hover:opacity-70"
             >
-              <Share2 className="h-4 w-4" />
-              Share
+              <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round">
+                <path d="M12 20h9" />
+                <path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4 12.5-12.5z" />
+              </svg>
             </button>
+
             <button
               type="button"
               onClick={() => dispatch(playNext({ tracks: mappedTracks }))}
               disabled={!mappedTracks.length}
-              className="inline-flex h-10 items-center gap-2 rounded-sm bg-off-black px-4 text-sm font-bold hover:opacity-80 disabled:cursor-not-allowed disabled:opacity-50"
+              aria-label="Add to next up"
+              className="flex h-10 w-10 items-center justify-center rounded-sm bg-off-black text-white-smoke transition-opacity hover:opacity-70 disabled:opacity-30"
             >
               <ListPlus className="h-4 w-4" />
-              Add to Next up
             </button>
+
             <button
               type="button"
-              className="inline-flex h-10 items-center gap-2 rounded-sm bg-off-black px-4 text-sm font-bold hover:opacity-80"
+              onClick={() => setShowDeleteModal(true)}
+              disabled={deletingPlaylist}
+              aria-label="Delete playlist"
+              className="flex h-10 w-10 items-center justify-center rounded-sm bg-off-black text-anger transition-opacity hover:opacity-70 disabled:opacity-30"
             >
-              <MoreHorizontal className="h-4 w-4" />
-              More
+              <Trash2 className="h-4 w-4" />
             </button>
+
             {isOwner && (
-              <>
-                <button
-                  type="button"
-                  onClick={handlePrivacyToggle}
-                  disabled={updatingPlaylist}
-                  className="inline-flex h-10 items-center gap-2 rounded-sm bg-off-black px-4 text-sm font-bold hover:opacity-80 disabled:opacity-50"
-                >
-                  <Lock className="h-4 w-4" />
-                  {isPrivate ? "Make public" : "Make private"}
-                </button>
-                <button
-                  type="button"
-                  onClick={handleDeletePlaylist}
-                  disabled={deletingPlaylist}
-                  className="inline-flex h-10 items-center gap-2 rounded-sm bg-off-black px-4 text-sm font-bold text-anger hover:opacity-80 disabled:opacity-50"
-                >
-                  <Trash2 className="h-4 w-4" />
-                  Delete
-                </button>
-              </>
+              <button
+                type="button"
+                onClick={handlePrivacyToggle}
+                disabled={updatingPlaylist}
+                aria-label={isPrivate ? "Make public" : "Make private"}
+                className="flex h-10 w-10 items-center justify-center rounded-sm bg-off-black text-white-smoke transition-opacity hover:opacity-70 disabled:opacity-30"
+              >
+                <Lock className="h-4 w-4" />
+              </button>
             )}
           </div>
 

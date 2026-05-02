@@ -229,6 +229,7 @@ const ProfilePage = ({ params }: Props) => {
     const artistIds = new Set<string>()
     ;(repostedPlaylists ?? []).forEach((p) => { if (p.artistId) artistIds.add(p.artistId) })
     ;(myPlaylists ?? []).forEach((p) => { if (p.artistId) artistIds.add(p.artistId) })
+    ;(playlistDetails ?? []).forEach((pd) => { if ((pd as any).artistId) artistIds.add((pd as any).artistId) })
 
     const toFetch = Array.from(artistIds).filter((id) => !creatorMap[id])
     if (!toFetch.length) return
@@ -252,7 +253,7 @@ const ProfilePage = ({ params }: Props) => {
     }
 
     void resolve()
-  }, [repostedPlaylists, myPlaylists, creatorMap])
+  }, [repostedPlaylists, myPlaylists, playlistDetails, creatorMap])
 
   const getTrackSortTime = (track: { releaseDate?: string; _id?: string }) => {
     const releaseTime = track.releaseDate ? new Date(track.releaseDate).getTime() : NaN
@@ -277,6 +278,7 @@ const ProfilePage = ({ params }: Props) => {
         : "Unknown Artist",
       img: track.image?.imgLink,
       trackUrl: track.audio?.audioLink,
+      wfLink: track.audio?.waveformLink,
       downloadUrl: track.audio?.downloadLink,
       duration: track.durationInSeconds,
       numLikes: track.numLikes,
@@ -341,10 +343,12 @@ const ProfilePage = ({ params }: Props) => {
   
 
   const mapPlaylistToProfileItem = (playlist: Playlist, fallbackIndex: number) => {
-    const stableId = playlist._id ?? `playlist-${fallbackIndex}`
-    const rawArtistId = (playlist as any).artistId || (playlist as any).creatorId || (playlist as any).ownerId
-    const artistFromObj = (playlist as any).artistDisplayName || (playlist as any).artistName || (playlist as any).creator?.displayName || (playlist as any).creator?.displayName
-    const artistName = artistFromObj || (rawArtistId ? creatorMap[rawArtistId] ?? rawArtistId : "Unknown Creator")
+    const stableId = playlist._id ?? `playlist-${fallbackIndex}`;
+    const rawArtistId = (playlist as any).artistId || (playlist as any).creatorId || (playlist as any).ownerId;
+    const artistFromObj = (playlist as any).artistDisplayName || (playlist as any).artistName || (playlist as any).creator?.displayName;
+    const resolvedArtistFromMap = rawArtistId ? creatorMap[rawArtistId] : undefined;
+    // Prefer explicit display name fields, then resolved creatorMap value. Do NOT show raw DB ids to the user.
+    const artistName = artistFromObj || resolvedArtistFromMap || "";
     return {
       id: stableId,
       title: playlist.title,
@@ -354,12 +358,41 @@ const ProfilePage = ({ params }: Props) => {
       numReposts: playlist.numOfReposts,
       isLikedByUser: playlist.isLiked,
       releaseDate: playlist.createdAt,
-    }
-  }
+    };
+  };
 
   const repostedTrackItems = [...(resolvedRepostedTracks.length ? resolvedRepostedTracks : (repostedTracks ?? []))]
     .sort((a, b) => getTrackSortTime(b) - getTrackSortTime(a))
-    .map((track, index) => mapTrackToProfileItem(track, index + 20000, false))
+    .map((track, index) => {
+      const base = mapTrackToProfileItem(track as any, index + 20000, false)
+      // If there is a repost entry in the original repostedTracks list, attach reposter metadata
+      const maybeRepostEntry = (repostedTracks ?? []).find(
+        (r: any) => (r.trackId ?? r._id) === (track.trackId ?? (track as any)._id),
+      ) as
+        | {
+            actorId?: string
+            reposterId?: string
+            userId?: string
+            displayName?: string
+            reposterName?: string
+          }
+        | undefined
+      if (maybeRepostEntry) {
+        return {
+          ...base,
+          isRepost: true,
+          reposterId:
+            maybeRepostEntry.actorId ??
+            maybeRepostEntry.reposterId ??
+            maybeRepostEntry.userId,
+          reposterName:
+            maybeRepostEntry.displayName ??
+            maybeRepostEntry.reposterName ??
+            undefined,
+        }
+      }
+      return base
+    })
 
   const repostedPlaylistItems = [...(repostedPlaylists ?? [])]
     .sort((a, b) => {
@@ -375,6 +408,9 @@ const ProfilePage = ({ params }: Props) => {
         type: 'playlist' as const,
         playlistTracks: detail?.tracks,
         totalTracks: detail?.totalTracks,
+        isRepost: (playlist as any).isRepost ?? (playlist as any).is_repost ?? false,
+        reposterId: (playlist as any).actorId ?? (playlist as any).reposterId ?? (playlist as any).userId,
+        reposterName: (playlist as any).displayName ?? (playlist as any).reposterName ?? undefined,
       }
     })
 

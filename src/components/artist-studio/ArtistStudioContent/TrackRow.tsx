@@ -41,7 +41,7 @@ export function TrackRow({
     if (!track.url) return;
     if (rowIsPlaying) { dispatch(pause()); return; }
     dispatch(playAudio({
-      tracks: [{ id: track.id, url: track.url, title: track.title, artist: track.label, img: track.cover }],
+      tracks: [{ id: track.id, url: track.url, title: track.title, artist: track.label, img: track.cover, duration: track.rawDuration }],
       startId: track.id,
     }));
     setTimeout(() => dispatch(play()), 0);

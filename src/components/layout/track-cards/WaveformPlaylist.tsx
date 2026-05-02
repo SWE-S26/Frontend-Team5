@@ -168,6 +168,7 @@ export function TrackRow({
           title: track.basicInfo.title,
           artist: track.basicInfo.mainArtists[0],
           img: track.image.imgLink,
+          duration: track.durationInSeconds,
         },
       }),
     );

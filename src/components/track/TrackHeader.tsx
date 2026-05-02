@@ -37,7 +37,7 @@ export default function TrackHeader({ track, loading, onTimeUpdate, onRepeat }: 
     onRepeat?.(() => {
       if (!track?.trackId || !track?.audio?.audioLink) return;
       dispatch(playAudio({
-        tracks: [{ id: track.trackId, url: track.audio.audioLink, title: track.basicInfo?.title, artist: track.basicInfo?.mainArtists?.join(", "), img: track.image?.imgLink }],
+        tracks: [{ id: track.trackId, url: track.audio.audioLink, title: track.basicInfo?.title, artist: track.basicInfo?.mainArtists?.join(", "), img: track.image?.imgLink, duration: track.durationInSeconds }],
         startId: track.trackId,
       }));
       setTimeout(() => dispatch(play()), 0);
@@ -73,7 +73,7 @@ export default function TrackHeader({ track, loading, onTimeUpdate, onRepeat }: 
       dispatch(play());
     } else {
       dispatch(playAudio({
-        tracks: [{ id: track.trackId, url: track.audio.audioLink, title: track.basicInfo?.title, artist: track.basicInfo?.mainArtists?.join(", "), img: track.image?.imgLink }],
+        tracks: [{ id: track.trackId, url: track.audio.audioLink, title: track.basicInfo?.title, artist: track.basicInfo?.mainArtists?.join(", "), img: track.image?.imgLink, duration: track.durationInSeconds }],
         startId: track.trackId,
       }));
       setTimeout(() => dispatch(play()), 0);
@@ -83,7 +83,7 @@ export default function TrackHeader({ track, loading, onTimeUpdate, onRepeat }: 
   const handleWaveformPlay = (seekPct?: number) => {
     if (!track?.trackId || !track?.audio?.audioLink || isThisTrackPlaying) return;
     dispatch(playAudio({
-      tracks: [{ id: track.trackId, url: track.audio.audioLink, title: track.basicInfo?.title, artist: track.basicInfo?.mainArtists?.join(", "), img: track.image?.imgLink }],
+      tracks: [{ id: track.trackId, url: track.audio.audioLink, title: track.basicInfo?.title, artist: track.basicInfo?.mainArtists?.join(", "), img: track.image?.imgLink, duration: track.durationInSeconds }],
       startId: track.trackId,
     }));
     setTimeout(() => {

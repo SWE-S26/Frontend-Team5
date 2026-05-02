@@ -15,6 +15,10 @@ export default function PopularTracks({ items, onEditTrack, onAddToPlaylist }: P
            artist={item.artist}
            trackId={item.trackId ?? item.id}
            trackUrl={item.trackUrl}
+          wfLink={(item as any).wfLink}
+          isRepost={(item as any).isRepost}
+          reposterId={(item as any).reposterId}
+          reposterName={(item as any).reposterName}
            downloadUrl={item.downloadUrl}
            enableDirectDownload={item.enableDirectDownload}
            duration={item.duration}
