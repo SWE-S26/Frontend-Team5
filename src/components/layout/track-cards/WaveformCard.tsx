@@ -25,7 +25,7 @@ import { tracksService } from "@/services/tracks.service";
 import { UserOutlined } from "@ant-design/icons";
 import { IoIosMore, IoMdPlay, IoMdPause } from "react-icons/io";
 import { HiHeart, HiOutlinePaperAirplane } from "react-icons/hi";
-import { LuRepeat2, LuShare } from "react-icons/lu";
+import { LuRepeat2, LuShare, LuMapPin } from "react-icons/lu";
 import { TbCopy } from "react-icons/tb";
 import { MdOutlineDownloadForOffline } from "react-icons/md";
 import { FiPlusSquare } from "react-icons/fi";
@@ -47,8 +47,8 @@ import {
 import { getBaseUrl } from "@/utilities/getBaseUrl";
 import { interactionToast } from "@/lib/interactive-toasts/interactiveToast";
 import { interactiveToastBus } from "@/lib/interactive-toasts/interactiveToastBus";
-import ProfilePopover from "./ProfilePopover";
 import { useGetProfile } from "@/hooks/useProfile";
+import { clearProfile, setProfile } from "@/store/slices/profileSlice";
 
 type CardProps = {
   img?: string;
@@ -58,6 +58,7 @@ type CardProps = {
   trackId: string;
   trackUrl?: string;
   duration?: number;
+  permalink?: string;
   tag?: string;
   audioClipStart?: number;
   audioClipEnd?: number;
@@ -77,6 +78,7 @@ type CardProps = {
   isRepost?: boolean;
   reposterId?: string;
   reposterName?: string;
+  isAvailable?: boolean;
 };
 
 const FLASH_DURATION = 3000;
@@ -89,8 +91,10 @@ export default function WaveformCard({
   artist,
   artistId,
   trackId,
+  permalink,
   trackUrl,
   duration,
+  isAvailable = true,
   tag,
   audioClipStart,
   audioClipEnd,
@@ -123,11 +127,54 @@ export default function WaveformCard({
   const [likeCountState, setLikeCountState] = useState(likeCount);
   const [repostCountState, setRepostCountState] = useState(repostCount);
   const [isAddToPlaylistOpen, setIsAddToPlaylistOpen] = useState(false);
+  const hasHydrated = useAppSelector((state) => state.auth.hasHydrated);
 
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const { getProfile, profile: artistProfile } = useGetProfile();
   const { getProfile: getReposterProfile, profile: reposterProfile } =
     useGetProfile();
+
+  useEffect(() => {
+    if (!hasHydrated || !artistId) return;
+
+    dispatch(setProfile({ isLoading: true }));
+    getProfile(artistId)
+      .then((data) => {
+        if (!data) return;
+        dispatch(
+          setProfile({
+            userId: data.userId,
+            displayName: data.displayName,
+            firstName: data.firstName,
+            lastName: data.lastName,
+            bio: data.bio,
+            profileLink: data.profileLink,
+            profileImgLink: data.profileImgLink,
+            bannerImgLink: data.bannerImgLink,
+            city: data.city,
+            country: data.country,
+            links: data.links,
+            bannerLinks: data.bannerLinks,
+            supportLink: data.supportLink,
+            favoriteGenres: data.favoriteGenres,
+            followersCount: data.followersCount,
+            followedCount: data.followedCount,
+            trackCount: data.trackCount,
+            isFollowed: data.isFollowed,
+            isBlocked: data.isBlocked,
+            amIBlocked: data.amIBlocked,
+            role: data.role,
+          }),
+        );
+      })
+      .finally(() => {
+        dispatch(setProfile({ isLoading: false }));
+      });
+
+    return () => {
+      dispatch(clearProfile());
+    };
+  }, [artistId, hasHydrated]);
 
   useEffect(() => {
     if (artistId) getProfile(artistId);
@@ -166,6 +213,7 @@ export default function WaveformCard({
   } | null> | null>(null);
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
+  const profileLink = artistProfile?.profileLink ?? null;
   const authRole = useAppSelector((state) => state.auth.role);
   const isAuthenticated = useAppSelector(
     (state) => state.auth.isAuthenticated && state.auth.hasHydrated,
@@ -320,6 +368,7 @@ export default function WaveformCard({
   };
 
   const handleOpenCommentBox = () => {
+    if (!isAvailable) return;
     setShowCommentBox(true);
   };
 
@@ -360,6 +409,7 @@ export default function WaveformCard({
   };
 
   function handleLikeClick() {
+    if (!isAvailable) return;
     likeTrack();
 
     setIsLiked((l) => !l);
@@ -372,6 +422,7 @@ export default function WaveformCard({
   }
 
   function handleRepostClick() {
+    if (!isAvailable) return;
     repostTrack();
     setIsReposted((r) => !r);
     if (isReposted) {
@@ -383,9 +434,9 @@ export default function WaveformCard({
   }
 
   const handleCopyLink = () => {
-    if (!trackId) return;
+    if (!isAvailable || !trackId || !profileLink) return;
 
-    const url = `${getBaseUrl()}/track/${trackId}`;
+    const url = `${getBaseUrl()}/${profileLink}/${permalink}`;
 
     navigator.clipboard.writeText(url);
     interactiveToastBus.emit({
@@ -398,7 +449,7 @@ export default function WaveformCard({
 
   function handlePlayClick(e: React.MouseEvent) {
     e.stopPropagation();
-    if (!trackId || !trackUrl) return;
+    if (!isAvailable || !trackId || !trackUrl) return;
     stopPreview();
     if (isThisCardPlaying) {
       dispatch(pause());
@@ -408,7 +459,16 @@ export default function WaveformCard({
       playAudio({
         tracks: allTracksRef.current?.length
           ? allTracksRef.current
-          : [{ id: trackId, url: trackUrl ?? "", title, artist, img, duration }],
+          : [
+              {
+                id: trackId,
+                url: trackUrl ?? "",
+                title,
+                artist,
+                img,
+                duration,
+              },
+            ],
         startId: trackId,
       }),
     );
@@ -416,13 +476,22 @@ export default function WaveformCard({
   }
 
   function handleWaveformPlay(seekPercentage?: number) {
-    if (!trackId || !trackUrl || isThisCardPlaying) return;
+    if (!isAvailable || !trackId || !trackUrl || isThisCardPlaying) return;
     stopPreview();
     dispatch(
       playAudio({
         tracks: allTracksRef.current?.length
           ? allTracksRef.current
-          : [{ id: trackId, url: trackUrl ?? "", title, artist, img, duration }],
+          : [
+              {
+                id: trackId,
+                url: trackUrl ?? "",
+                title,
+                artist,
+                img,
+                duration,
+              },
+            ],
         startId: trackId,
       }),
     );
@@ -434,7 +503,7 @@ export default function WaveformCard({
 
   function handlePlayNextClick(e: React.MouseEvent) {
     e.stopPropagation();
-    if (!trackId || !trackUrl) return;
+    if (!isAvailable || !trackId || !trackUrl) return;
 
     interactionToast.queued(title ?? "the track", img ?? "");
 
@@ -455,11 +524,12 @@ export default function WaveformCard({
   const transitionConfig: Transition = { duration: 0.25, ease: "easeOut" };
 
   const handleDownload = () => {
-    if (!allowDownload || !downloadUrl) return;
+    if (!isAvailable || !allowDownload || !downloadUrl) return;
     window.open(downloadUrl, "_blank", "noopener,noreferrer");
   };
 
   const handleOpenAddToPlaylistModal = () => {
+    if (!isAvailable) return;
     setIsAddToPlaylistOpen(true);
   };
 
@@ -488,7 +558,7 @@ export default function WaveformCard({
   }
 
   async function startPreview(requestId: number) {
-    if (!trackUrl || isPlaying) return;
+    if (!isAvailable || !trackUrl || isPlaying) return;
     if (previewingRef.current || previewStartingRef.current) return;
 
     previewStartingRef.current = true;
@@ -571,7 +641,7 @@ export default function WaveformCard({
   }
 
   function handleHoverStart(e: React.MouseEvent) {
-    if (isThisCardPlaying || isPlaying) return;
+    if (!isAvailable || isThisCardPlaying || isPlaying) return;
     isHoveringRef.current = true;
     const requestId = ++previewRequestIdRef.current;
     setPreviewTooltipPos({ x: e.clientX, y: e.clientY });
@@ -594,7 +664,14 @@ export default function WaveformCard({
 
   return (
     <>
-      <div className="flex flex-col sm:flex-row items-stretch gap-3 sm:gap-0 px-4 sm:px-0">
+      <div
+        className="flex flex-col sm:flex-row items-stretch gap-3 sm:gap-0 px-4 sm:px-0"
+        style={
+          !isAvailable
+            ? { pointerEvents: "none", userSelect: "none" }
+            : undefined
+        }
+      >
         <div
           className="hidden sm:block h-full overflow-hidden -m-1 -mb-1.75 sm:shrink-0"
           ref={ref}
@@ -607,8 +684,10 @@ export default function WaveformCard({
 
         <div className="flex flex-col flex-1 sm:ml-6">
           <div className="flex items-center mb-4 relative">
+            {/* Play button — dimmed when unavailable */}
             <div
               className="w-10 h-10 bg-white-smoke rounded-full flex items-center justify-center cursor-pointer"
+              style={!isAvailable ? { opacity: 0.3 } : undefined}
               onClick={handlePlayClick}
             >
               {!isThisCardPlaying ? (
@@ -617,12 +696,12 @@ export default function WaveformCard({
                 <IoMdPause className="text-chinese-black text-[23px]" />
               )}
             </div>
-            <div>
+            <div className="flex-1 min-w-0 overflow-hidden">
               {isRepost && reposterId ? (
                 <div className="flex items-center gap-1 text-sm font-bold text-silver ml-3">
                   <a
                     href={`/profile/${artistId}`}
-                    className="text-silver hover:text-white-smoke no-underline transition-colors"
+                    className="text-silver hover:text-white-smoke no-underline transition-colors truncate"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {artist}
@@ -631,7 +710,7 @@ export default function WaveformCard({
 
                   <a
                     href={`/profile/${reposterId}`}
-                    className="text-silver hover:text-white-smoke no-underline transition-colors"
+                    className="text-silver hover:text-white-smoke no-underline transition-colors truncate"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {reposterName}
@@ -641,7 +720,7 @@ export default function WaveformCard({
                 <div className="flex items-center gap-1 text-sm font-bold text-silver ml-3">
                   <a
                     href={`/profile/${artistId}`}
-                    className="text-silver hover:text-white-smoke no-underline transition-colors"
+                    className="text-silver hover:text-white-smoke no-underline transition-colors truncate"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {artist}
@@ -650,11 +729,11 @@ export default function WaveformCard({
               )}
               <a
                 href={`/track/${trackId}`}
-                className="text-sm font-bold text-white-smoke ml-3 no-underline hover:text-silver transition-colors truncate"
+                className="block text-sm font-bold text-white-smoke ml-3 no-underline hover:text-silver transition-colors truncate"
                 onClick={(e) => e.stopPropagation()}
               >
                 {title}
-              </a>{" "}
+              </a>
             </div>
 
             {tag && (
@@ -666,28 +745,47 @@ export default function WaveformCard({
             )}
           </div>
 
+          {/* Waveform — dimmed + overlay when unavailable */}
           <div
-            className="w-full h-20 sm:h-15 shrink-0 cursor-pointer"
+            className="w-full h-20 sm:h-15 shrink-0 relative"
             onClick={handleOpenCommentBox}
+            style={{ cursor: isAvailable ? "pointer" : "default" }}
           >
-            <SausageWaveform
-              trackId={trackId}
-              samplesUrl={wfLink ?? "/waveform.json"}
-              externalProgress={progress}
-              onSeek={seekToPercentage}
-              onPlay={handleWaveformPlay}
-              onAvatarHover={handleOpenCommentBox}
-              onTimestampChange={setCommentTimestamp}
-              isPlaying={isThisCardPlaying}
-              currentTime={currentTime}
-              duration={duration}
-              isCommenting={inputFocused}
-              commentTimestamp={commentTimestamp}
-              profileAvatarUrl={profileImgLink ?? undefined}
-              flashComment={flashComment}
-              reloadTrigger={reloadTrigger}
-              enabled={isVisible}
-            />
+            <div
+              style={!isAvailable ? { opacity: 0.3 } : undefined}
+              className="w-full h-full"
+            >
+              <SausageWaveform
+                trackId={trackId}
+                samplesUrl={wfLink ?? "/waveform.json"}
+                externalProgress={progress}
+                onSeek={seekToPercentage}
+                onPlay={handleWaveformPlay}
+                onAvatarHover={handleOpenCommentBox}
+                onTimestampChange={setCommentTimestamp}
+                isPlaying={isThisCardPlaying}
+                currentTime={currentTime}
+                duration={duration}
+                isCommenting={inputFocused}
+                commentTimestamp={commentTimestamp}
+                profileAvatarUrl={profileImgLink ?? undefined}
+                flashComment={flashComment}
+                reloadTrigger={reloadTrigger}
+                enabled={isVisible}
+              />
+            </div>
+
+            {!isAvailable && (
+              <div
+                className="absolute inset-0 flex items-center justify-center gap-1.5 pointer-events-none"
+                style={{ pointerEvents: "none" }}
+              >
+                <LuMapPin className="text-white-smoke text-[13px] shrink-0" />
+                <span className="text-white-smoke text-[13px] font-semibold">
+                  Not Available in Your Country
+                </span>
+              </div>
+            )}
           </div>
 
           <motion.div
@@ -737,7 +835,7 @@ export default function WaveformCard({
               )}
             </AnimatePresence>
 
-            <div className="flex items-center gap-4">
+            <div className="flex flex-wrap items-center gap-2 sm:gap-4">
               <Tooltip label="Like">
                 <Button
                   onClick={handleLikeClick}
@@ -834,7 +932,7 @@ export default function WaveformCard({
                 ]}
               />
 
-              <div className="ml-0 sm:ml-auto flex items-center gap-4">
+              <div className="ml-auto flex items-center gap-4">
                 <div className="flex items-center gap-1 text-silver">
                   <IoMdPlay className="text-silver text-[12px]" />
                   <span className="text-[12px]">{playsCount}</span>

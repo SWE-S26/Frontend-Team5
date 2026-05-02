@@ -79,7 +79,7 @@ export default function Legal() {
   );
 
   return (
-    <div className="flex justify-between bg-chinese-black text-white-smoke font-sans px-4 sm:px-0">
+    <div className="flex justify-between bg-chinese-black text-white-smoke font-sans px-4 sm:px-0 sm:mb-0 mb-4">
 
         {/* MAIN CONTENT */}
         <div className="w-full md:w-[68%]">

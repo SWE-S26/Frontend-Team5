@@ -2,45 +2,45 @@
 
 import React from "react";
 import LegalSidebar from "@/app/(main)/(more-dropdown)/legal/LegalSidebar";
+const tocItems = [
+  {
+    id: "who-we-are",
+    label: "Who We Are",
+    desc: "Learn about BeatZa and our mission.",
+  },
+  {
+    id: "our-story",
+    label: "Our Story",
+    desc: "How BeatZa came to be and where we are headed.",
+  },
+  {
+    id: "what-we-offer",
+    label: "What We Offer",
+    desc: "The tools and features we provide for artists and listeners.",
+  },
+  {
+    id: "for-artists",
+    label: "For Artists",
+    desc: "How BeatZa empowers artists to share and grow.",
+  },
+  {
+    id: "for-listeners",
+    label: "For Listeners",
+    desc: "How BeatZa connects listeners with music they love.",
+  },
+  {
+    id: "community",
+    label: "Our Community",
+    desc: "The people that make BeatZa what it is.",
+  },
+  {
+    id: "contact",
+    label: "Contact Us",
+    desc: "How to get in touch with the BeatZa team.",
+  },
+];
 
 export default function AboutUs() {
-  const tocItems = [
-    {
-      id: "who-we-are",
-      label: "Who We Are",
-      desc: "Learn about BeatZa and our mission.",
-    },
-    {
-      id: "our-story",
-      label: "Our Story",
-      desc: "How BeatZa came to be and where we are headed.",
-    },
-    {
-      id: "what-we-offer",
-      label: "What We Offer",
-      desc: "The tools and features we provide for artists and listeners.",
-    },
-    {
-      id: "for-artists",
-      label: "For Artists",
-      desc: "How BeatZa empowers artists to share and grow.",
-    },
-    {
-      id: "for-listeners",
-      label: "For Listeners",
-      desc: "How BeatZa connects listeners with music they love.",
-    },
-    {
-      id: "community",
-      label: "Our Community",
-      desc: "The people that make BeatZa what it is.",
-    },
-    {
-      id: "contact",
-      label: "Contact Us",
-      desc: "How to get in touch with the BeatZa team.",
-    },
-  ];
 
   const Section = ({
     id,

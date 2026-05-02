@@ -18,6 +18,7 @@ import {
 } from "@/hooks/useLikes";
 import { useRepostTrack, useRepostPlaylist } from "@/hooks/useReposts";
 import { useGetPlaylistById } from "@/hooks/usePlaylists";
+import { useGetProfile } from "@/hooks/useProfile";
 
 import SausageWaveform from "@/components/ui/SausageWaveform";
 import PlaylistCard from "@/components/ui/PlaylistCard";
@@ -26,7 +27,7 @@ import Tooltip from "@/components/ui/Tooltip";
 
 import { IoMdPlay, IoMdPause, IoIosMore } from "react-icons/io";
 import { HiHeart } from "react-icons/hi";
-import { LuRepeat2, LuShare } from "react-icons/lu";
+import { LuRepeat2, LuShare, LuMapPin } from "react-icons/lu";
 import { TbCopy } from "react-icons/tb";
 import { ListStart } from "lucide-react";
 import MoreDropdown from "@/components/ui/MoreDropdown";
@@ -39,6 +40,7 @@ import AddToPlaylistModal from "@/components/playlists/AddToPlaylistModal";
 
 type PlaylistTrack = {
   _id: string;
+  poster?: { _id: string; displayName: string; profileLink: string };
   basicInfo: { title: string; mainArtists: string[]; permalink: string };
   audio: { audioLink: string; waveformLink: string };
   image: { imgLink: string };
@@ -47,6 +49,7 @@ type PlaylistTrack = {
   numOfLikes: number;
   isLiked: boolean;
   isReposted: boolean;
+  isAvailableForUser?: boolean;
 };
 
 type Props = {
@@ -54,6 +57,7 @@ type Props = {
   title?: string;
   artist?: string;
   playlistId?: string;
+  permalink?: string;
   tag?: string;
   likeCount?: number;
   repostCount?: number;
@@ -69,15 +73,19 @@ type Props = {
 };
 
 function normalizePlaylistTrack(track: any, fallbackId: string): PlaylistTrack {
-  const imageLink = track?.image?.imgLink ?? track?.img ?? "/app-logo/blacklogo.png";
+  const imageLink =
+    track?.image?.imgLink ?? track?.img ?? "/app-logo/blacklogo.png";
   const audioLink = track?.audio?.audioLink ?? "";
   const waveformLink = track?.audio?.waveformLink ?? "/waveform.json";
 
   return {
     _id: track?._id ?? fallbackId,
+    poster: track?.poster ?? undefined,
     basicInfo: {
       title: track?.basicInfo?.title ?? track?.title ?? "Unknown Title",
-      mainArtists: track?.basicInfo?.mainArtists ?? [track?.artist ?? "Unknown Artist"],
+      mainArtists: track?.basicInfo?.mainArtists ?? [
+        track?.artist ?? "Unknown Artist",
+      ],
       permalink: track?.basicInfo?.permalink ?? "",
     },
     audio: {
@@ -92,6 +100,7 @@ function normalizePlaylistTrack(track: any, fallbackId: string): PlaylistTrack {
     numOfLikes: track?.numOfLikes ?? 0,
     isLiked: track?.isLiked ?? false,
     isReposted: track?.isReposted ?? false,
+    isAvailableForUser: track?.isAvailableForUser ?? true,
   };
 }
 
@@ -120,6 +129,9 @@ export function TrackRow({
   showArtist?: boolean;
   onAddToPlaylist: () => void;
 }) {
+  const isAvailable = track.isAvailableForUser !== false;
+  // const isAvailable = false;
+
   const [hovered, setHovered] = useState(false);
   const { likeTrack } = useLikeTrackOptimistic(track._id);
   const [isLiked, setIsLiked] = useState(track.isLiked);
@@ -133,13 +145,9 @@ export function TrackRow({
   const dispatch = useDispatch();
 
   const indexColor = isCurrent ? "text-inferno" : "text-silver";
-  const titleColor = isCurrent
-    ? "text-inferno"
-    : hovered
-      ? "text-silver"
-      : "text-white-smoke";
 
   function handleLikeClick() {
+    if (!isAvailable) return;
     likeTrack();
     setIsLiked((l) => !l);
     if (!isLiked) {
@@ -147,6 +155,7 @@ export function TrackRow({
     }
   }
   function handleRepostClick() {
+    if (!isAvailable) return;
     repostTrack();
     setIsReposted((r) => !r);
     if (!isReposted) {
@@ -156,7 +165,7 @@ export function TrackRow({
 
   function handlePlayNextClick(e: React.MouseEvent) {
     e.stopPropagation();
-    if (!track._id || !track.audio) return;
+    if (!isAvailable || !track._id || !track.audio) return;
 
     interactionToast.queued(track.basicInfo.title, track.image.imgLink);
 
@@ -175,30 +184,37 @@ export function TrackRow({
   }
 
   const handleCopyLink = () => {
-    if (!track._id) return;
-
-    const url = `${getBaseUrl()}/track/${track._id}`;
-
-    navigator.clipboard.writeText(url);
-    interactiveToastBus.emit({
-      type: "copied",
-    });
+    if (!isAvailable || !track.poster?.profileLink || !track.basicInfo.permalink) return;
+    navigator.clipboard.writeText(`${getBaseUrl()}/${track.poster.profileLink}/${track.basicInfo.permalink}`);
+    interactiveToastBus.emit({ type: "copied" });
   };
 
   return (
     <div
       ref={rowRef}
-      className="flex items-center gap-2 px-2 py-2 rounded hover:bg-white/5 transition-colors cursor-pointer group/row h-13 sm:h-13"
-      onMouseEnter={() => setHovered(true)}
+      className="flex items-center gap-2 px-2 py-2 rounded transition-colors h-13 sm:h-13 relative"
+      style={{
+        cursor: isAvailable ? "pointer" : "default",
+        pointerEvents: isAvailable ? undefined : "none",
+      }}
+      onMouseEnter={() => isAvailable && setHovered(true)}
       onMouseLeave={() => setHovered(false)}
-      onClick={onPlay}
+      onClick={isAvailable ? onPlay : undefined}
     >
-      <div className="relative w-12 sm:w-9 h-12 sm:h-9 shrink-0">
+      {/* Hover background only when available */}
+      {isAvailable && hovered && (
+        <div className="absolute inset-0 rounded bg-white/5 pointer-events-none" />
+      )}
+
+      <div
+        className="relative w-12 sm:w-9 h-12 sm:h-9 shrink-0"
+        style={!isAvailable ? { opacity: 0.3 } : undefined}
+      >
         <img
           src={track.image.imgLink}
           className="w-12 sm:w-9 h-12 sm:h-9 rounded object-cover"
         />
-        {(hovered || isPlaying) && (
+        {isAvailable && (hovered || isPlaying) && (
           <div
             className="absolute inset-0 flex items-center justify-center rounded"
             onClick={(e) => {
@@ -217,108 +233,188 @@ export function TrackRow({
         )}
       </div>
 
-      <span className={`${indexColor} text-sm font-normal shrink-0`}>
+      <span
+        className={`${indexColor} text-sm font-normal shrink-0`}
+        style={!isAvailable ? { opacity: 0.3 } : undefined}
+      >
         {index + 1}
       </span>
-      <span className={`${indexColor} text-sm shrink-0`}>{"\u00b7"}</span>
+      <span
+        className={`${indexColor} text-sm shrink-0`}
+        style={!isAvailable ? { opacity: 0.3 } : undefined}
+      >
+        {"\u00b7"}
+      </span>
+
       {showArtist && (
         <>
-          <span className="max-w-44 truncate text-sm font-bold text-silver shrink-0">
+          <span
+            className="max-w-24 sm:max-w-44 truncate text-sm font-bold text-silver shrink-0"
+            style={!isAvailable ? { opacity: 0.3 } : undefined}
+          >
             {track.basicInfo.mainArtists?.join(", ") || "Unknown artist"}
           </span>
-          <span className={`${indexColor} text-sm shrink-0`}>{"\u00b7"}</span>
+          <span
+            className={`${indexColor} text-sm shrink-0`}
+            style={!isAvailable ? { opacity: 0.3 } : undefined}
+          >
+            {"\u00b7"}
+          </span>
         </>
       )}
-      <a
-        href={`/track/${track._id}`}
-        onClick={(e) => e.stopPropagation()}
-        className={`text-sm font-bold flex-1 truncate min-w-0 no-underline transition-colors ${
-          isCurrent
-            ? "text-inferno"
-            : hovered
-              ? "text-silver"
-              : "text-white-smoke"
-        }`}
-      >
-        {track.basicInfo.title}
-      </a>
+
+      {/* Title + unavailable badge */}
+      <div className="flex items-center gap-2 flex-1 min-w-0">
+        <a
+          href={`/track/${track.basicInfo.permalink ?? track._id}`}
+          onClick={(e) => e.stopPropagation()}
+          className={`flex-1 text-sm font-bold truncate min-w-0 no-underline transition-colors ${
+            isCurrent
+              ? "text-inferno"
+              : hovered
+                ? "text-silver"
+                : "text-white-smoke"
+          }`}
+          style={!isAvailable ? { opacity: 0.3 } : undefined}
+        >
+          {track.basicInfo.title}
+        </a>
+
+        {!isAvailable && (
+          <span className="flex items-center gap-1 shrink-0 text-silver text-[11px]">
+            <LuMapPin className="text-[11px]" />
+            <span>Not Available</span>
+          </span>
+        )}
+      </div>
 
       <div
-        className="shrink-0 w-48 flex items-center justify-end"
+        className="shrink-0 flex items-center justify-end"
         onClick={(e) => e.stopPropagation()}
       >
-        {hovered || isPlaying ? (
-          <div className="flex items-center gap-3">
-            <Tooltip label="Like">
-              <Button
-                className={isPlaying ? "bg-off-black" : "bg-transparent"}
-                onClick={handleLikeClick}
-                icon={
-                  <HiHeart
-                    className={`text-[15px] ${isLiked ? "text-inferno" : ""}`}
-                  />
-                }
-              />
-            </Tooltip>
-            <Tooltip label="Repost">
-              <Button
-                className={isPlaying ? "bg-off-black" : "bg-transparent"}
-                onClick={handleRepostClick}
-                icon={
-                  <LuRepeat2
-                    className={`text-[15px] ${isReposted ? "text-inferno" : ""}`}
-                  />
-                }
-              />
-            </Tooltip>
-            <Tooltip label="Share">
-              <Button
-                className={isPlaying ? "bg-off-black" : "bg-transparent"}
-                icon={<LuShare className="text-[15px]" />}
-              />
-            </Tooltip>
-            <Tooltip label="Copy Link">
-              <Button
-                className={isPlaying ? "bg-off-black" : "bg-transparent"}
-                icon={<TbCopy className="text-[15px]" />}
-                onClick={handleCopyLink}
-              />
-            </Tooltip>
-            <MoreDropdown
-              trigger={
+        {/* Desktop: hover / playing reveals full controls */}
+        <div className="hidden sm:block w-48">
+          {isAvailable && (hovered || isPlaying) ? (
+            <div className="flex items-center gap-3 justify-end">
+              <Tooltip label="Like">
                 <Button
                   className={isPlaying ? "bg-off-black" : "bg-transparent"}
-                  icon={<IoIosMore className="text-[15px]" />}
+                  onClick={handleLikeClick}
+                  icon={
+                    <HiHeart
+                      className={`text-[15px] ${isLiked ? "text-inferno" : ""}`}
+                    />
+                  }
                 />
-              }
-              tooltipLabel="More"
-              items={[
-                {
-                  label: "Add to Next up",
-                  icon: <ListStart size={19} className="scale-x-[-1]" />,
-                  onClick: handlePlayNextClick,
-                },
-                {
-                  label: "Add to Playlist",
-                  icon: (
-                    <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
-                  ),
-                  onClick: () => onAddToPlaylist(),
-                },
-                {
-                  label: "Station",
-                  disabled: true,
-                  icon: <BiStation className="text-lg" />,
-                },
-              ]}
+              </Tooltip>
+              <Tooltip label="Repost">
+                <Button
+                  className={isPlaying ? "bg-off-black" : "bg-transparent"}
+                  onClick={handleRepostClick}
+                  icon={
+                    <LuRepeat2
+                      className={`text-[15px] ${isReposted ? "text-inferno" : ""}`}
+                    />
+                  }
+                />
+              </Tooltip>
+              <Tooltip label="Share">
+                <Button
+                  className={isPlaying ? "bg-off-black" : "bg-transparent"}
+                  icon={<LuShare className="text-[15px]" />}
+                />
+              </Tooltip>
+              <Tooltip label="Copy Link">
+                <Button
+                  className={isPlaying ? "bg-off-black" : "bg-transparent"}
+                  icon={<TbCopy className="text-[15px]" />}
+                  onClick={handleCopyLink}
+                />
+              </Tooltip>
+              <MoreDropdown
+                trigger={
+                  <Button
+                    className={isPlaying ? "bg-off-black" : "bg-transparent"}
+                    icon={<IoIosMore className="text-[15px]" />}
+                  />
+                }
+                tooltipLabel="More"
+                items={[
+                  {
+                    label: "Add to Next up",
+                    icon: <ListStart size={19} className="scale-x-[-1]" />,
+                    onClick: handlePlayNextClick,
+                  },
+                  {
+                    label: "Add to Playlist",
+                    icon: (
+                      <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
+                    ),
+                    onClick: () => onAddToPlaylist(),
+                  },
+                  {
+                    label: "Station",
+                    disabled: true,
+                    icon: <BiStation className="text-lg" />,
+                  },
+                ]}
+              />
+            </div>
+          ) : (
+            <div
+              className="flex items-center gap-1 text-silver text-[11px] justify-end"
+              style={!isAvailable ? { opacity: 0.3 } : undefined}
+            >
+              <IoMdPlay className="text-[11px]" />
+              <span>{formatPlays(track.numOfPlays)}</span>
+            </div>
+          )}
+        </div>
+
+        {/* Mobile: always-visible like + more */}
+        <div className="flex sm:hidden items-center gap-2">
+          <button
+            onClick={handleLikeClick}
+            className="p-1"
+            style={!isAvailable ? { opacity: 0.3, pointerEvents: "none" } : undefined}
+          >
+            <HiHeart
+              className={`text-[16px] ${isLiked ? "text-inferno" : "text-white-smoke"}`}
             />
-          </div>
-        ) : (
-          <div className="flex items-center gap-1 text-silver text-[11px]">
-            <IoMdPlay className="text-[11px]" />
-            <span>{formatPlays(track.numOfPlays)}</span>
-          </div>
-        )}
+          </button>
+          <MoreDropdown
+            trigger={
+              <button className="p-1">
+                <IoIosMore className="text-[16px] text-white-smoke" />
+              </button>
+            }
+            tooltipLabel="More"
+            items={[
+              {
+                label: "Add to Next up",
+                icon: <ListStart size={19} className="scale-x-[-1]" />,
+                onClick: handlePlayNextClick,
+              },
+              {
+                label: "Add to Playlist",
+                icon: (
+                  <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
+                ),
+                onClick: () => onAddToPlaylist(),
+              },
+              {
+                label: "Copy Link",
+                icon: <TbCopy className="text-lg" />,
+                onClick: handleCopyLink,
+              },
+              {
+                label: "Station",
+                disabled: true,
+                icon: <BiStation className="text-lg" />,
+              },
+            ]}
+          />
+        </div>
       </div>
     </div>
   );
@@ -329,6 +425,7 @@ export default function PlaylistWaveformCard({
   title,
   artist,
   playlistId,
+  permalink,
   tag,
   likeCount,
   repostCount,
@@ -354,9 +451,21 @@ export default function PlaylistWaveformCard({
   const { progress, currentTime, seekToPercentage } = useAudioProgress();
   const { ref, isVisible } = useIsVisible("200px");
   const { getPlaylistById } = useGetPlaylistById();
+  const { getProfile, profile: creatorProfile } = useGetProfile();
+
+  useEffect(() => {
+    if (artistId) getProfile(artistId);
+  }, [artistId]);
+
+  const profileLink = creatorProfile?.profileLink ?? null;
 
   const [cachedTracks, setCachedTracks] = useState<PlaylistTrack[]>(
-    (preloadedTracks ?? []).map((track, index) => normalizePlaylistTrack(track, track?._id ?? `${playlistId ?? "playlist"}-track-${index}`)),
+    (preloadedTracks ?? []).map((track, index) =>
+      normalizePlaylistTrack(
+        track,
+        track?._id ?? `${playlistId ?? "playlist"}-track-${index}`,
+      ),
+    ),
   );
   const [tracksExpanded, setTracksExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(isLikedByUser);
@@ -366,6 +475,8 @@ export default function PlaylistWaveformCard({
 
   const listRef = useRef<HTMLDivElement>(null);
   const rowRefs = useRef<Map<string, HTMLDivElement>>(new Map());
+  const cachedTracksRef = useRef(cachedTracks);
+  cachedTracksRef.current = cachedTracks;
 
   const { likePlaylist } = useLikePlaylistOptimistic(playlistId ?? "");
   const { repostPlaylist } = useRepostPlaylist(
@@ -379,6 +490,35 @@ export default function PlaylistWaveformCard({
   const currentTrack =
     cachedTracks.find((t) => t._id === currentTrackId) ?? cachedTracks[0];
 
+  // Skip unavailable tracks when they become current
+  useEffect(() => {
+    if (!currentTrackId || !isPlaying) return;
+    const tracks = cachedTracksRef.current;
+    const currentIndex = tracks.findIndex((t) => t._id === currentTrackId);
+    if (currentIndex === -1) return;
+    const current = tracks[currentIndex];
+    if (current.isAvailableForUser !== false) return;
+
+    // Find next available track
+    const nextAvailable = tracks
+      .slice(currentIndex + 1)
+      .find((t) => t.isAvailableForUser !== false);
+
+    if (!nextAvailable) return;
+
+    const mapped = tracks.map((t) => ({
+      id: t._id,
+      url: t.audio.audioLink,
+      title: t.basicInfo.title,
+      artist: t.basicInfo.mainArtists[0],
+      img: t.image.imgLink,
+      duration: t.durationInSeconds,
+    }));
+
+    dispatch(playAudio({ tracks: mapped, startId: nextAvailable._id }));
+    setTimeout(() => dispatch(play()), 0);
+  }, [currentTrackId, isPlaying]);
+
   useEffect(() => {
     if (likeCount !== undefined) setLikeCountState(likeCount);
     if (repostCount !== undefined) setRepostCountState(repostCount);
@@ -390,7 +530,10 @@ export default function PlaylistWaveformCard({
     if (preloadedTracks && preloadedTracks.length > 0)
       setCachedTracks(
         preloadedTracks.map((track, index) =>
-          normalizePlaylistTrack(track, track?._id ?? `${playlistId ?? "playlist"}-track-${index}`),
+          normalizePlaylistTrack(
+            track,
+            track?._id ?? `${playlistId ?? "playlist"}-track-${index}`,
+          ),
         ),
       );
   }, [preloadedTracks]);
@@ -413,7 +556,10 @@ export default function PlaylistWaveformCard({
     const pl = res?.data?.playlist;
     const detail = Array.isArray(pl) ? pl[0] : pl;
     const tracks = (detail?.tracks ?? []).map((track: any, index: number) =>
-      normalizePlaylistTrack(track, track?._id ?? `${playlistId}-track-${index}`),
+      normalizePlaylistTrack(
+        track,
+        track?._id ?? `${playlistId}-track-${index}`,
+      ),
     );
     setCachedTracks(tracks);
     return tracks;
@@ -427,6 +573,10 @@ export default function PlaylistWaveformCard({
     const tracks = await ensureTracks();
     if (!tracks.length) return;
 
+    // Start from the first available track
+    const firstAvailable = tracks.find((t) => t.isAvailableForUser !== false);
+    if (!firstAvailable) return;
+
     const queue = feedQueue?.length
       ? feedQueue
       : tracks.map((t) => ({
@@ -438,11 +588,12 @@ export default function PlaylistWaveformCard({
           duration: t.durationInSeconds,
         }));
 
-    dispatch(playAudio({ tracks: queue, startId: tracks[0]._id }));
+    dispatch(playAudio({ tracks: queue, startId: firstAvailable._id }));
     setTimeout(() => dispatch(play()), 0);
   }
 
   async function handleTrackPlay(track: PlaylistTrack) {
+    if (track.isAvailableForUser === false) return;
     const tracks = await ensureTracks();
     const mapped = tracks.map((t) => ({
       id: t._id,
@@ -479,14 +630,9 @@ export default function PlaylistWaveformCard({
   }
 
   const handleCopyLink = () => {
-    if (!playlistId) return;
-
-    const url = `${getBaseUrl()}/playlist/${playlistId}`;
-
-    navigator.clipboard.writeText(url);
-    interactiveToastBus.emit({
-      type: "copied",
-    });
+    if (!profileLink || !permalink) return;
+    navigator.clipboard.writeText(`${getBaseUrl()}/${profileLink}/sets/${permalink}`);
+    interactiveToastBus.emit({ type: "copied" });
   };
 
   return (
@@ -504,7 +650,7 @@ export default function PlaylistWaveformCard({
         />
       </div>
 
-      <div className="flex flex-col flex-1 sm:ml-6">
+      <div className="flex flex-col flex-1 sm:ml-6 min-w-0">
         {/* Header row */}
         <div className="flex items-center mb-4 relative">
           <div
@@ -517,25 +663,25 @@ export default function PlaylistWaveformCard({
               <IoMdPause className="text-chinese-black text-[23px]" />
             )}
           </div>
-          <div className="ml-3">
+          <div className="ml-3 min-w-0 flex-1 overflow-hidden">
             <div className="flex items-center gap-1 text-sm font-bold text-silver">
               {artistHref ? (
                 <a
                   href={artistHref}
-                  className="text-silver no-underline hover:text-white-smoke transition-colors"
+                  className="text-silver no-underline hover:text-white-smoke transition-colors truncate"
                   onClick={(e) => e.stopPropagation()}
                 >
                   {displayArtist}
                 </a>
               ) : (
-                <span>{displayArtist}</span>
+                <span className="truncate">{displayArtist}</span>
               )}
               {isRepost && reposterId && (
                 <>
                   <LuRepeat2 className="text-[13px] shrink-0" />
                   <a
                     href={`/profile/${reposterId}`}
-                    className="text-silver no-underline hover:text-white-smoke transition-colors"
+                    className="text-silver no-underline hover:text-white-smoke transition-colors truncate"
                     onClick={(e) => e.stopPropagation()}
                   >
                     {reposterName}
@@ -545,7 +691,7 @@ export default function PlaylistWaveformCard({
             </div>
             <a
               href={`/playlist/${playlistId}`}
-              className="block text-sm font-bold text-white-smoke no-underline hover:text-silver transition-colors"
+              className="block text-sm font-bold text-white-smoke no-underline hover:text-silver transition-colors truncate"
               onClick={(e) => e.stopPropagation()}
             >
               {title}
@@ -612,7 +758,7 @@ export default function PlaylistWaveformCard({
         )}
 
         {/* Bottom actions */}
-        <div className="flex items-center mt-4 gap-4">
+        <div className="flex flex-wrap items-center mt-4 gap-2 sm:gap-4">
           <Tooltip label="Like">
             <Button
               onClick={handleLikeClick}

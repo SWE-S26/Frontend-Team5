@@ -7,6 +7,7 @@ export const EXCLUDED_ROUTES = [
   "/legal",
   "/privacy-policy",
   "/copyright",
+  "/about-us",
   "/goplus",
   "/artist",
   "/profile",

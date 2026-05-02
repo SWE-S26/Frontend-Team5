@@ -29,6 +29,9 @@ import {
 } from "@/store/slices/playerSlice";
 import { useLikeTrackOptimistic } from "@/hooks/useLikes";
 import { useRepostTrack } from "@/hooks/useReposts";
+import { useGetProfile } from "@/hooks/useProfile";
+import { getBaseUrl } from "@/utilities/getBaseUrl";
+import { interactiveToastBus } from "@/lib/interactive-toasts/interactiveToastBus";
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -38,6 +41,7 @@ export type TrackListRowProps = {
   title: string;
   artist: string;
   artistId: string;
+  permalink?: string;
   img?: string;
   duration?: number;
   playsCount: number;
@@ -70,6 +74,7 @@ export default function TrackListRow({
   title,
   artist,
   artistId,
+  permalink,
   img,
   duration,
   playsCount,
@@ -103,6 +108,14 @@ export default function TrackListRow({
     document.addEventListener("click", handler);
     return () => document.removeEventListener("click", handler);
   }, [isMoreOpen]);
+
+  const { getProfile, profile: artistProfile } = useGetProfile();
+
+  useEffect(() => {
+    if (artistId) getProfile(artistId);
+  }, [artistId]);
+
+  const profileLink = artistProfile?.profileLink ?? null;
 
   const { likeTrack } = useLikeTrackOptimistic(trackId);
   const { repostTrack } = useRepostTrack(trackId, true, repostCount);
@@ -150,9 +163,9 @@ export default function TrackListRow({
 
   function handleCopyLink(e: React.MouseEvent) {
     e.stopPropagation();
-    navigator.clipboard.writeText(
-      `${window.location.origin}/track/${trackId}`,
-    );
+    if (!profileLink || !permalink) return;
+    navigator.clipboard.writeText(`${getBaseUrl()}/${profileLink}/${permalink}`);
+    interactiveToastBus.emit({ type: "copied" });
   }
 
   // ── Render ────────────────────────────────────────────────────────────────
@@ -192,7 +205,7 @@ export default function TrackListRow({
         </div>
 
         {/* 2. Text block — flex-1, three stacked lines: artist / title / stats */}
-        <div className="flex-1 min-w-0">
+        <div className="flex-1 min-w-0 overflow-hidden">
           {/* Artist name — triggers ProfilePopover on hover */}
           <ProfilePopover
             id={`popover-${trackId}`}
@@ -246,7 +259,7 @@ export default function TrackListRow({
         </div>
 
         {/* 3. Hover actions — appear to the RIGHT of text block on hover */}
-        <div className="shrink-0 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
+        <div className="shrink-0 flex items-center gap-1 opacity-100 sm:opacity-0 sm:group-hover:opacity-100 transition-opacity">
           {/* Like */}
           <button
             data-testid="track-list-row-like"

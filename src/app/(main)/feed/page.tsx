@@ -220,12 +220,13 @@ export default function Feed() {
     return () => observer.disconnect();
   }, []);
 
+  // Only available tracks enter the player queue
   const fullQueue = useMemo(() => {
     const queue: Track[] = [];
     for (const item of items) {
       if (item.type === "track") {
         const track = allTracks.find((t) => t.trackId === item.id);
-        if (track?.trackId)
+        if (track?.trackId && track.isAvailableForUser !== false)
           queue.push({
             id: track.trackId,
             url: track.audio?.audioLink ?? "",
@@ -236,16 +237,18 @@ export default function Feed() {
           });
       } else if (item.type === "playlist") {
         const playlist = allPlaylists.find((p) => p._id === item.id);
-        playlist?.tracks?.forEach((t) =>
-          queue.push({
-            id: t._id,
-            url: t.audio.audioLink,
-            title: t.basicInfo.title,
-            artist: t.basicInfo.mainArtists[0],
-            img: t.image.imgLink,
-            duration: t.durationInSeconds,
-          }),
-        );
+        playlist?.tracks
+          ?.filter((t) => t.isAvailableForUser !== false)
+          .forEach((t) =>
+            queue.push({
+              id: t._id,
+              url: t.audio.audioLink,
+              title: t.basicInfo.title,
+              artist: t.basicInfo.mainArtists[0],
+              img: t.image.imgLink,
+              duration: t.durationInSeconds,
+            }),
+          );
       }
     }
     return queue;
@@ -348,6 +351,8 @@ export default function Feed() {
                     img={item.data.image?.imgLink}
                     title={item.data.basicInfo?.title}
                     artist={item.data.basicInfo?.mainArtists?.[0]}
+                    permalink={item.data.basicInfo?.permalink}
+                    isAvailable={item.data.isAvailableForUser}
                     artistId={item.data.posterId}
                     trackId={item.data.trackId ?? ""}
                     trackUrl={item.data.audio?.audioLink}
@@ -381,6 +386,7 @@ export default function Feed() {
                     }
                     artistId={item.data.artistId}
                     playlistId={item.data._id}
+                    permalink={item.data.permaLink}
                     tag={item.data.genre}
                     likeCount={item.data.numOfLikes}
                     repostCount={item.data.numOfReposts}
