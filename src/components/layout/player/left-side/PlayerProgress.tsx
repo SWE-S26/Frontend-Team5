@@ -45,7 +45,7 @@ export default function PlayerProgress({
 
   return (
     <div className="flex items-center w-full gap-2">
-      <div className="flex items-center space-x-2 sm:w-64 md:w-80 lg:w-150">
+      <div className="flex items-center space-x-2 w-full">
         <span className="text-xs w-10 text-right">
           {formatTime(currentTime || 0)}
         </span>
