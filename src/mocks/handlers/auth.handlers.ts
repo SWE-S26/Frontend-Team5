@@ -1,8 +1,8 @@
 import { http, HttpResponse } from "msw";
-const BASE = process.env.NEXT_PUBLIC_API_URL;
+
 export const authHandlers = [
   /* (1) */
-  http.post(`${BASE}/api/auth/v1/find-email`, async ({ request }) => {
+  http.post("/api/auth/v1/find-email", async ({ request }) => {
     const body = (await request.json()) as { email: string };
 
     // 400 - missing or invalid email
@@ -43,7 +43,7 @@ export const authHandlers = [
   }),
 
   /* (2) */
-  http.post(`${BASE}/api/auth/v1/login`, async ({ request }) => {
+  http.post(`/api/auth/v1/login`, async ({ request }) => {
     const body = (await request.json()) as { email: string; password: string };
 
     // 400 - missing or invalid email
@@ -144,7 +144,7 @@ export const authHandlers = [
   }),
 
   /* (3) */
-  http.post(`${BASE}/api/auth/v1/sign-up`, async ({ request }) => {
+  http.post(`/api/auth/v1/sign-up`, async ({ request }) => {
     const body = (await request.json()) as {
       email: string;
       password: string;
@@ -250,7 +250,7 @@ export const authHandlers = [
   }),
 
   /* (4) */
-  http.post(`${BASE}/api/auth/v1/forgot-password`, async ({ request }) => {
+  http.post(`/api/auth/v1/forgot-password`, async ({ request }) => {
     const body = (await request.json()) as {
       email: string;
     };
@@ -320,7 +320,7 @@ export const authHandlers = [
   }),
 
   /* (5) */
-  http.post(`${BASE}/api/auth/v1/reset-password`, async ({ request }) => {
+  http.post(`/api/auth/v1/reset-password`, async ({ request }) => {
     /*
       /reset-password?token=valid-token   -> success screen + redirect
       /reset-password?token=invalid-token -> "Authorization failed"
@@ -389,7 +389,7 @@ export const authHandlers = [
   }),
 
   /* (6) */
-  http.get(`${BASE}/api/auth/v1/logout`, async () => {
+  http.get(`/api/auth/v1/logout`, async () => {
     // 401 - no token / invalid token (handled automatically by axios interceptor)
     // 500 - server error simulation (no request body to trigger it, so use a flag or just leave it)
 
@@ -401,7 +401,7 @@ export const authHandlers = [
   }),
 
   /* (7) refresh token - called by AuthGoogle on every page load */
-  http.get(`${BASE}/api/auth/v1/refresh-token`, () => {
+  http.get(`/api/auth/v1/refresh-token`, () => {
     return HttpResponse.json(
       {
         data: {
@@ -417,7 +417,7 @@ export const authHandlers = [
   }),
 
   /* (10) */
-  http.get(`${BASE}/api/auth/v1/verify-email`, async ({ request }) => {
+  http.get(`/api/auth/v1/verify-email`, async ({ request }) => {
     /*
       /verify-email?token=valid-token   -> success
       /verify-email?token=expired-token -> Link is expired
@@ -480,7 +480,7 @@ export const authHandlers = [
 
   /* (11) */
   http.post(
-    `${BASE}/api/auth/v1/resend-verification-email`,
+    `/api/auth/v1/resend-verification-email`,
     async ({ request }) => {
       const body = (await request.json()) as { email: string };
 
@@ -518,7 +518,7 @@ export const authHandlers = [
   ),
 
   /* (14) */
-  http.delete(`${BASE}/api/auth/v1/delete-account`, async () => {
+  http.delete(`/api/auth/v1/delete-account`, async () => {
     // 200 - success
     return HttpResponse.json(
       { message: "Account deleted successfully" },
@@ -527,10 +527,87 @@ export const authHandlers = [
   }),
 
   /* (15) */
-  http.get(`${BASE}/api/auth/v1/forgot-password/logged-in`, () => {
+  http.get(`/api/auth/v1/forgot-password/logged-in`, () => {
     return HttpResponse.json(
       { message: "Password reset email sent successfully" },
       { status: 200 }
     )
+  }),
+
+  http.get("/api/auth/v1/google/callback", ({ request }) => {
+    const url = new URL(request.url)
+    const code = url.searchParams.get("code")
+    if (!code) {
+      return HttpResponse.json({ status: "error" }, { status: 400 })
+    }
+    if (code === "incomplete") {
+      return HttpResponse.json({
+        status: "incomplete",
+        incompleteToken: "pending-token-mock",
+        email: "google@test.com",
+        displayName: "Google User",
+      })
+    }
+    return HttpResponse.json({ status: "complete" })
+  }),
+
+  http.post("/api/auth/v1/google/complete", async ({ request }) => {
+    await request.json().catch(() => ({}))
+    return HttpResponse.json({
+      message: "Profile completed",
+      data: {},
+    })
+  }),
+
+  http.post("/api/auth/v1/google/verify-code", async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as { code?: string }
+    if (body.code === "000000") {
+      return HttpResponse.json({ message: "Invalid code" }, { status: 401 })
+    }
+    return HttpResponse.json({
+      message: "Verified",
+      data: {},
+    })
+  }),
+
+  http.post("/api/auth/v1/google/resend-code", async () =>
+    HttpResponse.json({ message: "Code resent" }),
+  ),
+
+  http.get("/api/auth/v1/cross/desktop", () =>
+    HttpResponse.json({
+      message: "ok",
+      pendingToken: {
+        qrCode: "mock-qr-session-token",
+        expiresIn: 300,
+      },
+    }),
+  ),
+
+  http.post("/api/auth/v1/cross/desktop/poll", async ({ request }) => {
+    const body = (await request.json().catch(() => ({}))) as { qrCode?: string }
+    if (!body.qrCode) {
+      return HttpResponse.json({ success: false, message: "Missing code" }, { status: 400 })
+    }
+    return HttpResponse.json({
+      success: true,
+      message: "Authenticated",
+      data: {
+        user: {
+          id: "mock-user-id-123",
+          displayName: "Omar Mahmoud",
+          role: "user",
+          profileLink: "omds2005-1774126647643",
+          profileImg: {
+            imgLink: "https://picsum.photos/200",
+            publicId: "p/mock",
+          },
+          subscription: {
+            subscriptionType: "free",
+            quota: { unlimited: false, usedSeconds: 0 },
+          },
+        },
+      },
+    })
   }),
 ];
