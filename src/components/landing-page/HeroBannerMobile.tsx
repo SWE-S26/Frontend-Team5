@@ -73,13 +73,13 @@ export default function HeroBannerMobile() {
         <img src="/app-logo/beatza.png" alt="BeatZa" className="w-9 mt-0.5" />
         <div className="flex gap-2">
           <Button
-            className="px-3 py-1 bg-white-smoke text-chinese-black text-[12px] cursor-pointer"
+            className="px-3 py-1 bg-white text-black text-[12px] cursor-pointer"
             onClick={() => openAuth("/home")}
           >
             Sign in
           </Button>
           <Button
-            className="px-3 py-1 bg-chinese-black text-white-smoke text-[12px] cursor-pointer border border-white-smoke/30"
+            className="px-3 py-1 bg-black text-white text-[12px] cursor-pointer border border-white/30"
             onClick={() => openAuth("/home")}
           >
             Create account
@@ -89,14 +89,14 @@ export default function HeroBannerMobile() {
 
       {/* Bottom content */}
       <div className="absolute bottom-0 left-0 right-0 z-20 px-5 pb-5">
-        <h1 className="text-white-smoke text-[38px] font-bold leading-tight">
+        <h1 className="text-white text-[38px] font-bold leading-tight">
           {slides[current].heading[0]}
         </h1>
-        <h1 className="text-white-smoke text-[38px] font-bold leading-tight -mt-1">
+        <h1 className="text-white text-[38px] font-bold leading-tight -mt-1">
           {slides[current].heading[1]}
         </h1>
 
-        <p className="text-white-smoke/90 text-[13px] font-semibold mt-2 leading-relaxed">
+        <p className="text-white/90 text-[13px] font-semibold mt-2 leading-relaxed">
           {slides[current].description}
         </p>
 
@@ -106,8 +106,8 @@ export default function HeroBannerMobile() {
               key={j}
               className={`px-4 py-1.5 text-[14px] cursor-pointer ${
                 j === 0
-                  ? "bg-white-smoke text-chinese-black"
-                  : "text-white-smoke border border-white-smoke/60"
+                  ? "bg-white text-black"
+                  : "text-white border border-white/60"
               }`}
               onClick={() => {
                 if (btn.label === "Go+") {
@@ -122,8 +122,8 @@ export default function HeroBannerMobile() {
           ))}
 
           <div className="ml-auto text-right">
-            <p className="text-white-smoke font-bold text-xs">{slides[current].artist}</p>
-            <p className="text-white-smoke/60 text-[10px]">{slides[current].title}</p>
+            <p className="text-white font-bold text-xs">{slides[current].artist}</p>
+            <p className="text-white/60 text-[10px]">{slides[current].title}</p>
           </div>
         </div>
 
@@ -132,8 +132,8 @@ export default function HeroBannerMobile() {
             <button
               key={i}
               onClick={() => setCurrent(i)}
-              className={`h-3 aspect-square rounded-full border-2 border-white-smoke transition-all duration-300 ${
-                i === current ? "bg-white-smoke" : "bg-transparent"
+              className={`h-3 aspect-square rounded-full border-2 border-white transition-all duration-300 ${
+                i === current ? "bg-white" : "bg-transparent"
               }`}
             />
           ))}

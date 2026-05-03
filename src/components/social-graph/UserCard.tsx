@@ -23,8 +23,8 @@ const UserCard = ({ user }: UserCardProps) => {
         />
         </Link>
         <Link href={`/profile/${user.userId}`}>
-          <div className="text-xs sm:text-sm font-bold hover:text-silver text-center truncate max-w-full">
-            {user.displayName}
+          <div className="text-xs sm:text-sm font-bold hover:text-silver text-center truncate w-32">
+              {user.displayName}
           </div>
         </Link>
         <Link

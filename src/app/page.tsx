@@ -70,25 +70,25 @@ export default function LandingPage() {
 
         {/* Join section */}
         <div className="flex flex-col items-center gap-4 py-12 sm:py-16 px-4 sm:px-0">
-          <h2 className="text-white text-2xl sm:text-4xl leading-tight text-center">
+          <h2 className="text-white-smoke text-2xl sm:text-4xl leading-tight text-center">
             Thanks for listening. Now join in.
           </h2>
 
-          <p className="text-white font-bold text-[15px] text-center">
+          <p className="text-white-smoke font-bold text-[15px] text-center">
             Save tracks, follow artists and build playlists. All for free.
           </p>
 
           <Button
-            className="bg-white text-black mt-2 px-10 sm:px-12 py-3 text-[17px]!"
+            className="bg-white-smoke text-chinese-black mt-2 px-10 sm:px-12 py-3 text-[17px]!"
             onClick={() => setIsAuthModalOpen(true)}
           >
             Create account
           </Button>
 
           <div className="flex items-center gap-2 mt-1">
-            <span className="text-white text-sm">Already have an account?</span>
+            <span className="text-white-smoke text-sm">Already have an account?</span>
             <Button
-              className="text-white"
+              className="text-white-smoke"
               onClick={() => setIsAuthModalOpen(true)}
             >
               Sign in

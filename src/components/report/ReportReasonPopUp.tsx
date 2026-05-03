@@ -1,5 +1,3 @@
-// src/components/report/ReportReasonPopUp.tsx
-
 import { motion, AnimatePresence } from "framer-motion";
 import { useEffect } from "react";
 import { IoClose } from "react-icons/io5";
@@ -55,7 +53,7 @@ const ReportReasonPopUp = ({
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -60 }}
             transition={{ duration: 0.3, ease: "easeInOut" }}
-            className="flex flex-col w-160 p-5 px-8 bg-black rounded-md relative"
+            className="flex flex-col w-160 p-5 px-8 bg-chinese-black rounded-md relative"
             onClick={(e) => e.stopPropagation()}
           >
             {success ? (

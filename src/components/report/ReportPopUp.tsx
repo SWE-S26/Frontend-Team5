@@ -1,5 +1,3 @@
-// src/components/report/ReportPopUp.tsx
-
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useState } from "react";

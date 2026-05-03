@@ -1,12 +1,12 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useRef } from "react";
 import Link from "next/link";
 import { Avatar } from "antd";
 import { FaUser } from "react-icons/fa6";
-import Button from "@/components/ui/Button";
 import { usePopover } from "./PopoverContext";
 import FollowButton from "@/components/ui/FollowButton";
+import ProfileImage from "@/components/ui/ProfileImage"
 
 import {
   useFloating,
@@ -110,7 +110,13 @@ export default function ProfilePopover({
 
             {/* Content */}
             <div className="relative z-10 flex flex-col items-center p-4 bg-chinese-black rounded">
-              <Avatar size={96} src={profileImgLink || undefined} />
+              <ProfileImage
+                src={profileImgLink || null}
+                alt="Profile"
+                width={96}
+                height={96}
+                className="rounded-full w-24 h-24 object-cover"
+              />
               {profileHref ? (
                 <Link
                   className="font-bold mt-2 text-white-smoke hover:text-silver transition-colors duration-100 ease-in-out"

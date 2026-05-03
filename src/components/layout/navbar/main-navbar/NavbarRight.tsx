@@ -62,6 +62,12 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
     if (success) router.push("/")
   }, [success, router])
 
+  const [authRedirect, setAuthRedirect] = useState("/home")
+  const openAuth = (redirectTo: string) => {
+    setAuthRedirect(redirectTo)
+    setIsAuthModalOpen(true)
+  }
+
   const profileTarget = userId ? `/profile/${userId}` : "/home"
 
   const profileItems: DropdownItem[] = useMemo(() => [
@@ -152,15 +158,15 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
         </>
       ) : (
         <>
-          <Button className="px-3 py-2 bg-chinese-black text-white-smoke cursor-pointer" onClick={() => setIsAuthModalOpen(true)}>
+          <Button className="px-3 py-2 bg-chinese-black text-white-smoke cursor-pointer" onClick={() => openAuth("/home")}>
             Sign In
           </Button>
-          <Button className="px-3 py-2 bg-white-smoke text-chinese-black cursor-pointer" onClick={() => setIsAuthModalOpen(true)}>
+          <Button className="px-3 py-2 bg-white-smoke text-chinese-black cursor-pointer" onClick={() => openAuth("/home")}>
             Create Account
           </Button>
-          <Link href="/upload" className={NAV_LINK_CLASS}>
+          <Button className="px-3 py-2 bg-chinese-black text-white-smoke cursor-pointer" onClick={() => openAuth("/upload")}>
             Upload
-          </Link>
+          </Button>
         </>
       )}
 
@@ -173,7 +179,7 @@ export default function NavbarRight({ isLoggedIn }: NavbarRightProps) {
         items={moreItems}
       />
 
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} redirectTo={authRedirect}/>
       <KeyboardShortcutsModal isOpen={isShortcutsOpen} onClose={() => setIsShortcutsOpen(false)} />
     </div>
   )

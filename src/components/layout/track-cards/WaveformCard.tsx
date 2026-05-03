@@ -8,6 +8,7 @@ import MoreDropdown from "@/components/ui/MoreDropdown";
 import AddToPlaylistModal from "@/components/playlists/AddToPlaylistModal";
 import PreviewTooltip from "@/components/layout/track-cards/PreviewTooltip";
 import SharePopup from "@/components/profile/SharePopUp";
+import ProfileImage from "@/components/ui/ProfileImage"
 
 import { useState, useRef, useEffect } from "react";
 import { Avatar } from "antd";
@@ -806,15 +807,12 @@ export default function WaveformCard({
                   transition={transitionConfig}
                   className="flex items-center overflow-hidden mt-7"
                 >
-                  <Avatar
-                    size="large"
-                    icon={
-                      profileImgLink ? (
-                          <img src={profileImgLink} alt="Profile" />
-                      ) : (
-                        <UserOutlined />
-                      )
-                    }
+                  <ProfileImage
+                    src={profileImgLink}
+                    alt="Profile"
+                    width={50}
+                    height={50}
+                    className="rounded-full w-6.5 h-6.5 object-cover"
                   />
                   <input
                     type="text"

@@ -98,9 +98,9 @@ useEffect(() => {
         <ProfileImage
           src={profileImgLink}
           alt="avatar"
-          width={26}
-          height={26}
-          className="w-20 h-20 rounded-full object-cover"
+          width={50}
+          height={50}
+          className="w-20 h-20 rounded-full object-cover border border-white-smoke"
         />
         <h2 className="text-2xl font-bold">{getTitleNode()}</h2>
       </div>

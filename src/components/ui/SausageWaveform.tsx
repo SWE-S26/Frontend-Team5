@@ -3,6 +3,7 @@
 import React, { useEffect, useRef, useState } from "react";
 import { useStatelessComments } from "@/hooks/useComments";
 import { TrackComment } from "@/types/comments.types";
+import ProfileImage from "@/components/ui/ProfileImage"
 
 const imgFix = {
   transform: "translateZ(0)",
@@ -109,6 +110,7 @@ function CommentAvatar({
           </>
         )}
       </div>
+      
       <img
         src={comment.avatarUrl}
         alt={comment.displayName}

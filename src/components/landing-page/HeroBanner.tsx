@@ -74,9 +74,9 @@ export default function HeroBanner() {
             {/* slide content */}
             <div className="relative z-10 flex flex-col justify-between h-3/4 px-4 sm:px-8 pt-16 sm:pt-22 pb-6">
               <div className="max-w-xl">
-                <h1 className="text-white-smoke text-[32px] sm:text-[60px] font-bold leading-tight">{slide.heading[0]}</h1>
-                <h1 className="text-white-smoke text-[32px] sm:text-[60px] font-bold leading-tight -mt-1 sm:-mt-3">{slide.heading[1]}</h1>
-                <p className="text-white-smoke text-[13px] sm:text-[17px] font-bold mt-3 sm:mt-4 line-clamp-3 sm:line-clamp-none">{slide.description}</p>
+                <h1 className="text-white text-[32px] sm:text-[60px] font-bold leading-tight">{slide.heading[0]}</h1>
+                <h1 className="text-white text-[32px] sm:text-[60px] font-bold leading-tight -mt-1 sm:-mt-3">{slide.heading[1]}</h1>
+                <p className="text-white text-[13px] sm:text-[17px] font-bold mt-3 sm:mt-4 line-clamp-3 sm:line-clamp-none">{slide.description}</p>
               </div>
 
               <div className="flex items-center gap-4 sm:gap-6 mt-6 sm:mt-8">
@@ -84,7 +84,7 @@ export default function HeroBanner() {
                   {slide.buttons.map((btn, j) => (
                     <Button
                       key={j}
-                      className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[13px] sm:text-[17px] cursor-pointer ${j === 0 ? "bg-white-smoke text-chinese-black" : "text-white-smoke hover:text-white-smoke"}`}
+                      className={`px-2.5 sm:px-3 py-1 sm:py-1.5 text-[13px] sm:text-[17px] cursor-pointer ${j === 0 ? "bg-white text-black" : "text-white hover:text-white"}`}
                       onClick={() => {
                         if (btn.label === "Explore Go+") {
                           router.push("/goplus")
@@ -99,8 +99,8 @@ export default function HeroBanner() {
                 </div>
 
                 <div className="ml-auto text-left">
-                  <p className="text-white-smoke font-bold text-xs sm:text-sm">{slide.artist}</p>
-                  <p className="text-white-smoke/70 text-[10px] sm:text-xs">{slide.title}</p>
+                  <p className="text-white font-bold text-xs sm:text-sm">{slide.artist}</p>
+                  <p className="text-white/70 text-[10px] sm:text-xs">{slide.title}</p>
                 </div>
               </div>
             </div>
@@ -112,19 +112,19 @@ export default function HeroBanner() {
       <div className="relative z-20 flex items-center justify-between px-4 sm:px-8 pt-4 sm:pt-7">
         <div className="flex items-center">
           <img src="/app-logo/beatza.png" alt="BeatZa" className="w-8 sm:w-12 mr-1.5 sm:mr-2 mt-1"/>
-          <h1 className="text-white-smoke font-bold text-xs sm:text-sm mt-1 hidden sm:block">CRAVING TUNES</h1>
+          <h1 className="text-white font-bold text-xs sm:text-sm mt-1 hidden sm:block">CRAVING TUNES</h1>
         </div>
         <div className="flex gap-2 sm:gap-3">
           <Button
             data-testid="landing_sign_in"
-            className="px-2.5 sm:px-4 py-1 sm:py-1.5 bg-white-smoke text-chinese-black text-[11px] sm:text-[13px] cursor-pointer"
+            className="px-2.5 sm:px-4 py-1 sm:py-1.5 bg-white text-black text-[11px] sm:text-[13px] cursor-pointer"
             onClick={() => openAuth("/home")}
           >
             Sign in
           </Button>
           <Button
             data-testid="landing_create_account"
-            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-chinese-black text-white-smoke text-[11px] sm:text-[13px] cursor-pointer"
+            className="px-2 sm:px-3 py-1 sm:py-1.5 bg-black text-white text-[11px] sm:text-[13px] cursor-pointer"
             onClick={() => openAuth("/home")}
           >
             Create account
@@ -132,7 +132,7 @@ export default function HeroBanner() {
           <Link
             data-testid="landing_for_artist"
             href="/sign-in"
-            className="py-1 sm:py-1.5 text-white-smoke font-bold text-[11px] sm:text-[13px] transition-all duration-300 cursor-pointer hidden sm:block"
+            className="py-1 sm:py-1.5 text-white font-bold text-[11px] sm:text-[13px] transition-all duration-300 cursor-pointer hidden sm:block"
           >
             For Artists
           </Link>
@@ -143,8 +143,8 @@ export default function HeroBanner() {
       <div className="absolute bottom-5.5 left-1/2 -translate-x-1/2 z-20 flex gap-3 sm:gap-4">
         {slides.map((_, i) => (
           <button key={i} onClick={() => goToSlide(i)}
-            className={`aspect-square h-3 sm:h-4 rounded-full border-2 border-white-smoke transition-all duration-300
-                        ${i === current ? "bg-white-smoke" : "bg-transparent"}`}
+            className={`aspect-square h-3 sm:h-4 rounded-full border-2 border-white transition-all duration-300
+                        ${i === current ? "bg-white" : "bg-transparent"}`}
           />
         ))}
       </div>
