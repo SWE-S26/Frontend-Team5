@@ -17,9 +17,7 @@ export const interactiveToastBus = {
     if (listener) {
       listener(data);
     } else {
-      console.warn(
-        "No toast listener registered. Is the Toast component mounted?",
-      );
+      console.warn("No toast listener registered. Is the Toast component mounted?");
     }
   },
   clear: () => {

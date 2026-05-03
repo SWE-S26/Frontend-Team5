@@ -17,15 +17,10 @@ function SignInContent() {
     if (isAndroidClient) {
       window.localStorage.setItem("beatza:auth-client", "Android");
 
-      const accessToken =
-        searchParams.get("accessToken") ||
-        searchParams.get("token");
-      const refreshToken =
-        searchParams.get("refreshToken");
+      const accessToken = searchParams.get("accessToken") || searchParams.get("token");
+      const refreshToken = searchParams.get("refreshToken");
       const error = searchParams.get("error");
-      const errorDescription =
-        searchParams.get("error_description") ||
-        searchParams.get("message");
+      const errorDescription = searchParams.get("error_description") || searchParams.get("message");
 
       if (accessToken || refreshToken || error) {
         const params = new URLSearchParams();

@@ -66,8 +66,7 @@ export default function NotificationToast() {
           >
             <ProfileImage
               src={
-                !toast.actor.avatarUrl ||
-                toast.actor.avatarUrl === DEFAULT_PROFILE_IMAGE_URL
+                !toast.actor.avatarUrl || toast.actor.avatarUrl === DEFAULT_PROFILE_IMAGE_URL
                   ? null
                   : toast.actor.avatarUrl
               }
@@ -87,9 +86,10 @@ export default function NotificationToast() {
                 {toast.actor.displayName}
               </Link>{" "}
               <span className="font-normal text-white-smoke/80">
-                {MESSAGES[toast.activityType]?.(
+                {MESSAGES[toast.activityType]?.(toast.actor.displayName).replace(
                   toast.actor.displayName,
-                ).replace(toast.actor.displayName, "")}
+                  ""
+                )}
               </span>
             </p>
             {(toast.target?.title || toast.target?.commentText) && (
@@ -97,15 +97,11 @@ export default function NotificationToast() {
                 {toast.target.title || toast.target.commentText}
               </p>
             )}
-            <p className="text-xs text-white-smoke/30 mt-1 m-0">
-              {timeAgo(toast.createdAt)}
-            </p>
+            <p className="text-xs text-white-smoke/30 mt-1 m-0">{timeAgo(toast.createdAt)}</p>
           </div>
 
           <button
-            onClick={() =>
-              setToasts((prev) => prev.filter((t) => t.id !== toast.id))
-            }
+            onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
             className="text-white-smoke/40 hover:text-white-smoke/80 text-xl leading-none bg-transparent border-none cursor-pointer shrink-0"
           >
             <MdClose />

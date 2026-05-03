@@ -106,9 +106,7 @@ function QueueItem({
           <p className="truncate text-sm font-bold text-white-smoke">
             {track.title ?? "Unknown track"}
           </p>
-          <p className="truncate text-xs text-silver">
-            {track.artist ?? "Unknown artist"}
-          </p>
+          <p className="truncate text-xs text-silver">{track.artist ?? "Unknown artist"}</p>
         </div>
 
         <div className="flex items-center gap-3">
@@ -117,21 +115,15 @@ function QueueItem({
               Now playing
             </span>
           )}
-          <span className="text-xs text-silver">
-            {formatDuration(track.duration)}
-          </span>
-          <span className="min-w-4 text-right text-[11px] text-silver/70">
-            {index + 1}
-          </span>
+          <span className="text-xs text-silver">{formatDuration(track.duration)}</span>
+          <span className="min-w-4 text-right text-[11px] text-silver/70">{index + 1}</span>
         </div>
       </div>
     </Reorder.Item>
   );
 }
 
-export default function PlayerNextUp({
-  hasTrackInfo = false,
-}: PlayerNextUpProps) {
+export default function PlayerNextUp({ hasTrackInfo = false }: PlayerNextUpProps) {
   const dispatch = useAppDispatch();
   const panelRef = useRef<HTMLDivElement | null>(null);
   const [showToast, setShowToast] = useState(false);
@@ -150,16 +142,17 @@ export default function PlayerNextUp({
   );
   const { likeTrack, loading: likeLoading } = useLikeTrackOptimistic(currentTrackId ?? "");
 
-
   const handleLike = async () => {
     if (!currentTrackId || likeLoading) return;
     try {
       await likeTrack();
       const nextLiked = !isLiked;
-      dispatch(setTrackLiked({
-        liked: nextLiked,
-        likeCount: nextLiked ? currentTrackLikeCount + 1 : currentTrackLikeCount - 1,
-      }));
+      dispatch(
+        setTrackLiked({
+          liked: nextLiked,
+          likeCount: nextLiked ? currentTrackLikeCount + 1 : currentTrackLikeCount - 1,
+        })
+      );
       if (nextLiked) {
         setShowToast(true);
         setTimeout(() => setShowToast(false), 6000);
@@ -199,9 +192,7 @@ export default function PlayerNextUp({
   function handleQueueReorder(nextQueue: Track[]) {
     if (nextQueue.length !== queue.length) return;
 
-    const movedTrack = nextQueue.find(
-      (track, index) => queue[index]?.id !== track.id,
-    );
+    const movedTrack = nextQueue.find((track, index) => queue[index]?.id !== track.id);
     if (!movedTrack) return;
 
     const from = queue.findIndex((track) => track.id === movedTrack.id);
@@ -263,30 +254,9 @@ export default function PlayerNextUp({
           className="h-4 w-3 fill-current stroke-current font-bold"
         >
           <polygon points="2,2 2,10 8,6" />
-          <line
-            x1="11"
-            y1="6"
-            x2="24"
-            y2="6"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-          <line
-            x1="2"
-            y1="14"
-            x2="24"
-            y2="14"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
-          <line
-            x1="2"
-            y1="20"
-            x2="24"
-            y2="20"
-            strokeWidth="2.5"
-            strokeLinecap="round"
-          />
+          <line x1="11" y1="6" x2="24" y2="6" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="2" y1="14" x2="24" y2="14" strokeWidth="2.5" strokeLinecap="round" />
+          <line x1="2" y1="20" x2="24" y2="20" strokeWidth="2.5" strokeLinecap="round" />
         </svg>
         <span className="absolute left-1/2 top-full mt-1 -translate-x-1/2 whitespace-nowrap border border-gray-400 bg-[#f3f3f3] px-2 py-0.5 text-xs text-chinese-black opacity-0 transition-opacity duration-150 group-hover:opacity-100 pointer-events-none z-50">
           Next Up
@@ -346,9 +316,7 @@ export default function PlayerNextUp({
                 })}
               </Reorder.Group>
             ) : (
-              <div className="py-10 text-center text-sm text-silver">
-                Your queue is empty.
-              </div>
+              <div className="py-10 text-center text-sm text-silver">Your queue is empty.</div>
             )}
           </div>
         </div>

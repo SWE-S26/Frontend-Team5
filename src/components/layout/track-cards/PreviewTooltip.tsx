@@ -60,6 +60,6 @@ export default function PreviewTooltip({
         </div>
       </div>
     </div>,
-    document.body,
+    document.body
   );
 }

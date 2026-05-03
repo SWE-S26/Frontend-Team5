@@ -12,7 +12,7 @@ export default function DetailsValidationForm({
   onSendAgain,
 }: DetailsValidationFormProps) {
   const [resendCooldown, setResendCooldown] = useState(0);
-  
+
   const router = useRouter();
 
   useEffect(() => {
@@ -31,17 +31,19 @@ export default function DetailsValidationForm({
   };
 
   return (
-    <div data-testid="Details-Validation-Form" className="w-full text-white-smoke flex flex-col items-center text-center px-1 sm:px-0">
-      <h1 className="mb-4 text-[24px] font-bold leading-tight sm:text-[28px]">
-        Check your inbox!
-      </h1>
+    <div
+      data-testid="Details-Validation-Form"
+      className="w-full text-white-smoke flex flex-col items-center text-center px-1 sm:px-0"
+    >
+      <h1 className="mb-4 text-[24px] font-bold leading-tight sm:text-[28px]">Check your inbox!</h1>
 
       <p className="text-sm text-gray-300 mb-1">Click on the link we sent to</p>
       <p className="text-sm font-bold text-white-smoke mb-4">{email}</p>
 
       <p className="text-sm text-gray-400 mb-6">
         No email in your inbox or spam folder?{" "}
-        <button data-testid="send-again-button"
+        <button
+          data-testid="send-again-button"
           onClick={handleSendAgain}
           disabled={resendCooldown > 0}
           className="text-[#699FFF] hover:underline cursor-pointer font-medium disabled:cursor-not-allowed disabled:opacity-60"
@@ -75,7 +77,8 @@ export default function DetailsValidationForm({
 
       <p className="text-sm text-gray-400">
         Wrong address?{" "}
-        <button data-testid="back-to-login-button-validate"
+        <button
+          data-testid="back-to-login-button-validate"
           onClick={onBackToLogin}
           className="text-[#699FFF] hover:underline cursor-pointer font-medium"
         >
@@ -84,7 +87,10 @@ export default function DetailsValidationForm({
       </p>
       <p className="text-sm text-gray-400 mt-1">
         If you still need help, visit our{" "}
-        <span onClick={() => router.push("/need-help")} className="text-[#699FFF] hover:underline cursor-pointer font-medium">
+        <span
+          onClick={() => router.push("/need-help")}
+          className="text-[#699FFF] hover:underline cursor-pointer font-medium"
+        >
           Help Center.
         </span>
       </p>

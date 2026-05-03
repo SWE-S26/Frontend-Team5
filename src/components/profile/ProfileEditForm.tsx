@@ -1,377 +1,427 @@
-"use client"
-import { useState, useEffect, useRef } from "react"
-import { motion, AnimatePresence } from "framer-motion"
-import InfoPopover from "@/components/settings/InfoPopover"
-import Button from "@/components/ui/Button"
-import { useAppSelector } from "@/store/hooks"
+"use client";
+import { useState, useEffect, useRef } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import InfoPopover from "@/components/settings/InfoPopover";
+import Button from "@/components/ui/Button";
+import { useAppSelector } from "@/store/hooks";
 
-import { useUpdateProfile, useUpdateProfileImages } from "@/hooks/useProfile"
-import { setProfile } from "@/store/slices/profileSlice"
-import { useAppDispatch } from "@/store/hooks"
+import { useUpdateProfile, useUpdateProfileImages } from "@/hooks/useProfile";
+import { setProfile } from "@/store/slices/profileSlice";
+import { useAppDispatch } from "@/store/hooks";
 
-import Cropper from "react-easy-crop"
-import type { Area } from "react-easy-crop"
-import { useCallback } from "react"
+import Cropper from "react-easy-crop";
+import type { Area } from "react-easy-crop";
+import { useCallback } from "react";
 
-import { IoIosLink } from "react-icons/io"
-import { FiTrash2 } from "react-icons/fi"
+import { IoIosLink } from "react-icons/io";
+import { FiTrash2 } from "react-icons/fi";
 
-import { FaFacebook, FaInstagram, FaSpotify, FaPaperPlane, FaYoutube, FaTiktok, FaPinterest, FaLinkedin } from "react-icons/fa6"
-import { FaSoundcloud, FaTwitter } from "react-icons/fa6"
-import { IoEarthSharp } from "react-icons/io5"
+import {
+  FaFacebook,
+  FaInstagram,
+  FaSpotify,
+  FaPaperPlane,
+  FaYoutube,
+  FaTiktok,
+  FaPinterest,
+  FaLinkedin,
+} from "react-icons/fa6";
+import { FaSoundcloud, FaTwitter } from "react-icons/fa6";
+import { IoEarthSharp } from "react-icons/io5";
 
-import { Select } from "antd"
-import { COUNTRIES } from "@/components/payment/countries"
+import { Select } from "antd";
+import { COUNTRIES } from "@/components/payment/countries";
 
 interface EditProfilePopUPProps {
-  isOpen: boolean
-  onClose: () => void
+  isOpen: boolean;
+  onClose: () => void;
 }
 
 interface LinkItem {
-  linkId: string
-  name:   string
-  link:   string
+  linkId: string;
+  name: string;
+  link: string;
 }
 
-const LINK_ICON_CLASS = "text-silver"
+const LINK_ICON_CLASS = "text-silver";
 const getLinkIcon = (link: string) => {
-  const url = link.toLowerCase()
-  if (url.includes("facebook.com"))   return <FaFacebook   className={LINK_ICON_CLASS} />
-  if (url.includes("instagram.com"))  return <FaInstagram  className={LINK_ICON_CLASS} />
-  if (url.includes("spotify.com"))    return <FaSpotify    className={LINK_ICON_CLASS} />
-  if (url.includes("soundcloud.com")) return <FaSoundcloud className={LINK_ICON_CLASS} />
-  if (url.includes("twitter.com") || url.includes("x.com")) return <FaTwitter className={LINK_ICON_CLASS} />
-  if (url.includes("youtube.com"))    return <FaYoutube    className={LINK_ICON_CLASS} />
-  if (url.includes("tiktok.com"))     return <FaTiktok     className={LINK_ICON_CLASS} />
-  if (url.includes("pinterest.com"))  return <FaPinterest  className={LINK_ICON_CLASS} />
-  if (url.includes("linkedin.com"))   return <FaLinkedin   className={LINK_ICON_CLASS} />
-  if (url.startsWith("mailto:") || url.includes("gmail.com") || url.includes("@")) return <FaPaperPlane className={LINK_ICON_CLASS} />
-  if (url.trim() === "")              return <IoIosLink    className={LINK_ICON_CLASS} />
-  return <IoEarthSharp className={LINK_ICON_CLASS} />
-}
+  const url = link.toLowerCase();
+  if (url.includes("facebook.com")) return <FaFacebook className={LINK_ICON_CLASS} />;
+  if (url.includes("instagram.com")) return <FaInstagram className={LINK_ICON_CLASS} />;
+  if (url.includes("spotify.com")) return <FaSpotify className={LINK_ICON_CLASS} />;
+  if (url.includes("soundcloud.com")) return <FaSoundcloud className={LINK_ICON_CLASS} />;
+  if (url.includes("twitter.com") || url.includes("x.com"))
+    return <FaTwitter className={LINK_ICON_CLASS} />;
+  if (url.includes("youtube.com")) return <FaYoutube className={LINK_ICON_CLASS} />;
+  if (url.includes("tiktok.com")) return <FaTiktok className={LINK_ICON_CLASS} />;
+  if (url.includes("pinterest.com")) return <FaPinterest className={LINK_ICON_CLASS} />;
+  if (url.includes("linkedin.com")) return <FaLinkedin className={LINK_ICON_CLASS} />;
+  if (url.startsWith("mailto:") || url.includes("gmail.com") || url.includes("@"))
+    return <FaPaperPlane className={LINK_ICON_CLASS} />;
+  if (url.trim() === "") return <IoIosLink className={LINK_ICON_CLASS} />;
+  return <IoEarthSharp className={LINK_ICON_CLASS} />;
+};
 
 const ProfileEditForm = ({ isOpen, onClose }: EditProfilePopUPProps) => {
-  const profileImgLink   = useAppSelector((state) => state.profile.profileImgLink)
-  const displayName      = useAppSelector((state) => state.profile.displayName)
-  const firstName        = useAppSelector((state) => state.profile.firstName)
-  const lastName         = useAppSelector((state) => state.profile.lastName)
-  const profileLink      = useAppSelector((state) => state.profile.profileLink)
-  const city             = useAppSelector((state) => state.profile.city)
-  const country          = useAppSelector((state) => state.profile.country)
-  const bio              = useAppSelector((state) => state.profile.bio)
-  const reduxLinks       = useAppSelector((state) => state.profile.bannerLinks)
-  const reduxSupportLink = useAppSelector((state) => state.profile.supportLink)
+  const profileImgLink = useAppSelector((state) => state.profile.profileImgLink);
+  const displayName = useAppSelector((state) => state.profile.displayName);
+  const firstName = useAppSelector((state) => state.profile.firstName);
+  const lastName = useAppSelector((state) => state.profile.lastName);
+  const profileLink = useAppSelector((state) => state.profile.profileLink);
+  const city = useAppSelector((state) => state.profile.city);
+  const country = useAppSelector((state) => state.profile.country);
+  const bio = useAppSelector((state) => state.profile.bio);
+  const reduxLinks = useAppSelector((state) => state.profile.bannerLinks);
+  const reduxSupportLink = useAppSelector((state) => state.profile.supportLink);
 
-  const [formLinks,   setFormLinks]   = useState<LinkItem[]>([])
-  const [linkErrors,  setLinkErrors]  = useState<Record<string, boolean>>({})
+  const [formLinks, setFormLinks] = useState<LinkItem[]>([]);
+  const [linkErrors, setLinkErrors] = useState<Record<string, boolean>>({});
 
-  const [avatarImage,     setAvatarImage]         = useState<string | null>(null)
-  const [formDisplayName, setFormDisplayName]     = useState("")
-  const [formProfileLink, setFormProfileLink]     = useState("")
-  const [formFirstName,   setFormFirstName]       = useState("")
-  const [formLastName,    setFormLastName]        = useState("")
-  const [formCity,        setFormCity]            = useState("")
-  const [formCountry,     setFormCountry]         = useState("")
-  const [formBio,         setFormBio]             = useState("")
-  const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null)
+  const [avatarImage, setAvatarImage] = useState<string | null>(null);
+  const [formDisplayName, setFormDisplayName] = useState("");
+  const [formProfileLink, setFormProfileLink] = useState("");
+  const [formFirstName, setFormFirstName] = useState("");
+  const [formLastName, setFormLastName] = useState("");
+  const [formCity, setFormCity] = useState("");
+  const [formCountry, setFormCountry] = useState("");
+  const [formBio, setFormBio] = useState("");
+  const [pendingAvatarFile, setPendingAvatarFile] = useState<File | null>(null);
 
-  const [rawImageUrl,   setRawImageUrl]   = useState<string | null>(null)
-  const [rawFile,       setRawFile]       = useState<File | null>(null)
-  const [isCropping,    setIsCropping]    = useState(false)
-  const [crop,          setCrop]          = useState({ x: 0, y: 0 })
-  const [zoom,          setZoom]          = useState(1)
-  const [croppedArea,   setCroppedArea]   = useState<Area | null>(null)
-  const fileInputRef = useRef<HTMLInputElement>(null)
+  const [rawImageUrl, setRawImageUrl] = useState<string | null>(null);
+  const [rawFile, setRawFile] = useState<File | null>(null);
+  const [isCropping, setIsCropping] = useState(false);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
+  const [croppedArea, setCroppedArea] = useState<Area | null>(null);
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
+  const [formSupportLink, setFormSupportLink] = useState<string | null>(null);
+  const [showSupportLinkInfo, setShowSupportLinkInfo] = useState(false);
 
-  const [formSupportLink,     setFormSupportLink]     = useState<string | null>(null)
-  const [showSupportLinkInfo, setShowSupportLinkInfo] = useState(false)
+  const [displayNameError, setDisplayNameError] = useState(false);
+  const [profileLinkError, setProfileLinkError] = useState(false);
+  const [showLinksInfo, setShowLinksInfo] = useState(false);
+  const [profileLinkTakenError, setProfileLinkTakenError] = useState(false);
+  const [isDirty, setIsDirty] = useState(false);
 
-  const [displayNameError, setDisplayNameError]           = useState(false)
-  const [profileLinkError, setProfileLinkError]           = useState(false)
-  const [showLinksInfo,    setShowLinksInfo]              = useState(false)
-  const [profileLinkTakenError, setProfileLinkTakenError] = useState(false)
-  const [isDirty, setIsDirty] = useState(false)
+  const dispatch = useAppDispatch();
+  const { updateProfile, loading, error } = useUpdateProfile();
 
-  const dispatch = useAppDispatch()
-  const { updateProfile, loading, error } = useUpdateProfile()
-
-  const linksInfoRef       = useRef<HTMLDivElement>(null)
-  const supportLinkInfoRef = useRef<HTMLDivElement>(null)
+  const linksInfoRef = useRef<HTMLDivElement>(null);
+  const supportLinkInfoRef = useRef<HTMLDivElement>(null);
 
   // refs to always have latest Redux values without being dependencies
-  const profileImgLinkRef   = useRef(profileImgLink)
-  const displayNameRef      = useRef(displayName)
-  const firstNameRef        = useRef(firstName)
-  const lastNameRef         = useRef(lastName)
-  const profileLinkRef      = useRef(profileLink)
-  const cityRef             = useRef(city)
-  const countryRef          = useRef(country)
-  const bioRef              = useRef(bio)
-  const reduxLinksRef       = useRef(reduxLinks)
-  const reduxSupportLinkRef = useRef(reduxSupportLink)
+  const profileImgLinkRef = useRef(profileImgLink);
+  const displayNameRef = useRef(displayName);
+  const firstNameRef = useRef(firstName);
+  const lastNameRef = useRef(lastName);
+  const profileLinkRef = useRef(profileLink);
+  const cityRef = useRef(city);
+  const countryRef = useRef(country);
+  const bioRef = useRef(bio);
+  const reduxLinksRef = useRef(reduxLinks);
+  const reduxSupportLinkRef = useRef(reduxSupportLink);
 
   // keep refs in sync with Redux
-  useEffect(() => { profileImgLinkRef.current   = profileImgLink },   [profileImgLink])
-  useEffect(() => { displayNameRef.current       = displayName },      [displayName])
-  useEffect(() => { firstNameRef.current         = firstName },        [firstName])
-  useEffect(() => { lastNameRef.current          = lastName },         [lastName])
-  useEffect(() => { profileLinkRef.current       = profileLink },      [profileLink])
-  useEffect(() => { cityRef.current              = city },             [city])
-  useEffect(() => { countryRef.current           = country },          [country])
-  useEffect(() => { bioRef.current               = bio },              [bio])
-  useEffect(() => { reduxLinksRef.current        = reduxLinks },       [reduxLinks])
-  useEffect(() => { reduxSupportLinkRef.current  = reduxSupportLink }, [reduxSupportLink])
+  useEffect(() => {
+    profileImgLinkRef.current = profileImgLink;
+  }, [profileImgLink]);
+  useEffect(() => {
+    displayNameRef.current = displayName;
+  }, [displayName]);
+  useEffect(() => {
+    firstNameRef.current = firstName;
+  }, [firstName]);
+  useEffect(() => {
+    lastNameRef.current = lastName;
+  }, [lastName]);
+  useEffect(() => {
+    profileLinkRef.current = profileLink;
+  }, [profileLink]);
+  useEffect(() => {
+    cityRef.current = city;
+  }, [city]);
+  useEffect(() => {
+    countryRef.current = country;
+  }, [country]);
+  useEffect(() => {
+    bioRef.current = bio;
+  }, [bio]);
+  useEffect(() => {
+    reduxLinksRef.current = reduxLinks;
+  }, [reduxLinks]);
+  useEffect(() => {
+    reduxSupportLinkRef.current = reduxSupportLink;
+  }, [reduxSupportLink]);
 
-  const { updateProfileImages } = useUpdateProfileImages()
+  const { updateProfileImages } = useUpdateProfileImages();
 
-  async function getCroppedImage(imageSrc: string, croppedAreaPixels: Area, fileName: string): Promise<{ file: File; dataUrl: string }> {
-  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
-    const img = new Image()
-    img.crossOrigin = "anonymous"
-    img.onload  = () => resolve(img)
-    img.onerror = reject
-    img.src     = imageSrc
-  })
-  const canvas = document.createElement("canvas")
-  canvas.width  = croppedAreaPixels.width
-  canvas.height = croppedAreaPixels.height
-  const ctx = canvas.getContext("2d")
-  if (!ctx) throw new Error("No canvas context")
-  ctx.beginPath()
-  ctx.arc(croppedAreaPixels.width / 2, croppedAreaPixels.height / 2, Math.min(croppedAreaPixels.width, croppedAreaPixels.height) / 2, 0, Math.PI * 2)
-  ctx.clip()
-  ctx.drawImage(image, croppedAreaPixels.x, croppedAreaPixels.y, croppedAreaPixels.width, croppedAreaPixels.height, 0, 0, croppedAreaPixels.width, croppedAreaPixels.height)
-  const dataUrl = canvas.toDataURL("image/png")
-  const blob    = await (await fetch(dataUrl)).blob()
-  const file    = new File([blob], fileName, { type: "image/png" })
-  return { file, dataUrl }
-}
+  async function getCroppedImage(
+    imageSrc: string,
+    croppedAreaPixels: Area,
+    fileName: string
+  ): Promise<{ file: File; dataUrl: string }> {
+    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+      const img = new Image();
+      img.crossOrigin = "anonymous";
+      img.onload = () => resolve(img);
+      img.onerror = reject;
+      img.src = imageSrc;
+    });
+    const canvas = document.createElement("canvas");
+    canvas.width = croppedAreaPixels.width;
+    canvas.height = croppedAreaPixels.height;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) throw new Error("No canvas context");
+    ctx.beginPath();
+    ctx.arc(
+      croppedAreaPixels.width / 2,
+      croppedAreaPixels.height / 2,
+      Math.min(croppedAreaPixels.width, croppedAreaPixels.height) / 2,
+      0,
+      Math.PI * 2
+    );
+    ctx.clip();
+    ctx.drawImage(
+      image,
+      croppedAreaPixels.x,
+      croppedAreaPixels.y,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height,
+      0,
+      0,
+      croppedAreaPixels.width,
+      croppedAreaPixels.height
+    );
+    const dataUrl = canvas.toDataURL("image/png");
+    const blob = await (await fetch(dataUrl)).blob();
+    const file = new File([blob], fileName, { type: "image/png" });
+    return { file, dataUrl };
+  }
 
- 
   const handleAvatarChange = useCallback(async (file: File, previewUrl: string) => {
-    setAvatarImage(previewUrl)
-    setPendingAvatarFile(file)   // ← store file, don't upload yet
-    setIsDirty(true)
-  }, [])
-
-
-  
+    setAvatarImage(previewUrl);
+    setPendingAvatarFile(file); // ← store file, don't upload yet
+    setIsDirty(true);
+  }, []);
 
   const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-  const file = e.target.files?.[0]
-  if (!file) return
-  const url = URL.createObjectURL(file)
-  setRawFile(file)
-  setRawImageUrl(url)
-  setCrop({ x: 0, y: 0 })
-  setZoom(1)
-  setIsCropping(true)
-  e.target.value = ""
-}
+    const file = e.target.files?.[0];
+    if (!file) return;
+    const url = URL.createObjectURL(file);
+    setRawFile(file);
+    setRawImageUrl(url);
+    setCrop({ x: 0, y: 0 });
+    setZoom(1);
+    setIsCropping(true);
+    e.target.value = "";
+  };
 
-const onCropComplete = useCallback((_: Area, pixels: Area) => {
-  setCroppedArea(pixels)
-}, [])
+  const onCropComplete = useCallback((_: Area, pixels: Area) => {
+    setCroppedArea(pixels);
+  }, []);
 
-const handleReplace = useCallback(async () => {
-  if (!croppedArea || !rawFile || !rawImageUrl) return
-  const { file, dataUrl } = await getCroppedImage(rawImageUrl, croppedArea, rawFile.name)
-  await handleAvatarChange(file, dataUrl)
-  setIsDirty(true)
-  setIsCropping(false)
-  setRawImageUrl(null)
-  setRawFile(null)
-}, [croppedArea, rawFile, rawImageUrl, handleAvatarChange])
+  const handleReplace = useCallback(async () => {
+    if (!croppedArea || !rawFile || !rawImageUrl) return;
+    const { file, dataUrl } = await getCroppedImage(rawImageUrl, croppedArea, rawFile.name);
+    await handleAvatarChange(file, dataUrl);
+    setIsDirty(true);
+    setIsCropping(false);
+    setRawImageUrl(null);
+    setRawFile(null);
+  }, [croppedArea, rawFile, rawImageUrl, handleAvatarChange]);
 
-const handleCancelCrop = () => {
-  setIsCropping(false)
-  setRawImageUrl(null)
-  setRawFile(null)
-}
+  const handleCancelCrop = () => {
+    setIsCropping(false);
+    setRawImageUrl(null);
+    setRawFile(null);
+  };
 
   // populate form only when modal opens
   useEffect(() => {
-    if (!isOpen) return
-    setAvatarImage(profileImgLinkRef.current    || null)
-    setFormDisplayName(displayNameRef.current   || "")
-    setFormProfileLink(profileLinkRef.current   || "")
-    setFormFirstName(firstNameRef.current       || "")
-    setFormLastName(lastNameRef.current         || "")
-    setFormCity(cityRef.current                 || "")
-    setFormCountry(countryRef.current           || "")
-    setFormBio(bioRef.current                   || "")
+    if (!isOpen) return;
+    setAvatarImage(profileImgLinkRef.current || null);
+    setFormDisplayName(displayNameRef.current || "");
+    setFormProfileLink(profileLinkRef.current || "");
+    setFormFirstName(firstNameRef.current || "");
+    setFormLastName(lastNameRef.current || "");
+    setFormCity(cityRef.current || "");
+    setFormCountry(countryRef.current || "");
+    setFormBio(bioRef.current || "");
     setFormLinks(
       (reduxLinksRef.current || []).map((l: any) => ({
         linkId: l.linkId || crypto.randomUUID(),
         name: l.name || "",
-        link: l.link?.startsWith("mailto:")
-          ? l.link.replace("mailto:", "")
-          : l.link || "",
+        link: l.link?.startsWith("mailto:") ? l.link.replace("mailto:", "") : l.link || "",
       }))
-    )
-    setFormSupportLink(reduxSupportLinkRef.current || null)
-    setLinkErrors({})
-    setPendingAvatarFile(null)
-    setProfileLinkTakenError(false)
-    setIsDirty(false)
-  }, [isOpen])
+    );
+    setFormSupportLink(reduxSupportLinkRef.current || null);
+    setLinkErrors({});
+    setPendingAvatarFile(null);
+    setProfileLinkTakenError(false);
+    setIsDirty(false);
+  }, [isOpen]);
 
   // close links info tooltip on outside click
   useEffect(() => {
-    if (!showLinksInfo) return
+    if (!showLinksInfo) return;
     const handleClickOutside = (e: MouseEvent) => {
       if (linksInfoRef.current && !linksInfoRef.current.contains(e.target as Node)) {
-        setShowLinksInfo(false)
+        setShowLinksInfo(false);
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [showLinksInfo])
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showLinksInfo]);
 
   // close support link info tooltip on outside click
   useEffect(() => {
-    if (!showSupportLinkInfo) return
+    if (!showSupportLinkInfo) return;
     const handleClickOutside = (e: MouseEvent) => {
       if (supportLinkInfoRef.current && !supportLinkInfoRef.current.contains(e.target as Node)) {
-        setShowSupportLinkInfo(false)
+        setShowSupportLinkInfo(false);
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [showSupportLinkInfo])
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, [showSupportLinkInfo]);
 
   const handleAddLink = () => {
-    const newLink: LinkItem = { linkId: crypto.randomUUID(), name: "", link: "" }
-    setFormLinks((prev) => [...prev, newLink])
-    setIsDirty(true)
-  }
+    const newLink: LinkItem = { linkId: crypto.randomUUID(), name: "", link: "" };
+    setFormLinks((prev) => [...prev, newLink]);
+    setIsDirty(true);
+  };
 
   const handleRemoveLink = (linkId: string) => {
-    setFormLinks((prev) => prev.filter((l) => l.linkId !== linkId))
+    setFormLinks((prev) => prev.filter((l) => l.linkId !== linkId));
     setLinkErrors((prev) => {
-      const next = { ...prev }
-      delete next[linkId]
-      return next
-    })
-    setIsDirty(true)
-  }
+      const next = { ...prev };
+      delete next[linkId];
+      return next;
+    });
+    setIsDirty(true);
+  };
 
   const handleLinkChange = (linkId: string, field: "link" | "name", value: string) => {
-    setFormLinks((prev) =>
-      prev.map((l) => (l.linkId === linkId ? { ...l, [field]: value } : l))
-    )
+    setFormLinks((prev) => prev.map((l) => (l.linkId === linkId ? { ...l, [field]: value } : l)));
     if (field === "link" && value.trim()) {
-      setLinkErrors((prev) => ({ ...prev, [linkId]: false }))
+      setLinkErrors((prev) => ({ ...prev, [linkId]: false }));
     }
-    setIsDirty(true)
-  }
+    setIsDirty(true);
+  };
 
   const handleCancel = () => {
-    setAvatarImage(profileImgLinkRef.current    || null)
-    setFormDisplayName(displayNameRef.current   || "")
-    setFormProfileLink(profileLinkRef.current   || "")
-    setFormFirstName(firstNameRef.current       || "")
-    setFormLastName(lastNameRef.current         || "")
-    setFormCity(cityRef.current                 || "")
-    setFormCountry(countryRef.current           || "")
-    setFormBio(bioRef.current                   || "")
+    setAvatarImage(profileImgLinkRef.current || null);
+    setFormDisplayName(displayNameRef.current || "");
+    setFormProfileLink(profileLinkRef.current || "");
+    setFormFirstName(firstNameRef.current || "");
+    setFormLastName(lastNameRef.current || "");
+    setFormCity(cityRef.current || "");
+    setFormCountry(countryRef.current || "");
+    setFormBio(bioRef.current || "");
     setFormLinks(
       (reduxLinksRef.current || []).map((l: any) => ({
         linkId: l.linkId || crypto.randomUUID(),
-        name:   l.name   || "",
-        link:   l.link   || "",
+        name: l.name || "",
+        link: l.link || "",
       }))
-    )
-    setFormSupportLink(reduxSupportLinkRef.current || null)
-    setDisplayNameError(false)
-    setProfileLinkError(false)
-    setPendingAvatarFile(null)
-    setLinkErrors({})
-    setProfileLinkTakenError(false)
-    onClose()
-  }
+    );
+    setFormSupportLink(reduxSupportLinkRef.current || null);
+    setDisplayNameError(false);
+    setProfileLinkError(false);
+    setPendingAvatarFile(null);
+    setLinkErrors({});
+    setProfileLinkTakenError(false);
+    onClose();
+  };
 
   const handleSave = async () => {
-    let hasError = false
+    let hasError = false;
 
-    if (!formDisplayName.trim()) { setDisplayNameError(true); hasError = true }
-    if (!formProfileLink.trim()) { setProfileLinkError(true); hasError = true }
-    if (hasError) return
+    if (!formDisplayName.trim()) {
+      setDisplayNameError(true);
+      hasError = true;
+    }
+    if (!formProfileLink.trim()) {
+      setProfileLinkError(true);
+      hasError = true;
+    }
+    if (hasError) return;
 
-    setProfileLinkTakenError(false)
+    setProfileLinkTakenError(false);
 
     const formattedLinks = formLinks
       .filter((l) => l.link.trim())
       .map(({ linkId, name, link }) => {
-        let finalLink = link.trim()
+        let finalLink = link.trim();
         if (finalLink.includes("@") && !finalLink.startsWith("http")) {
-          finalLink = `mailto:${finalLink}`
+          finalLink = `mailto:${finalLink}`;
         } else if (!finalLink.startsWith("http")) {
-          finalLink = `https://${finalLink}`
+          finalLink = `https://${finalLink}`;
         }
-        return { linkId, name, link: finalLink }
+        return { linkId, name, link: finalLink };
       })
-      .filter((l, index, self) => index === self.findIndex((x) => x.link === l.link))
+      .filter((l, index, self) => index === self.findIndex((x) => x.link === l.link));
 
     const updateData: any = {
       displayName: formDisplayName,
       profileLink: formProfileLink,
-      firstName:   formFirstName.trim()  || null,
-      lastName:    formLastName.trim()   || null,
-      city:        formCity.trim()       || null,
-      country:     formCountry.trim()    || null,
-      bio:         formBio.trim()        || null,
-      links:       formattedLinks,
+      firstName: formFirstName.trim() || null,
+      lastName: formLastName.trim() || null,
+      city: formCity.trim() || null,
+      country: formCountry.trim() || null,
+      bio: formBio.trim() || null,
+      links: formattedLinks,
       bannerLinks: formattedLinks,
       supportLink: formSupportLink?.trim() || null,
-    }
+    };
 
     try {
       // 1. Upload avatar if one is pending — do this BEFORE updateProfile
       //    so finalAvatarUrl holds the real Cloudinary URL, not a blob URL
-      let finalAvatarUrl = profileImgLinkRef.current ?? null
+      let finalAvatarUrl = profileImgLinkRef.current ?? null;
 
       if (pendingAvatarFile) {
-        const updated = await updateProfileImages({ profileImg: pendingAvatarFile })
+        const updated = await updateProfileImages({ profileImg: pendingAvatarFile });
         if (updated?.profileImgLink) {
-          finalAvatarUrl = updated.profileImgLink
-          setAvatarImage(finalAvatarUrl)
+          finalAvatarUrl = updated.profileImgLink;
+          setAvatarImage(finalAvatarUrl);
         }
-        setPendingAvatarFile(null)
+        setPendingAvatarFile(null);
       }
 
       // 2. Save text fields
-      const res = await updateProfile(updateData)
+      const res = await updateProfile(updateData);
       if (res) {
-        dispatch(setProfile({
-          displayName:    res.displayName,
-          profileLink:    res.profileLink,
-          firstName:      res.firstName,
-          lastName:       res.lastName,
-          city:           res.city,
-          country:        res.country,
-          bio:            res.bio,
-          bannerLinks:    res.bannerLinks?.length ? res.bannerLinks : [],
-          profileImgLink: finalAvatarUrl,
-          links:          res.links,
-          supportLink:    res.supportLink,
-        }))
-        onClose()
+        dispatch(
+          setProfile({
+            displayName: res.displayName,
+            profileLink: res.profileLink,
+            firstName: res.firstName,
+            lastName: res.lastName,
+            city: res.city,
+            country: res.country,
+            bio: res.bio,
+            bannerLinks: res.bannerLinks?.length ? res.bannerLinks : [],
+            profileImgLink: finalAvatarUrl,
+            links: res.links,
+            supportLink: res.supportLink,
+          })
+        );
+        onClose();
       }
     } catch (err: any) {
-      console.log("error status:", err?.response?.status)
-      console.log("error message:", err?.response?.data)
-      const status  = err?.response?.status
-      const message = (err?.response?.data?.message ?? "").toLowerCase()
+      console.log("error status:", err?.response?.status);
+      console.log("error message:", err?.response?.data);
+      const status = err?.response?.status;
+      const message = (err?.response?.data?.message ?? "").toLowerCase();
       if (status === 409 || message.includes("taken") || message.includes("already")) {
-        setProfileLinkTakenError(true)
+        setProfileLinkTakenError(true);
       } else {
-        console.error("Failed to save profile:", err)
+        console.error("Failed to save profile:", err);
       }
     }
-  }
+  };
 
   return (
     <AnimatePresence>
@@ -379,10 +429,11 @@ const handleCancelCrop = () => {
         <div
           className="fixed inset-0 bg-white/30 z-1001 flex items-start pt-4 sm:pt-10 justify-center px-2 sm:px-0 overflow-y-auto"
           onClick={(e) => {
-            if (e.target === e.currentTarget) handleCancel()
+            if (e.target === e.currentTarget) handleCancel();
           }}
         >
-          <button data-testid="cancel-button-popup"
+          <button
+            data-testid="cancel-button-popup"
             className="fixed top-4 right-4 text-white-smoke text-2xl font-bold bg-off-black rounded-full w-11 h-11 flex items-center justify-center hover:text-silver cursor-pointer z-1002"
             onClick={handleCancel}
           >
@@ -397,96 +448,108 @@ const handleCancelCrop = () => {
             className="flex flex-col w-full sm:w-200 p-4 sm:p-6 bg-chinese-black rounded-md relative overflow-y-auto max-h-[92vh] sm:max-h-[90vh] scrollbar-hide"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-xl text-white-smoke font-bold mb-6">
-              Edit your Profile
-            </p>
+            <p className="text-xl text-white-smoke font-bold mb-6">Edit your Profile</p>
 
             <div className="flex flex-col sm:flex-row gap-6 mb-4">
               <div className="flex flex-col items-center gap-2 shrink-0">
-  <div className="relative w-40 h-40 group/avatar">
-    {isCropping && rawImageUrl ? (
-      <div className="relative overflow-hidden rounded-full w-40 h-40">
-        <Cropper
-          image={rawImageUrl}
-          crop={crop}
-          zoom={zoom}
-          aspect={1}
-          cropShape="round"
-          showGrid={false}
-          cropSize={{ width: 160, height: 160 }}
-          onCropChange={setCrop}
-          onZoomChange={setZoom}
-          onCropComplete={onCropComplete}
-          style={{
-            containerStyle: { borderRadius: "50%", overflow: "hidden", width: 160, height: 160, background: "#000" },
-            cropAreaStyle:  { border: "none", boxShadow: "none" },
-          }}
-        />
-      </div>
-    ) : (
-      <div
-        className="relative overflow-hidden w-40 h-40 rounded-full cursor-pointer group/avatar"
-        onClick={() => fileInputRef.current?.click()}
-      >
-  {avatarImage ? (
-    <img src={avatarImage} alt="Avatar" className="w-full h-full object-cover rounded-full" />
-  ) : (
-    <div className="w-full h-full rounded-full bg-off-black flex items-center justify-center">
-      <span className="text-silver text-xs text-center px-2">Upload image</span>
-    </div>
-  )}
-  <div className="absolute inset-0 bg-gray-400/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-full" />
-</div>
-    )}
-  </div>
+                <div className="relative w-40 h-40 group/avatar">
+                  {isCropping && rawImageUrl ? (
+                    <div className="relative overflow-hidden rounded-full w-40 h-40">
+                      <Cropper
+                        image={rawImageUrl}
+                        crop={crop}
+                        zoom={zoom}
+                        aspect={1}
+                        cropShape="round"
+                        showGrid={false}
+                        cropSize={{ width: 160, height: 160 }}
+                        onCropChange={setCrop}
+                        onZoomChange={setZoom}
+                        onCropComplete={onCropComplete}
+                        style={{
+                          containerStyle: {
+                            borderRadius: "50%",
+                            overflow: "hidden",
+                            width: 160,
+                            height: 160,
+                            background: "#000",
+                          },
+                          cropAreaStyle: { border: "none", boxShadow: "none" },
+                        }}
+                      />
+                    </div>
+                  ) : (
+                    <div
+                      className="relative overflow-hidden w-40 h-40 rounded-full cursor-pointer group/avatar"
+                      onClick={() => fileInputRef.current?.click()}
+                    >
+                      {avatarImage ? (
+                        <img
+                          src={avatarImage}
+                          alt="Avatar"
+                          className="w-full h-full object-cover rounded-full"
+                        />
+                      ) : (
+                        <div className="w-full h-full rounded-full bg-off-black flex items-center justify-center">
+                          <span className="text-silver text-xs text-center px-2">Upload image</span>
+                        </div>
+                      )}
+                      <div className="absolute inset-0 bg-gray-400/40 opacity-0 group-hover/avatar:opacity-100 transition-opacity rounded-full" />
+                    </div>
+                  )}
+                </div>
 
-  {isCropping && (
-    <input data-testid="AvatarZoom-input"
-      type="range"
-      min={1} max={3} step={0.01}
-      value={zoom}
-      onChange={(e) => setZoom(Number(e.target.value))}
-      className="w-30 accent-white-smoke"
-    />
-  )}
+                {isCropping && (
+                  <input
+                    data-testid="AvatarZoom-input"
+                    type="range"
+                    min={1}
+                    max={3}
+                    step={0.01}
+                    value={zoom}
+                    onChange={(e) => setZoom(Number(e.target.value))}
+                    className="w-30 accent-white-smoke"
+                  />
+                )}
 
-  {isCropping ? (
-    <div className="flex gap-2">
-      
-      <Button data-testid="Replace-button-ReplaceAvatarInEditForm"
-        onClick={handleReplace}
-        className="bg-chinese-black text-white-smoke text-xs font-semibold px-3 py-1.5 rounded cursor-pointer"
-      >
-        Replace
-      </Button>
-    </div>
-  ) : null}
+                {isCropping ? (
+                  <div className="flex gap-2">
+                    <Button
+                      data-testid="Replace-button-ReplaceAvatarInEditForm"
+                      onClick={handleReplace}
+                      className="bg-chinese-black text-white-smoke text-xs font-semibold px-3 py-1.5 rounded cursor-pointer"
+                    >
+                      Replace
+                    </Button>
+                  </div>
+                ) : null}
 
-  <input data-testid="Avatar-input"
-    ref={fileInputRef}
-    type="file"
-    accept="image/*"
-    className="hidden"
-    onChange={(e) => {
-      handleFileChange(e)
-      setIsDirty(true)
-    }}
-  />
-</div>
+                <input
+                  data-testid="Avatar-input"
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/*"
+                  className="hidden"
+                  onChange={(e) => {
+                    handleFileChange(e);
+                    setIsDirty(true);
+                  }}
+                />
+              </div>
 
               <div className="flex-1 flex flex-col gap-3">
-
                 <div>
                   <p className="text-sm text-white-smoke font-bold mb-1">
                     Display name <span className="text-red-500">*</span>
                   </p>
-                  <input data-testid="DisplayName-input"
+                  <input
+                    data-testid="DisplayName-input"
                     maxLength={40}
                     value={formDisplayName || ""}
                     onChange={(e) => {
-                      setFormDisplayName(e.target.value)
-                      setIsDirty(true)
-                      if (e.target.value.trim()) setDisplayNameError(false)
+                      setFormDisplayName(e.target.value);
+                      setIsDirty(true);
+                      if (e.target.value.trim()) setDisplayNameError(false);
                     }}
                     className={`w-full bg-off-black px-3 py-2 text-white-smoke rounded border ${
                       displayNameError ? "border-red-500" : "border-transparent"
@@ -504,9 +567,13 @@ const handleCancelCrop = () => {
                   <p className="text-sm text-white-smoke font-bold mb-1">
                     Profile URL <span className="text-red-500">*</span>
                   </p>
-                  <div className={`flex items-center bg-off-black rounded border ${
-                    profileLinkError || profileLinkTakenError ? "border-red-500" : "border-transparent"
-                  }`}>
+                  <div
+                    className={`flex items-center bg-off-black rounded border ${
+                      profileLinkError || profileLinkTakenError
+                        ? "border-red-500"
+                        : "border-transparent"
+                    }`}
+                  >
                     <span className="text-silver px-3 py-2 whitespace-nowrap border-r border-zinc-700 select-none">
                       beatza.me/
                     </span>
@@ -514,12 +581,12 @@ const handleCancelCrop = () => {
                       data-testid="ProfileLink-input"
                       value={formProfileLink || ""}
                       onChange={(e) => {
-                        const sanitized = e.target.value.replace(/[/\\]/g, "")
-                        setFormProfileLink(sanitized)
-                        setIsDirty(true)
+                        const sanitized = e.target.value.replace(/[/\\]/g, "");
+                        setFormProfileLink(sanitized);
+                        setIsDirty(true);
                         if (sanitized.trim()) {
-                          setProfileLinkError(false)
-                          setProfileLinkTakenError(false)
+                          setProfileLinkError(false);
+                          setProfileLinkTakenError(false);
                         }
                       }}
                       className="flex-1 bg-transparent px-3 py-2 text-white-smoke outline-none"
@@ -541,12 +608,13 @@ const handleCancelCrop = () => {
                 <div className="flex flex-col sm:flex-row gap-2">
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">First name</p>
-                    <input data-testid="FirstName-input"
+                    <input
+                      data-testid="FirstName-input"
                       maxLength={40}
                       value={formFirstName || ""}
                       onChange={(e) => {
-                        setFormFirstName(e.target.value)
-                        setIsDirty(true)
+                        setFormFirstName(e.target.value);
+                        setIsDirty(true);
                       }}
                       className="w-full bg-off-black px-3 py-2 text-white-smoke rounded"
                       placeholder="First name"
@@ -554,12 +622,13 @@ const handleCancelCrop = () => {
                   </div>
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">Last name</p>
-                    <input data-testid="LastName-input"
+                    <input
+                      data-testid="LastName-input"
                       maxLength={40}
                       value={formLastName || ""}
                       onChange={(e) => {
-                        setFormLastName(e.target.value)
-                        setIsDirty(true)
+                        setFormLastName(e.target.value);
+                        setIsDirty(true);
                       }}
                       className="w-full bg-off-black px-3 py-2 text-white-smoke rounded"
                       placeholder="Last name"
@@ -570,12 +639,13 @@ const handleCancelCrop = () => {
                 <div className="flex flex-col sm:flex-row gap-2">
                   <div className="flex-1">
                     <p className="text-sm text-white-smoke font-bold mb-1">City</p>
-                    <input data-testid="City-input"
+                    <input
+                      data-testid="City-input"
                       maxLength={40}
                       value={formCity || ""}
                       onChange={(e) => {
-                        setFormCity(e.target.value)
-                        setIsDirty(true)
+                        setFormCity(e.target.value);
+                        setIsDirty(true);
                       }}
                       className="w-full bg-off-black px-3 py-2 text-white-smoke rounded"
                       placeholder="City"
@@ -587,8 +657,8 @@ const handleCancelCrop = () => {
                       data-testid="Country-input-dropdown"
                       value={formCountry || undefined}
                       onChange={(value) => {
-                        setFormCountry(value)
-                        setIsDirty(true)
+                        setFormCountry(value);
+                        setIsDirty(true);
                       }}
                       placeholder="Country"
                       options={COUNTRIES.map((c) => ({ value: c.label, label: c.label }))}
@@ -604,24 +674,27 @@ const handleCancelCrop = () => {
                   <textarea
                     value={formBio}
                     onChange={(e) => {
-                      setFormBio(e.target.value)
-                      setIsDirty(true)
+                      setFormBio(e.target.value);
+                      setIsDirty(true);
                     }}
                     className="w-full h-20 bg-off-black px-3 py-2 text-white-smoke rounded resize-none text-sm"
                     placeholder="Tell the world a little bit about yourself. The shorter the better."
                   />
                 </div>
-
               </div>
             </div>
 
             {/* Your links header with info tooltip */}
             <div ref={linksInfoRef} className="flex items-center gap-2 mb-2 relative">
               <p className="text-sm text-white-smoke font-bold">Your links</p>
-              <InfoPopover text="Add links to your social media profiles, website, or other pages you want to share with your fans." data-testid="Your-links-button-EditForm"/>
+              <InfoPopover
+                text="Add links to your social media profiles, website, or other pages you want to share with your fans."
+                data-testid="Your-links-button-EditForm"
+              />
               {showLinksInfo && (
                 <div className="absolute left-16 -top-2 z-10 w-64 bg-zinc-700 text-white-smoke text-sm rounded-md px-4 py-3 shadow-lg">
-                  Add links to your website and social network profiles to help your audience find you wherever you are.
+                  Add links to your website and social network profiles to help your audience find
+                  you wherever you are.
                 </div>
               )}
             </div>
@@ -634,11 +707,12 @@ const handleCancelCrop = () => {
 
                     <div className="flex-1 flex flex-col sm:flex-row gap-2">
                       <div className="flex-1 flex flex-col gap-1">
-                        <input data-testid="Link-input"
+                        <input
+                          data-testid="Link-input"
                           value={l.link || ""}
                           onChange={(e) => {
-                            handleLinkChange(l.linkId, "link", e.target.value)
-                            setIsDirty(true)
+                            handleLinkChange(l.linkId, "link", e.target.value);
+                            setIsDirty(true);
                           }}
                           placeholder="Web or email address *"
                           className={`w-full bg-off-black px-3 py-2 text-white-smoke rounded border ${
@@ -650,19 +724,21 @@ const handleCancelCrop = () => {
                         )}
                       </div>
 
-                      <input data-testid="LinkName-input"
+                      <input
+                        data-testid="LinkName-input"
                         maxLength={40}
                         value={l.name || ""}
                         onChange={(e) => {
-                          handleLinkChange(l.linkId, "name", e.target.value)
-                          setIsDirty(true)
+                          handleLinkChange(l.linkId, "name", e.target.value);
+                          setIsDirty(true);
                         }}
                         placeholder="Short title"
                         className="w-full sm:w-36 bg-off-black px-3 py-2 text-white-smoke rounded border border-transparent"
                       />
                     </div>
 
-                    <button data-testid="RemoveLink-button-EditForm"
+                    <button
+                      data-testid="RemoveLink-button-EditForm"
                       onClick={() => handleRemoveLink(l.linkId)}
                       className="mt-1 text-silver transition-colors cursor-pointer rounded border border-transparent hover:text-red-400 shrink-0"
                     >
@@ -678,18 +754,29 @@ const handleCancelCrop = () => {
               <div className="flex flex-col gap-1 mb-5">
                 <div className="flex items-center gap-1.5">
                   <span className="text-silver">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                    <svg
+                      xmlns="http://www.w3.org/2000/svg"
+                      width="18"
+                      height="18"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="2"
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                    >
                       <circle cx="12" cy="12" r="10" />
                       <line x1="12" y1="8" x2="12" y2="16" />
                       <line x1="8" y1="12" x2="16" y2="12" />
                     </svg>
                   </span>
 
-                  <input data-testid="SupportLink-input"
+                  <input
+                    data-testid="SupportLink-input"
                     value={formSupportLink}
                     onChange={(e) => {
-                      setFormSupportLink(e.target.value)
-                      setIsDirty(true)
+                      setFormSupportLink(e.target.value);
+                      setIsDirty(true);
                     }}
                     placeholder="e.g.: https://paypal.me/username"
                     className="flex-1 bg-off-black px-3 py-2 text-white-smoke rounded border border-transparent"
@@ -701,8 +788,12 @@ const handleCancelCrop = () => {
                     position="right"
                   />
 
-                  <button data-testid="Remove-button-EditForm"
-                    onClick={() => { setFormSupportLink(null); setIsDirty(true) }}
+                  <button
+                    data-testid="Remove-button-EditForm"
+                    onClick={() => {
+                      setFormSupportLink(null);
+                      setIsDirty(true);
+                    }}
                     className="text-silver transition-colors cursor-pointer rounded border border-transparent hover:text-red-400"
                   >
                     <FiTrash2 />
@@ -710,8 +801,11 @@ const handleCancelCrop = () => {
                 </div>
 
                 <p className="text-silver text-xs ml-6">
-                  Supported platforms: PayPal, Cash app, Venmo, Bandcamp, Shopify, Kickstarter, Patreon, and Gofundme.{" "}
-                  <a href="#" className="text-blue-400 hover:underline">Learn more</a>
+                  Supported platforms: PayPal, Cash app, Venmo, Bandcamp, Shopify, Kickstarter,
+                  Patreon, and Gofundme.{" "}
+                  <a href="#" className="text-blue-400 hover:underline">
+                    Learn more
+                  </a>
                 </p>
               </div>
             )}
@@ -754,12 +848,11 @@ const handleCancelCrop = () => {
                 {loading ? "Saving..." : "Save changes"}
               </Button>
             </div>
-
           </motion.div>
         </div>
       )}
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export default ProfileEditForm
+export default ProfileEditForm;

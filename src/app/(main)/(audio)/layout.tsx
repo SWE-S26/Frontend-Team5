@@ -23,11 +23,7 @@ function SocketInitializer() {
   return null;
 }
 
-export default function ProtectedLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function ProtectedLayout({ children }: { children: React.ReactNode }) {
   return (
     <NotificationsProvider>
       <SocketInitializer />

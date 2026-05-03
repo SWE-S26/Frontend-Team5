@@ -32,7 +32,13 @@ function CompletedStep({ question, answer }: { question: string; answer: string 
   return (
     <div className="flex items-start gap-3 mb-4">
       <div className="mt-0.5 shrink-0 w-6 h-6 rounded-full bg-green-600 flex items-center justify-center">
-        <svg className="w-3.5 h-3.5 text-white" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={3}>
+        <svg
+          className="w-3.5 h-3.5 text-white"
+          fill="none"
+          viewBox="0 0 24 24"
+          stroke="currentColor"
+          strokeWidth={3}
+        >
           <path strokeLinecap="round" strokeLinejoin="round" d="M5 13l4 4L19 7" />
         </svg>
       </div>
@@ -58,8 +64,13 @@ function RadioOption({
   onChange: (v: string) => void;
 }) {
   return (
-    <label className="flex items-start gap-3 mb-5 cursor-pointer group" onClick={() => onChange(value)}>
-      <div className={`mt-0.5 w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${selected === value ? "border-white" : "border-[#555] group-hover:border-[#888]"}`}>
+    <label
+      className="flex items-start gap-3 mb-5 cursor-pointer group"
+      onClick={() => onChange(value)}
+    >
+      <div
+        className={`mt-0.5 w-5 h-5 rounded-full border-2 shrink-0 flex items-center justify-center transition-colors ${selected === value ? "border-white" : "border-[#555] group-hover:border-[#888]"}`}
+      >
         {selected === value && <div className="w-2.5 h-2.5 rounded-full bg-white" />}
       </div>
       <div>
@@ -138,12 +149,24 @@ export default function ReportCopyrightForm() {
     if (step === 3) return form.rightsNature !== "";
     if (step === 4) return form.infringementDetails.trim() !== "";
     if (step === 5)
-      return !!(form.firstName && form.lastName && form.rightsholder &&
-        form.streetAddress && form.city && form.zipCode &&
-        form.country && form.telephone);
+      return !!(
+        form.firstName &&
+        form.lastName &&
+        form.rightsholder &&
+        form.streetAddress &&
+        form.city &&
+        form.zipCode &&
+        form.country &&
+        form.telephone
+      );
     if (step === 6)
-      return !!(form.confirmGoodFaith && form.confirmAccurate &&
-        form.confirmLiability && form.confirmOwner && form.signature.trim());
+      return !!(
+        form.confirmGoodFaith &&
+        form.confirmAccurate &&
+        form.confirmLiability &&
+        form.confirmOwner &&
+        form.signature.trim()
+      );
     return true;
   };
 
@@ -162,7 +185,6 @@ export default function ReportCopyrightForm() {
   return (
     <div className="min-h-screen bg-chinese-black text-white-smoke font-sans">
       <div className="max-w-7xl mx-auto pr-8 py-2 flex gap-28 px-4 sm:px-0">
-
         {/* MAIN CONTENT */}
         <main className="flex-1 w-full max-w-3xl text-[14px] leading-relaxed text-white-smoke">
           <h1 className="text-2xl font-bold text-white-smoke mb-2">
@@ -170,16 +192,13 @@ export default function ReportCopyrightForm() {
           </h1>
           <p className="mb-6 text-[14px]">
             If you identify content on BeatZa that you believe{" "}
-            <strong className="text-white-smoke">infringes your copyright</strong>
-            , you can let us know here.
+            <strong className="text-white-smoke">infringes your copyright</strong>, you can let us
+            know here.
           </p>
 
           {/* Completed steps summary */}
           {step >= 2 && (
-            <CompletedStep
-              question="Which track(s) do you wish to report?"
-              answer={form.urls}
-            />
+            <CompletedStep question="Which track(s) do you wish to report?" answer={form.urls} />
           )}
           {step >= 3 && (
             <CompletedStep
@@ -227,9 +246,7 @@ export default function ReportCopyrightForm() {
           {/* Step 2: Involvement */}
           {step === 2 && (
             <div>
-              <h2 className="text-base font-bold text-white-smoke mb-5">
-                How are you involved?
-              </h2>
+              <h2 className="text-base font-bold text-white-smoke mb-5">How are you involved?</h2>
               <RadioOption
                 value="owner"
                 selected={form.involvement}
@@ -285,7 +302,8 @@ export default function ReportCopyrightForm() {
           {step === 4 && (
             <div>
               <h2 className="text-base font-bold text-white-smoke mb-3">
-                Identify, in as much detail as possible, the copyright work(s) that you believe are being infringed.
+                Identify, in as much detail as possible, the copyright work(s) that you believe are
+                being infringed.
               </h2>
               <label className="block text-[13px] text-silver mb-1">
                 Details of infringement <span className="text-red-500">*</span>
@@ -305,28 +323,76 @@ export default function ReportCopyrightForm() {
                 Please provide your contact details
               </h2>
               <div className="grid grid-cols-2 gap-4 mb-4">
-                <Field label="First name" required value={form.firstName} onChange={setField("firstName") as (v: string) => void} />
-                <Field label="Last name" required value={form.lastName} onChange={setField("lastName") as (v: string) => void} />
+                <Field
+                  label="First name"
+                  required
+                  value={form.firstName}
+                  onChange={setField("firstName") as (v: string) => void}
+                />
+                <Field
+                  label="Last name"
+                  required
+                  value={form.lastName}
+                  onChange={setField("lastName") as (v: string) => void}
+                />
               </div>
               <div className="flex flex-col gap-4 mb-4">
-                <Field label="Company name (optional)" value={form.companyName} onChange={setField("companyName") as (v: string) => void} />
-                <Field label="Rightsholder that you represent" required value={form.rightsholder} onChange={setField("rightsholder") as (v: string) => void} />
-                <Field label="Street address" required value={form.streetAddress} onChange={setField("streetAddress") as (v: string) => void} />
-                <Field label="Apt, Suite, etc. (optional)" value={form.aptSuite} onChange={setField("aptSuite") as (v: string) => void} />
+                <Field
+                  label="Company name (optional)"
+                  value={form.companyName}
+                  onChange={setField("companyName") as (v: string) => void}
+                />
+                <Field
+                  label="Rightsholder that you represent"
+                  required
+                  value={form.rightsholder}
+                  onChange={setField("rightsholder") as (v: string) => void}
+                />
+                <Field
+                  label="Street address"
+                  required
+                  value={form.streetAddress}
+                  onChange={setField("streetAddress") as (v: string) => void}
+                />
+                <Field
+                  label="Apt, Suite, etc. (optional)"
+                  value={form.aptSuite}
+                  onChange={setField("aptSuite") as (v: string) => void}
+                />
               </div>
               <div className="grid grid-cols-2 gap-4 mb-4">
-                <Field label="City" required value={form.city} onChange={setField("city") as (v: string) => void} />
-                <Field label="ZIP / Postal code" required value={form.zipCode} onChange={setField("zipCode") as (v: string) => void} />
+                <Field
+                  label="City"
+                  required
+                  value={form.city}
+                  onChange={setField("city") as (v: string) => void}
+                />
+                <Field
+                  label="ZIP / Postal code"
+                  required
+                  value={form.zipCode}
+                  onChange={setField("zipCode") as (v: string) => void}
+                />
               </div>
               <div className="mb-4">
-                <Field label="Country" required value={form.country} onChange={setField("country") as (v: string) => void} />
+                <Field
+                  label="Country"
+                  required
+                  value={form.country}
+                  onChange={setField("country") as (v: string) => void}
+                />
               </div>
               <div className="grid grid-cols-2 gap-4 mb-4">
                 <Field label="Your display name" value={form.displayName} readOnly />
                 <Field label="Email address" value={form.email} readOnly />
               </div>
               <div className="w-1/2">
-                <Field label="Telephone number" required value={form.telephone} onChange={setField("telephone") as (v: string) => void} />
+                <Field
+                  label="Telephone number"
+                  required
+                  value={form.telephone}
+                  onChange={setField("telephone") as (v: string) => void}
+                />
               </div>
             </div>
           )}
@@ -336,17 +402,32 @@ export default function ReportCopyrightForm() {
             <div>
               {/* Contact summary table */}
               <div className="mb-6 text-[13px] text-silver grid grid-cols-2 gap-x-8 gap-y-1.5">
-                <span>Name</span><span>{form.firstName} {form.lastName}</span>
-                <span>Display name</span><span>{form.displayName}</span>
-                <span>Company name</span><span>{form.companyName || "—"}</span>
-                <span>Email</span><span>{form.email}</span>
-                <span>Rightsholder</span><span>{form.rightsholder || "none"}</span>
-                <span>Telephone</span><span>{form.telephone}</span>
+                <span>Name</span>
+                <span>
+                  {form.firstName} {form.lastName}
+                </span>
+                <span>Display name</span>
+                <span>{form.displayName}</span>
+                <span>Company name</span>
+                <span>{form.companyName || "—"}</span>
+                <span>Email</span>
+                <span>{form.email}</span>
+                <span>Rightsholder</span>
+                <span>{form.rightsholder || "none"}</span>
+                <span>Telephone</span>
+                <span>{form.telephone}</span>
                 <span>Address</span>
                 <span>
-                  {form.aptSuite && <>{form.aptSuite}<br /></>}
-                  {form.streetAddress}<br />
-                  {form.city}, {form.zipCode}<br />
+                  {form.aptSuite && (
+                    <>
+                      {form.aptSuite}
+                      <br />
+                    </>
+                  )}
+                  {form.streetAddress}
+                  <br />
+                  {form.city}, {form.zipCode}
+                  <br />
                   {form.country}
                 </span>
               </div>
@@ -356,24 +437,26 @@ export default function ReportCopyrightForm() {
                 Please read the following statements and check the boxes to confirm your agreement.
               </p>
 
-              {([
-                {
-                  key: "confirmGoodFaith" as keyof FormData,
-                  text: "I have a good faith belief that use of the copyrighted work described above is not authorized by the copyright owner, its agent or the law.",
-                },
-                {
-                  key: "confirmAccurate" as keyof FormData,
-                  text: "I confirm that the information in this notification is accurate.",
-                },
-                {
-                  key: "confirmLiability" as keyof FormData,
-                  text: "I acknowledge that BeatZa may suspend or disable my account if I make false, malicious or bad faith allegations of copyright infringement, and that I may also be liable for damages (including costs and attorney's fees) incurred by BeatZa, the alleged infringer, or the copyright owner or its authorized licensee as the result of any such allegations.",
-                },
-                {
-                  key: "confirmOwner" as keyof FormData,
-                  text: "I confirm that I am the copyright owner or am authorised to act on behalf of the owner of an exclusive right that is allegedly infringed. Where I am making notice pursuant to the United States Digital Millennium Copyright Act U.S.C.17§512(c), I make this statement under penalty of perjury.",
-                },
-              ] as { key: keyof FormData; text: string }[]).map(({ key, text }) => (
+              {(
+                [
+                  {
+                    key: "confirmGoodFaith" as keyof FormData,
+                    text: "I have a good faith belief that use of the copyrighted work described above is not authorized by the copyright owner, its agent or the law.",
+                  },
+                  {
+                    key: "confirmAccurate" as keyof FormData,
+                    text: "I confirm that the information in this notification is accurate.",
+                  },
+                  {
+                    key: "confirmLiability" as keyof FormData,
+                    text: "I acknowledge that BeatZa may suspend or disable my account if I make false, malicious or bad faith allegations of copyright infringement, and that I may also be liable for damages (including costs and attorney's fees) incurred by BeatZa, the alleged infringer, or the copyright owner or its authorized licensee as the result of any such allegations.",
+                  },
+                  {
+                    key: "confirmOwner" as keyof FormData,
+                    text: "I confirm that I am the copyright owner or am authorised to act on behalf of the owner of an exclusive right that is allegedly infringed. Where I am making notice pursuant to the United States Digital Millennium Copyright Act U.S.C.17§512(c), I make this statement under penalty of perjury.",
+                  },
+                ] as { key: keyof FormData; text: string }[]
+              ).map(({ key, text }) => (
                 <label key={key as string} className="flex items-start gap-3 mb-4 cursor-pointer">
                   <input
                     type="checkbox"
@@ -388,7 +471,9 @@ export default function ReportCopyrightForm() {
               ))}
 
               <p className="text-[13px] text-silver mb-4">
-                By submitting this takedown form, I agree to having my information in respect to my rights ownership and email address shared with the uploader in case of dispute. In no instance, will my postal address or telephone number be shared.
+                By submitting this takedown form, I agree to having my information in respect to my
+                rights ownership and email address shared with the uploader in case of dispute. In
+                no instance, will my postal address or telephone number be shared.
               </p>
 
               <p className="text-[13px] text-white-smoke font-semibold mb-1">
@@ -417,8 +502,7 @@ export default function ReportCopyrightForm() {
             )}
             <button
               onClick={() => {
-                if (step < 6) 
-                  setStep((s) => s + 1);
+                if (step < 6) setStep((s) => s + 1);
               }}
               disabled={!canNext()}
               className="bg-white text-black font-semibold text-[14px] px-6 py-2 rounded hover:bg-gray-200 transition-colors cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
@@ -431,12 +515,10 @@ export default function ReportCopyrightForm() {
         {/* RIGHT COLUMN */}
         <div className="hidden md:block w-64 shrink-0">
           <div className="bg-off-black w-80 p-5 mb-8">
-            <h3 className="text-white-smoke font-bold text-base mb-3">
-              Learn About Copyright
-            </h3>
+            <h3 className="text-white-smoke font-bold text-base mb-3">Learn About Copyright</h3>
             <p className="text-silver text-[13px] mb-4">
-              BeatZa is a platform for creators and we expect all BeatZa users
-              to respect other people&apos;s copyright.
+              BeatZa is a platform for creators and we expect all BeatZa users to respect other
+              people&apos;s copyright.
             </p>
             <button
               onClick={() => router.push("/copyright")}

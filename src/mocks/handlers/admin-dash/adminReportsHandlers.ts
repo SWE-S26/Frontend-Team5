@@ -103,7 +103,11 @@ export const adminReportsHandlers = [
   }),
 
   http.post("/api/admin/v1/reports", async ({ request }) => {
-    const body = await request.json() as { violatorId: string; violatorType: string; reason: string };
+    const body = (await request.json()) as {
+      violatorId: string;
+      violatorType: string;
+      reason: string;
+    };
     const newReport: AdminReport = {
       reportId: `rep_00${mockReports.length + 1}`,
       reportedId: "usr_000",

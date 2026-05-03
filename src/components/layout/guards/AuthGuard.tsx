@@ -21,10 +21,10 @@ export default function AuthGuard({ children }: { children: React.ReactNode }) {
     (route) => pathname === route || pathname.startsWith(route + "/")
   );
 
-  if (!hasHydrated) return null
-  if (!isAuthenticated && !isExempt) return null
-  if (isAuthenticated && role !== "Admin" && isAdminRoute) return null
-  if (isAuthenticated && role === "Admin" && !isAdminRoute) return null
+  if (!hasHydrated) return null;
+  if (!isAuthenticated && !isExempt) return null;
+  if (isAuthenticated && role !== "Admin" && isAdminRoute) return null;
+  if (isAuthenticated && role === "Admin" && !isAdminRoute) return null;
 
   return <>{children}</>;
 }

@@ -8,7 +8,7 @@ import MoreDropdown from "@/components/ui/MoreDropdown";
 import AddToPlaylistModal from "@/components/playlists/AddToPlaylistModal";
 import PreviewTooltip from "@/components/layout/track-cards/PreviewTooltip";
 import SharePopup from "@/components/profile/SharePopUp";
-import ProfileImage from "@/components/ui/ProfileImage"
+import ProfileImage from "@/components/ui/ProfileImage";
 
 import { useState, useRef, useEffect } from "react";
 import { Avatar } from "antd";
@@ -38,13 +38,7 @@ import { BiSolidCommentDetail } from "react-icons/bi";
 
 import { RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  pause,
-  play,
-  playAudio,
-  playNext,
-  Track,
-} from "@/store/slices/playerSlice";
+import { pause, play, playAudio, playNext, Track } from "@/store/slices/playerSlice";
 import { getBaseUrl } from "@/utilities/getBaseUrl";
 import { interactionToast } from "@/lib/interactive-toasts/interactiveToast";
 import { interactiveToastBus } from "@/lib/interactive-toasts/interactiveToastBus";
@@ -85,7 +79,7 @@ type CardProps = {
 
 const FLASH_DURATION = 3000;
 const HOVER_PREVIEW_DELAY = 600;
-const clipBoundsCache = new Map<string, { start: number; end: number; duration: number; }>();
+const clipBoundsCache = new Map<string, { start: number; end: number; duration: number }>();
 
 export default function WaveformCard({
   img,
@@ -131,12 +125,11 @@ export default function WaveformCard({
   const [repostCountState, setRepostCountState] = useState(repostCount);
   const [isAddToPlaylistOpen, setIsAddToPlaylistOpen] = useState(false);
   const hasHydrated = useAppSelector((state) => state.auth.hasHydrated);
-  const [isShareOpen, setIsShareOpen] = useState(false)
+  const [isShareOpen, setIsShareOpen] = useState(false);
 
   const [isMoreOpen, setIsMoreOpen] = useState(false);
   const { getProfile, profile: artistProfile } = useGetProfile();
-  const { getProfile: getReposterProfile, profile: reposterProfile } =
-    useGetProfile();
+  const { getProfile: getReposterProfile, profile: reposterProfile } = useGetProfile();
 
   useEffect(() => {
     if (!hasHydrated || !artistId || profileLinkOverride !== undefined) return;
@@ -168,7 +161,7 @@ export default function WaveformCard({
             isBlocked: data.isBlocked,
             amIBlocked: data.amIBlocked,
             role: data.role,
-          }),
+          })
         );
       })
       .finally(() => {
@@ -200,17 +193,15 @@ export default function WaveformCard({
   const commentBoxRef = useRef<HTMLInputElement>(null);
   const flashTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const hoverTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
-  const previewStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(
-    null,
-  );
+  const previewStopTimerRef = useRef<ReturnType<typeof setTimeout> | null>(null);
   const previewAudioRef = useRef<HTMLAudioElement | null>(null);
   const previewingRef = useRef(false);
   const previewStartingRef = useRef(false);
   const previewRequestIdRef = useRef(0);
   const isHoveringRef = useRef(false);
-  const previewTimeUpdateHandlerRef = useRef<
-    ((this: HTMLAudioElement, ev: Event) => any) | null
-  >(null);
+  const previewTimeUpdateHandlerRef = useRef<((this: HTMLAudioElement, ev: Event) => any) | null>(
+    null
+  );
   const fetchClipPromiseRef = useRef<Promise<{
     start: number;
     end: number;
@@ -221,7 +212,7 @@ export default function WaveformCard({
   const profileLink = artistProfile?.profileLink ?? null;
   const authRole = useAppSelector((state) => state.auth.role);
   const isAuthenticated = useAppSelector(
-    (state) => state.auth.isAuthenticated && state.auth.hasHydrated,
+    (state) => state.auth.isAuthenticated && state.auth.hasHydrated
   );
   const isArtistPro = authRole === "Pro";
   const allowDownload = isArtistPro || !!enableDirectDownload;
@@ -237,19 +228,11 @@ export default function WaveformCard({
     loading: repostLoading,
   } = useRepostTrack(trackId, isVisible, repostCount);
 
-  const {
-    progress,
-    currentTime,
-    seekToPercentage,
-    dragStart,
-    dragMove,
-    dragEnd,
-  } = useAudioProgress();
+  const { progress, currentTime, seekToPercentage, dragStart, dragMove, dragEnd } =
+    useAudioProgress();
 
   const dispatch = useDispatch();
-  const { currentTrackId, isPlaying } = useSelector(
-    (state: RootState) => state.player,
-  );
+  const { currentTrackId, isPlaying } = useSelector((state: RootState) => state.player);
   const isThisCardPlaying = currentTrackId === trackId && isPlaying;
 
   const [showPreviewTooltip, setShowPreviewTooltip] = useState(false);
@@ -277,13 +260,12 @@ export default function WaveformCard({
   useEffect(() => {
     return () => {
       if (hoverTimerRef.current) clearTimeout(hoverTimerRef.current);
-      if (previewStopTimerRef.current)
-        clearTimeout(previewStopTimerRef.current);
+      if (previewStopTimerRef.current) clearTimeout(previewStopTimerRef.current);
       if (previewAudioRef.current) {
         if (previewTimeUpdateHandlerRef.current) {
           previewAudioRef.current.removeEventListener(
             "timeupdate",
-            previewTimeUpdateHandlerRef.current,
+            previewTimeUpdateHandlerRef.current
           );
         }
         previewAudioRef.current.pause();
@@ -293,16 +275,11 @@ export default function WaveformCard({
 
   const { submitComment } = useStatelessComments();
 
-  const parseClipBounds = (
-    startRaw: unknown,
-    endRaw: unknown,
-    durationRaw: unknown,
-  ) => {
+  const parseClipBounds = (startRaw: unknown, endRaw: unknown, durationRaw: unknown) => {
     const start = Number(startRaw);
     const end = Number(endRaw);
     const clipDuration = Number(durationRaw);
-    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start)
-      return null;
+    if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start) return null;
     return {
       start,
       end,
@@ -314,9 +291,7 @@ export default function WaveformCard({
     return Number(startRaw) === 0 && Number(endRaw) === 0 && Number(durationRaw) < 30;
   };
 
-  const getClipBounds = (
-    serverClip?: { start: number; end: number; duration: number; } | null,
-  ) => {
+  const getClipBounds = (serverClip?: { start: number; end: number; duration: number } | null) => {
     if (serverClip) {
       if (isDisabledClip(serverClip.start, serverClip.end, serverClip.duration)) return null;
       return serverClip;
@@ -411,10 +386,7 @@ export default function WaveformCard({
       if (flashTimerRef.current) clearTimeout(flashTimerRef.current);
       setFlashComment(content);
       setTimeout(() => setReloadTrigger((n) => n + 1), FLASH_DURATION - 1500);
-      flashTimerRef.current = setTimeout(
-        () => setFlashComment(null),
-        FLASH_DURATION,
-      );
+      flashTimerRef.current = setTimeout(() => setFlashComment(null), FLASH_DURATION);
     } finally {
       setIsSubmitting(false);
     }
@@ -491,7 +463,7 @@ export default function WaveformCard({
               },
             ],
         startId: trackId,
-      }),
+      })
     );
     setTimeout(() => dispatch(play()), 0);
   }
@@ -514,7 +486,7 @@ export default function WaveformCard({
               },
             ],
         startId: trackId,
-      }),
+      })
     );
     setTimeout(() => {
       if (seekPercentage !== undefined) seekToPercentage(seekPercentage);
@@ -538,7 +510,7 @@ export default function WaveformCard({
           img,
           duration,
         },
-      }),
+      })
     );
   }
 
@@ -568,7 +540,7 @@ export default function WaveformCard({
       if (previewTimeUpdateHandlerRef.current) {
         previewAudioRef.current.removeEventListener(
           "timeupdate",
-          previewTimeUpdateHandlerRef.current,
+          previewTimeUpdateHandlerRef.current
         );
         previewTimeUpdateHandlerRef.current = null;
       }
@@ -611,11 +583,7 @@ export default function WaveformCard({
     }
 
     const playFrom = () => {
-      if (
-        !audio ||
-        requestId !== previewRequestIdRef.current ||
-        !isHoveringRef.current
-      ) {
+      if (!audio || requestId !== previewRequestIdRef.current || !isHoveringRef.current) {
         previewStartingRef.current = false;
         return;
       }
@@ -634,10 +602,7 @@ export default function WaveformCard({
       setShowPreviewTooltip(true);
 
       if (previewTimeUpdateHandlerRef.current) {
-        audio.removeEventListener(
-          "timeupdate",
-          previewTimeUpdateHandlerRef.current,
-        );
+        audio.removeEventListener("timeupdate", previewTimeUpdateHandlerRef.current);
       }
       const onTimeUpdate = () => {
         if (audio.currentTime >= clipEnd) {
@@ -648,8 +613,7 @@ export default function WaveformCard({
       audio.addEventListener("timeupdate", onTimeUpdate);
 
       const playMs = Math.max(0, clipEnd - clipStart) * 1000;
-      if (previewStopTimerRef.current)
-        clearTimeout(previewStopTimerRef.current);
+      if (previewStopTimerRef.current) clearTimeout(previewStopTimerRef.current);
       previewStopTimerRef.current = setTimeout(stopPreview, playMs + 200);
     };
 
@@ -687,11 +651,7 @@ export default function WaveformCard({
     <>
       <div
         className="flex flex-col sm:flex-row items-stretch gap-3 sm:gap-0 px-4 sm:px-0"
-        style={
-          !isAvailable
-            ? { pointerEvents: "none", userSelect: "none" }
-            : undefined
-        }
+        style={!isAvailable ? { pointerEvents: "none", userSelect: "none" } : undefined}
       >
         <div
           className="hidden sm:block h-full overflow-hidden -m-1 -mb-1.75 sm:shrink-0"
@@ -772,10 +732,7 @@ export default function WaveformCard({
             onClick={handleOpenCommentBox}
             style={{ cursor: isAvailable ? "pointer" : "default" }}
           >
-            <div
-              style={!isAvailable ? { opacity: 0.3 } : undefined}
-              className="w-full h-full"
-            >
+            <div style={!isAvailable ? { opacity: 0.3 } : undefined} className="w-full h-full">
               <SausageWaveform
                 trackId={trackId}
                 samplesUrl={wfLink ?? "/waveform.json"}
@@ -896,7 +853,6 @@ export default function WaveformCard({
                   icon={<LuShare className="text-xl" />}
                   onClick={() => setIsShareOpen(true)}
                 />
-
               </Tooltip>
               <Tooltip label="Copy Link">
                 <Button
@@ -925,10 +881,7 @@ export default function WaveformCard({
               )}
               <MoreDropdown
                 trigger={
-                  <Button
-                    className="bg-off-black"
-                    icon={<IoIosMore className="text-xl" />}
-                  />
+                  <Button className="bg-off-black" icon={<IoIosMore className="text-xl" />} />
                 }
                 tooltipLabel="More"
                 items={[
@@ -939,9 +892,7 @@ export default function WaveformCard({
                   },
                   {
                     label: "Add to Playlist",
-                    icon: (
-                      <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
-                    ),
+                    icon: <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />,
                     onClick: handleOpenAddToPlaylistModal,
                   },
                   {
@@ -986,11 +937,12 @@ export default function WaveformCard({
         trackImage={img}
       />
       <SharePopup
-      isOpen={isShareOpen}
-      onClose={() => setIsShareOpen(false)}
-      prefilledMessage={profileLink && permalink ? `${getBaseUrl()}/${profileLink}/${permalink}` : undefined}
-    />
-
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        prefilledMessage={
+          profileLink && permalink ? `${getBaseUrl()}/${profileLink}/${permalink}` : undefined
+        }
+      />
     </>
   );
 }

@@ -60,7 +60,9 @@ export default function DeletePlaylistModal({
           </div>
 
           <p className="text-silver text-sm leading-relaxed">
-            Are you sure you want to permanently delete <span className="text-white-smoke font-semibold">{displayTitle}</span>? This action <span className="text-white-smoke font-semibold">cannot be undone</span>.
+            Are you sure you want to permanently delete{" "}
+            <span className="text-white-smoke font-semibold">{displayTitle}</span>? This action{" "}
+            <span className="text-white-smoke font-semibold">cannot be undone</span>.
           </p>
 
           <ul className="text-silver text-sm space-y-1 list-disc list-inside">

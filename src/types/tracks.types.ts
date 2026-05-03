@@ -233,7 +233,7 @@ export interface GetTrackDetailedResponse {
   data: TrackDetailed;
 }
 
-export interface TrackDetailsGeoBlocking{
+export interface TrackDetailsGeoBlocking {
   mode: "worldwide" | "exclusive" | "blocked";
   regions: string[];
   countries: string[];
@@ -255,10 +255,10 @@ export interface UpdateTrackResponse {
   data?: string;
 }
 
-export interface incrementPlayCountRequest{
-  trackId: string
-  listenedDuration: number
-  sessionIdPlay: string
+export interface incrementPlayCountRequest {
+  trackId: string;
+  listenedDuration: number;
+  sessionIdPlay: string;
 }
 
 export interface incrementPlayCountResponse {

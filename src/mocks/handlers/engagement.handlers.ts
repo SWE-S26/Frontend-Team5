@@ -1,16 +1,16 @@
-import { http, HttpResponse } from "msw"
-import type { TrackComment } from "@/types/comments.types"
-import { MOCK_TRACKS, toPlaylistSummary, MOCK_PLAYLIST_DETAIL } from "@/mocks/data/fixtures"
+import { http, HttpResponse } from "msw";
+import type { TrackComment } from "@/types/comments.types";
+import { MOCK_TRACKS, toPlaylistSummary, MOCK_PLAYLIST_DETAIL } from "@/mocks/data/fixtures";
 
 const mockLikeUser = {
   userId: "mock-fan-001",
   displayName: "Fan One",
   avatarUrl: "https://picsum.photos/seed/fan1/100",
   followersCount: 42,
-}
+};
 
-let trackLiked = false
-let playlistLiked = false
+let trackLiked = false;
+let playlistLiked = false;
 
 const mockComment = (trackId: string): TrackComment => ({
   commentId: "comment-mock-1",
@@ -24,21 +24,21 @@ const mockComment = (trackId: string): TrackComment => ({
   isLikedByUser: false,
   isOwnComment: false,
   createdAt: new Date().toISOString(),
-})
+});
 
 export const engagementHandlers = [
   http.post("/api/engagement/tracks/v1/:trackId/like", () => {
-    trackLiked = true
-    return HttpResponse.json({ liked: true, numOfLikes: 11 })
+    trackLiked = true;
+    return HttpResponse.json({ liked: true, numOfLikes: 11 });
   }),
 
   http.get("/api/engagement/tracks/v1/:trackId/like", () =>
-    HttpResponse.json({ liked: trackLiked }),
+    HttpResponse.json({ liked: trackLiked })
   ),
 
   http.post("/api/engagement/playlists/v1/:playlistId/like", () => {
-    playlistLiked = true
-    return HttpResponse.json({ ok: true })
+    playlistLiked = true;
+    return HttpResponse.json({ ok: true });
   }),
 
   http.get("/api/public/engagement/tracks/v1/:trackId/likes", () =>
@@ -47,7 +47,7 @@ export const engagementHandlers = [
       offset: 1,
       limit: 20,
       users: [mockLikeUser],
-    }),
+    })
   ),
 
   http.get("/api/public/engagement/playlists/v1/:playlistId/likes", () =>
@@ -56,7 +56,7 @@ export const engagementHandlers = [
       offset: 1,
       limit: 20,
       users: [mockLikeUser],
-    }),
+    })
   ),
 
   http.get("/api/public/engagement/tracks/v1/:trackId/comments", () =>
@@ -65,7 +65,7 @@ export const engagementHandlers = [
       offset: 1,
       limit: 50,
       comments: [mockComment("t1")],
-    }),
+    })
   ),
 
   http.get("/api/public/engagement/comments/v1/:commentId/replies", () =>
@@ -74,24 +74,24 @@ export const engagementHandlers = [
       offset: 1,
       limit: 20,
       replies: [],
-    }),
+    })
   ),
 
   http.post("/api/engagement/tracks/v1/:trackId/comments", async ({ request, params }) => {
-    const body = (await request.json().catch(() => ({}))) as { content?: string }
+    const body = (await request.json().catch(() => ({}))) as { content?: string };
     return HttpResponse.json({
       ...mockComment(params.trackId as string),
       content: body.content ?? "Nice!",
       commentId: `comment-${Date.now()}`,
-    })
+    });
   }),
 
   http.post("/api/engagement/comments/v1/:commentId/like", () =>
-    HttpResponse.json({ liked: true, numLikes: 3 }),
+    HttpResponse.json({ liked: true, numLikes: 3 })
   ),
 
   http.delete("/api/engagement/comments/v1/:commentId", () =>
-    HttpResponse.json(null, { status: 204 }),
+    HttpResponse.json(null, { status: 204 })
   ),
 
   http.get("/api/engagement/mentions/v1/followers", () =>
@@ -102,11 +102,11 @@ export const engagementHandlers = [
         avatarUrl: "https://picsum.photos/seed/fan2/100",
         profileLink: "fan-two",
       },
-    ]),
+    ])
   ),
 
   http.post("/api/engagement/tracks/v1/:trackId/repost", async () =>
-    HttpResponse.json({ reposted: true, numberOfReposts: 3 }),
+    HttpResponse.json({ reposted: true, numberOfReposts: 3 })
   ),
 
   http.get("/api/engagement/tracks/v1/:trackId/repost", () =>
@@ -114,19 +114,19 @@ export const engagementHandlers = [
       reposted: false,
       caption: null,
       repostedAt: null,
-    }),
+    })
   ),
 
   http.patch("/api/engagement/tracks/v1/:trackId/repost", async ({ request }) => {
-    const body = (await request.json().catch(() => ({}))) as { caption?: string }
+    const body = (await request.json().catch(() => ({}))) as { caption?: string };
     return HttpResponse.json({
       success: true,
       caption: body.caption ?? "",
-    })
+    });
   }),
 
   http.post("/api/engagement/playlists/v1/:playlistId/repost", async () =>
-    HttpResponse.json({ reposted: true, numberOfReposts: 2 }),
+    HttpResponse.json({ reposted: true, numberOfReposts: 2 })
   ),
 
   http.get("/api/public/engagement/tracks/v1/:trackId/reposts", () =>
@@ -135,7 +135,7 @@ export const engagementHandlers = [
       offset: 1,
       limit: 20,
       users: [mockLikeUser],
-    }),
+    })
   ),
 
   http.get("/api/public/engagement/playlists/v1/:playlistId/reposts", () =>
@@ -144,7 +144,7 @@ export const engagementHandlers = [
       offset: 1,
       limit: 20,
       users: [mockLikeUser],
-    }),
+    })
   ),
 
   http.get("/api/public/engagement/tracks/v1/users/:userId/reposted", () =>
@@ -153,7 +153,7 @@ export const engagementHandlers = [
       offset: 1,
       limit: 20,
       tracks: MOCK_TRACKS,
-    }),
+    })
   ),
 
   http.get("/api/public/engagement/playlists/v1/users/:userId/reposted", () =>
@@ -162,6 +162,6 @@ export const engagementHandlers = [
       offset: 1,
       limit: 20,
       playlists: [toPlaylistSummary(MOCK_PLAYLIST_DETAIL)],
-    }),
+    })
   ),
-]
+];

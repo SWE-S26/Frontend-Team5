@@ -5,9 +5,7 @@ import UploadIconBlack from "../../../../public/upload-icon/upload-black.svg";
 import UploadIconWhite from "../../../../public/upload-icon/upload-white.svg";
 import { useRouter } from "next/navigation";
 import { useRef, useState, useCallback, useEffect } from "react";
-import {
-  CloseOutlined,
-} from "@ant-design/icons";
+import { CloseOutlined } from "@ant-design/icons";
 import {
   UploadedFile,
   Toast,
@@ -83,7 +81,9 @@ function slugify(value: string): string {
 }
 
 async function mergeRecordingBlobs(previousBlob: Blob, nextBlob: Blob): Promise<Blob> {
-  const AudioCtx = window.AudioContext || (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+  const AudioCtx =
+    window.AudioContext ||
+    (window as Window & { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
   if (!AudioCtx) {
     return new Blob([previousBlob, nextBlob], {
       type: previousBlob.type || nextBlob.type || "audio/webm",
@@ -149,7 +149,7 @@ export default function UploadPage() {
   const [uploadedFiles, setUploadedFiles] = useState<UploadedFile[]>([]);
   const [isDragging, setIsDragging] = useState(false);
   const [showTrackInfo, setShowTrackInfo] = useState(false);
-  
+
   // Upload state for the form
   const [isUploading, setIsUploading] = useState(false);
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -188,8 +188,8 @@ export default function UploadPage() {
   const [artistName, setArtistName] = useState("");
   const [permalink, setPermalink] = useState("https://beatza.me/");
   const [genre, setGenre] = useState("");
-    const artistNameInitializedRef = useRef(false);
-    const permalinkInitializedRef = useRef(false);
+  const artistNameInitializedRef = useRef(false);
+  const permalinkInitializedRef = useRef(false);
   const [tags, setTags] = useState("");
   const [description, setDescription] = useState("");
   const [isPublic, setIsPublic] = useState(true);
@@ -220,9 +220,7 @@ export default function UploadPage() {
   const [toasts, setToasts] = useState<Toast[]>([]);
   const [recordingDurationSeconds, setRecordingDurationSeconds] = useState(0);
 
-  const uploadedTracksCount = uploadedFiles
-    .filter((f) => f.status === "done")
-    .length;
+  const uploadedTracksCount = uploadedFiles.filter((f) => f.status === "done").length;
   const serverQuota = quota ?? TOTAL_TRACK_LIMIT;
   const totalTrackQuota = Math.max(1, serverQuota);
   const usedTracks = Math.max(0, Math.min(totalTrackQuota, uploadedTracksCount));
@@ -252,9 +250,13 @@ export default function UploadPage() {
       if (progress >= 100) {
         progress = 100;
         clearInterval(interval);
-        setUploadedFiles((prev) => prev.map((f) => f.id === id ? { ...f, progress: 100, status: "done" } : f));
+        setUploadedFiles((prev) =>
+          prev.map((f) => (f.id === id ? { ...f, progress: 100, status: "done" } : f))
+        );
       } else {
-        setUploadedFiles((prev) => prev.map((f) => f.id === id ? { ...f, progress: Math.round(progress) } : f));
+        setUploadedFiles((prev) =>
+          prev.map((f) => (f.id === id ? { ...f, progress: Math.round(progress) } : f))
+        );
       }
     }, 300);
   }
@@ -283,11 +285,18 @@ export default function UploadPage() {
     const nextEntries: UploadedFile[] = [];
     for (const file of files) {
       const error = validateFile(file);
-      if (error) { addToast("error", error); continue; }
+      if (error) {
+        addToast("error", error);
+        continue;
+      }
       valid.push(file);
 
       const entry: UploadedFile = {
-        id: generateId(), file, status: "uploading", progress: 0, estimatedMinutes: estimateMinutes(file),
+        id: generateId(),
+        file,
+        status: "uploading",
+        progress: 0,
+        estimatedMinutes: estimateMinutes(file),
       };
       nextEntries.push(entry);
 
@@ -330,13 +339,19 @@ export default function UploadPage() {
   };
 
   const handleDragOver = useCallback((e: React.DragEvent) => {
-    e.preventDefault(); e.stopPropagation(); setIsDragging(true);
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(true);
   }, []);
   const handleDragLeave = useCallback((e: React.DragEvent) => {
-    e.preventDefault(); e.stopPropagation(); setIsDragging(false);
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
   }, []);
   const handleDrop = useCallback((e: React.DragEvent) => {
-    e.preventDefault(); e.stopPropagation(); setIsDragging(false);
+    e.preventDefault();
+    e.stopPropagation();
+    setIsDragging(false);
     const files = Array.from(e.dataTransfer.files);
     if (!files.length) return;
     if (!hasAtLeastOneSupportedAudioFile(files)) {
@@ -362,20 +377,33 @@ export default function UploadPage() {
       const devices = await navigator.mediaDevices.enumerateDevices();
       const audioInputs = devices
         .filter((d) => d.kind === "audioinput")
-        .map((d) => ({ deviceId: d.deviceId, label: d.label || `Microphone ${d.deviceId.slice(0, 5)}...` }));
-      if (audioInputs.length > 0) { setMicrophones(audioInputs); setSelectedMicId(audioInputs[0].deviceId); }
-    } catch (err) { console.error("Error getting microphones:", err); }
+        .map((d) => ({
+          deviceId: d.deviceId,
+          label: d.label || `Microphone ${d.deviceId.slice(0, 5)}...`,
+        }));
+      if (audioInputs.length > 0) {
+        setMicrophones(audioInputs);
+        setSelectedMicId(audioInputs[0].deviceId);
+      }
+    } catch (err) {
+      console.error("Error getting microphones:", err);
+    }
   };
 
   const createSegment = (): RecordingSegment => ({
-    id: generateId(), duration: UNDO_SEGMENT_SECONDS, timestamp: Date.now(),
+    id: generateId(),
+    duration: UNDO_SEGMENT_SECONDS,
+    timestamp: Date.now(),
   });
 
   const startRecording = async () => {
     setMicError(null);
     try {
       const constraints: MediaStreamConstraints = {
-        audio: selectedMicId && selectedMicId !== "default" ? { deviceId: { exact: selectedMicId } } : true,
+        audio:
+          selectedMicId && selectedMicId !== "default"
+            ? { deviceId: { exact: selectedMicId } }
+            : true,
       };
       const stream = await navigator.mediaDevices.getUserMedia(constraints);
       streamRef.current = stream;
@@ -416,7 +444,7 @@ export default function UploadPage() {
         const file = new File([combinedBlob], recFileName, {
           type: combinedBlob.type || "audio/webm",
         });
-        
+
         // Process file for upload simulation
         processFiles([file], false);
         setHasRecording(true);
@@ -425,7 +453,7 @@ export default function UploadPage() {
       };
 
       recorder.start();
-      setIsRecording(true); 
+      setIsRecording(true);
       setIsPaused(false);
 
       if (!hasRecording && !isPreviewMode) {
@@ -445,12 +473,17 @@ export default function UploadPage() {
       timerRef.current = setInterval(() => {
         setRecordingSeconds((s) => {
           const ns = s + 0.1;
-          if (ns >= MAX_RECORDING_SECONDS) { handleStopAndUpload(); return MAX_RECORDING_SECONDS; }
+          if (ns >= MAX_RECORDING_SECONDS) {
+            handleStopAndUpload();
+            return MAX_RECORDING_SECONDS;
+          }
           return ns;
         });
       }, 100);
     } catch {
-      setMicError("Microphone access denied. Please allow microphone access in your browser settings.");
+      setMicError(
+        "Microphone access denied. Please allow microphone access in your browser settings."
+      );
     }
   };
 
@@ -466,14 +499,17 @@ export default function UploadPage() {
   const resumeRecording = () => {
     if (mediaRecorderRef.current?.state === "paused") {
       mediaRecorderRef.current.resume();
-      setIsPaused(false); 
+      setIsPaused(false);
       setIsRecording(true);
-      
+
       // Restart timer from current value
       timerRef.current = setInterval(() => {
         setRecordingSeconds((s) => {
           const ns = s + 0.1;
-          if (ns >= MAX_RECORDING_SECONDS) { handleStopAndUpload(); return MAX_RECORDING_SECONDS; }
+          if (ns >= MAX_RECORDING_SECONDS) {
+            handleStopAndUpload();
+            return MAX_RECORDING_SECONDS;
+          }
           return ns;
         });
       }, 100);
@@ -488,14 +524,17 @@ export default function UploadPage() {
     }
   };
 
-  const togglePauseResume = () => { if (isPaused) resumeRecording(); else pauseRecording(); };
+  const togglePauseResume = () => {
+    if (isPaused) resumeRecording();
+    else pauseRecording();
+  };
 
   const handleStopAndUpload = () => {
     if (mediaRecorderRef.current && mediaRecorderRef.current.state !== "inactive")
       mediaRecorderRef.current.stop();
     if (timerRef.current) clearInterval(timerRef.current);
     if (segmentTimerRef.current) clearInterval(segmentTimerRef.current);
-    setIsRecording(false); 
+    setIsRecording(false);
     setIsPaused(false);
     setIsPreviewMode(true);
   };
@@ -507,7 +546,7 @@ export default function UploadPage() {
     }
     if (timerRef.current) clearInterval(timerRef.current);
     if (segmentTimerRef.current) clearInterval(segmentTimerRef.current);
-    
+
     setIsRecording(false);
     setIsPaused(false);
     setIsPreviewMode(true);
@@ -536,21 +575,21 @@ export default function UploadPage() {
   };
 
   const handleDeleteRecording = () => {
-    setHasRecording(false); 
+    setHasRecording(false);
     setRecordingSeconds(0); // Reset only on full delete
-    setRecordingSegments([]); 
+    setRecordingSegments([]);
     setUndoneSegments([]);
-    setIsPaused(false); 
+    setIsPaused(false);
     setIsRecording(false);
     if (timerRef.current) clearInterval(timerRef.current);
     if (segmentTimerRef.current) clearInterval(segmentTimerRef.current);
-    setAudioUrl(null); 
+    setAudioUrl(null);
     setRecordingBlob(null);
     mergedRecordingBlobRef.current = null;
     audioChunksRef.current = [];
     recordingSecondsRef.current = 0;
     setRecordingDurationSeconds(0);
-    setIsPlaying(false); 
+    setIsPlaying(false);
     setCurrentTime(0);
     if (recordingAudioRef.current) {
       recordingAudioRef.current.pause();
@@ -599,9 +638,12 @@ export default function UploadPage() {
       setIsPlaying(false);
       stopPreviewProgressLoop();
     } else {
-      const duration = recordingDurationSeconds > 0
-        ? recordingDurationSeconds
-        : (Number.isFinite(audioEl.duration) ? audioEl.duration : 0);
+      const duration =
+        recordingDurationSeconds > 0
+          ? recordingDurationSeconds
+          : Number.isFinite(audioEl.duration)
+            ? audioEl.duration
+            : 0;
       const nearEnd = duration > 0 && currentTime >= duration - 0.05;
       if (nearEnd) {
         audioEl.currentTime = 0;
@@ -685,13 +727,17 @@ export default function UploadPage() {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  const liveRecordingProgressPercent = Math.min(100, (recordingSeconds / MAX_RECORDING_SECONDS) * 100);
+  const liveRecordingProgressPercent = Math.min(
+    100,
+    (recordingSeconds / MAX_RECORDING_SECONDS) * 100
+  );
   const audioElementDuration = recordingAudioRef.current?.duration;
-  const previewDurationSeconds = Number.isFinite(audioElementDuration) && (audioElementDuration ?? 0) > 0
-    ? (audioElementDuration as number)
-    : recordingDurationSeconds > 0
-      ? recordingDurationSeconds
-      : Math.max(recordingSeconds, 0.1);
+  const previewDurationSeconds =
+    Number.isFinite(audioElementDuration) && (audioElementDuration ?? 0) > 0
+      ? (audioElementDuration as number)
+      : recordingDurationSeconds > 0
+        ? recordingDurationSeconds
+        : Math.max(recordingSeconds, 0.1);
   const previewProgressPercent = Math.min(100, (currentTime / previewDurationSeconds) * 100);
   const progressPercent = isPreviewMode ? previewProgressPercent : liveRecordingProgressPercent;
   const displayToolbarSeconds = isPreviewMode ? currentTime : recordingSeconds;
@@ -699,8 +745,17 @@ export default function UploadPage() {
   const canRedo = isPaused && undoneSegments.length > 0;
   const canDelete = isPaused && (recordingSegments.length > 0 || recordingSeconds > 0);
   const canConfirm = isPaused;
-  const footerLinks = ["Legal", "Privacy", "Cookie Policy", "Cookie Manager", "Imprint", "About us", "Copyright", "Feedback"];
-  
+  const footerLinks = [
+    "Legal",
+    "Privacy",
+    "Cookie Policy",
+    "Cookie Manager",
+    "Imprint",
+    "About us",
+    "Copyright",
+    "Feedback",
+  ];
+
   const currentFile = uploadedFiles.length > 0 ? uploadedFiles[uploadedFiles.length - 1] : null;
   const currentFileName = currentFile?.file.name ?? "recording.wav";
 
@@ -714,31 +769,56 @@ export default function UploadPage() {
           currentFileName={currentFileName}
           currentFile={currentFile?.file ?? null}
           uploadedFileUrl={uploadedFileUrl}
-          trackTitle={trackTitle} setTrackTitle={setTrackTitle}
-          artistName={artistName} setArtistName={setArtistName}
-          genre={genre} setGenre={setGenre}
-          tags={tags} setTags={setTags}
-          description={description} setDescription={setDescription}
-          isPublic={isPublic} setIsPublic={setIsPublic}
-          scheduleRelease={scheduleRelease} setScheduleRelease={setScheduleRelease}
-          expandedSections={expandedSections} toggleSection={toggleSection}
-          buyLink={buyLink} setBuyLink={setBuyLink}
-          recordLabel={recordLabel} setRecordLabel={setRecordLabel}
-          releaseDate={releaseDate} setReleaseDate={setReleaseDate}
-          publisher={publisher} setPublisher={setPublisher}
-          isrc={isrc} setIsrc={setIsrc}
-          explicitContent={explicitContent} setExplicitContent={setExplicitContent}
-          pline={pline} setPline={setPline}
-          enableDownloads={enableDownloads} setEnableDownloads={setEnableDownloads}
-          offlineListening={offlineListening} setOfflineListening={setOfflineListening}
-          includeRssFeed={includeRssFeed} setIncludeRssFeed={setIncludeRssFeed}
-          displayEmbedCode={displayEmbedCode} setDisplayEmbedCode={setDisplayEmbedCode}
-          enableAppPlayback={enableAppPlayback} setEnableAppPlayback={setEnableAppPlayback}
-          allowComments={allowComments} setAllowComments={setAllowComments}
-          showTrackComments={showTrackComments} setShowTrackComments={setShowTrackComments}
-          showTrackInsights={showTrackInsights} setShowTrackInsights={setShowTrackInsights}
-          geoblockingOption={geoblockingOption} setGeoblockingOption={setGeoblockingOption}
-          licenseType={licenseType} setLicenseType={setLicenseType}
+          trackTitle={trackTitle}
+          setTrackTitle={setTrackTitle}
+          artistName={artistName}
+          setArtistName={setArtistName}
+          genre={genre}
+          setGenre={setGenre}
+          tags={tags}
+          setTags={setTags}
+          description={description}
+          setDescription={setDescription}
+          isPublic={isPublic}
+          setIsPublic={setIsPublic}
+          scheduleRelease={scheduleRelease}
+          setScheduleRelease={setScheduleRelease}
+          expandedSections={expandedSections}
+          toggleSection={toggleSection}
+          buyLink={buyLink}
+          setBuyLink={setBuyLink}
+          recordLabel={recordLabel}
+          setRecordLabel={setRecordLabel}
+          releaseDate={releaseDate}
+          setReleaseDate={setReleaseDate}
+          publisher={publisher}
+          setPublisher={setPublisher}
+          isrc={isrc}
+          setIsrc={setIsrc}
+          explicitContent={explicitContent}
+          setExplicitContent={setExplicitContent}
+          pline={pline}
+          setPline={setPline}
+          enableDownloads={enableDownloads}
+          setEnableDownloads={setEnableDownloads}
+          offlineListening={offlineListening}
+          setOfflineListening={setOfflineListening}
+          includeRssFeed={includeRssFeed}
+          setIncludeRssFeed={setIncludeRssFeed}
+          displayEmbedCode={displayEmbedCode}
+          setDisplayEmbedCode={setDisplayEmbedCode}
+          enableAppPlayback={enableAppPlayback}
+          setEnableAppPlayback={setEnableAppPlayback}
+          allowComments={allowComments}
+          setAllowComments={setAllowComments}
+          showTrackComments={showTrackComments}
+          setShowTrackComments={setShowTrackComments}
+          showTrackInsights={showTrackInsights}
+          setShowTrackInsights={setShowTrackInsights}
+          geoblockingOption={geoblockingOption}
+          setGeoblockingOption={setGeoblockingOption}
+          licenseType={licenseType}
+          setLicenseType={setLicenseType}
           permalink={permalink}
           setPermalink={setPermalink}
           isArtistPro={isArtistPro}
@@ -772,8 +852,22 @@ export default function UploadPage() {
               className="flex h-9 w-9 items-center justify-center overflow-hidden rounded-full transition-opacity hover:opacity-90 cursor-pointer"
               aria-label="Go to home"
             >
-              <Image src="/app-logo/whitelogo.png" alt="BeatZa" width={52} height={52} className="object-contain logo-dark" priority />
-              <Image src="/app-logo/blacklogo.png" alt="BeatZa" width={52} height={52} className="object-contain logo-light" priority />
+              <Image
+                src="/app-logo/whitelogo.png"
+                alt="BeatZa"
+                width={52}
+                height={52}
+                className="object-contain logo-dark"
+                priority
+              />
+              <Image
+                src="/app-logo/blacklogo.png"
+                alt="BeatZa"
+                width={52}
+                height={52}
+                className="object-contain logo-light"
+                priority
+              />
             </button>
             <span className="text-[16px] font-black tracking-[-0.03em]">Upload</span>
           </div>
@@ -789,99 +883,128 @@ export default function UploadPage() {
         </div>
 
         <main className="mx-auto max-w-6xl mt-5 w-full flex-1">
-        <UploadUsageBar
-          usedTracks={usedTracks}
-          totalTracks={totalTrackQuota}
-          usagePercent={usagePercent}
-          isArtistPro={isArtistPro}
-          onUpgradeClick={() => router.push("/artist")}
-        />
-
-        <section className="mt-8">
-          <h1 className="pb-2 text-[24px] font-black tracking-[-0.03em] text-white-smoke sm:text-[28px]">Upload your audio files.</h1>
-          <p className="mt-2 pb-2 text-[14px] font-semibold leading-relaxed text-white-smoke/90">
-            For best quality, use WAV, FLAC, AIFF, or ALAC. The maximum file size is 4GB uncompressed.
-            <button type="button" data-testid="upload-learn-more" className="ml-1 border-b border-silver pb-px text-[14px] font-semibold text-white-smoke cursor-pointer">Learn more.</button>
-          </p>
-
-          <input
-            id="main-upload-audio-input"
-            ref={fileInputRef}
-            type="file"
-            multiple
-            accept="audio/*,.wav,.flac,.aiff,.aif,.alac,.m4a,.mp3"
-            className="hidden"
-            onChange={handleFileSelect}
-            data-testid="upload-file-input"
+          <UploadUsageBar
+            usedTracks={usedTracks}
+            totalTracks={totalTrackQuota}
+            usagePercent={usagePercent}
+            isArtistPro={isArtistPro}
+            onUpgradeClick={() => router.push("/artist")}
           />
 
-          {/* Drop zone */}
-          <div
-            onDragOver={handleDragOver}
-            onDragLeave={handleDragLeave}
-            onDrop={handleDrop}
-            data-testid="upload-drop-zone"
-            className={`mt-6 rounded-md border border-dashed px-5 py-16 transition-colors hover:border-white-smoke sm:px-12 sm:py-20 cursor-pointer
+          <section className="mt-8">
+            <h1 className="pb-2 text-[24px] font-black tracking-[-0.03em] text-white-smoke sm:text-[28px]">
+              Upload your audio files.
+            </h1>
+            <p className="mt-2 pb-2 text-[14px] font-semibold leading-relaxed text-white-smoke/90">
+              For best quality, use WAV, FLAC, AIFF, or ALAC. The maximum file size is 4GB
+              uncompressed.
+              <button
+                type="button"
+                data-testid="upload-learn-more"
+                className="ml-1 border-b border-silver pb-px text-[14px] font-semibold text-white-smoke cursor-pointer"
+              >
+                Learn more.
+              </button>
+            </p>
+
+            <input
+              id="main-upload-audio-input"
+              ref={fileInputRef}
+              type="file"
+              multiple
+              accept="audio/*,.wav,.flac,.aiff,.aif,.alac,.m4a,.mp3"
+              className="hidden"
+              onChange={handleFileSelect}
+              data-testid="upload-file-input"
+            />
+
+            {/* Drop zone */}
+            <div
+              onDragOver={handleDragOver}
+              onDragLeave={handleDragLeave}
+              onDrop={handleDrop}
+              data-testid="upload-drop-zone"
+              className={`mt-6 rounded-md border border-dashed px-5 py-16 transition-colors hover:border-white-smoke sm:px-12 sm:py-20 cursor-pointer
               ${isDragging ? "border-white-smoke bg-chinese-black" : "border-off-black bg-chinese-black"}`}
-          >
-            <div onDragOver={handleDragOver}
+            >
+              <div
+                onDragOver={handleDragOver}
                 onDragLeave={handleDragLeave}
                 onDrop={handleDrop}
-                onClick={() => fileInputRef.current?.click()} data-testid="upload-drop-click" className="mx-auto flex max-w-sm flex-col items-center text-center">
-              <div className="mb-6">
-                <Image
-                  src={UploadIconWhite}
-                  alt="Upload icon"
-                  className="logo-dark"
-                  width={74}
-                  height={74}
-                />
-                <Image
-                  src={UploadIconBlack}
-                  alt="Upload icon"
-                  className="logo-light"
-                  width={74}
-                  height={74}
-                />
-              </div>
-              <p className="text-[16px] font-bold text-white-smoke">
-                {isDragging ? "Drop audio files here." : "Drag and drop audio files to get started."}
-              </p>
-              <label
-                data-testid="upload-choose-files"
-                className="mt-6 rounded-full bg-white-smoke px-7 py-2 text-[14px] border font-bold text-chinese-black transition-opacity hover:opacity-90 cursor-pointer"
+                onClick={() => fileInputRef.current?.click()}
+                data-testid="upload-drop-click"
+                className="mx-auto flex max-w-sm flex-col items-center text-center"
               >
-                Choose files
-              </label>
+                <div className="mb-6">
+                  <Image
+                    src={UploadIconWhite}
+                    alt="Upload icon"
+                    className="logo-dark"
+                    width={74}
+                    height={74}
+                  />
+                  <Image
+                    src={UploadIconBlack}
+                    alt="Upload icon"
+                    className="logo-light"
+                    width={74}
+                    height={74}
+                  />
+                </div>
+                <p className="text-[16px] font-bold text-white-smoke">
+                  {isDragging
+                    ? "Drop audio files here."
+                    : "Drag and drop audio files to get started."}
+                </p>
+                <label
+                  data-testid="upload-choose-files"
+                  className="mt-6 rounded-full bg-white-smoke px-7 py-2 text-[14px] border font-bold text-chinese-black transition-opacity hover:opacity-90 cursor-pointer"
+                >
+                  Choose files
+                </label>
+              </div>
             </div>
-          </div>
 
-          {/* Microphone Section */}
-          <MicrophoneSection
-            micOpen={micOpen} setMicOpen={setMicOpen}
-            micDropdownRef={micDropdownRef}
-            micDropdownOpen={micDropdownOpen} setMicDropdownOpen={setMicDropdownOpen}
-            isRecording={isRecording} isPaused={isPaused}
-            hasRecording={hasRecording} isPreviewMode={isPreviewMode}
-            isPlaying={isPlaying} recordingSeconds={displayToolbarSeconds}
-            progressPercent={progressPercent} microphones={microphones}
-            selectedMicId={selectedMicId}
-            canUndo={canUndo} canRedo={canRedo} canDelete={canDelete} canConfirm={canConfirm}
-            getMicrophones={getMicrophones}
-            handleMicSelect={(deviceId) => {
-              setSelectedMicId(deviceId);
-              setMicDropdownOpen(false);
-            }}
-            startRecording={startRecording} togglePauseResume={togglePauseResume}
-            resumeRecording={resumeRecording} handleStopAndUpload={handleStopAndUpload}
-            handleCheckmark={handleCheckmark} handleUndo={handleUndo} handleRedo={handleRedo}
-            handleDeleteRecording={handleDeleteRecording} handleBackToRecording={handleBackToRecording}
-            handleClearAndRestart={handleDeleteRecording}
-            handleUpload={handleUpload} togglePlayPause={togglePlayPause}
-          />
-        </section>
-      </main>
-
+            {/* Microphone Section */}
+            <MicrophoneSection
+              micOpen={micOpen}
+              setMicOpen={setMicOpen}
+              micDropdownRef={micDropdownRef}
+              micDropdownOpen={micDropdownOpen}
+              setMicDropdownOpen={setMicDropdownOpen}
+              isRecording={isRecording}
+              isPaused={isPaused}
+              hasRecording={hasRecording}
+              isPreviewMode={isPreviewMode}
+              isPlaying={isPlaying}
+              recordingSeconds={displayToolbarSeconds}
+              progressPercent={progressPercent}
+              microphones={microphones}
+              selectedMicId={selectedMicId}
+              canUndo={canUndo}
+              canRedo={canRedo}
+              canDelete={canDelete}
+              canConfirm={canConfirm}
+              getMicrophones={getMicrophones}
+              handleMicSelect={(deviceId) => {
+                setSelectedMicId(deviceId);
+                setMicDropdownOpen(false);
+              }}
+              startRecording={startRecording}
+              togglePauseResume={togglePauseResume}
+              resumeRecording={resumeRecording}
+              handleStopAndUpload={handleStopAndUpload}
+              handleCheckmark={handleCheckmark}
+              handleUndo={handleUndo}
+              handleRedo={handleRedo}
+              handleDeleteRecording={handleDeleteRecording}
+              handleBackToRecording={handleBackToRecording}
+              handleClearAndRestart={handleDeleteRecording}
+              handleUpload={handleUpload}
+              togglePlayPause={togglePlayPause}
+            />
+          </section>
+        </main>
       </div>
 
       <footer className="fixed inset-x-0 bottom-0 z-40 min-h-15 border-t border-silver/15 bg-chinese-black/90 py-2 text-center text-[12px] text-white-smoke">
@@ -890,7 +1013,13 @@ export default function UploadPage() {
             {footerLinks.map((label, index) => (
               <div key={label} className="flex items-center gap-2">
                 {index > 0 && <span className="text-[#666873]">-</span>}
-                <button type="button" data-testid={`upload-footer-${label.toLowerCase().replace(/\s+/g, "-")}`} className="transition-colors hover:text-[#e8e8ec] cursor-pointer">{label}</button>
+                <button
+                  type="button"
+                  data-testid={`upload-footer-${label.toLowerCase().replace(/\s+/g, "-")}`}
+                  className="transition-colors hover:text-[#e8e8ec] cursor-pointer"
+                >
+                  {label}
+                </button>
               </div>
             ))}
           </div>
@@ -899,7 +1028,10 @@ export default function UploadPage() {
 
       {/* Recording preview audio */}
       {audioUrl && (
-        <audio className="hidden" ref={recordingAudioRef} src={audioUrl}
+        <audio
+          className="hidden"
+          ref={recordingAudioRef}
+          src={audioUrl}
           onLoadedMetadata={() => {
             if (recordingAudioRef.current) {
               const duration = recordingAudioRef.current.duration;
@@ -919,7 +1051,8 @@ export default function UploadPage() {
               recordingAudioRef.current.currentTime = 0;
             }
           }}
-          onTimeUpdate={handleAudioTimeUpdate} />
+          onTimeUpdate={handleAudioTimeUpdate}
+        />
       )}
     </div>
   );

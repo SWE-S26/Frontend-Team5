@@ -7,7 +7,7 @@ import { FiMail } from "react-icons/fi";
 import { IoCloudUploadOutline } from "react-icons/io5";
 import { LuSearch } from "react-icons/lu";
 import { SlBell } from "react-icons/sl";
-import ProfileImage from "@/components/ui/ProfileImage"
+import ProfileImage from "@/components/ui/ProfileImage";
 
 import { useLogout } from "@/hooks/useAuth";
 import { useAppSelector } from "@/store/hooks";
@@ -58,7 +58,10 @@ export default function ArtistTopbar({ onMenuOpenChange, onSidebarToggle }: Topb
 
   const menuItems: ProfileMenuItem[] = [
     { label: "Profile", action: () => router.push(userId ? `/profile/${userId}` : "/home") },
-    { label: "Tracks", action: () => router.push(userId ? `/profile/${userId}?tab=tracks` : "/artists") },
+    {
+      label: "Tracks",
+      action: () => router.push(userId ? `/profile/${userId}?tab=tracks` : "/artists"),
+    },
     { label: "Insights", action: () => router.push("/artists") },
     { label: "Distribute music", action: () => router.push("/artist") },
     { label: "Artist Membership", action: () => router.push("/artist"), dividerBefore: true },
@@ -85,89 +88,89 @@ export default function ArtistTopbar({ onMenuOpenChange, onSidebarToggle }: Topb
 
         {/* Right actions */}
         <div className="flex items-center gap-1.5 sm:gap-2 lg:gap-2">
-        {/* Search */}
-        <button
-          type="button"
-          data-testid="artist-topbar-search"
-          className="flex items-center gap-2 rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[18px] text-white-smoke transition-colors hover:border-[#666] sm:px-4 cursor-pointer"
-          aria-label="Search"
-        >
-          <LuSearch className="text-[25px]" />
-          <span className="hidden sm:inline">Search</span>
-        </button>
-
-        {/* Upload */}
-        <button
-          type="button"
-          onClick={() => router.push("/upload")}
-          data-testid="artist-topbar-upload"
-          className="flex items-center gap-2 rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[18px] text-white-smoke transition-colors hover:border-[#666] sm:px-4 cursor-pointer"
-          aria-label="Upload"
-        >
-          <IoCloudUploadOutline className="text-[25px]" />
-          <span className="hidden sm:inline">Upload</span>
-        </button>
-
-        {/* Notifications */}
-        <button
-          type="button"
-          onClick={() => router.push("/notifications")}
-          data-testid="artist-topbar-notifications"
-          className="rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[25px] text-white-smoke transition-colors hover:border-[#666] sm:px-3 cursor-pointer"
-          aria-label="Notifications"
-        >
-          <SlBell />
-        </button>
-
-        {/* Messages */}
-        <button
-          type="button"
-          onClick={() => router.push("/messages")}
-          data-testid="artist-topbar-messages"
-          className="rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[25px] text-white-smoke transition-colors hover:border-[#666] sm:px-3 cursor-pointer"
-          aria-label="Messages"
-        >
-          <FiMail />
-        </button>
-
-        {/* Profile menu */}
-        <div ref={menuRef} className="relative">
+          {/* Search */}
           <button
             type="button"
-            onClick={toggleMenu}
-            data-testid="artist-topbar-profile-menu"
-            className="mt-1 h-10 w-10 overflow-hidden rounded-full border border-white-smoke bg-transparent transition-colors hover:border-[#666] cursor-pointer"
-            aria-label="Open profile menu"
+            data-testid="artist-topbar-search"
+            className="flex items-center gap-2 rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[18px] text-white-smoke transition-colors hover:border-[#666] sm:px-4 cursor-pointer"
+            aria-label="Search"
           >
-            {profileImgLink && (
-              <ProfileImage
-                src={profileImgLink}
-                alt="Profile"
-                width={32}
-                height={32}
-                className="h-10 w-10 object-cover"
-              />
-            )}
+            <LuSearch className="text-[25px]" />
+            <span className="hidden sm:inline">Search</span>
           </button>
 
-          {showUserMenu && (
-            <div className="absolute right-0 top-10 z-300 min-w-55 overflow-hidden rounded-lg border border-[#333] bg-chinese-black shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
-              {menuItems.map((item) => (
-                <div key={item.label}>
-                  {item.dividerBefore && <div className="my-1 border-t border-[#2e2e2e]" />}
-                  <button
-                    type="button"
-                    onClick={item.action}
-                    data-testid={`artist-topbar-menu-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
-                    className="w-full bg-transparent px-4 py-2.5 text-left text-[13px] text-white-smoke transition-colors hover:bg-[#2a2a2a] cursor-pointer"
-                  >
-                    {item.label}
-                  </button>
-                </div>
-              ))}
-            </div>
-          )}
-        </div>
+          {/* Upload */}
+          <button
+            type="button"
+            onClick={() => router.push("/upload")}
+            data-testid="artist-topbar-upload"
+            className="flex items-center gap-2 rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[18px] text-white-smoke transition-colors hover:border-[#666] sm:px-4 cursor-pointer"
+            aria-label="Upload"
+          >
+            <IoCloudUploadOutline className="text-[25px]" />
+            <span className="hidden sm:inline">Upload</span>
+          </button>
+
+          {/* Notifications */}
+          <button
+            type="button"
+            onClick={() => router.push("/notifications")}
+            data-testid="artist-topbar-notifications"
+            className="rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[25px] text-white-smoke transition-colors hover:border-[#666] sm:px-3 cursor-pointer"
+            aria-label="Notifications"
+          >
+            <SlBell />
+          </button>
+
+          {/* Messages */}
+          <button
+            type="button"
+            onClick={() => router.push("/messages")}
+            data-testid="artist-topbar-messages"
+            className="rounded-full border border-white-smoke bg-transparent px-2.5 py-1.5 text-[25px] text-white-smoke transition-colors hover:border-[#666] sm:px-3 cursor-pointer"
+            aria-label="Messages"
+          >
+            <FiMail />
+          </button>
+
+          {/* Profile menu */}
+          <div ref={menuRef} className="relative">
+            <button
+              type="button"
+              onClick={toggleMenu}
+              data-testid="artist-topbar-profile-menu"
+              className="mt-1 h-10 w-10 overflow-hidden rounded-full border border-white-smoke bg-transparent transition-colors hover:border-[#666] cursor-pointer"
+              aria-label="Open profile menu"
+            >
+              {profileImgLink && (
+                <ProfileImage
+                  src={profileImgLink}
+                  alt="Profile"
+                  width={32}
+                  height={32}
+                  className="h-10 w-10 object-cover"
+                />
+              )}
+            </button>
+
+            {showUserMenu && (
+              <div className="absolute right-0 top-10 z-300 min-w-55 overflow-hidden rounded-lg border border-[#333] bg-chinese-black shadow-[0_8px_32px_rgba(0,0,0,0.6)]">
+                {menuItems.map((item) => (
+                  <div key={item.label}>
+                    {item.dividerBefore && <div className="my-1 border-t border-[#2e2e2e]" />}
+                    <button
+                      type="button"
+                      onClick={item.action}
+                      data-testid={`artist-topbar-menu-${item.label.toLowerCase().replace(/\s+/g, "-")}`}
+                      className="w-full bg-transparent px-4 py-2.5 text-left text-[13px] text-white-smoke transition-colors hover:bg-[#2a2a2a] cursor-pointer"
+                    >
+                      {item.label}
+                    </button>
+                  </div>
+                ))}
+              </div>
+            )}
+          </div>
         </div>
       </div>
     </header>

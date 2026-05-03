@@ -8,14 +8,7 @@ import PlayerTrackInfo from "./right-side/PlayerTrackInfo";
 import PlayerNextUp from "./right-side/PlayerNextUp";
 import { RootState } from "@/store/store";
 import { useDispatch, useSelector } from "react-redux";
-import {
-  play,
-  pause,
-  setVolume,
-  setTrackDuration,
-  next,
-  prev,
-} from "@/store/slices/playerSlice";
+import { play, pause, setVolume, setTrackDuration, next, prev } from "@/store/slices/playerSlice";
 import { useAudioProgress } from "@/hooks/useAudioProgress";
 import { IoIosPlay } from "react-icons/io";
 import { GiPauseButton } from "react-icons/gi";
@@ -30,16 +23,10 @@ const slideUpAnimation = `
 
 export default function PlayerBar() {
   const dispatch = useDispatch();
-  const {
-    isPlaying,
-    volume,
-    currentTrackArtist,
-    currentTrackTitle,
-    currentTrackImage,
-  } = useSelector((state: RootState) => state.player);
+  const { isPlaying, volume, currentTrackArtist, currentTrackTitle, currentTrackImage } =
+    useSelector((state: RootState) => state.player);
 
-  const { currentTime, duration, dragStart, dragMove, dragEnd } =
-    useAudioProgress();
+  const { currentTime, duration, dragStart, dragMove, dragEnd } = useAudioProgress();
 
   const togglePlay = () => {
     if (isPlaying) {
@@ -107,8 +94,12 @@ export default function PlayerBar() {
                 onMouseDown={dragStart}
                 onTouchStart={dragStart}
                 onChange={(e) => dragMove((Number(e.target.value) / (duration || 100)) * 100)}
-                onMouseUp={(e) => dragEnd((Number(e.currentTarget.value) / (duration || 100)) * 100)}
-                onTouchEnd={(e) => dragEnd((Number(e.currentTarget.value) / (duration || 100)) * 100)}
+                onMouseUp={(e) =>
+                  dragEnd((Number(e.currentTarget.value) / (duration || 100)) * 100)
+                }
+                onTouchEnd={(e) =>
+                  dragEnd((Number(e.currentTarget.value) / (duration || 100)) * 100)
+                }
                 className="absolute inset-0 w-full opacity-0 cursor-pointer h-6 -top-2"
                 style={{ touchAction: "none" }}
               />
@@ -138,7 +129,10 @@ export default function PlayerBar() {
             </button>
 
             <button
-              onClick={() => { dispatch(next()); dispatch(play()); }}
+              onClick={() => {
+                dispatch(next());
+                dispatch(play());
+              }}
               className="p-2 text-white-smoke active:text-silver transition"
               aria-label="Next"
             >
@@ -171,10 +165,7 @@ export default function PlayerBar() {
 
           <div className="flex items-center gap-2 lg:gap-3 shrink-0">
             <div className="hidden lg:block">
-              <PlayerVolume
-                volume={volume}
-                setVolume={(v) => dispatch(setVolume(v))}
-              />
+              <PlayerVolume volume={volume} setVolume={(v) => dispatch(setVolume(v))} />
             </div>
 
             <div className="hidden lg:block">

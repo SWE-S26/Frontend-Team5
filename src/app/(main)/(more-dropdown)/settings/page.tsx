@@ -1,128 +1,143 @@
-"use client"
+"use client";
 
-import { useState, useEffect, useRef } from "react"
-import { Select } from "antd"
-import ThemeSwitcher from "@/components/settings/theme/ThemeSwitcher"
-import Button from "@/components/ui/Button"
-import DeleteAccountModal from "@/components/settings/DeleteAccountModal"
-import InfoPopover from "@/components/settings/InfoPopover"
-import { useForgotPasswordLoggedIn } from "@/hooks/useAuth"
-import { useAccountSettings } from "@/hooks/useSettings"
-import { Gender, Theme } from "@/types/settings.types"
+import { useState, useEffect, useRef } from "react";
+import { Select } from "antd";
+import ThemeSwitcher from "@/components/settings/theme/ThemeSwitcher";
+import Button from "@/components/ui/Button";
+import DeleteAccountModal from "@/components/settings/DeleteAccountModal";
+import InfoPopover from "@/components/settings/InfoPopover";
+import { useForgotPasswordLoggedIn } from "@/hooks/useAuth";
+import { useAccountSettings } from "@/hooks/useSettings";
+import { Gender, Theme } from "@/types/settings.types";
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
-]
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
+];
 
 const DAYS = Array.from({ length: 31 }, (_, i) => ({
   value: String(i + 1),
   label: String(i + 1),
-}))
+}));
 
-const currentYear = new Date().getFullYear()
+const currentYear = new Date().getFullYear();
 const YEARS = Array.from({ length: currentYear - 1950 + 1 }, (_, i) => ({
   value: String(currentYear - i),
   label: String(currentYear - i),
-}))
+}));
 
-const MONTH_OPTIONS = MONTHS.map((m) => ({ value: m, label: m }))
+const MONTH_OPTIONS = MONTHS.map((m) => ({ value: m, label: m }));
 
 const GENDER_OPTIONS = [
-  { value: "Male",   label: "Male" },
+  { value: "Male", label: "Male" },
   { value: "Female", label: "Female" },
-]
+];
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 const parseDateOfBirth = (dob: string) => {
-  const date = new Date(dob)
+  const date = new Date(dob);
   return {
     month: MONTHS[date.getUTCMonth()],
-    day:   String(date.getUTCDate()),
-    year:  String(date.getUTCFullYear()),
-  }
-}
+    day: String(date.getUTCDate()),
+    year: String(date.getUTCFullYear()),
+  };
+};
 
 const buildDateOfBirth = (month: string, day: string, year: string): string => {
-  const monthIndex = MONTHS.indexOf(month) + 1
-  return `${year}-${String(monthIndex).padStart(2, "0")}-${day.padStart(2, "0")}`
-}
+  const monthIndex = MONTHS.indexOf(month) + 1;
+  return `${year}-${String(monthIndex).padStart(2, "0")}-${day.padStart(2, "0")}`;
+};
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function Settings() {
-  const [showSuccess,     setShowSuccess]     = useState(false)
-  const [deleteModalOpen, setDeleteModalOpen] = useState(false)
+  const [showSuccess, setShowSuccess] = useState(false);
+  const [deleteModalOpen, setDeleteModalOpen] = useState(false);
 
-  const { settings, loading, saveStatus, updateSettings } = useAccountSettings()
+  const { settings, loading, saveStatus, updateSettings } = useAccountSettings();
 
-  const [birthMonth, setBirthMonth] = useState<string>("")
-  const [birthDay,   setBirthDay]   = useState<string>("")
-  const [birthYear,  setBirthYear]  = useState<string>("")
-  const [gender,     setGender]     = useState<string>("")
+  const [birthMonth, setBirthMonth] = useState<string>("");
+  const [birthDay, setBirthDay] = useState<string>("");
+  const [birthYear, setBirthYear] = useState<string>("");
+  const [gender, setGender] = useState<string>("");
 
-  const birthMonthRef = useRef(birthMonth)
-  const birthDayRef   = useRef(birthDay)
-  const birthYearRef  = useRef(birthYear)
+  const birthMonthRef = useRef(birthMonth);
+  const birthDayRef = useRef(birthDay);
+  const birthYearRef = useRef(birthYear);
 
-  useEffect(() => { birthMonthRef.current = birthMonth }, [birthMonth])
-  useEffect(() => { birthDayRef.current   = birthDay   }, [birthDay])
-  useEffect(() => { birthYearRef.current  = birthYear  }, [birthYear])
+  useEffect(() => {
+    birthMonthRef.current = birthMonth;
+  }, [birthMonth]);
+  useEffect(() => {
+    birthDayRef.current = birthDay;
+  }, [birthDay]);
+  useEffect(() => {
+    birthYearRef.current = birthYear;
+  }, [birthYear]);
 
   // Hydrate date/gender — also keep localStorage in sync for ThemeProvider
   useEffect(() => {
-    if (!settings) return
+    if (!settings) return;
 
-    localStorage.setItem("theme", settings.theme.toLowerCase())
+    localStorage.setItem("theme", settings.theme.toLowerCase());
 
-    const { month, day, year } = parseDateOfBirth(settings.dateOfBirth)
-    setBirthMonth(month)
-    setBirthDay(day)
-    setBirthYear(year)
-    setGender(settings.gender)
-  }, [settings])
+    const { month, day, year } = parseDateOfBirth(settings.dateOfBirth);
+    setBirthMonth(month);
+    setBirthDay(day);
+    setBirthYear(year);
+    setGender(settings.gender);
+  }, [settings]);
 
-  const { forgotPasswordLoggedIn, loading: pwLoading, error } = useForgotPasswordLoggedIn()
+  const { forgotPasswordLoggedIn, loading: pwLoading, error } = useForgotPasswordLoggedIn();
 
   const handleResetPassword = async () => {
-    const res = await forgotPasswordLoggedIn()
+    const res = await forgotPasswordLoggedIn();
     if (res) {
-      setShowSuccess(true)
-      setTimeout(() => setShowSuccess(false), 5000)
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 5000);
     }
-  }
+  };
 
   const handleDateChange = (month: string, day: string, year: string) => {
-    if (!month || !day || !year) return
-    updateSettings({ dateOfBirth: buildDateOfBirth(month, day, year) })
-  }
+    if (!month || !day || !year) return;
+    updateSettings({ dateOfBirth: buildDateOfBirth(month, day, year) });
+  };
 
   const handleMonthChange = (val: string) => {
-    setBirthMonth(val)
-    handleDateChange(val, birthDayRef.current, birthYearRef.current)
-  }
+    setBirthMonth(val);
+    handleDateChange(val, birthDayRef.current, birthYearRef.current);
+  };
 
   const handleDayChange = (val: string) => {
-    setBirthDay(val)
-    handleDateChange(birthMonthRef.current, val, birthYearRef.current)
-  }
+    setBirthDay(val);
+    handleDateChange(birthMonthRef.current, val, birthYearRef.current);
+  };
 
   const handleYearChange = (val: string) => {
-    setBirthYear(val)
-    handleDateChange(birthMonthRef.current, birthDayRef.current, val)
-  }
+    setBirthYear(val);
+    handleDateChange(birthMonthRef.current, birthDayRef.current, val);
+  };
 
   const handleGenderChange = (val: string) => {
-    setGender(val)
-    updateSettings({ gender: val as Gender })
-  }
+    setGender(val);
+    updateSettings({ gender: val as Gender });
+  };
 
   return (
     <div className="bg-chinese-black w-full max-w-3xl">
-
       <ThemeSwitcher
         saveStatus={saveStatus}
         onThemeChange={(val) =>
@@ -138,9 +153,7 @@ export default function Settings() {
             We've sent you an email with a link to reset your password.
           </p>
         )}
-        {error && (
-          <p className="text-anger text-xs mb-2">{error}</p>
-        )}
+        {error && <p className="text-anger text-xs mb-2">{error}</p>}
         <Button
           className="px-3 py-2 bg-off-black text-white-smoke text-xs cursor-pointer hover:text-silver"
           onClick={handleResetPassword}
@@ -158,7 +171,6 @@ export default function Settings() {
           <p className="text-white-smoke/40 text-sm">Loading...</p>
         ) : (
           <div className="flex flex-col sm:flex-row items-start gap-6 sm:gap-16">
-
             {/* Birth date */}
             <div className="w-full sm:w-auto">
               <label className="text-sm text-white-smoke flex items-center gap-1.5 mb-2">
@@ -212,7 +224,6 @@ export default function Settings() {
                 classNames={{ popup: { root: "notif-dropdown-popup" } }}
               />
             </div>
-
           </div>
         )}
       </div>
@@ -223,10 +234,7 @@ export default function Settings() {
       >
         Delete Account
       </Button>
-      <DeleteAccountModal
-        isOpen={deleteModalOpen}
-        onClose={() => setDeleteModalOpen(false)}
-      />
+      <DeleteAccountModal isOpen={deleteModalOpen} onClose={() => setDeleteModalOpen(false)} />
     </div>
-  )
+  );
 }

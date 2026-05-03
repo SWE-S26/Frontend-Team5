@@ -28,7 +28,7 @@ export function useRequireAuth() {
     }
 
     // Admin trying to access non-admin routes
-    if (isAuthenticated && role === "Admin" && !isAdminRoute ) {
+    if (isAuthenticated && role === "Admin" && !isAdminRoute) {
       router.replace("/admin-dash/profiles-manage");
       return;
     }
@@ -38,6 +38,5 @@ export function useRequireAuth() {
       router.replace("/home");
       return;
     }
-
   }, [hasHydrated, isAuthenticated, pathname, router, role]);
 }

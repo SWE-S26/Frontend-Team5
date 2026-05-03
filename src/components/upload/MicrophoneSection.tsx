@@ -81,7 +81,7 @@ export function MicrophoneSection({
   togglePlayPause,
 }: MicrophoneSectionProps) {
   const formattedRecordingTime = `${Math.floor(recordingSeconds / 60)}:${Math.floor(
-    recordingSeconds % 60,
+    recordingSeconds % 60
   )
     .toString()
     .padStart(2, "0")}`;
@@ -137,9 +137,7 @@ export function MicrophoneSection({
           {micDropdownOpen && (
             <div className="absolute left-0 top-full z-50 mt-2 w-[min(20rem,calc(100vw-2.5rem))] rounded-md border border-[#3f4047] bg-[#1b1c20] py-2 shadow-xl">
               {microphones.length === 0 ? (
-                <div className="px-4 py-2 text-[13px] text-[#888]">
-                  No microphones found
-                </div>
+                <div className="px-4 py-2 text-[13px] text-[#888]">No microphones found</div>
               ) : (
                 microphones.map((mic) => (
                   <div
@@ -184,8 +182,7 @@ export function MicrophoneSection({
             Or record with a microphone
           </p>
           <p className="mt-1 text-[13px] text-[#ececef]">
-            Upload recorded voice memos, updates, news, or intros to new
-            releases.
+            Upload recorded voice memos, updates, news, or intros to new releases.
           </p>
         </div>
 
@@ -208,9 +205,7 @@ export function MicrophoneSection({
           }}
           className="order-2 ml-auto flex items-center justify-center rounded text-[14px] text-[#d0d0d4] transition-all duration-200 hover:text-[#f2f2f2] focus:outline-none sm:order-3 sm:ml-0 cursor-pointer"
           data-testid="upload-mic-collapse"
-          aria-label={
-            micOpen ? "Collapse recording options" : "Expand recording options"
-          }
+          aria-label={micOpen ? "Collapse recording options" : "Expand recording options"}
           aria-expanded={micOpen}
         >
           {micOpen ? <UpOutlined /> : <DownOutlined />}
@@ -247,12 +242,7 @@ export function MicrophoneSection({
                       aria-label="Back"
                       title="Back to recording"
                     >
-                      <svg
-                        width="16"
-                        height="16"
-                        viewBox="0 0 16 16"
-                        fill="none"
-                      >
+                      <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
                         <path
                           d="M10 3L5 8l5 5"
                           stroke="currentColor"
@@ -270,40 +260,13 @@ export function MicrophoneSection({
                       aria-label={isPlaying ? "Pause" : "Play"}
                     >
                       {isPlaying ? (
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 16 16"
-                          fill="none"
-                        >
-                          <rect
-                            x="3"
-                            y="3"
-                            width="3.5"
-                            height="10"
-                            rx="1"
-                            fill="currentColor"
-                          />
-                          <rect
-                            x="9.5"
-                            y="3"
-                            width="3.5"
-                            height="10"
-                            rx="1"
-                            fill="currentColor"
-                          />
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                          <rect x="3" y="3" width="3.5" height="10" rx="1" fill="currentColor" />
+                          <rect x="9.5" y="3" width="3.5" height="10" rx="1" fill="currentColor" />
                         </svg>
                       ) : (
-                        <svg
-                          width="16"
-                          height="16"
-                          viewBox="0 0 16 16"
-                          fill="none"
-                        >
-                          <path
-                            d="M5 3.5L13 8L5 12.5V3.5Z"
-                            fill="currentColor"
-                          />
+                        <svg width="16" height="16" viewBox="0 0 16 16" fill="none">
+                          <path d="M5 3.5L13 8L5 12.5V3.5Z" fill="currentColor" />
                         </svg>
                       )}
                     </button>

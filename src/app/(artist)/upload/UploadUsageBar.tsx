@@ -20,7 +20,9 @@ export default function UploadUsageBar({
   className = "",
 }: UploadUsageBarProps) {
   return (
-    <div className={`rounded-md border border-off-black bg-chinese-black px-4 py-3 ${className}`.trim()}>
+    <div
+      className={`rounded-md border border-off-black bg-chinese-black px-4 py-3 ${className}`.trim()}
+    >
       <div className="flex flex-col gap-3 md:flex-row md:items-center md:justify-between">
         <div className="flex min-w-0 flex-col gap-2 sm:flex-row sm:items-center sm:gap-3">
           <div className="flex h-12 w-5 items-center justify-center text-[10px] text-silver">

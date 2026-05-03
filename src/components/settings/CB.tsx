@@ -1,13 +1,18 @@
-"use client"
+"use client";
 
 interface CBProps {
-  checked: boolean
-  onChange: (v: boolean) => void
-  uncheckedClassName?: string
-  checkStroke?: string
+  checked: boolean;
+  onChange: (v: boolean) => void;
+  uncheckedClassName?: string;
+  checkStroke?: string;
 }
 
-export default function CB({ checked, onChange, uncheckedClassName = "bg-transparent border-(--fg)/50", checkStroke = "var(--bg)" }: CBProps) {
+export default function CB({
+  checked,
+  onChange,
+  uncheckedClassName = "bg-transparent border-(--fg)/50",
+  checkStroke = "var(--bg)",
+}: CBProps) {
   return (
     <button
       type="button"
@@ -28,5 +33,5 @@ export default function CB({ checked, onChange, uncheckedClassName = "bg-transpa
         </svg>
       )}
     </button>
-  )
+  );
 }

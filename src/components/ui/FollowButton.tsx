@@ -1,67 +1,73 @@
-"use client"
-import { useState, useEffect } from "react"
-import { useFollowUser } from "@/hooks/useSocial"
-import { useUnfollowUser } from "@/hooks/useSocial"
-import { profileService } from "@/services/profile.service"
-import { useAppDispatch, useAppSelector } from '@/store/hooks'
-import { decrementFollowedCount, incrementFollowedCount } from '@/store/slices/profileSlice'
+"use client";
+import { useState, useEffect } from "react";
+import { useFollowUser } from "@/hooks/useSocial";
+import { useUnfollowUser } from "@/hooks/useSocial";
+import { profileService } from "@/services/profile.service";
+import { useAppDispatch, useAppSelector } from "@/store/hooks";
+import { decrementFollowedCount, incrementFollowedCount } from "@/store/slices/profileSlice";
 
 interface FollowButtonProps {
-    userId?:             string
-    initialIsFollowing?: boolean
-    onUnfollow?:         () => void
-    onFollowChange?:     (isFollowing: boolean) => void
+  userId?: string;
+  initialIsFollowing?: boolean;
+  onUnfollow?: () => void;
+  onFollowChange?: (isFollowing: boolean) => void;
 }
 
-const FollowButton = ({ userId, initialIsFollowing = false, onUnfollow, onFollowChange }: FollowButtonProps) => {
-    const [isFollowing, setIsFollowing] = useState(initialIsFollowing)
-    const { followUser,   loading: followLoading   } = useFollowUser()
-    const { unfollowUser, loading: unfollowLoading } = useUnfollowUser()
-    const isLoading = followLoading || unfollowLoading
-    const dispatch = useAppDispatch()
-    const isOwnProfile = useAppSelector((state) => state.profile.isOwnProfile)
-    
-    useEffect(() => {
-        setIsFollowing(initialIsFollowing)
-    }, [initialIsFollowing])
-    
-    return (
-                <button
-                    onClick={async () => {
-                if (!userId || isLoading) return
-                if (isFollowing) {
-                        const res = await unfollowUser(userId)
-                        if (res) {
-                            profileService.invalidateProfileCache(userId)
-                            setIsFollowing(false)
-                            onFollowChange?.(false)
-                            if (isOwnProfile) {
-                                dispatch(decrementFollowedCount())
-                            }
-                            onUnfollow?.()
-                        }
-                    } else {
-                        const res = await followUser(userId)
-                        if (res) {
-                            profileService.invalidateProfileCache(userId)
-                            setIsFollowing(true)
-                            onFollowChange?.(true)
-                            if (isOwnProfile) {
-                                dispatch(incrementFollowedCount())
-                            }
-                        }
-                    }
-            }}
-            disabled={isLoading}
-        className={`px-3 py-0 text-sm font-bold rounded-md transition mt-2 mb-2 h-8 w-25 cursor-pointer
-            ${isFollowing 
-            ? "bg-off-black text-white-smoke hover:text-silver" 
-            : "bg-white-smoke text-chinese-black hover:text-silver"
-            }`}
-        >
-        {isFollowing ? "Following" : "Follow"}
-        </button>
-    )
-    }
+const FollowButton = ({
+  userId,
+  initialIsFollowing = false,
+  onUnfollow,
+  onFollowChange,
+}: FollowButtonProps) => {
+  const [isFollowing, setIsFollowing] = useState(initialIsFollowing);
+  const { followUser, loading: followLoading } = useFollowUser();
+  const { unfollowUser, loading: unfollowLoading } = useUnfollowUser();
+  const isLoading = followLoading || unfollowLoading;
+  const dispatch = useAppDispatch();
+  const isOwnProfile = useAppSelector((state) => state.profile.isOwnProfile);
 
-export default FollowButton
+  useEffect(() => {
+    setIsFollowing(initialIsFollowing);
+  }, [initialIsFollowing]);
+
+  return (
+    <button
+      onClick={async () => {
+        if (!userId || isLoading) return;
+        if (isFollowing) {
+          const res = await unfollowUser(userId);
+          if (res) {
+            profileService.invalidateProfileCache(userId);
+            setIsFollowing(false);
+            onFollowChange?.(false);
+            if (isOwnProfile) {
+              dispatch(decrementFollowedCount());
+            }
+            onUnfollow?.();
+          }
+        } else {
+          const res = await followUser(userId);
+          if (res) {
+            profileService.invalidateProfileCache(userId);
+            setIsFollowing(true);
+            onFollowChange?.(true);
+            if (isOwnProfile) {
+              dispatch(incrementFollowedCount());
+            }
+          }
+        }
+      }}
+      disabled={isLoading}
+      className={`px-3 py-0 text-sm font-bold rounded-md transition mt-2 mb-2 h-8 w-25 cursor-pointer
+            ${
+              isFollowing
+                ? "bg-off-black text-white-smoke hover:text-silver"
+                : "bg-white-smoke text-chinese-black hover:text-silver"
+            }`}
+    >
+      {isFollowing ? "Following" : "Follow"}
+    </button>
+  );
+};
+
+export default FollowButton;

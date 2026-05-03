@@ -4,12 +4,12 @@ async function until(callback) {
     return [
       null,
       await callback().catch((error) => {
-        throw error
+        throw error;
       }),
-    ]
+    ];
   } catch (error) {
-    return [error, null]
+    return [error, null];
   }
 }
 
-module.exports = { until }
+module.exports = { until };

@@ -1,53 +1,58 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import Button from "@/components/ui/Button"
-import { usePaymentPlans, useManageSubscription } from "@/hooks/usePayment"
-import { useRefreshToken } from "@/hooks/useAuth"
+import { useState, useEffect } from "react";
+import Button from "@/components/ui/Button";
+import { usePaymentPlans, useManageSubscription } from "@/hooks/usePayment";
+import { useRefreshToken } from "@/hooks/useAuth";
 
 interface ChangeSubscriptionModalProps {
-  isOpen: boolean
-  onClose: () => void
-  currentPlan: string // 'pro_monthly' | 'pro_yearly'
-  onSuccess: () => void
+  isOpen: boolean;
+  onClose: () => void;
+  currentPlan: string; // 'pro_monthly' | 'pro_yearly'
+  onSuccess: () => void;
 }
 
-export default function ChangeSubscriptionModal({ isOpen, onClose, currentPlan, onSuccess }: ChangeSubscriptionModalProps) {
-  const [shouldRender, setShouldRender] = useState(false)
-  const [animate, setAnimate] = useState(false)
+export default function ChangeSubscriptionModal({
+  isOpen,
+  onClose,
+  currentPlan,
+  onSuccess,
+}: ChangeSubscriptionModalProps) {
+  const [shouldRender, setShouldRender] = useState(false);
+  const [animate, setAnimate] = useState(false);
 
-  const { plans, loading: plansLoading } = usePaymentPlans()
-  const { updateSubscription, loading, error } = useManageSubscription()
-  const { refreshToken } = useRefreshToken()
+  const { plans, loading: plansLoading } = usePaymentPlans();
+  const { updateSubscription, loading, error } = useManageSubscription();
+  const { refreshToken } = useRefreshToken();
 
-  const isCurrentlyMonthly = currentPlan === 'pro_monthly'
-  const targetPlan = isCurrentlyMonthly ? plans?.pro_yearly : plans?.pro_monthly
-  const targetLabel = isCurrentlyMonthly ? 'Yearly' : 'Monthly'
-  const currentLabel = isCurrentlyMonthly ? 'Monthly' : 'Yearly'
+  const isCurrentlyMonthly = currentPlan === "pro_monthly";
+  const targetPlan = isCurrentlyMonthly ? plans?.pro_yearly : plans?.pro_monthly;
+  const targetLabel = isCurrentlyMonthly ? "Yearly" : "Monthly";
+  const currentLabel = isCurrentlyMonthly ? "Monthly" : "Yearly";
 
   useEffect(() => {
     if (isOpen) {
-      setShouldRender(true)
-      const timer = setTimeout(() => setAnimate(true), 20)
-      return () => clearTimeout(timer)
+      setShouldRender(true);
+      const timer = setTimeout(() => setAnimate(true), 20);
+      return () => clearTimeout(timer);
     } else {
-      setAnimate(false)
-      const timer = setTimeout(() => setShouldRender(false), 300)
-      return () => clearTimeout(timer)
+      setAnimate(false);
+      const timer = setTimeout(() => setShouldRender(false), 300);
+      return () => clearTimeout(timer);
     }
-  }, [isOpen])
+  }, [isOpen]);
 
-  if (!shouldRender) return null
+  if (!shouldRender) return null;
 
   const handleChange = async () => {
-    if (!targetPlan) return
-    const success = await updateSubscription(targetPlan.priceId)
+    if (!targetPlan) return;
+    const success = await updateSubscription(targetPlan.priceId);
     if (success) {
-      await refreshToken()
-      onClose()
-      onSuccess()
+      await refreshToken();
+      onClose();
+      onSuccess();
     }
-  }
+  };
 
   return (
     <div
@@ -74,8 +79,7 @@ export default function ChangeSubscriptionModal({ isOpen, onClose, currentPlan, 
                 <p className="text-sm text-silver mt-1">
                   {isCurrentlyMonthly
                     ? `$${plans?.pro_monthly.amount.toFixed(2)} / month`
-                    : `$${plans?.pro_yearly.amount.toFixed(2)} / year ($${(plans!.pro_yearly.amount / 12).toFixed(2)}/month)`
-                  }
+                    : `$${plans?.pro_yearly.amount.toFixed(2)} / year ($${(plans!.pro_yearly.amount / 12).toFixed(2)}/month)`}
                 </p>
               </div>
 
@@ -89,8 +93,7 @@ export default function ChangeSubscriptionModal({ isOpen, onClose, currentPlan, 
                 <p className="text-sm text-silver mt-1">
                   {isCurrentlyMonthly
                     ? `$${plans?.pro_yearly.amount.toFixed(2)} / year ($${(plans!.pro_yearly.amount / 12).toFixed(2)}/month)`
-                    : `$${plans?.pro_monthly.amount.toFixed(2)} / month`
-                  }
+                    : `$${plans?.pro_monthly.amount.toFixed(2)} / month`}
                 </p>
               </div>
 
@@ -109,7 +112,7 @@ export default function ChangeSubscriptionModal({ isOpen, onClose, currentPlan, 
                   disabled={loading || plansLoading}
                   className="bg-white-smoke text-chinese-black disabled:opacity-40 disabled:cursor-not-allowed"
                 >
-                  {loading ? 'Updating...' : `Switch to ${targetLabel}`}
+                  {loading ? "Updating..." : `Switch to ${targetLabel}`}
                 </Button>
               </div>
             </>
@@ -117,5 +120,5 @@ export default function ChangeSubscriptionModal({ isOpen, onClose, currentPlan, 
         </div>
       </div>
     </div>
-  )
+  );
 }

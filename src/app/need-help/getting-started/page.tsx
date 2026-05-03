@@ -1,14 +1,20 @@
-import Link from "next/link"
-import { ChevronRight } from "lucide-react"
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 
 const ARTICLES = [
-  { title: "Introduction to BeatZa",        href: "/need-help/getting-started/introduction-to-beatza"        },
-  { title: "Creating an account on BeatZa", href: "/need-help/getting-started/creating-an-account"           },
-  { title: "Anatomy of BeatZa",             href: "/need-help/getting-started/anatomy-of-beatza"             },
-  { title: "Email requirements",            href: "/need-help/getting-started/email-requirements"            },
-  { title: "Verify your email",             href: "/need-help/getting-started/verify-your-email"             },
-  { title: "Common Errors During Sign Up",  href: "/need-help/getting-started/common-errors-during-sign-up"  },
-]
+  { title: "Introduction to BeatZa", href: "/need-help/getting-started/introduction-to-beatza" },
+  {
+    title: "Creating an account on BeatZa",
+    href: "/need-help/getting-started/creating-an-account",
+  },
+  { title: "Anatomy of BeatZa", href: "/need-help/getting-started/anatomy-of-beatza" },
+  { title: "Email requirements", href: "/need-help/getting-started/email-requirements" },
+  { title: "Verify your email", href: "/need-help/getting-started/verify-your-email" },
+  {
+    title: "Common Errors During Sign Up",
+    href: "/need-help/getting-started/common-errors-during-sign-up",
+  },
+];
 
 export default function GettingStartedPage() {
   return (
@@ -21,7 +27,10 @@ export default function GettingStartedPage() {
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <ul>
           {ARTICLES.map((article, idx) => (
-            <li key={article.href} className={idx < ARTICLES.length - 1 ? "border-b border-gray-100" : ""}>
+            <li
+              key={article.href}
+              className={idx < ARTICLES.length - 1 ? "border-b border-gray-100" : ""}
+            >
               <Link
                 href={article.href}
                 className="flex items-center justify-between px-6 py-4 text-sm text-gray-800 hover:bg-gray-50 hover:text-black transition-colors"
@@ -34,5 +43,5 @@ export default function GettingStartedPage() {
         </ul>
       </div>
     </div>
-  )
+  );
 }

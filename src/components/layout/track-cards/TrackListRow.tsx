@@ -18,15 +18,8 @@ import ProfilePopover from "@/components/layout/track-cards/ProfilePopover";
 import AddToPlaylistModal from "@/components/playlists/AddToPlaylistModal";
 import SharePopup from "@/components/profile/SharePopUp";
 
-
 import { RootState } from "@/store/store";
-import {
-  play,
-  pause,
-  playAudio,
-  playNext,
-  Track,
-} from "@/store/slices/playerSlice";
+import { play, pause, playAudio, playNext, Track } from "@/store/slices/playerSlice";
 import { useLikeTrackOptimistic } from "@/hooks/useLikes";
 import { useRepostTrack } from "@/hooks/useReposts";
 import { useGetProfile } from "@/hooks/useProfile";
@@ -85,15 +78,13 @@ export default function TrackListRow({
   isRepostedByUser = false,
   allTracks,
   artistFollowCount = 0,
-  artistProfileImg = undefined ,
+  artistProfileImg = undefined,
   artistLocation,
   artistUserId,
   artistIsFollowing = false,
 }: TrackListRowProps) {
   const dispatch = useDispatch();
-  const { currentTrackId, isPlaying } = useSelector(
-    (state: RootState) => state.player,
-  );
+  const { currentTrackId, isPlaying } = useSelector((state: RootState) => state.player);
   const isThisPlaying = currentTrackId === trackId && isPlaying;
 
   const [isLiked, setIsLiked] = useState(isLikedByUser);
@@ -135,7 +126,7 @@ export default function TrackListRow({
           ? allTracks
           : [{ id: trackId, url: trackUrl, title, artist, img, duration }],
         startId: trackId,
-      }),
+      })
     );
     setTimeout(() => dispatch(play()), 0);
   }
@@ -157,7 +148,7 @@ export default function TrackListRow({
     dispatch(
       playNext({
         tracks: { id: trackId, url: trackUrl, title, artist, img, duration },
-      }),
+      })
     );
   }
 
@@ -183,11 +174,7 @@ export default function TrackListRow({
         >
           {/* Image */}
           {img ? (
-            <img
-              src={img}
-              alt={title}
-              className="w-full h-full object-cover"
-            />
+            <img src={img} alt={title} className="w-full h-full object-cover" />
           ) : (
             <div className="w-full h-full bg-linear-to-br from-off-black to-crusta/70" />
           )}
@@ -217,7 +204,6 @@ export default function TrackListRow({
             followersHref={`/profile/${artistId}/followers`}
             userId={artistUserId}
             isFollowing={artistIsFollowing}
-           
           >
             <p
               data-testid="track-list-row-artist"
@@ -297,11 +283,7 @@ export default function TrackListRow({
               items={[
                 {
                   label: <span className={isReposted ? "text-inferno" : ""}>Repost</span>,
-                  icon: (
-                    <LuRepeat2
-                      className={`text-lg ${isReposted ? "text-inferno" : ""}`}
-                    />
-                  ),
+                  icon: <LuRepeat2 className={`text-lg ${isReposted ? "text-inferno" : ""}`} />,
                   onClick: handleRepostClick,
                 },
                 {
@@ -325,9 +307,7 @@ export default function TrackListRow({
                 },
                 {
                   label: "Add to Playlist",
-                  icon: (
-                    <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
-                  ),
+                  icon: <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />,
                   onClick: (e) => {
                     e.stopPropagation();
                     setIsAddToPlaylistOpen(true);
@@ -354,10 +334,12 @@ export default function TrackListRow({
         trackImage={img}
       />
       <SharePopup
-      isOpen={isShareOpen}
-      onClose={() => setIsShareOpen(false)}
-      prefilledMessage={profileLink && permalink ? `${getBaseUrl()}/${profileLink}/${permalink}` : undefined}
-    />
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        prefilledMessage={
+          profileLink && permalink ? `${getBaseUrl()}/${profileLink}/${permalink}` : undefined
+        }
+      />
     </>
   );
 }

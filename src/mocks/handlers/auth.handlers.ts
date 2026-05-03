@@ -7,38 +7,28 @@ export const authHandlers = [
 
     // 400 - missing or invalid email
     if (!body.email || !body.email.includes("@")) {
-      return HttpResponse.json(
-        { message: "Email is required or invalid format" },
-        { status: 400 },
-      );
+      return HttpResponse.json({ message: "Email is required or invalid format" }, { status: 400 });
     }
 
     // 429 - too many requests (simulate by using specific test email)
     if (body.email === "ratelimit@test.com") {
       return HttpResponse.json(
         { message: "Too many requests, please try again later" },
-        { status: 429 },
+        { status: 429 }
       );
     }
 
     // 500 - server error (simulate by using specific test email)
     if (body.email === "error@test.com") {
-      return HttpResponse.json(
-        { message: "Something went wrong on the server" },
-        { status: 500 },
-      );
+      return HttpResponse.json({ message: "Something went wrong on the server" }, { status: 500 });
     }
 
     // 200 - success
-    const existingEmails = [
-      "test@test.com",
-      "omar@beatza.com",
-      "unverified@test.com",
-    ];
+    const existingEmails = ["test@test.com", "omar@beatza.com", "unverified@test.com"];
     const exists = existingEmails.includes(body.email);
     return HttpResponse.json(
       { data: { exists }, message: "Email exists in the system" },
-      { status: 200 },
+      { status: 200 }
     );
   }),
 
@@ -54,7 +44,7 @@ export const authHandlers = [
           message: "Email is required or invalid format",
           data: {},
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -62,7 +52,7 @@ export const authHandlers = [
     if (!body.password || body.password.trim().length === 0) {
       return HttpResponse.json(
         { success: false, message: "Password is required", data: {} },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -74,7 +64,7 @@ export const authHandlers = [
           message: "Too many requests, please try again later",
           data: {},
         },
-        { status: 429 },
+        { status: 429 }
       );
     }
 
@@ -86,7 +76,7 @@ export const authHandlers = [
           message: "Something went wrong on the server",
           data: {},
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -101,7 +91,7 @@ export const authHandlers = [
     if (!storedPassword) {
       return HttpResponse.json(
         { success: false, message: "User not found", data: {} },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -109,7 +99,7 @@ export const authHandlers = [
     if (storedPassword !== body.password) {
       return HttpResponse.json(
         { success: false, message: "Authorization failed", data: {} },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -118,11 +108,10 @@ export const authHandlers = [
       return HttpResponse.json(
         {
           success: false,
-          message:
-            "Email not verified. Please verify your email before logging in.",
+          message: "Email not verified. Please verify your email before logging in.",
           data: {},
         },
-        { status: 403 },
+        { status: 403 }
       );
     }
 
@@ -133,14 +122,14 @@ export const authHandlers = [
         message: "Authenticated successfully",
         data: {
           user: {
-            id:          "mock-user-id-123",
+            id: "mock-user-id-123",
             displayName: "Omar Mahmoud",
-            profileImg:  { imgLink: "https://picsum.photos/200" },
-          }
-        }
+            profileImg: { imgLink: "https://picsum.photos/200" },
+          },
+        },
       },
-      { status: 200 },
-    )
+      { status: 200 }
+    );
   }),
 
   /* (3) */
@@ -161,7 +150,7 @@ export const authHandlers = [
           message: "Email is required or invalid format",
           data: {},
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -169,7 +158,7 @@ export const authHandlers = [
     if (!body.password || body.password.trim().length === 0) {
       return HttpResponse.json(
         { success: false, message: "Password is required", data: {} },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -177,7 +166,7 @@ export const authHandlers = [
     if (!body.displayName || body.displayName.trim().length === 0) {
       return HttpResponse.json(
         { success: false, message: "Display name is required", data: {} },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -189,7 +178,7 @@ export const authHandlers = [
           message: "Date of birth is required or invalid format",
           data: {},
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -197,7 +186,7 @@ export const authHandlers = [
     if (!body.gender) {
       return HttpResponse.json(
         { success: false, message: "Gender is required", data: {} },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -209,7 +198,7 @@ export const authHandlers = [
           message: "Too many requests, please try again later",
           data: {},
         },
-        { status: 429 },
+        { status: 429 }
       );
     }
 
@@ -217,7 +206,7 @@ export const authHandlers = [
     if (body.email === "error@test.com") {
       return HttpResponse.json(
         { success: false, message: "Internal server error", data: {} },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -226,7 +215,7 @@ export const authHandlers = [
     if (existingEmails.includes(body.email)) {
       return HttpResponse.json(
         { success: false, message: "Authorization failed", data: {} },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -238,14 +227,14 @@ export const authHandlers = [
           message: "Property not found or not updated",
           data: {},
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
     // 200 - signup successful
     return HttpResponse.json(
       { success: true, message: "Signup successful", data: null },
-      { status: 200 },
+      { status: 200 }
     );
   }),
 
@@ -263,7 +252,7 @@ export const authHandlers = [
           message: "Email is required or invalid format",
           data: {},
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -275,7 +264,7 @@ export const authHandlers = [
           message: "Too many requests, please try again later",
           data: {},
         },
-        { status: 429 },
+        { status: 429 }
       );
     }
 
@@ -283,7 +272,7 @@ export const authHandlers = [
     if (body.email === "error@test.com") {
       return HttpResponse.json(
         { success: false, message: "Internal server error", data: {} },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
@@ -291,7 +280,7 @@ export const authHandlers = [
     if (body.email === "unauth@test.com") {
       return HttpResponse.json(
         { success: false, message: "Authorization failed", data: {} },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -304,7 +293,7 @@ export const authHandlers = [
           message: "Property not found or not updated",
           data: {},
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -315,7 +304,7 @@ export const authHandlers = [
         message: "Password reset email sent successfully",
         data: null,
       },
-      { status: 200 },
+      { status: 200 }
     );
   }),
 
@@ -341,7 +330,7 @@ export const authHandlers = [
           message: "Token and new password are required",
           data: {},
         },
-        { status: 400 },
+        { status: 400 }
       );
     }
 
@@ -353,7 +342,7 @@ export const authHandlers = [
           message: "Authorization failed",
           data: {},
         },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -365,7 +354,7 @@ export const authHandlers = [
           message: "Property not found or not updated",
           data: {},
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
@@ -377,15 +366,12 @@ export const authHandlers = [
           message: "Internal server error",
           data: {},
         },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
     // 200 - success (to test add a token in your url: {reset-password?token=valid-token})
-    return HttpResponse.json(
-      { message: "Password reset successfully" },
-      { status: 200 },
-    );
+    return HttpResponse.json({ message: "Password reset successfully" }, { status: 200 });
   }),
 
   /* (6) */
@@ -394,10 +380,7 @@ export const authHandlers = [
     // 500 - server error simulation (no request body to trigger it, so use a flag or just leave it)
 
     // 200 - success
-    return HttpResponse.json(
-      { message: "Logged out successfully", data: null },
-      { status: 200 },
-    );
+    return HttpResponse.json({ message: "Logged out successfully", data: null }, { status: 200 });
   }),
 
   /* (7) refresh token - called by AuthGoogle on every page load */
@@ -406,14 +389,14 @@ export const authHandlers = [
       {
         data: {
           user: {
-            id:          "mock-user-id-123",
+            id: "mock-user-id-123",
             displayName: "Omar Mahmoud",
-            profileImg:  { imgLink: "https://picsum.photos/200" },
-          }
-        }
+            profileImg: { imgLink: "https://picsum.photos/200" },
+          },
+        },
       },
       { status: 200 }
-    )
+    );
   }),
 
   /* (10) */
@@ -431,7 +414,7 @@ export const authHandlers = [
     if (!token) {
       return HttpResponse.json(
         { success: false, message: "Authorization failed", data: {} },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -439,7 +422,7 @@ export const authHandlers = [
     if (token === "invalid-token") {
       return HttpResponse.json(
         { success: false, message: "Authorization failed", data: {} },
-        { status: 401 },
+        { status: 401 }
       );
     }
 
@@ -451,79 +434,55 @@ export const authHandlers = [
           message: "Property not found or not updated",
           data: {},
         },
-        { status: 404 },
+        { status: 404 }
       );
     }
 
     // 410 - link expired
     if (token === "expired-token") {
-      return HttpResponse.json(
-        { success: false, message: "Link is expired" },
-        { status: 410 },
-      );
+      return HttpResponse.json({ success: false, message: "Link is expired" }, { status: 410 });
     }
 
     // 500 - server error
     if (token === "error-token") {
       return HttpResponse.json(
         { success: false, message: "Internal server error", data: {} },
-        { status: 500 },
+        { status: 500 }
       );
     }
 
     // 200 - success
-    return HttpResponse.json(
-      { message: "User Verified successfully" },
-      { status: 200 },
-    );
+    return HttpResponse.json({ message: "User Verified successfully" }, { status: 200 });
   }),
 
   /* (11) */
-  http.post(
-    `/api/auth/v1/resend-verification-email`,
-    async ({ request }) => {
-      const body = (await request.json()) as { email: string };
+  http.post(`/api/auth/v1/resend-verification-email`, async ({ request }) => {
+    const body = (await request.json()) as { email: string };
 
-      // 404 - email not found
-      if (!body.email || !body.email.includes("@")) {
-        return HttpResponse.json(
-          { message: "User not found" },
-          { status: 404 },
-        );
-      }
+    // 404 - email not found
+    if (!body.email || !body.email.includes("@")) {
+      return HttpResponse.json({ message: "User not found" }, { status: 404 });
+    }
 
-      // 500 - server error simulation
-      if (body.email === "error@test.com") {
-        return HttpResponse.json(
-          { message: "Internal server error" },
-          { status: 500 },
-        );
-      }
+    // 500 - server error simulation
+    if (body.email === "error@test.com") {
+      return HttpResponse.json({ message: "Internal server error" }, { status: 500 });
+    }
 
-      // 404 - unregistered email
-      const registeredEmails = ["test@test.com", "omar@beatza.com"];
-      if (!registeredEmails.includes(body.email)) {
-        return HttpResponse.json(
-          { message: "User not found" },
-          { status: 404 },
-        );
-      }
+    // 404 - unregistered email
+    const registeredEmails = ["test@test.com", "omar@beatza.com"];
+    if (!registeredEmails.includes(body.email)) {
+      return HttpResponse.json({ message: "User not found" }, { status: 404 });
+    }
 
-      // 200 - success
-      return HttpResponse.json(
-        { message: "Verification email sent successfully" },
-        { status: 200 },
-      );
-    },
-  ),
+    // 200 - success
+    return HttpResponse.json({ message: "Verification email sent successfully" }, { status: 200 });
+  }),
 
   /* (14) */
   http.delete(`/api/auth/v1/delete-account`, async () => {
     // 200 - success
-    return HttpResponse.json(
-      { message: "Account deleted successfully" },
-      { status: 200 },
-    );
+    return HttpResponse.json({ message: "Account deleted successfully" }, { status: 200 });
   }),
 
   /* (15) */
@@ -531,14 +490,14 @@ export const authHandlers = [
     return HttpResponse.json(
       { message: "Password reset email sent successfully" },
       { status: 200 }
-    )
+    );
   }),
 
   http.get("/api/auth/v1/google/callback", ({ request }) => {
-    const url = new URL(request.url)
-    const code = url.searchParams.get("code")
+    const url = new URL(request.url);
+    const code = url.searchParams.get("code");
     if (!code) {
-      return HttpResponse.json({ status: "error" }, { status: 400 })
+      return HttpResponse.json({ status: "error" }, { status: 400 });
     }
     if (code === "incomplete") {
       return HttpResponse.json({
@@ -546,32 +505,32 @@ export const authHandlers = [
         incompleteToken: "pending-token-mock",
         email: "google@test.com",
         displayName: "Google User",
-      })
+      });
     }
-    return HttpResponse.json({ status: "complete" })
+    return HttpResponse.json({ status: "complete" });
   }),
 
   http.post("/api/auth/v1/google/complete", async ({ request }) => {
-    await request.json().catch(() => ({}))
+    await request.json().catch(() => ({}));
     return HttpResponse.json({
       message: "Profile completed",
       data: {},
-    })
+    });
   }),
 
   http.post("/api/auth/v1/google/verify-code", async ({ request }) => {
-    const body = (await request.json().catch(() => ({}))) as { code?: string }
+    const body = (await request.json().catch(() => ({}))) as { code?: string };
     if (body.code === "000000") {
-      return HttpResponse.json({ message: "Invalid code" }, { status: 401 })
+      return HttpResponse.json({ message: "Invalid code" }, { status: 401 });
     }
     return HttpResponse.json({
       message: "Verified",
       data: {},
-    })
+    });
   }),
 
   http.post("/api/auth/v1/google/resend-code", async () =>
-    HttpResponse.json({ message: "Code resent" }),
+    HttpResponse.json({ message: "Code resent" })
   ),
 
   http.get("/api/auth/v1/cross/desktop", () =>
@@ -581,13 +540,13 @@ export const authHandlers = [
         qrCode: "mock-qr-session-token",
         expiresIn: 300,
       },
-    }),
+    })
   ),
 
   http.post("/api/auth/v1/cross/desktop/poll", async ({ request }) => {
-    const body = (await request.json().catch(() => ({}))) as { qrCode?: string }
+    const body = (await request.json().catch(() => ({}))) as { qrCode?: string };
     if (!body.qrCode) {
-      return HttpResponse.json({ success: false, message: "Missing code" }, { status: 400 })
+      return HttpResponse.json({ success: false, message: "Missing code" }, { status: 400 });
     }
     return HttpResponse.json({
       success: true,
@@ -608,6 +567,6 @@ export const authHandlers = [
           },
         },
       },
-    })
+    });
   }),
 ];

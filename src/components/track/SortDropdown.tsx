@@ -1,37 +1,37 @@
-"use client"
-import { useState, useRef, useEffect } from "react"
+"use client";
+import { useState, useRef, useEffect } from "react";
 import { FaChevronUp } from "react-icons/fa";
 import { FaChevronDown } from "react-icons/fa";
 
-export type SortOption = "Newest" | "Oldest" | "Track Time"
+export type SortOption = "Newest" | "Oldest" | "Track Time";
 
 interface SortDropdownProps {
-  value?:    SortOption
-  onChange?: (value: SortOption) => void
+  value?: SortOption;
+  onChange?: (value: SortOption) => void;
 }
 
 export default function SortDropdown({ value, onChange }: SortDropdownProps) {
-  const [selected, setSelected] = useState<SortOption>(value ?? "Newest")
-  const [open, setOpen]         = useState(false)
-  const ref                     = useRef<HTMLDivElement>(null)
+  const [selected, setSelected] = useState<SortOption>(value ?? "Newest");
+  const [open, setOpen] = useState(false);
+  const ref = useRef<HTMLDivElement>(null);
 
-  const options: SortOption[] = ["Newest", "Oldest", "Track Time"]
+  const options: SortOption[] = ["Newest", "Oldest", "Track Time"];
 
   const handleSelect = (option: SortOption) => {
-    setSelected(option)
-    setOpen(false)
-    onChange?.(option)
-  }
+    setSelected(option);
+    setOpen(false);
+    onChange?.(option);
+  };
 
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) {
-        setOpen(false)
+        setOpen(false);
       }
-    }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    };
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   return (
     <div ref={ref} className="relative">
@@ -40,7 +40,7 @@ export default function SortDropdown({ value, onChange }: SortDropdownProps) {
         className="flex items-center gap-2 px-4 py-2 bg-white-smoke/10 text-white-smoke text-sm rounded cursor-pointer hover:bg-white-smoke/15 transition"
       >
         Sorted by: {selected}
-        <span>{open ? <FaChevronUp /> : <FaChevronDown /> }</span>
+        <span>{open ? <FaChevronUp /> : <FaChevronDown />}</span>
       </button>
 
       {open && (
@@ -50,9 +50,10 @@ export default function SortDropdown({ value, onChange }: SortDropdownProps) {
               key={option}
               onClick={() => handleSelect(option)}
               className={`w-full text-left px-4 py-3 text-sm cursor-pointer transition
-                ${selected === option
-                  ? "text-white-smoke font-bold"
-                  : "text-gray-400 hover:text-white-smoke"
+                ${
+                  selected === option
+                    ? "text-white-smoke font-bold"
+                    : "text-gray-400 hover:text-white-smoke"
                 }`}
             >
               {option}
@@ -61,5 +62,5 @@ export default function SortDropdown({ value, onChange }: SortDropdownProps) {
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -54,9 +54,7 @@ export default function Toast() {
                 exit={{ opacity: 0, y: -20, x: 20 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
                 className="flex items-center gap-3 bg-off-black border border-silver/30 rounded-md px-2 py-2 shadow-xl max-w-sm cursor-pointer w-fit"
-                onClick={() =>
-                  setToasts((prev) => prev.filter((t) => t.id !== toast.id))
-                }
+                onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
               >
                 <img
                   src={toast.image}
@@ -65,9 +63,7 @@ export default function Toast() {
                 />
 
                 <div className="flex flex-col leading-tight mr-12">
-                  <p className="text-white text-[13px] font-bold mb-1">
-                    {toast.name}
-                  </p>
+                  <p className="text-white text-[13px] font-bold mb-1">{toast.name}</p>
 
                   <p className="text-silver text-[13px]">
                     was reposted to{" "}
@@ -91,9 +87,7 @@ export default function Toast() {
                 exit={{ opacity: 0, y: -20, x: 20 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
                 className="flex items-center gap-3 bg-off-black border border-silver/30 rounded-md px-2 py-2 shadow-xl max-w-sm cursor-pointer w-fit"
-                onClick={() =>
-                  setToasts((prev) => prev.filter((t) => t.id !== toast.id))
-                }
+                onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
               >
                 <img
                   src={toast.image}
@@ -102,9 +96,7 @@ export default function Toast() {
                 />
 
                 <div className="flex flex-col leading-tight mr-12">
-                  <p className="text-white text-[13px] font-bold mb-1">
-                    {toast.name}
-                  </p>
+                  <p className="text-white text-[13px] font-bold mb-1">{toast.name}</p>
                   <p className="text-silver text-[13px]">
                     was saved to{" "}
                     <a href="#" className="text-white-smoke no-underline">
@@ -127,9 +119,7 @@ export default function Toast() {
                 exit={{ opacity: 0, y: -20, x: 20 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
                 className="flex items-center gap-3 bg-off-black border border-silver/30 rounded-md px-2 py-2 shadow-xl max-w-sm cursor-pointer w-fit"
-                onClick={() =>
-                  setToasts((prev) => prev.filter((t) => t.id !== toast.id))
-                }
+                onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
               >
                 <img
                   src={toast.image}
@@ -138,9 +128,7 @@ export default function Toast() {
                 />
 
                 <div className="flex flex-col leading-tight mr-12">
-                  <p className="text-white text-[13px] font-bold mb-1">
-                    {toast.name}
-                  </p>
+                  <p className="text-white text-[13px] font-bold mb-1">{toast.name}</p>
                   <p className="text-silver text-[13px]">
                     was added to{" "}
                     <a href="#" className="text-white-smoke no-underline">
@@ -163,9 +151,7 @@ export default function Toast() {
                 exit={{ opacity: 0, y: -20, x: 20 }}
                 transition={{ duration: 0.3, ease: "easeInOut" }}
                 className="flex w-fit items-center gap-3 bg-off-black border border-silver/30 rounded-md px-4 py-3 shadow-xl cursor-pointer"
-                onClick={() =>
-                  setToasts((prev) => prev.filter((t) => t.id !== toast.id))
-                }
+                onClick={() => setToasts((prev) => prev.filter((t) => t.id !== toast.id))}
               >
                 <FaCheckCircle className="text-green-500 text-lg shrink-0" />
 

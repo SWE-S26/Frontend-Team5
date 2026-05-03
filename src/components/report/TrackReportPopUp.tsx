@@ -94,12 +94,7 @@ interface TrackReportPopUpProps {
   violatorId: string;
 }
 
-const TrackReportPopUp = ({
-  isOpen,
-  onClose,
-  trackTitle,
-  violatorId,
-}: TrackReportPopUpProps) => {
+const TrackReportPopUp = ({ isOpen, onClose, trackTitle, violatorId }: TrackReportPopUpProps) => {
   const [activeReason, setActiveReason] = useState<TrackReasonKey | null>(null);
 
   const handleClose = () => {
@@ -129,9 +124,7 @@ const TrackReportPopUp = ({
               className="flex flex-col w-160 p-6 bg-chinese-black rounded-md relative"
               onClick={(e) => e.stopPropagation()}
             >
-              <h2 className="text-2xl text-white-smoke font-bold mb-6">
-                Report track for
-              </h2>
+              <h2 className="text-2xl text-white-smoke font-bold mb-6">Report track for</h2>
 
               <div className="flex flex-col gap-2 mb-10 ml-4">
                 {(Object.keys(TRACK_REASONS) as TrackReasonKey[]).map((key) => (
@@ -148,8 +141,8 @@ const TrackReportPopUp = ({
               <div className="flex flex-col gap-3">
                 <p className="text-white-smoke font-bold text-md">Disclaimer</p>
                 <p className="text-white-smoke text-[13px]">
-                  Reported tracks are reviewed by a specialist team who take
-                  action if the content violates our{" "}
+                  Reported tracks are reviewed by a specialist team who take action if the content
+                  violates our{" "}
                   <Link href="/legal" className="text-blue-400 hover:underline">
                     Guidelines
                   </Link>{" "}
@@ -157,8 +150,8 @@ const TrackReportPopUp = ({
                   <Link href="/legal" className="text-blue-400 hover:underline">
                     Terms
                   </Link>
-                  . Repeated violation or serious breaches can result in the
-                  permanent deletion of accounts.
+                  . Repeated violation or serious breaches can result in the permanent deletion of
+                  accounts.
                 </p>
               </div>
             </motion.div>

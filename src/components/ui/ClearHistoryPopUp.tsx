@@ -34,15 +34,12 @@ const ClearHistoryPopUp = ({
             <div className="absolute -top-2 right-3 hidden h-4 w-4 bg-chinese-black rotate-45 sm:block" />
 
             <p className="text-white-smoke text-xs mb-5 leading-snug">
-              Are you sure you want to clear your entire listening history?
-              You won&apos;t be able to undo this action.
+              Are you sure you want to clear your entire listening history? You won&apos;t be able
+              to undo this action.
             </p>
 
             <div className="flex justify-end gap-2">
-              <Button
-                onClick={onClose}
-                className="bg-off-black text-white-smoke text-sm"
-              >
+              <Button onClick={onClose} className="bg-off-black text-white-smoke text-sm">
                 Cancel
               </Button>
               <Button

@@ -1,33 +1,33 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
 // keeping types minimal for now — expand these once the backend contract is confirmed
 interface Message {
-  id: string
-  senderId: string
-  receiverId: string
-  content: string
-  timestamp: string
-  read: boolean
+  id: string;
+  senderId: string;
+  receiverId: string;
+  content: string;
+  timestamp: string;
+  read: boolean;
 }
 
 interface Conversation {
-  id: string
-  participantId: string
-  participantName: string
-  participantImgLink: string | null
-  lastMessage: string | null
-  lastMessageAt: string | null
-  unreadCount: number
+  id: string;
+  participantId: string;
+  participantName: string;
+  participantImgLink: string | null;
+  lastMessage: string | null;
+  lastMessageAt: string | null;
+  unreadCount: number;
 }
 
 interface MessagesState {
-  conversations: Conversation[]
+  conversations: Conversation[];
   // messages are keyed by conversationId so you can cache multiple open conversations
-  messagesByConversation: Record<string, Message[]>
-  activeConversationId: string | null
-  isConnected: boolean    // websocket connection status
-  isLoading: boolean
-  error: string | null
+  messagesByConversation: Record<string, Message[]>;
+  activeConversationId: string | null;
+  isConnected: boolean; // websocket connection status
+  isLoading: boolean;
+  error: string | null;
 }
 
 const initialState: MessagesState = {
@@ -37,46 +37,49 @@ const initialState: MessagesState = {
   isConnected: false,
   isLoading: false,
   error: null,
-}
+};
 
 const messagesSlice = createSlice({
   name: "messages",
   initialState,
   reducers: {
     setConversations: (state, action: PayloadAction<Conversation[]>) => {
-      state.conversations = action.payload
+      state.conversations = action.payload;
     },
 
     // called when a new message arrives via websocket or is sent by the user
     addMessage: (state, action: PayloadAction<{ conversationId: string; message: Message }>) => {
-      const { conversationId, message } = action.payload
+      const { conversationId, message } = action.payload;
       if (!state.messagesByConversation[conversationId]) {
-        state.messagesByConversation[conversationId] = []
+        state.messagesByConversation[conversationId] = [];
       }
-      state.messagesByConversation[conversationId].push(message)
+      state.messagesByConversation[conversationId].push(message);
     },
 
     // called when loading chat history for a conversation
-    setMessages: (state, action: PayloadAction<{ conversationId: string; messages: Message[] }>) => {
-      state.messagesByConversation[action.payload.conversationId] = action.payload.messages
+    setMessages: (
+      state,
+      action: PayloadAction<{ conversationId: string; messages: Message[] }>
+    ) => {
+      state.messagesByConversation[action.payload.conversationId] = action.payload.messages;
     },
 
     setActiveConversation: (state, action: PayloadAction<string | null>) => {
-      state.activeConversationId = action.payload
+      state.activeConversationId = action.payload;
     },
 
     // flips to true when websocket connects, false when it drops
     setConnected: (state, action: PayloadAction<boolean>) => {
-      state.isConnected = action.payload
+      state.isConnected = action.payload;
     },
 
     setMessagesLoading: (state, action: PayloadAction<boolean>) => {
-      state.isLoading = action.payload
+      state.isLoading = action.payload;
     },
 
     clearMessages: () => initialState,
   },
-})
+});
 
 export const {
   setConversations,
@@ -86,6 +89,6 @@ export const {
   setConnected,
   setMessagesLoading,
   clearMessages,
-} = messagesSlice.actions
+} = messagesSlice.actions;
 
-export default messagesSlice.reducer
+export default messagesSlice.reducer;

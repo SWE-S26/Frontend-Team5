@@ -12,13 +12,8 @@ import type {
 
 // ─── Normalize helpers ─────────────────────────────────────────────────────────
 
-function normalizeConversation(
-  raw: ChatConversation,
-  currentUserId: string,
-): Conversation {
-  const receiverParticipant = raw.participants.find(
-    (p) => p._id !== currentUserId,
-  );
+function normalizeConversation(raw: ChatConversation, currentUserId: string): Conversation {
+  const receiverParticipant = raw.participants.find((p) => p._id !== currentUserId);
 
   return {
     chatId: raw.chat,
@@ -61,9 +56,7 @@ export function useConversations() {
     setLoading(true);
     try {
       const res = await messageService.getChats();
-      const normalized = res.data.data.map((raw) =>
-        normalizeConversation(raw, currentUserId),
-      );
+      const normalized = res.data.data.map((raw) => normalizeConversation(raw, currentUserId));
       setConversations(normalized);
     } catch (err) {
       console.error("Failed to fetch conversations:", err);
@@ -76,7 +69,7 @@ export function useConversations() {
   // so the UI clears instantly and wins the race against updateFromSocket
   const markAsRead = useCallback(async (chatId: string) => {
     setConversations((prev) =>
-      prev.map((c) => (c.chatId === chatId ? { ...c, isUnread: false } : c)),
+      prev.map((c) => (c.chatId === chatId ? { ...c, isUnread: false } : c))
     );
     try {
       await messageService.markAsRead(chatId);
@@ -89,7 +82,7 @@ export function useConversations() {
     try {
       await messageService.markAsUnread(chatId);
       setConversations((prev) =>
-        prev.map((c) => (c.chatId === chatId ? { ...c, isUnread: true } : c)),
+        prev.map((c) => (c.chatId === chatId ? { ...c, isUnread: true } : c))
       );
     } catch (err) {
       console.error("Failed to mark as unread:", err);
@@ -119,9 +112,9 @@ export function useConversations() {
                   lastMessageAt: data.lastMessage.createdAt,
                   isUnread: true,
                 }
-              : c,
+              : c
           )
-        : prev,
+        : prev
     );
   }, []);
 
@@ -140,13 +133,13 @@ export function useConversations() {
                   lastMessageAt: normalized.lastMessageAt,
                   isUnread: false,
                 }
-              : c,
+              : c
           );
         }
         return [...prev, { ...normalized, isUnread: false }];
       });
     },
-    [currentUserId],
+    [currentUserId]
   );
 
   useEffect(() => {
@@ -203,7 +196,7 @@ export function useMessages(chatId: string | null) {
         return [...prev, normalizeMessage(raw)];
       });
     },
-    [],
+    []
   );
 
   return { messages, isReceiverBlocked, loading, addMessage };
@@ -222,7 +215,7 @@ export function useSendMessage(
       createdAt: string;
     };
     conversation: ChatConversation;
-  }) => void,
+  }) => void
 ) {
   const [isSending, setIsSending] = useState(false);
 
@@ -230,7 +223,7 @@ export function useSendMessage(
     async (
       receiverId: string,
       content: string,
-      options?: { clientId?: string; chatId?: string },
+      options?: { clientId?: string; chatId?: string }
     ) => {
       if (!content.trim()) return;
       setIsSending(true);
@@ -244,13 +237,13 @@ export function useSendMessage(
           content: last.content,
           seenBy: last.seenBy,
           createdAt: last.createdAt,
-        }
+        };
         messageLocalBus.emit({
           type: "final",
           chatId: res.data.data.chat,
           clientId: options?.clientId,
           message: payload,
-        })
+        });
         onSuccess?.({
           message: {
             _id: payload._id,
@@ -268,7 +261,7 @@ export function useSendMessage(
             type: "rollback",
             chatId: options.chatId,
             clientId: options.clientId,
-          })
+          });
         }
         if (err?.response?.status === 403) {
           messageToastBus.emit({
@@ -282,7 +275,7 @@ export function useSendMessage(
         setIsSending(false);
       }
     },
-    [onSuccess],
+    [onSuccess]
   );
 
   return { send, isSending };

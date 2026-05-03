@@ -6,12 +6,10 @@ import {
 } from "@/types/history.types";
 
 export const historyService = {
-  getTrackHistory: () =>
-    api.get<GetTrackHistoryResponse>("/api/playback/v1/history/tracks"),
+  getTrackHistory: () => api.get<GetTrackHistoryResponse>("/api/playback/v1/history/tracks"),
 
   getPlaylistHistory: () =>
     api.get<GetPlaylistHistoryResponse>("/api/playback/v1/history/playlists"),
 
-  deleteHistory: () =>
-    api.delete<DeleteHistoryResponse>("/api/playback/v1/history/"),
+  deleteHistory: () => api.delete<DeleteHistoryResponse>("/api/playback/v1/history/"),
 };

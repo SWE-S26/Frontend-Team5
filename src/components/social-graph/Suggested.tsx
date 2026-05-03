@@ -4,11 +4,7 @@ import { useEffect, useState } from "react";
 import { useGetSuggestedUsers } from "@/hooks/useSocial";
 import User from "@/components/layout/User";
 
-export default function Suggested({
-  DISPLAY_COUNT = 3,
-}: {
-  DISPLAY_COUNT?: number;
-}) {
+export default function Suggested({ DISPLAY_COUNT = 3 }: { DISPLAY_COUNT?: number }) {
   const { getSuggestedUsers, suggestedUsers, loading } = useGetSuggestedUsers();
   const [offset, setOffset] = useState(0);
 
@@ -21,8 +17,7 @@ export default function Suggested({
     setOffset((prev) => (prev + DISPLAY_COUNT) % suggestedUsers.length);
   };
 
-  if (!loading && suggestedUsers !== null && suggestedUsers.length === 0)
-    return null;
+  if (!loading && suggestedUsers !== null && suggestedUsers.length === 0) return null;
 
   const displayedUsers = suggestedUsers
     ? (() => {
@@ -30,10 +25,7 @@ export default function Suggested({
 
         if (slice.length === DISPLAY_COUNT) return slice;
 
-        return [
-          ...slice,
-          ...suggestedUsers.slice(0, DISPLAY_COUNT - slice.length),
-        ];
+        return [...slice, ...suggestedUsers.slice(0, DISPLAY_COUNT - slice.length)];
       })()
     : [];
 

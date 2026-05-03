@@ -8,14 +8,7 @@ import { useAudioProgress } from "@/hooks/useAudioProgress";
 
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import {
-  prev,
-  next,
-  toggleShuffle,
-  cycleLoop,
-  pause,
-  play,
-} from "@/store/slices/playerSlice";
+import { prev, next, toggleShuffle, cycleLoop, pause, play } from "@/store/slices/playerSlice";
 import { set } from "zod";
 
 type Props = {
@@ -24,9 +17,7 @@ type Props = {
 };
 
 export default function PlayerControls({ isPlaying, togglePlay }: Props) {
-  const { shuffle, loop, tracks, currentTrackId } = useSelector(
-    (state: RootState) => state.player,
-  );
+  const { shuffle, loop, tracks, currentTrackId } = useSelector((state: RootState) => state.player);
   const dispatch = useDispatch();
 
   const { currentTime, seekToPercentage } = useAudioProgress();
@@ -63,10 +54,7 @@ export default function PlayerControls({ isPlaying, togglePlay }: Props) {
     <div className="flex items-center shrink-0">
       <div className="flex gap-2 sm:gap-4 pr-5 mx-3">
         <button onClick={handlePrev}>
-          <IoPlaySkipBackSharp
-            className="hover:text-silver cursor-pointer"
-            size={25}
-          />
+          <IoPlaySkipBackSharp className="hover:text-silver cursor-pointer" size={25} />
         </button>
 
         <button
@@ -81,10 +69,7 @@ export default function PlayerControls({ isPlaying, togglePlay }: Props) {
         </button>
 
         <button onClick={handleNext}>
-          <IoPlaySkipForwardSharp
-            className="hover:text-silver cursor-pointer"
-            size={25}
-          />
+          <IoPlaySkipForwardSharp className="hover:text-silver cursor-pointer" size={25} />
         </button>
       </div>
 
@@ -112,11 +97,7 @@ export default function PlayerControls({ isPlaying, togglePlay }: Props) {
               strokeLinejoin="round"
               d="M17 4h-7a7 7 0 000 14h7a7 7 0 000-14z"
             />
-            <polyline
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              points="14,1 17,4 14,7"
-            />
+            <polyline strokeLinecap="round" strokeLinejoin="round" points="14,1 17,4 14,7" />
           </svg>
           {loop === "one" && (
             <span className="absolute top-0 right-0 w-2.5 h-2.5 rounded-full bg-papaya text-chinese-black text-[6px] flex items-center justify-center leading-none pointer-events-none">

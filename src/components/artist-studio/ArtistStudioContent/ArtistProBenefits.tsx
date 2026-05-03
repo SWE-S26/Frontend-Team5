@@ -39,9 +39,7 @@ function BenefitCard({
       </div>
 
       <div className="p-3 flex flex-col gap-2">
-        <p className="text-[15px] font-bold leading-tight text-white-smoke line-clamp-2">
-          {title}
-        </p>
+        <p className="text-[15px] font-bold leading-tight text-white-smoke line-clamp-2">{title}</p>
         <div className="flex flex-row gap-2">
           <span className="shrink-0 rounded-full bg-green-500 px-3 py-1 text-[11px] font-bold text-chinese-black shadow-md transition-all hover:bg-green-400 hover:scale-105">
             {save}
@@ -59,7 +57,8 @@ export function ArtistProBenefits({ isArtistPro = false }: { isArtistPro?: boole
         <div className="max-w-3xl">
           <h3 className="text-[16px] font-bold text-white-smoke">Artist Pro Membership Benefits</h3>
           <p className="mt-1 text-[13px] text-[#888]">
-            Jump start your music career with Artist Pro and immediately unlock $100+ in premium music tools and services.
+            Jump start your music career with Artist Pro and immediately unlock $100+ in premium
+            music tools and services.
           </p>
           {isArtistPro && (
             <p className="mt-3 inline-flex w-fit rounded-full border border-[#2f6f4f] bg-[#0f2a1e] px-3 py-1 text-[11px] font-semibold text-[#8ad8a8]">
@@ -67,15 +66,38 @@ export function ArtistProBenefits({ isArtistPro = false }: { isArtistPro?: boole
             </p>
           )}
         </div>
-        <button type="button" className="w-full shrink-0 rounded-full border border-white px-5 py-2 text-[13px] font-bold text-white-smoke hover:bg-white hover:text-black transition-colors sm:w-auto">
+        <button
+          type="button"
+          className="w-full shrink-0 rounded-full border border-white px-5 py-2 text-[13px] font-bold text-white-smoke hover:bg-white hover:text-black transition-colors sm:w-auto"
+        >
           See all
         </button>
       </div>
       <div className="grid grid-cols-1 gap-3 sm:grid-cols-2 lg:grid-cols-4">
-        <BenefitCard img="/artists-icons/man-headphones.svg" title="Get 2 free months of Splice Sounds+ royalty-free samples" save="Save $25.98" fallback="/artists-icons/splice.svg" />
-        <BenefitCard img="/artists-icons/send-campaign.svg"  title="Get 20% off all campaigns on Groover.co and free hype add-on" save="Save $21" fallback="/artists-icons/groover.svg" />
-        <BenefitCard img="/artists-icons/dg-set.svg"         title="Get 1 month free of Native Instrument's 360 Pro suite" save="Save $50" fallback="/artists-icons/NI.svg" />
-        <BenefitCard img="/artists-icons/edit-tracks.svg"    title="Get 3 free months of Output's Arcade plug-in and samples" save="Save $39" fallback="/artists-icons/arcade.svg" />
+        <BenefitCard
+          img="/artists-icons/man-headphones.svg"
+          title="Get 2 free months of Splice Sounds+ royalty-free samples"
+          save="Save $25.98"
+          fallback="/artists-icons/splice.svg"
+        />
+        <BenefitCard
+          img="/artists-icons/send-campaign.svg"
+          title="Get 20% off all campaigns on Groover.co and free hype add-on"
+          save="Save $21"
+          fallback="/artists-icons/groover.svg"
+        />
+        <BenefitCard
+          img="/artists-icons/dg-set.svg"
+          title="Get 1 month free of Native Instrument's 360 Pro suite"
+          save="Save $50"
+          fallback="/artists-icons/NI.svg"
+        />
+        <BenefitCard
+          img="/artists-icons/edit-tracks.svg"
+          title="Get 3 free months of Output's Arcade plug-in and samples"
+          save="Save $39"
+          fallback="/artists-icons/arcade.svg"
+        />
       </div>
     </div>
   );

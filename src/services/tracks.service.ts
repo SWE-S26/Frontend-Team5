@@ -1,4 +1,4 @@
-import { incrementPlayCountRequest } from './../types/tracks.types';
+import { incrementPlayCountRequest } from "./../types/tracks.types";
 import api from "@/lib/api";
 import {
   GetPostedTracksResponse,
@@ -8,20 +8,20 @@ import {
 } from "@/types/tracks.types";
 
 import {
-	CreateTrackRequest,
-	CreateTrackResponse,
-	GetTrackByIdResponse,
+  CreateTrackRequest,
+  CreateTrackResponse,
+  GetTrackByIdResponse,
   GetTrackPermalinkResponse,
   GetTrackDetailedResponse,
-	CheckTrackPermalinkResponse,
-	UpdateTrackRequest,
-	UpdateTrackResponse,
-	incrementPlayCountResponse,
-	deleteTrackResponse,
-	GetUploadQuotaResponse,
+  CheckTrackPermalinkResponse,
+  UpdateTrackRequest,
+  UpdateTrackResponse,
+  incrementPlayCountResponse,
+  deleteTrackResponse,
+  GetUploadQuotaResponse,
   GetLikedTracksResponse,
   AddTrackToHistoryResponse,
-  GetRepostedTracksResponse
+  GetRepostedTracksResponse,
 } from "@/types/tracks.types";
 
 const appendTrackMetadata = (
@@ -32,7 +32,7 @@ const appendTrackMetadata = (
     license?: CreateTrackRequest["license"] | UpdateTrackRequest["license"];
     advanced?: CreateTrackRequest["advanced"] | UpdateTrackRequest["advanced"];
     geoBlocking?: CreateTrackRequest["geoBlocking"] | UpdateTrackRequest["geoBlocking"];
-  },
+  }
 ) => {
   formData.append("basicInfo", JSON.stringify(data.basicInfo));
   if (data.permissions) {
@@ -42,11 +42,14 @@ const appendTrackMetadata = (
     formData.append("license", JSON.stringify(data.license));
   }
   if (data.geoBlocking) {
-      formData.append("geoBlocking", JSON.stringify({
+    formData.append(
+      "geoBlocking",
+      JSON.stringify({
         mode: data.geoBlocking.mode,
         regions: data.geoBlocking.regions || [],
         countries: data.geoBlocking.countries || [],
-      }));
+      })
+    );
   }
   if (data.advanced) {
     formData.append("advanced", JSON.stringify(data.advanced));
@@ -63,7 +66,7 @@ const buildQuery = (page?: number, limit?: number) => {
 
 const submitCreateTrack = (
   data: CreateTrackRequest,
-  onUploadProgress?: (progress: number) => void,
+  onUploadProgress?: (progress: number) => void
 ) => {
   const formData = new FormData();
 
@@ -102,10 +105,7 @@ const submitUpdateTrack = (data: UpdateTrackRequest) => {
 };
 
 export const tracksService = {
-  createTrack: (
-    data: CreateTrackRequest,
-    onUploadProgress?: (progress: number) => void,
-  ) => {
+  createTrack: (data: CreateTrackRequest, onUploadProgress?: (progress: number) => void) => {
     return submitCreateTrack(data, onUploadProgress);
   },
   getTracks: (page: number, limit: number) =>
@@ -116,14 +116,14 @@ export const tracksService = {
     api.get<GetPostedTracksResponse>(`/api/tracks/v2/posted/${userId}`),
   getPublicPostedTracks: (userId: string) =>
     api.get<GetPostedTracksResponse>(`/api/public/tracks/v2/posted/${userId}`),
-  getTrackById: (id: string) =>
-    api.get<GetTrackByIdResponse>(`/api/tracks/v2/${id}`),
-  getPublicTrackById: (id: string) =>
-    api.get<GetTrackByIdResponse>(`/api/public/tracks/v2/${id}`),
+  getTrackById: (id: string) => api.get<GetTrackByIdResponse>(`/api/tracks/v2/${id}`),
+  getPublicTrackById: (id: string) => api.get<GetTrackByIdResponse>(`/api/public/tracks/v2/${id}`),
   getTrackByPermalink: (profileLink: string, permalink: string) =>
     api.get<GetTrackPermalinkResponse>(`/api/tracks/v2/permalink/${profileLink}/${permalink}`),
   getPublicTrackByPermalink: (profileLink: string, permalink: string) =>
-    api.get<GetTrackPermalinkResponse>(`/api/public/tracks/v2/permalink/${profileLink}/${permalink}`),
+    api.get<GetTrackPermalinkResponse>(
+      `/api/public/tracks/v2/permalink/${profileLink}/${permalink}`
+    ),
   getTrackDetailed: (id: string) =>
     api.get<GetTrackDetailedResponse>(`/api/tracks/v2/detailed/${id}`),
   getPublicLikedTracks: (userId: string) =>
@@ -143,18 +143,16 @@ export const tracksService = {
   addTrackToHistory: (id: string) =>
     api.post<AddTrackToHistoryResponse>(`/api/tracks/v1/played/${id}`),
 
-	deleteTrack: (id: string) =>
-		api.delete<deleteTrackResponse>(`/api/tracks/v1/${id}`),
-	getUploadQuota: () =>
-		api.get<GetUploadQuotaResponse>("/api/tracks/v1/quota"),
+  deleteTrack: (id: string) => api.delete<deleteTrackResponse>(`/api/tracks/v1/${id}`),
+  getUploadQuota: () => api.get<GetUploadQuotaResponse>("/api/tracks/v1/quota"),
   checkTrackPermalinkValidity: (permalink: string) =>
     api.get<CheckTrackPermalinkResponse>(`/api/tracks/v1/permalink/valid/${permalink}`),
 
   getTrackPlaylists: (trackId: string) =>
-  api.get<GetTrackPlaylistsResponse>(`/api/tracks/v1/playlists/${trackId}`),
-  
+    api.get<GetTrackPlaylistsResponse>(`/api/tracks/v1/playlists/${trackId}`),
+
   getPublicTrackPlaylists: (trackId: string) =>
-  api.get<GetTrackPlaylistsResponse>(`/api/public/tracks/v1/playlists/${trackId}`),
+    api.get<GetTrackPlaylistsResponse>(`/api/public/tracks/v1/playlists/${trackId}`),
 
   getTrackAlbums: (trackId: string) =>
     api.get<GetTrackPlaylistsResponse>(`/api/tracks/v2/albums/${trackId}`),
@@ -163,7 +161,7 @@ export const tracksService = {
     api.get<GetTrackPlaylistsResponse>(`/api/public/tracks/v1/albums/${trackId}`),
 
   getTrackStats: (trackId: string) =>
-  api.get<GetTrackStatsResponse>(`/api/tracks/v2/stats/${trackId}`),
+    api.get<GetTrackStatsResponse>(`/api/tracks/v2/stats/${trackId}`),
 
   getPublicTrackStats: (trackId: string) =>
     api.get<GetTrackStatsResponse>(`/api/public/tracks/v2/stats/${trackId}`),
@@ -171,7 +169,6 @@ export const tracksService = {
   getRepostedTracks: (userId: string, offset = 1, limit = 20) =>
     api.get<GetRepostedTracksResponse>(
       `/api/public/engagement/tracks/v1/users/${userId}/reposted`,
-      { params: { offset, limit } },
+      { params: { offset, limit } }
     ),
-
 };

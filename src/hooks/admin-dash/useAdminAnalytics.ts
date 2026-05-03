@@ -1,5 +1,8 @@
 import { useState, useEffect } from "react";
-import { AdminAnalyticsOverview, AdminAnalyticsStorage } from "@/types/admin-dash/adminAnalytics.types";
+import {
+  AdminAnalyticsOverview,
+  AdminAnalyticsStorage,
+} from "@/types/admin-dash/adminAnalytics.types";
 import { adminAnalyticsService } from "@/services/admin-dash/adminAnalytics.service";
 
 export function useAdminAnalytics() {

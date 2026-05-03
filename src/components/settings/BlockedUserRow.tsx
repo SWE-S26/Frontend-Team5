@@ -1,13 +1,13 @@
-import Image from "next/image"
-import Link from "next/link"
-import { Ban } from "lucide-react"
-import Button from "@/components/ui/Button"
+import Image from "next/image";
+import Link from "next/link";
+import { Ban } from "lucide-react";
+import Button from "@/components/ui/Button";
 
 interface BlockedUserRowProps {
-  userId: string
-  displayName: string
-  profileImgLink: string
-  onUnblock: () => void
+  userId: string;
+  displayName: string;
+  profileImgLink: string;
+  onUnblock: () => void;
 }
 
 export default function BlockedUserRow({
@@ -45,5 +45,5 @@ export default function BlockedUserRow({
         Blocked
       </Button>
     </div>
-  )
+  );
 }

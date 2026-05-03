@@ -1,5 +1,3 @@
-// src/mocks/handlers/admin/adminTracksHandlers.ts
-
 import { http, HttpResponse } from "msw";
 import { AdminTrack, AdminTracksResponse } from "@/types/admin-dash/adminTracks.types";
 
@@ -78,9 +76,7 @@ export const adminTracksHandlers = [
 
     if (query) {
       filtered = filtered.filter(
-        (t) =>
-          t.title.toLowerCase().includes(query) ||
-          t.artistName.toLowerCase().includes(query)
+        (t) => t.title.toLowerCase().includes(query) || t.artistName.toLowerCase().includes(query)
       );
     }
 
@@ -104,10 +100,7 @@ export const adminTracksHandlers = [
     const track = mockTracks.find((t) => t.id === trackId);
 
     if (!track) {
-      return HttpResponse.json(
-        { message: "Property not found or not updated" },
-        { status: 404 }
-      );
+      return HttpResponse.json({ message: "Property not found or not updated" }, { status: 404 });
     }
 
     track.banned = true;
@@ -121,10 +114,7 @@ export const adminTracksHandlers = [
     const track = mockTracks.find((t) => t.id === trackId);
 
     if (!track) {
-      return HttpResponse.json(
-        { message: "Property not found or not updated" },
-        { status: 404 }
-      );
+      return HttpResponse.json({ message: "Property not found or not updated" }, { status: 404 });
     }
 
     track.banned = false;
@@ -138,10 +128,7 @@ export const adminTracksHandlers = [
     const index = mockTracks.findIndex((t) => t.id === trackId);
 
     if (index === -1) {
-      return HttpResponse.json(
-        { message: "Property not found or not updated" },
-        { status: 404 }
-      );
+      return HttpResponse.json({ message: "Property not found or not updated" }, { status: 404 });
     }
 
     mockTracks.splice(index, 1);

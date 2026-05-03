@@ -1,8 +1,8 @@
-import Image from "next/image"
+import Image from "next/image";
 
 interface TabletMockupProps {
-  className?: string
-  screenImage?: string
+  className?: string;
+  screenImage?: string;
 }
 
 export default function TabletMockup({ className = "", screenImage }: TabletMockupProps) {
@@ -10,7 +10,6 @@ export default function TabletMockup({ className = "", screenImage }: TabletMock
     <div className={`relative ${className}`}>
       {/* Outer shell */}
       <div className="relative w-100 h-113.75 rounded-xl border-[3px] border-[#FF5500] bg-white shadow-md">
-
         {/* Camera dot — orange */}
         <div className="absolute top-3 left-1/2 -translate-x-1/2 w-1.5 h-1.5 rounded-full border border-[#FF5500]" />
 
@@ -22,5 +21,5 @@ export default function TabletMockup({ className = "", screenImage }: TabletMock
         </div>
       </div>
     </div>
-  )
+  );
 }

@@ -1,8 +1,8 @@
-"use client"
-import { useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import Button from "@/components/ui/Button"
-import AuthModal from "@/components/auth/AuthModal"
+"use client";
+import { useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import Button from "@/components/ui/Button";
+import AuthModal from "@/components/auth/AuthModal";
 
 const slides = [
   {
@@ -19,7 +19,10 @@ const slides = [
     title: "Ascending Artist",
     heading: ["It all starts with", "an upload."],
     description: "BeatZa is where you define what's next in music. Just hit upload.",
-    buttons: [{ label: "Upload", href: "/upload" }, { label: "Artist Pro", href: "/artist" }],
+    buttons: [
+      { label: "Upload", href: "/upload" },
+      { label: "Artist Pro", href: "/artist" },
+    ],
   },
   {
     image: "/landing-page/hero-banner/placeholder3.jpeg",
@@ -27,31 +30,33 @@ const slides = [
     title: "Ascending Artist",
     heading: ["Where every music", "scene lives."],
     description: "Discover 400 million songs, remixes and DJ sets.",
-    buttons: [{ label: "Upload", href: "/upload" }, { label: "Go+", href: "/go" }],
+    buttons: [
+      { label: "Upload", href: "/upload" },
+      { label: "Go+", href: "/go" },
+    ],
   },
-]
+];
 
 export default function HeroBannerMobile() {
-  const router = useRouter()
-  const [current, setCurrent] = useState(0)
-  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false)
-  const [authRedirect, setAuthRedirect] = useState("/home")
+  const router = useRouter();
+  const [current, setCurrent] = useState(0);
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
+  const [authRedirect, setAuthRedirect] = useState("/home");
 
   const openAuth = (redirectTo: string) => {
-    setAuthRedirect(redirectTo)
-    setIsAuthModalOpen(true)
-  }
+    setAuthRedirect(redirectTo);
+    setIsAuthModalOpen(true);
+  };
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setCurrent((prev) => (prev + 1) % slides.length)
-    }, 5000)
-    return () => clearInterval(timer)
-  }, [])
+      setCurrent((prev) => (prev + 1) % slides.length);
+    }, 5000);
+    return () => clearInterval(timer);
+  }, []);
 
   return (
     <div className="relative w-full overflow-hidden h-135">
-
       {/* Sliding track */}
       <div
         className="absolute inset-0 flex transition-transform duration-500 ease-in-out"
@@ -61,7 +66,11 @@ export default function HeroBannerMobile() {
           <div
             key={i}
             className="relative w-full h-full shrink-0"
-            style={{ backgroundImage: `url(${slide.image})`, backgroundSize: "cover", backgroundPosition: "center" }}
+            style={{
+              backgroundImage: `url(${slide.image})`,
+              backgroundSize: "cover",
+              backgroundPosition: "center",
+            }}
           >
             <div className="absolute inset-0 bg-linear-to-t from-black/80 via-black/20 to-transparent" />
           </div>
@@ -105,16 +114,14 @@ export default function HeroBannerMobile() {
             <Button
               key={j}
               className={`px-4 py-1.5 text-[14px] cursor-pointer ${
-                j === 0
-                  ? "bg-white text-black"
-                  : "text-white border border-white/60"
+                j === 0 ? "bg-white text-black" : "text-white border border-white/60"
               }`}
               onClick={() => {
                 if (btn.label === "Go+") {
-                  router.push("/goplus")
-                  return
+                  router.push("/goplus");
+                  return;
                 }
-                openAuth(btn.label === "Upload" ? "/upload" : "/home")
+                openAuth(btn.label === "Upload" ? "/upload" : "/home");
               }}
             >
               {btn.label}
@@ -140,7 +147,11 @@ export default function HeroBannerMobile() {
         </div>
       </div>
 
-      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} redirectTo={authRedirect} />
+      <AuthModal
+        isOpen={isAuthModalOpen}
+        onClose={() => setIsAuthModalOpen(false)}
+        redirectTo={authRedirect}
+      />
     </div>
-  )
+  );
 }

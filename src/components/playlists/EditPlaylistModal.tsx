@@ -23,12 +23,36 @@ type Props = {
 };
 
 const GENRES = [
-  "None", "Alternative Rock", "Ambient", "Classical", "Country",
-  "Dance & EDM", "Dancehall", "Deep House", "Disco", "Drum & Bass",
-  "Electronic", "Folk & Singer-Songwriter", "Hip-hop & Rap", "House",
-  "Indie", "Jazz & Blues", "Latin", "Metal", "Piano", "Pop",
-  "R&B & Soul", "Reggae", "Reggaeton", "Rock", "Soundtrack",
-  "Techno", "Trance", "Trap", "Triphop", "World",
+  "None",
+  "Alternative Rock",
+  "Ambient",
+  "Classical",
+  "Country",
+  "Dance & EDM",
+  "Dancehall",
+  "Deep House",
+  "Disco",
+  "Drum & Bass",
+  "Electronic",
+  "Folk & Singer-Songwriter",
+  "Hip-hop & Rap",
+  "House",
+  "Indie",
+  "Jazz & Blues",
+  "Latin",
+  "Metal",
+  "Piano",
+  "Pop",
+  "R&B & Soul",
+  "Reggae",
+  "Reggaeton",
+  "Rock",
+  "Soundtrack",
+  "Techno",
+  "Trance",
+  "Trap",
+  "Triphop",
+  "World",
 ];
 
 export default function EditPlaylistModal({
@@ -48,7 +72,9 @@ export default function EditPlaylistModal({
 
   // basic info
   const [title, setTitle] = useState(playlist?.title ?? "");
-  const [permalink, setPermalink] = useState(playlist?.permalink ?? (playlist as any)?.permaLink ?? "");
+  const [permalink, setPermalink] = useState(
+    playlist?.permalink ?? (playlist as any)?.permaLink ?? ""
+  );
   const [isPermalinkDirty, setIsPermalinkDirty] = useState(false);
   const lastPlaylistIdRef = useRef<string | null>(null);
   const wasOpenRef = useRef(false);
@@ -83,7 +109,12 @@ export default function EditPlaylistModal({
     const rawValue = (value ?? "").trim();
     if (!rawValue) return "";
 
-    const normalizedPrefix = (creatorProfileLink || artistId || playlist?.artistId || "creator").trim();
+    const normalizedPrefix = (
+      creatorProfileLink ||
+      artistId ||
+      playlist?.artistId ||
+      "creator"
+    ).trim();
     return rawValue
       .replace(/^https?:\/\/beatza\.me\//i, "")
       .replace(/^beatza\.me\//i, "")
@@ -131,8 +162,8 @@ export default function EditPlaylistModal({
           (playlist as any)?.permaLink ??
           (playlist as any)?.basicInfo?.permalink ??
           "",
-        playlist.artistId,
-      ),
+        playlist.artistId
+      )
     );
     const pt = (playlist as any)?.playlistType ?? "playlist";
     setPlaylistType(pt.charAt(0).toUpperCase() + pt.slice(1));
@@ -148,7 +179,9 @@ export default function EditPlaylistModal({
     setReleaseDateState(rd);
     const parsed = parseIsoDate(rd);
     setSelectedReleaseDate(parsed);
-    setReleaseCalendarMonth(parsed ? new Date(parsed.getFullYear(), parsed.getMonth(), 1) : new Date());
+    setReleaseCalendarMonth(
+      parsed ? new Date(parsed.getFullYear(), parsed.getMonth(), 1) : new Date()
+    );
     setImageFile(null);
     setImagePreview(null);
   }, [playlist]);
@@ -168,10 +201,7 @@ export default function EditPlaylistModal({
       setIsPermalinkDirty(false);
     }
     const nextPermalink =
-      source.permalink ??
-      (source as any)?.permaLink ??
-      (source as any)?.basicInfo?.permalink ??
-      "";
+      source.permalink ?? (source as any)?.permaLink ?? (source as any)?.basicInfo?.permalink ?? "";
     if (nextPermalink && (isOpening || !isPermalinkDirty)) {
       setPermalink(normalizePlaylistPermalink(nextPermalink, source.artistId));
     }
@@ -215,11 +245,15 @@ export default function EditPlaylistModal({
     setSelectedReleaseDate(parsed);
   }, [releaseDateState]);
 
-  const calendarMonthStart = new Date(releaseCalendarMonth.getFullYear(), releaseCalendarMonth.getMonth(), 1);
+  const calendarMonthStart = new Date(
+    releaseCalendarMonth.getFullYear(),
+    releaseCalendarMonth.getMonth(),
+    1
+  );
   const calendarGridStart = new Date(
     calendarMonthStart.getFullYear(),
     calendarMonthStart.getMonth(),
-    1 - calendarMonthStart.getDay(),
+    1 - calendarMonthStart.getDay()
   );
   const calendarDays = Array.from({ length: 42 }, (_, i) => {
     const day = new Date(calendarGridStart);
@@ -276,7 +310,9 @@ export default function EditPlaylistModal({
         <div
           className="fixed inset-0 z-1001 flex items-start justify-center pt-10"
           style={{ background: "rgba(0,0,0,0.55)" }}
-          onClick={(e) => { if (e.target === e.currentTarget) onClose(); }}
+          onClick={(e) => {
+            if (e.target === e.currentTarget) onClose();
+          }}
         >
           <motion.div
             initial={{ opacity: 0, y: -40 }}
@@ -323,7 +359,6 @@ export default function EditPlaylistModal({
 
             {/* Body */}
             <div className="flex-1 overflow-y-auto scrollbar-hide">
-
               {/* BASIC INFO */}
               {activeTab === "basic" && (
                 <div className="flex gap-5 p-6">
@@ -374,7 +409,9 @@ export default function EditPlaylistModal({
                           value={permalink}
                           onChange={(e) => {
                             setIsPermalinkDirty(true);
-                            setPermalink(normalizePlaylistPermalink(e.target.value, playlistArtistId));
+                            setPermalink(
+                              normalizePlaylistPermalink(e.target.value, playlistArtistId)
+                            );
                           }}
                           placeholder="playlist-slug"
                           className="flex-1 bg-transparent py-2 pr-3 text-sm text-white-smoke outline-none min-w-0"
@@ -383,7 +420,7 @@ export default function EditPlaylistModal({
                     </div>
 
                     <div className="flex flex-col gap-3 lg:flex-row">
-                        <div className="flex-1 min-w-0">
+                      <div className="flex-1 min-w-0">
                         <label className="block text-[13px] font-semibold text-white-smoke mb-1">
                           Playlist type
                         </label>
@@ -428,19 +465,39 @@ export default function EditPlaylistModal({
                           {releaseCalendarOpen && (
                             <div className="absolute left-0 top-full z-40 mt-2 w-[min(18rem,calc(100vw-2.5rem))] rounded-md border border-[#2f3035] bg-chinese-black p-3 shadow-xl sm:w-72">
                               <div className="mb-2 flex items-center justify-between">
-                                <button type="button" onClick={() => shiftReleaseCalendarMonth(-1)} className="rounded px-2 py-1 text-white-smoke/80 hover:bg-chinese-black hover:text-white-smoke">{"<"}</button>
+                                <button
+                                  type="button"
+                                  onClick={() => shiftReleaseCalendarMonth(-1)}
+                                  className="rounded px-2 py-1 text-white-smoke/80 hover:bg-chinese-black hover:text-white-smoke"
+                                >
+                                  {"<"}
+                                </button>
                                 <p className="text-[12px] font-semibold text-white-smoke">
-                                  {calendarMonthStart.toLocaleString("en-US", { month: "long", year: "numeric" })}
+                                  {calendarMonthStart.toLocaleString("en-US", {
+                                    month: "long",
+                                    year: "numeric",
+                                  })}
                                 </p>
-                                <button type="button" onClick={() => shiftReleaseCalendarMonth(1)} className="rounded px-2 py-1 text-white-smoke/80 hover:bg-chinese-black hover:text-white-smoke">{">"}</button>
+                                <button
+                                  type="button"
+                                  onClick={() => shiftReleaseCalendarMonth(1)}
+                                  className="rounded px-2 py-1 text-white-smoke/80 hover:bg-chinese-black hover:text-white-smoke"
+                                >
+                                  {">"}
+                                </button>
                               </div>
                               <div className="mb-2 grid grid-cols-7 text-center text-[10px] font-semibold uppercase text-[#8a8a91]">
-                                {["Sun","Mon","Tue","Wed","Thu","Fri","Sat"].map((d) => <span key={d}>{d}</span>)}
+                                {["Sun", "Mon", "Tue", "Wed", "Thu", "Fri", "Sat"].map((d) => (
+                                  <span key={d}>{d}</span>
+                                ))}
                               </div>
                               <div className="grid grid-cols-7 gap-1">
                                 {calendarDays.map((day) => {
-                                  const inCurrentMonth = day.getMonth() === calendarMonthStart.getMonth();
-                                  const isSelected = selectedReleaseDate ? isSameDay(day, selectedReleaseDate) : false;
+                                  const inCurrentMonth =
+                                    day.getMonth() === calendarMonthStart.getMonth();
+                                  const isSelected = selectedReleaseDate
+                                    ? isSameDay(day, selectedReleaseDate)
+                                    : false;
                                   const isToday = isSameDay(day, new Date());
                                   return (
                                     <button
@@ -448,9 +505,13 @@ export default function EditPlaylistModal({
                                       type="button"
                                       onClick={() => handleSelectReleaseDate(day)}
                                       className={`h-8 rounded text-[11px] transition-colors ${
-                                        isSelected ? "bg-[#1db954] text-chinese-black font-bold"
-                                        : inCurrentMonth ? isToday ? "border border-[#1db954] text-white-smoke" : "text-white-smoke hover:bg-chinese-black"
-                                        : "text-[#666] hover:bg-[#222]"
+                                        isSelected
+                                          ? "bg-[#1db954] text-chinese-black font-bold"
+                                          : inCurrentMonth
+                                            ? isToday
+                                              ? "border border-[#1db954] text-white-smoke"
+                                              : "text-white-smoke hover:bg-chinese-black"
+                                            : "text-[#666] hover:bg-[#222]"
                                       }`}
                                     >
                                       {day.getDate()}
@@ -465,21 +526,27 @@ export default function EditPlaylistModal({
                     </div>
 
                     <div>
-                      <label className="block text-[13px] font-semibold text-white-smoke mb-1">Genre</label>
+                      <label className="block text-[13px] font-semibold text-white-smoke mb-1">
+                        Genre
+                      </label>
                       <div className="relative">
                         <select
                           value={genre}
                           onChange={(e) => setGenre(e.target.value)}
                           className="w-full appearance-none bg-chinese-black border border-white-smoke focus:border-white-smoke/30 rounded-sm px-3 py-2 text-sm text-white-smoke outline-none cursor-pointer pr-8"
                         >
-                          {GENRES.map((g) => <option key={g}>{g}</option>)}
+                          {GENRES.map((g) => (
+                            <option key={g}>{g}</option>
+                          ))}
                         </select>
                         <ChevronDown className="pointer-events-none absolute right-2.5 top-1/2 -translate-y-1/2 h-4 w-4 text-white-smoke/50" />
                       </div>
                     </div>
 
                     <div>
-                      <label className="block text-[13px] font-semibold text-white-smoke mb-1">Additional tags</label>
+                      <label className="block text-[13px] font-semibold text-white-smoke mb-1">
+                        Additional tags
+                      </label>
                       <input
                         value={tags}
                         onChange={(e) => setTags(e.target.value)}
@@ -489,7 +556,9 @@ export default function EditPlaylistModal({
                     </div>
 
                     <div>
-                      <label className="block text-[13px] font-semibold text-white-smoke mb-1">Description</label>
+                      <label className="block text-[13px] font-semibold text-white-smoke mb-1">
+                        Description
+                      </label>
                       <textarea
                         value={description}
                         onChange={(e) => setDescription(e.target.value)}
@@ -502,16 +571,30 @@ export default function EditPlaylistModal({
                     <div>
                       <p className="text-[13px] font-semibold text-white-smoke mb-2">Privacy:</p>
                       <label className="flex items-center gap-2 cursor-pointer mb-1">
-                        <input type="radio" name="privacy" checked={privacy === "public"} onChange={() => setPrivacy("public")} className="accent-white-smoke" />
+                        <input
+                          type="radio"
+                          name="privacy"
+                          checked={privacy === "public"}
+                          onChange={() => setPrivacy("public")}
+                          className="accent-white-smoke"
+                        />
                         <span className="text-sm text-white-smoke">Public</span>
                       </label>
                       <label className="flex items-center gap-2 cursor-pointer">
-                        <input type="radio" name="privacy" checked={privacy === "private"} onChange={() => setPrivacy("private")} className="accent-white-smoke" />
+                        <input
+                          type="radio"
+                          name="privacy"
+                          checked={privacy === "private"}
+                          onChange={() => setPrivacy("private")}
+                          className="accent-white-smoke"
+                        />
                         <span className="text-sm text-white-smoke">Private</span>
                       </label>
                       {privacy === "private" && (
                         <p className="text-xs text-white-smoke/50 mt-1 ml-5">
-                          Only you and people you share a <span className="text-white-smoke/80">secret link</span> with will be able to listen to this playlist.
+                          Only you and people you share a{" "}
+                          <span className="text-white-smoke/80">secret link</span> with will be able
+                          to listen to this playlist.
                         </p>
                       )}
                     </div>
@@ -527,17 +610,27 @@ export default function EditPlaylistModal({
                   ) : (
                     <div className="space-y-1">
                       {localTracks.map((track) => (
-                        <div key={track._id} className="flex items-center gap-3 py-2 border-b border-white-smoke/5 group">
-                          <img src={track.image?.imgLink ?? "/test.jpg"} alt="" className="h-9 w-9 rounded-sm object-cover shrink-0" />
-                          <span className="flex-1 text-sm text-white-smoke truncate">{track.basicInfo?.title ?? "Untitled"}</span>
-                          <span className="text-xs text-white-smoke/40 shrink-0">{formatDuration(track.durationInSeconds)}</span>
+                        <div
+                          key={track._id}
+                          className="flex items-center gap-3 py-2 border-b border-white-smoke/5 group"
+                        >
+                          <img
+                            src={track.image?.imgLink ?? "/test.jpg"}
+                            alt=""
+                            className="h-9 w-9 rounded-sm object-cover shrink-0"
+                          />
+                          <span className="flex-1 text-sm text-white-smoke truncate">
+                            {track.basicInfo?.title ?? "Untitled"}
+                          </span>
+                          <span className="text-xs text-white-smoke/40 shrink-0">
+                            {formatDuration(track.durationInSeconds)}
+                          </span>
                           <button
                             type="button"
                             onClick={() => handleRemoveTrack(track._id)}
                             className="text-white-smoke/30 hover:text-red-400 transition-colors ml-2"
                             aria-label="Remove track"
-                          >
-                          </button>
+                          ></button>
                         </div>
                       ))}
                     </div>
@@ -549,23 +642,47 @@ export default function EditPlaylistModal({
               {activeTab === "meta" && (
                 <div className="px-6 py-5 flex flex-col gap-4">
                   <div>
-                    <label className="block text-[13px] font-semibold text-white-smoke mb-1">Buy-link</label>
-                    <input value={buyLink} onChange={(e) => setBuyLink(e.target.value)} className="w-full bg-chinese-black border border-white-smoke focus:border-white-smoke/30 rounded-sm px-3 py-2 text-sm text-white-smoke outline-none" />
+                    <label className="block text-[13px] font-semibold text-white-smoke mb-1">
+                      Buy-link
+                    </label>
+                    <input
+                      value={buyLink}
+                      onChange={(e) => setBuyLink(e.target.value)}
+                      className="w-full bg-chinese-black border border-white-smoke focus:border-white-smoke/30 rounded-sm px-3 py-2 text-sm text-white-smoke outline-none"
+                    />
                   </div>
                   <div>
-                    <label className="block text-[13px] font-semibold text-white-smoke mb-1">Record label</label>
-                    <input value={recordLabel} onChange={(e) => setRecordLabel(e.target.value)} className="w-full bg-chinese-black border border-white-smoke focus:border-white-smoke/30 rounded-sm px-3 py-2 text-sm text-white-smoke outline-none" />
+                    <label className="block text-[13px] font-semibold text-white-smoke mb-1">
+                      Record label
+                    </label>
+                    <input
+                      value={recordLabel}
+                      onChange={(e) => setRecordLabel(e.target.value)}
+                      className="w-full bg-chinese-black border border-white-smoke focus:border-white-smoke/30 rounded-sm px-3 py-2 text-sm text-white-smoke outline-none"
+                    />
                   </div>
                   <div>
                     <label className="block text-[13px] font-semibold text-white-smoke mb-2">
                       License <span className="text-white-smoke/40 font-normal">ℹ</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer mb-2">
-                      <input type="radio" name="license" checked={license === "all-rights"} onChange={() => setLicense("all-rights")} className="accent-white-smoke" />
+                      <input
+                        type="radio"
+                        name="license"
+                        checked={license === "all-rights"}
+                        onChange={() => setLicense("all-rights")}
+                        className="accent-white-smoke"
+                      />
                       <span className="text-sm text-white-smoke">All Rights Reserved</span>
                     </label>
                     <label className="flex items-center gap-2 cursor-pointer">
-                      <input type="radio" name="license" checked={license === "creative-commons"} onChange={() => setLicense("creative-commons")} className="accent-white-smoke" />
+                      <input
+                        type="radio"
+                        name="license"
+                        checked={license === "creative-commons"}
+                        onChange={() => setLicense("creative-commons")}
+                        className="accent-white-smoke"
+                      />
                       <span className="text-sm text-white-smoke">Creative Commons</span>
                     </label>
                   </div>
@@ -579,7 +696,10 @@ export default function EditPlaylistModal({
                 <span className="text-[#f50]">*</span> Required fields
               </p>
               <div className="flex mb-10 gap-3 justify-end">
-                <button onClick={onClose} className="px-5 py-2 text-sm font-semibold text-white-smoke/70 hover:text-white-smoke transition-colors">
+                <button
+                  onClick={onClose}
+                  className="px-5 py-2 text-sm font-semibold text-white-smoke/70 hover:text-white-smoke transition-colors"
+                >
                   Cancel
                 </button>
                 <button

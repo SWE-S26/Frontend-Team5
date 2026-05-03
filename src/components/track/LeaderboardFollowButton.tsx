@@ -12,7 +12,11 @@ interface LeaderboardFollowButtonProps {
   onUnfollow?: () => void;
 }
 
-export default function LeaderboardFollowButton({ userId, initialIsFollowing = false, onUnfollow }: LeaderboardFollowButtonProps) {
+export default function LeaderboardFollowButton({
+  userId,
+  initialIsFollowing = false,
+  onUnfollow,
+}: LeaderboardFollowButtonProps) {
   const { followUser, loading: followLoading } = useFollowUser();
   const { unfollowUser, loading: unfollowLoading } = useUnfollowUser();
   const isLoading = followLoading || unfollowLoading;
@@ -49,18 +53,18 @@ export default function LeaderboardFollowButton({ userId, initialIsFollowing = f
       onClick={handleClick}
       disabled={isFollowing || isLoading}
       className={`w-17 h-17 rounded-xl flex flex-col items-center justify-center gap-2 transition text-gray-400
-        ${isFollowing || isLoading
-          ? "bg-off-black opacity-40 shadow-inner cursor-not-allowed"
-          : "bg-off-black hover:bg-[#262626] active:scale-95 cursor-pointer"
+        ${
+          isFollowing || isLoading
+            ? "bg-off-black opacity-40 shadow-inner cursor-not-allowed"
+            : "bg-off-black hover:bg-[#262626] active:scale-95 cursor-pointer"
         }`}
     >
-      {isFollowing
-        ? <UserCheck size={20} className="text-silver" />
-        : <UserPlus size={20} className="text-silver" />
-      }
-      <span className="text-sm text-silver">
-        {isFollowing ? "Following" : "Follow"}
-      </span>
+      {isFollowing ? (
+        <UserCheck size={20} className="text-silver" />
+      ) : (
+        <UserPlus size={20} className="text-silver" />
+      )}
+      <span className="text-sm text-silver">{isFollowing ? "Following" : "Follow"}</span>
     </button>
   );
 }

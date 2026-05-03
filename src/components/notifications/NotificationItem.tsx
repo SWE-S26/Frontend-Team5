@@ -1,64 +1,64 @@
-"use client"
-import { useState } from "react"
-import Link from "next/link"
-import { FaUser } from "react-icons/fa"
-import { IoIosMore } from "react-icons/io"
-import { formatDistanceToNow } from "date-fns"
-import FollowButton from "@/components/ui/FollowButton"
-import MoreDropdown from "@/components/ui/MoreDropdown"
-import BlockPopUp from "@/components/messages/conversation/BlockPopUp"
-import ReportPopUp from "@/components/report/ReportPopUp"
-import ProfileImage from "@/components/ui/ProfileImage"
-import { DEFAULT_PROFILE_IMAGE_URL } from "@/store/slices/authSlice"
-import { useBlockUser, useUnblockUser } from "@/hooks/useSocial"
-import type { Notification } from "@/types/notification.types"
-import { Ban } from "lucide-react"
+"use client";
+import { useState } from "react";
+import Link from "next/link";
+import { FaUser } from "react-icons/fa";
+import { IoIosMore } from "react-icons/io";
+import { formatDistanceToNow } from "date-fns";
+import FollowButton from "@/components/ui/FollowButton";
+import MoreDropdown from "@/components/ui/MoreDropdown";
+import BlockPopUp from "@/components/messages/conversation/BlockPopUp";
+import ReportPopUp from "@/components/report/ReportPopUp";
+import ProfileImage from "@/components/ui/ProfileImage";
+import { DEFAULT_PROFILE_IMAGE_URL } from "@/store/slices/authSlice";
+import { useBlockUser, useUnblockUser } from "@/hooks/useSocial";
+import type { Notification } from "@/types/notification.types";
+import { Ban } from "lucide-react";
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 
 function getNotificationText(n: Notification): string {
-  const { activityType, target } = n
+  const { activityType, target } = n;
   switch (activityType) {
     case "track_liked":
-      return `liked your track "${(target as any).title}"`
+      return `liked your track "${(target as any).title}"`;
     case "track_reposted":
-      return `reposted your track "${(target as any).title}"`
+      return `reposted your track "${(target as any).title}"`;
     case "new_track":
-      return `uploaded a new track "${(target as any).title}"`
+      return `uploaded a new track "${(target as any).title}"`;
     case "track_commented":
-      return `commented "${(target as any).commentText}" on your track`
+      return `commented "${(target as any).commentText}" on your track`;
     case "user_mentioned":
-      return `mentioned you in a comment "${(target as any).commentText}"`
+      return `mentioned you in a comment "${(target as any).commentText}"`;
     case "user_followed":
-      return "started following you"
+      return "started following you";
     default:
-      return ""
+      return "";
   }
 }
 
 function getTargetHref(n: Notification): string | null {
-  const { activityType, target } = n
+  const { activityType, target } = n;
   switch (activityType) {
     case "track_liked":
     case "track_reposted":
     case "new_track":
-      return `/tracks/${(target as any).targetId}`
+      return `/tracks/${(target as any).targetId}`;
     case "track_commented":
     case "user_mentioned":
-      return `/tracks/${(target as any).trackId}`
+      return `/tracks/${(target as any).trackId}`;
     case "user_followed":
-      return `/profile/${(target as any).targetId}`
+      return `/profile/${(target as any).targetId}`;
     default:
-      return null
+      return null;
   }
 }
 
 // ─── Props ────────────────────────────────────────────────────────────────────
 
 interface NotificationItemProps {
-  notification:    Notification
-  showFollowBack?: boolean
-  showMore?:       boolean
+  notification: Notification;
+  showFollowBack?: boolean;
+  showMore?: boolean;
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -66,20 +66,20 @@ interface NotificationItemProps {
 export default function NotificationItem({
   notification,
   showFollowBack = false,
-  showMore       = false,
+  showMore = false,
 }: NotificationItemProps) {
-  const { actor, activityType, createdAt, read } = notification
-  const text     = getNotificationText(notification)
-  const href     = getTargetHref(notification)
-  const isFollow = activityType === "user_followed"
-  const timeAgo  = formatDistanceToNow(new Date(createdAt), { addSuffix: true })
+  const { actor, activityType, createdAt, read } = notification;
+  const text = getNotificationText(notification);
+  const href = getTargetHref(notification);
+  const isFollow = activityType === "user_followed";
+  const timeAgo = formatDistanceToNow(new Date(createdAt), { addSuffix: true });
 
-  const [isBlocked, setIsBlocked] = useState(notification.isBlockingActor ?? false)
-  const [isBlockOpen,  setIsBlockOpen]  = useState(false)
-  const [isReportOpen, setIsReportOpen] = useState(false)
+  const [isBlocked, setIsBlocked] = useState(notification.isBlockingActor ?? false);
+  const [isBlockOpen, setIsBlockOpen] = useState(false);
+  const [isReportOpen, setIsReportOpen] = useState(false);
 
-  const { blockUser }   = useBlockUser()
-  const { unblockUser } = useUnblockUser()
+  const { blockUser } = useBlockUser();
+  const { unblockUser } = useUnblockUser();
 
   const moreItems = [
     {
@@ -87,26 +87,25 @@ export default function NotificationItem({
       icon: isBlocked ? <Ban className="w-4 h-4" /> : undefined,
       onClick: async () => {
         if (isBlocked) {
-          await unblockUser(actor.userId)
-          setIsBlocked(false)
+          await unblockUser(actor.userId);
+          setIsBlocked(false);
         } else {
-          setIsBlockOpen(true)
+          setIsBlockOpen(true);
         }
       },
     },
     { label: `Report ${actor.displayName}`, onClick: () => setIsReportOpen(true) },
-  ]
+  ];
 
   async function handleBlockConfirm() {
-    await blockUser(actor.userId)
-    setIsBlocked(true)
-    setIsBlockOpen(false)
+    await blockUser(actor.userId);
+    setIsBlocked(true);
+    setIsBlockOpen(false);
   }
 
   return (
     <>
       <div className="flex items-start gap-3 px-4 py-3 hover:bg-off-black/40 transition-colors">
-
         {/* Avatar with unread dot on top-left */}
         <div className="relative shrink-0 mt-0.5">
           <Link href={`/profile/${actor.userId}`}>
@@ -132,8 +131,7 @@ export default function NotificationItem({
           <p className="text-sm leading-snug">
             <Link href={`/profile/${actor.userId}`} className="font-bold text-white-smoke">
               {actor.displayName}
-            </Link>
-            {" "}
+            </Link>{" "}
             {href ? (
               <Link href={href} className="text-silver">
                 {text}
@@ -173,7 +171,6 @@ export default function NotificationItem({
             />
           </div>
         )}
-
       </div>
 
       <BlockPopUp
@@ -190,7 +187,7 @@ export default function NotificationItem({
         violatorType="user"
       />
     </>
-  )
+  );
 }
 
 // ─── Mocks ────────────────────────────────────────────────────────────────────
@@ -203,7 +200,11 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     to: "me",
     read: false,
     activityType: "track_liked",
-    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1" },
+    actor: {
+      userId: "u1",
+      displayName: "lujina shehata",
+      avatarUrl: "https://i.pravatar.cc/48?img=1",
+    },
     target: { targetType: "track", targetId: "t1", title: "test" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
@@ -214,7 +215,11 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     to: "me",
     read: false,
     activityType: "track_commented",
-    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1" },
+    actor: {
+      userId: "u1",
+      displayName: "lujina shehata",
+      avatarUrl: "https://i.pravatar.cc/48?img=1",
+    },
     target: { targetType: "comment", targetId: "c1", trackId: "t1", commentText: "oops" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
@@ -225,7 +230,11 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     to: "me",
     read: true,
     activityType: "user_followed",
-    actor: { userId: "u2", displayName: "Guardian 2004930", avatarUrl: "https://i.pravatar.cc/48?img=5" },
+    actor: {
+      userId: "u2",
+      displayName: "Guardian 2004930",
+      avatarUrl: "https://i.pravatar.cc/48?img=5",
+    },
     target: { targetType: "user", targetId: "me" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
@@ -236,7 +245,11 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     to: "me",
     read: true,
     activityType: "track_reposted",
-    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1" },
+    actor: {
+      userId: "u1",
+      displayName: "lujina shehata",
+      avatarUrl: "https://i.pravatar.cc/48?img=1",
+    },
     target: { targetType: "track", targetId: "t1", title: "test" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
@@ -247,8 +260,12 @@ export const MOCK_NOTIFICATIONS: Notification[] = [
     to: "me",
     read: true,
     activityType: "new_track",
-    actor: { userId: "u1", displayName: "lujina shehata", avatarUrl: "https://i.pravatar.cc/48?img=1" },
+    actor: {
+      userId: "u1",
+      displayName: "lujina shehata",
+      avatarUrl: "https://i.pravatar.cc/48?img=1",
+    },
     target: { targetType: "track", targetId: "t2", title: "New Track dsdsewfaeblhaewfbnolaef" },
     createdAt: new Date(Date.now() - 1000 * 60 * 60).toISOString(),
   },
-]
+];

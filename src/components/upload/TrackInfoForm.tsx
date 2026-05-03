@@ -19,9 +19,7 @@ import {
 import { useCreateTrack } from "@/hooks/useTracks";
 import type { CreateTrackRequest } from "@/types/tracks.types";
 import { MAX_FILE_SIZE_BYTES, formatBytes } from "@/types/upload.types";
-import {
-  Header,
-} from "./TrackInfoForm/Header";
+import { Header } from "./TrackInfoForm/Header";
 import { QuitModal } from "./TrackInfoForm/QuitModal";
 import { ProFeatureModal } from "./TrackInfoForm/ProFeatureModal";
 import { ArtworkPanel } from "./TrackInfoForm/ArtworkPanel";
@@ -40,21 +38,64 @@ import { CiCircleQuestion } from "react-icons/ci";
 export const AUDIO_PREVIEW_SECONDS = 20;
 
 export const SUPPORTED_AUDIO_EXTENSIONS = [
-  ".wav", ".flac", ".aiff", ".aif", ".alac", ".m4a", ".mp3", ".aac", ".ogg", ".opus",
+  ".wav",
+  ".flac",
+  ".aiff",
+  ".aif",
+  ".alac",
+  ".m4a",
+  ".mp3",
+  ".aac",
+  ".ogg",
+  ".opus",
 ];
 
 export const MUSIC_GENRES = [
-  "Alternative Rock", "Ambient", "Classical", "Country", "Dance & EDM",
-  "Dancehall", "Deep House", "Disco", "Drum & Bass", "Dubstep", "Electronic",
-  "Folk & Singer-Songwriter", "Hip-hop & Rap", "House", "Indie", "Jazz & Blues",
-  "Latin", "Metal", "Piano", "Pop", "R&B & Soul", "Reggae", "Reggaeton", "Rock",
-  "Soundtrack", "Speech", "Techno", "Trance", "Trap", "Triphop", "World",
+  "Alternative Rock",
+  "Ambient",
+  "Classical",
+  "Country",
+  "Dance & EDM",
+  "Dancehall",
+  "Deep House",
+  "Disco",
+  "Drum & Bass",
+  "Dubstep",
+  "Electronic",
+  "Folk & Singer-Songwriter",
+  "Hip-hop & Rap",
+  "House",
+  "Indie",
+  "Jazz & Blues",
+  "Latin",
+  "Metal",
+  "Piano",
+  "Pop",
+  "R&B & Soul",
+  "Reggae",
+  "Reggaeton",
+  "Rock",
+  "Soundtrack",
+  "Speech",
+  "Techno",
+  "Trance",
+  "Trap",
+  "Triphop",
+  "World",
 ];
 
 export const AUDIO_GENRES = [
-  "Audiobooks", "Business", "Comedy", "Entertainment", "Learning",
-  "News & Politics", "Religion & Spirituality", "Science", "Sports",
-  "Storytelling", "Technology",
+  "Audiobooks",
+  "Business",
+  "Comedy",
+  "Entertainment",
+  "Learning",
+  "News & Politics",
+  "Religion & Spirituality",
+  "Science",
+  "Sports",
+  "Storytelling",
+  "Technology",
 ];
 
 export const TOOLTIP_TEXT = {
@@ -258,8 +299,7 @@ export function isSameDay(a: Date, b: Date): boolean {
 export function isAudioFile(file: File): boolean {
   const lower = file.name.toLowerCase();
   return (
-    file.type.startsWith("audio/") ||
-    SUPPORTED_AUDIO_EXTENSIONS.some((ext) => lower.endsWith(ext))
+    file.type.startsWith("audio/") || SUPPORTED_AUDIO_EXTENSIONS.some((ext) => lower.endsWith(ext))
   );
 }
 
@@ -288,8 +328,14 @@ export async function createZoomCroppedArtworkFile(
     const maxOffsetWithinSquare = Math.max(0, (shortestSide - cropSize) / 2);
     const centerX = imageWidth / 2 - clampPos(position.x) * maxOffsetWithinSquare;
     const centerY = imageHeight / 2 - clampPos(position.y) * maxOffsetWithinSquare;
-    const sourceX = Math.max(0, Math.min(imageWidth - cropSize, Math.floor(centerX - cropSize / 2)));
-    const sourceY = Math.max(0, Math.min(imageHeight - cropSize, Math.floor(centerY - cropSize / 2)));
+    const sourceX = Math.max(
+      0,
+      Math.min(imageWidth - cropSize, Math.floor(centerX - cropSize / 2))
+    );
+    const sourceY = Math.max(
+      0,
+      Math.min(imageHeight - cropSize, Math.floor(centerY - cropSize / 2))
+    );
 
     const canvas = document.createElement("canvas");
     canvas.width = cropSize;
@@ -302,7 +348,10 @@ export async function createZoomCroppedArtworkFile(
     const blob = await new Promise<Blob>((resolve, reject) => {
       canvas.toBlob(
         (result) => {
-          if (result) { resolve(result); return; }
+          if (result) {
+            resolve(result);
+            return;
+          }
           reject(new Error("Failed to generate cropped artwork."));
         },
         outputType,
@@ -339,13 +388,7 @@ export function PrettyCheckbox({
   );
 }
 
-export function PrettyRadio({
-  checked,
-  onSelect,
-}: {
-  checked: boolean;
-  onSelect: () => void;
-}) {
+export function PrettyRadio({ checked, onSelect }: { checked: boolean; onSelect: () => void }) {
   return (
     <button
       type="button"
@@ -354,7 +397,10 @@ export function PrettyRadio({
       onClick={onSelect}
       className="relative mt-0.5 flex h-4.5 w-4.5 items-center justify-center cursor-pointer"
     >
-      <Circle className={`h-4.5 w-4.5 ${checked ? "text-white-smoke" : "text-[#7a7a7a]"}`} strokeWidth={2.2} />
+      <Circle
+        className={`h-4.5 w-4.5 ${checked ? "text-white-smoke" : "text-[#7a7a7a]"}`}
+        strokeWidth={2.2}
+      />
       {checked && <span className="absolute h-2 w-2 rounded-full bg-white-smoke" />}
     </button>
   );
@@ -478,92 +524,153 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   const router = useRouter();
 
   // Refs
-  const audioRef                     = useRef<HTMLAudioElement | null>(null);
-  const clipAudioRef                 = useRef<HTMLAudioElement | null>(null);
-  const clipTrackRef                 = useRef<HTMLDivElement | null>(null);
-  const clipSelectionRef             = useRef<HTMLDivElement | null>(null);
-  const clipLeftShadeRef             = useRef<HTMLDivElement | null>(null);
-  const clipLeftShadeWaveRef         = useRef<HTMLDivElement | null>(null);
-  const clipRightShadeRef            = useRef<HTMLDivElement | null>(null);
-  const clipActivePointerIdRef       = useRef<number | null>(null);
-  const clipDragOffsetRef            = useRef(0);
-  const clipTrackMetricsRef          = useRef<{ left: number; width: number } | null>(null);
+  const audioRef = useRef<HTMLAudioElement | null>(null);
+  const clipAudioRef = useRef<HTMLAudioElement | null>(null);
+  const clipTrackRef = useRef<HTMLDivElement | null>(null);
+  const clipSelectionRef = useRef<HTMLDivElement | null>(null);
+  const clipLeftShadeRef = useRef<HTMLDivElement | null>(null);
+  const clipLeftShadeWaveRef = useRef<HTMLDivElement | null>(null);
+  const clipRightShadeRef = useRef<HTMLDivElement | null>(null);
+  const clipActivePointerIdRef = useRef<number | null>(null);
+  const clipDragOffsetRef = useRef(0);
+  const clipTrackMetricsRef = useRef<{ left: number; width: number } | null>(null);
   const clipWasPlayingOnDragStartRef = useRef(false);
-  const clipDragRafRef               = useRef<number | null>(null);
-  const clipPendingRangeRef          = useRef<{ start: number; end: number } | null>(null);
-  const clipVisualRangeRef           = useRef<{ start: number; end: number } | null>(null);
-  const replaceFileInputRef          = useRef<HTMLInputElement | null>(null);
-  const artworkInputRef              = useRef<HTMLInputElement | null>(null);
-  const releaseCalendarRef           = useRef<HTMLDivElement | null>(null);
-  const artworkFrameRef              = useRef<HTMLDivElement | null>(null);
-  const artworkPanStartRef           = useRef<{ clientX: number; clientY: number; startX: number; startY: number } | null>(null);
-  const privacyMenuRef               = useRef<HTMLDivElement | null>(null);
-  const genreMenuRef                 = useRef<HTMLDivElement | null>(null);
+  const clipDragRafRef = useRef<number | null>(null);
+  const clipPendingRangeRef = useRef<{ start: number; end: number } | null>(null);
+  const clipVisualRangeRef = useRef<{ start: number; end: number } | null>(null);
+  const replaceFileInputRef = useRef<HTMLInputElement | null>(null);
+  const artworkInputRef = useRef<HTMLInputElement | null>(null);
+  const releaseCalendarRef = useRef<HTMLDivElement | null>(null);
+  const artworkFrameRef = useRef<HTMLDivElement | null>(null);
+  const artworkPanStartRef = useRef<{
+    clientX: number;
+    clientY: number;
+    startX: number;
+    startY: number;
+  } | null>(null);
+  const privacyMenuRef = useRef<HTMLDivElement | null>(null);
+  const genreMenuRef = useRef<HTMLDivElement | null>(null);
 
   // State
-  const [isPlaying, setIsPlaying]                       = useState(false);
-  const [isSubmitting, setIsSubmitting]                 = useState(false);
-  const [submitted, setSubmitted]                       = useState(false);
-  const [showQuitModal, setShowQuitModal]               = useState(false);
-  const [showProFeatureModal, setShowProFeatureModal]   = useState(false);
-  const [submitError, setSubmitError]                   = useState<string | null>(null);
-  const [artworkUrl, setArtworkUrl]                     = useState<string | null>(null);
-  const [artworkFile, setArtworkFile]                   = useState<File | null>(null);
-  const [artworkZoom, setArtworkZoom]                   = useState(1);
-  const [artworkPosition, setArtworkPosition]           = useState({ x: 0, y: 0 });
-  const [isPanningArtwork, setIsPanningArtwork]         = useState(false);
-  const [privacyMenuOpen, setPrivacyMenuOpen]           = useState(false);
-  const [visibilityOption, setVisibilityOption]         = useState<"public" | "private" | "followerExclusive">("public");
-  const [genreMenuOpen, setGenreMenuOpen]               = useState(false);
-  const [genreSearch, setGenreSearch]                   = useState("");
-  const [releaseCalendarOpen, setReleaseCalendarOpen]   = useState(false);
+  const [isPlaying, setIsPlaying] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [submitted, setSubmitted] = useState(false);
+  const [showQuitModal, setShowQuitModal] = useState(false);
+  const [showProFeatureModal, setShowProFeatureModal] = useState(false);
+  const [submitError, setSubmitError] = useState<string | null>(null);
+  const [artworkUrl, setArtworkUrl] = useState<string | null>(null);
+  const [artworkFile, setArtworkFile] = useState<File | null>(null);
+  const [artworkZoom, setArtworkZoom] = useState(1);
+  const [artworkPosition, setArtworkPosition] = useState({ x: 0, y: 0 });
+  const [isPanningArtwork, setIsPanningArtwork] = useState(false);
+  const [privacyMenuOpen, setPrivacyMenuOpen] = useState(false);
+  const [visibilityOption, setVisibilityOption] = useState<
+    "public" | "private" | "followerExclusive"
+  >("public");
+  const [genreMenuOpen, setGenreMenuOpen] = useState(false);
+  const [genreSearch, setGenreSearch] = useState("");
+  const [releaseCalendarOpen, setReleaseCalendarOpen] = useState(false);
   const [releaseCalendarMonth, setReleaseCalendarMonth] = useState(() => new Date());
-  const [audioClipStartInput, setAudioClipStartInput]   = useState("0");
-  const [audioClipEndInput, setAudioClipEndInput]       = useState("20");
-  const [audioClipStartDraft, setAudioClipStartDraft]   = useState("0:00");
-  const [audioClipEndDraft, setAudioClipEndDraft]       = useState("0:20");
+  const [audioClipStartInput, setAudioClipStartInput] = useState("0");
+  const [audioClipEndInput, setAudioClipEndInput] = useState("20");
+  const [audioClipStartDraft, setAudioClipStartDraft] = useState("0:00");
+  const [audioClipEndDraft, setAudioClipEndDraft] = useState("0:20");
   const [audioDurationSeconds, setAudioDurationSeconds] = useState(0);
-  const [isClipPlaying, setIsClipPlaying]               = useState(false);
-  const [clipPlaybackSeconds, setClipPlaybackSeconds]   = useState(0);
-  const [isDraggingClip, setIsDraggingClip]             = useState(false);
-  const [clipDragDisplayRange, setClipDragDisplayRange] = useState<{ start: number; end: number } | null>(null);
-  const [isArtworkDragActive, setIsArtworkDragActive]   = useState(false);
-  const [isTrackDragActive, setIsTrackDragActive]       = useState(false);
-  const [geoblockingRegions, setGeoblockingRegions]     = useState<string[]>([]);
+  const [isClipPlaying, setIsClipPlaying] = useState(false);
+  const [clipPlaybackSeconds, setClipPlaybackSeconds] = useState(0);
+  const [isDraggingClip, setIsDraggingClip] = useState(false);
+  const [clipDragDisplayRange, setClipDragDisplayRange] = useState<{
+    start: number;
+    end: number;
+  } | null>(null);
+  const [isArtworkDragActive, setIsArtworkDragActive] = useState(false);
+  const [isTrackDragActive, setIsTrackDragActive] = useState(false);
+  const [geoblockingRegions, setGeoblockingRegions] = useState<string[]>([]);
 
   // API
   const { createTrack, error: createTrackError } = useCreateTrack();
 
   // Props
   const {
-    isUploading, uploadProgress, currentFileName, currentFile, uploadedFileUrl,
-    trackTitle, setTrackTitle, permalink, setPermalink, artistName, setArtistName, genre, setGenre,
-    tags, setTags, description, setDescription, isPublic, setIsPublic,
-    scheduleRelease, setScheduleRelease, expandedSections, toggleSection,
-    buyLink, setBuyLink, recordLabel, setRecordLabel, releaseDate, setReleaseDate,
-    publisher, setPublisher, isrc, setIsrc, explicitContent, setExplicitContent,
-    pline, setPline, enableDownloads, setEnableDownloads, offlineListening, setOfflineListening,
-    includeRssFeed, setIncludeRssFeed, displayEmbedCode, setDisplayEmbedCode,
-    enableAppPlayback, setEnableAppPlayback, allowComments, setAllowComments,
-    showTrackComments, setShowTrackComments, showTrackInsights, setShowTrackInsights,
-    geoblockingOption, setGeoblockingOption, licenseType, setLicenseType,
-    isArtistPro = false, onReplaceTrackFile,
+    isUploading,
+    uploadProgress,
+    currentFileName,
+    currentFile,
+    uploadedFileUrl,
+    trackTitle,
+    setTrackTitle,
+    permalink,
+    setPermalink,
+    artistName,
+    setArtistName,
+    genre,
+    setGenre,
+    tags,
+    setTags,
+    description,
+    setDescription,
+    isPublic,
+    setIsPublic,
+    scheduleRelease,
+    setScheduleRelease,
+    expandedSections,
+    toggleSection,
+    buyLink,
+    setBuyLink,
+    recordLabel,
+    setRecordLabel,
+    releaseDate,
+    setReleaseDate,
+    publisher,
+    setPublisher,
+    isrc,
+    setIsrc,
+    explicitContent,
+    setExplicitContent,
+    pline,
+    setPline,
+    enableDownloads,
+    setEnableDownloads,
+    offlineListening,
+    setOfflineListening,
+    includeRssFeed,
+    setIncludeRssFeed,
+    displayEmbedCode,
+    setDisplayEmbedCode,
+    enableAppPlayback,
+    setEnableAppPlayback,
+    allowComments,
+    setAllowComments,
+    showTrackComments,
+    setShowTrackComments,
+    showTrackInsights,
+    setShowTrackInsights,
+    geoblockingOption,
+    setGeoblockingOption,
+    licenseType,
+    setLicenseType,
+    isArtistPro = false,
+    onReplaceTrackFile,
   } = props;
 
   // Derived Value
-  const roundedUploadProgress  = Math.round(uploadProgress);
-  const showUploadProgress     = isUploading;
+  const roundedUploadProgress = Math.round(uploadProgress);
+  const showUploadProgress = isUploading;
   const hasTrackForReplacement = Boolean(currentFile || uploadedFileUrl);
-  const hasFinishedUpload      = !isUploading && uploadProgress >= 99.5;
-  const showReplaceTrack       = hasTrackForReplacement && hasFinishedUpload;
+  const hasFinishedUpload = !isUploading && uploadProgress >= 99.5;
+  const showReplaceTrack = hasTrackForReplacement && hasFinishedUpload;
 
-  const permaLinkRegex        = /^[a-z0-9_-]+$/;
-  const isrcRegex             = /^[A-Z]{2}[A-Z0-9]{3}\d{7}$/;
+  const permaLinkRegex = /^[a-z0-9_-]+$/;
+  const isrcRegex = /^[A-Z]{2}[A-Z0-9]{3}\d{7}$/;
 
   // Genre filtering
-  const normalizedGenreSearch    = genreSearch.trim().toLowerCase();
-  const filteredMusicGenres      = MUSIC_GENRES.filter((item) => item.toLowerCase().includes(normalizedGenreSearch));
-  const filteredAudioGenres      = AUDIO_GENRES.filter((item) => item.toLowerCase().includes(normalizedGenreSearch));
+  const normalizedGenreSearch = genreSearch.trim().toLowerCase();
+  const filteredMusicGenres = MUSIC_GENRES.filter((item) =>
+    item.toLowerCase().includes(normalizedGenreSearch)
+  );
+  const filteredAudioGenres = AUDIO_GENRES.filter((item) =>
+    item.toLowerCase().includes(normalizedGenreSearch)
+  );
   const shouldShowAddCustomGenre =
     normalizedGenreSearch.length > 0 &&
     filteredMusicGenres.length === 0 &&
@@ -571,8 +678,12 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
 
   // Calendar
   const selectedReleaseDate = parseIsoDate(releaseDate);
-  const calendarMonthStart  = new Date(releaseCalendarMonth.getFullYear(), releaseCalendarMonth.getMonth(), 1);
-  const calendarGridStart   = new Date(
+  const calendarMonthStart = new Date(
+    releaseCalendarMonth.getFullYear(),
+    releaseCalendarMonth.getMonth(),
+    1
+  );
+  const calendarGridStart = new Date(
     calendarMonthStart.getFullYear(),
     calendarMonthStart.getMonth(),
     1 - calendarMonthStart.getDay()
@@ -584,29 +695,46 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   });
 
   // Audio clip geometry
-  const canSetAudioPreview         = audioDurationSeconds > AUDIO_PREVIEW_SECONDS;
-  const timelineMax                = audioDurationSeconds > 0 ? audioDurationSeconds : AUDIO_PREVIEW_SECONDS;
-  const selectionDuration          = canSetAudioPreview
+  const canSetAudioPreview = audioDurationSeconds > AUDIO_PREVIEW_SECONDS;
+  const timelineMax = audioDurationSeconds > 0 ? audioDurationSeconds : AUDIO_PREVIEW_SECONDS;
+  const selectionDuration = canSetAudioPreview
     ? AUDIO_PREVIEW_SECONDS
     : Math.max(1, Math.min(AUDIO_PREVIEW_SECONDS, timelineMax));
-  const rawClipStart               = Number.isFinite(Number(audioClipStartInput)) ? Math.max(0, Number(audioClipStartInput)) : 0;
-  const safeClipStart              = canSetAudioPreview ? clamp(rawClipStart, 0, Math.max(0, timelineMax - selectionDuration)) : 0;
-  const safeClipEnd                = canSetAudioPreview ? safeClipStart + selectionDuration : selectionDuration;
-  const clipDuration               = Math.max(1, safeClipEnd - safeClipStart);
-  const clipLeftPercent            = Math.min(100, (safeClipStart / timelineMax) * 100);
-  const clipWidthPercent           = Math.max(5, Math.min(100 - clipLeftPercent, (clipDuration / timelineMax) * 100));
-  const rightShadePercent          = Math.max(0, 100 - (clipLeftPercent + clipWidthPercent));
-  const clipPlaybackOverlayPercent = clamp(((clipPlaybackSeconds - safeClipStart) / clipDuration) * 100, 0, 100);
-  const liveClipStart              = isDraggingClip ? (clipDragDisplayRange?.start ?? safeClipStart) : safeClipStart;
-  const isClipWindowAtZeroStart    = liveClipStart < 0.5;
-  const showClipResetButton        = liveClipStart > 0.001;
+  const rawClipStart = Number.isFinite(Number(audioClipStartInput))
+    ? Math.max(0, Number(audioClipStartInput))
+    : 0;
+  const safeClipStart = canSetAudioPreview
+    ? clamp(rawClipStart, 0, Math.max(0, timelineMax - selectionDuration))
+    : 0;
+  const safeClipEnd = canSetAudioPreview ? safeClipStart + selectionDuration : selectionDuration;
+  const clipDuration = Math.max(1, safeClipEnd - safeClipStart);
+  const clipLeftPercent = Math.min(100, (safeClipStart / timelineMax) * 100);
+  const clipWidthPercent = Math.max(
+    5,
+    Math.min(100 - clipLeftPercent, (clipDuration / timelineMax) * 100)
+  );
+  const rightShadePercent = Math.max(0, 100 - (clipLeftPercent + clipWidthPercent));
+  const clipPlaybackOverlayPercent = clamp(
+    ((clipPlaybackSeconds - safeClipStart) / clipDuration) * 100,
+    0,
+    100
+  );
+  const liveClipStart = isDraggingClip
+    ? (clipDragDisplayRange?.start ?? safeClipStart)
+    : safeClipStart;
+  const isClipWindowAtZeroStart = liveClipStart < 0.5;
+  const showClipResetButton = liveClipStart > 0.001;
 
   // Waveform Memos
   const waveformDisplaySamples = useMemo(
-    () => Array.from({ length: 220 }, (_, idx) => 48 + Math.sin(idx / 7) * 12 + Math.cos(idx / 15) * 7),
-    [],
+    () =>
+      Array.from({ length: 220 }, (_, idx) => 48 + Math.sin(idx / 7) * 12 + Math.cos(idx / 15) * 7),
+    []
   );
-  const waveformMax = useMemo(() => Math.max(...waveformDisplaySamples, 1), [waveformDisplaySamples]);
+  const waveformMax = useMemo(
+    () => Math.max(...waveformDisplaySamples, 1),
+    [waveformDisplaySamples]
+  );
   const baseWaveformBars = useMemo(
     () =>
       waveformDisplaySamples.map((sample, idx) => {
@@ -615,11 +743,14 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
           <span
             key={`wave-${idx}`}
             className="block flex-1 rounded-[1px]"
-            style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-base)" }}
+            style={{
+              height: `${Math.round(14 + normalized * 72)}px`,
+              backgroundColor: "var(--waveform-base)",
+            }}
           />
         );
       }),
-    [waveformDisplaySamples, waveformMax],
+    [waveformDisplaySamples, waveformMax]
   );
   const leftMaskedWaveformBars = useMemo(
     () =>
@@ -629,11 +760,14 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
           <span
             key={`wave-left-mask-${idx}`}
             className="block flex-1 rounded-[1px]"
-            style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-left-wave)" }}
+            style={{
+              height: `${Math.round(14 + normalized * 72)}px`,
+              backgroundColor: "var(--waveform-left-wave)",
+            }}
           />
         );
       }),
-    [waveformDisplaySamples, waveformMax],
+    [waveformDisplaySamples, waveformMax]
   );
 
   // Handlers: Track File
@@ -671,7 +805,10 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   const applyArtworkFile = (file: File) => {
     setArtworkFile(file);
     const url = URL.createObjectURL(file);
-    setArtworkUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return url; });
+    setArtworkUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return url;
+    });
     setArtworkZoom(1);
     setArtworkPosition({ x: 0, y: 0 });
   };
@@ -698,7 +835,10 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
 
   const handleDeleteArtwork = () => {
     setArtworkFile(null);
-    setArtworkUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
+    setArtworkUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
     setArtworkZoom(1);
     setArtworkPosition({ x: 0, y: 0 });
     setIsPanningArtwork(false);
@@ -733,8 +873,8 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     const width = Math.max(1, frame.clientWidth);
     const height = Math.max(1, frame.clientHeight);
     setArtworkPosition({
-      x: clampArtworkPosition(artworkPanStartRef.current.startX + (dx / width)),
-      y: clampArtworkPosition(artworkPanStartRef.current.startY + (dy / height)),
+      x: clampArtworkPosition(artworkPanStartRef.current.startX + dx / width),
+      y: clampArtworkPosition(artworkPanStartRef.current.startY + dy / height),
     });
   };
 
@@ -750,8 +890,13 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
   // Handlers: Audio Playback
   const togglePlayPause = () => {
     if (!audioRef.current) return;
-    if (isPlaying) { audioRef.current.pause(); setIsPlaying(false); }
-    else           { audioRef.current.play();  setIsPlaying(true);  }
+    if (isPlaying) {
+      audioRef.current.pause();
+      setIsPlaying(false);
+    } else {
+      audioRef.current.play();
+      setIsPlaying(true);
+    }
   };
 
   // Handlers: Genre
@@ -788,7 +933,10 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
 
   const updateClipTrackMetrics = () => {
     const rect = clipTrackRef.current?.getBoundingClientRect();
-    if (!rect || rect.width <= 0) { clipTrackMetricsRef.current = null; return null; }
+    if (!rect || rect.width <= 0) {
+      clipTrackMetricsRef.current = null;
+      return null;
+    }
     const metrics = { left: rect.left, width: rect.width };
     clipTrackMetricsRef.current = metrics;
     return metrics;
@@ -796,24 +944,26 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
 
   const applyClipVisualRange = (start: number, end: number) => {
     const duration = Math.max(0.001, end - start);
-    const metrics  = clipTrackMetricsRef.current;
-    const leftPercent  = Math.min(100, (start / timelineMax) * 100);
+    const metrics = clipTrackMetricsRef.current;
+    const leftPercent = Math.min(100, (start / timelineMax) * 100);
     const widthPercent = Math.max(5, Math.min(100 - leftPercent, (duration / timelineMax) * 100));
 
     if (clipSelectionRef.current) {
       if (metrics && metrics.width > 0) {
-        clipSelectionRef.current.style.left      = "0px";
-        clipSelectionRef.current.style.width     = `${(widthPercent / 100) * metrics.width}px`;
+        clipSelectionRef.current.style.left = "0px";
+        clipSelectionRef.current.style.width = `${(widthPercent / 100) * metrics.width}px`;
         clipSelectionRef.current.style.transform = `translate3d(${(leftPercent / 100) * metrics.width}px, 0, 0)`;
       } else {
         clipSelectionRef.current.style.transform = "translate3d(0px, 0, 0)";
-        clipSelectionRef.current.style.left      = `${leftPercent}%`;
-        clipSelectionRef.current.style.width     = `${widthPercent}%`;
+        clipSelectionRef.current.style.left = `${leftPercent}%`;
+        clipSelectionRef.current.style.width = `${widthPercent}%`;
       }
     }
     if (clipLeftShadeRef.current) {
       clipLeftShadeRef.current.style.width =
-        metrics && metrics.width > 0 ? `${(leftPercent / 100) * metrics.width}px` : `${leftPercent}%`;
+        metrics && metrics.width > 0
+          ? `${(leftPercent / 100) * metrics.width}px`
+          : `${leftPercent}%`;
     }
     if (clipLeftShadeWaveRef.current) {
       clipLeftShadeWaveRef.current.style.width =
@@ -821,9 +971,13 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     }
   };
 
-  const setDraggedClipRange = (nextStart: number, nextEnd: number, options?: { syncDraft?: boolean }) => {
+  const setDraggedClipRange = (
+    nextStart: number,
+    nextEnd: number,
+    options?: { syncDraft?: boolean }
+  ) => {
     const preciseStart = Number(nextStart.toFixed(3));
-    const preciseEnd   = Number(nextEnd.toFixed(3));
+    const preciseEnd = Number(nextEnd.toFixed(3));
     setAudioClipStartInput(String(preciseStart));
     setAudioClipEndInput(String(preciseEnd));
     if (options?.syncDraft !== false) {
@@ -837,15 +991,19 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     if (!clipAudio || !uploadedFileUrl || !canSetAudioPreview) return;
     clipAudio.currentTime = startSeconds;
     setClipPlaybackSeconds(startSeconds);
-    try { await clipAudio.play(); setIsClipPlaying(true); }
-    catch { setIsClipPlaying(false); }
+    try {
+      await clipAudio.play();
+      setIsClipPlaying(true);
+    } catch {
+      setIsClipPlaying(false);
+    }
   };
 
   const handleClipReset = () => {
     const clipAudio = clipAudioRef.current;
     if (!clipAudio || !canSetAudioPreview) return;
     const resetStart = 0;
-    const resetEnd   = Math.min(AUDIO_PREVIEW_SECONDS, timelineMax);
+    const resetEnd = Math.min(AUDIO_PREVIEW_SECONDS, timelineMax);
     setDraggedClipRange(resetStart, resetEnd);
     clipAudio.pause();
     clipAudio.currentTime = resetStart;
@@ -855,18 +1013,24 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
 
   const applyTypedClipTime = async (target: "start" | "end") => {
     if (!canSetAudioPreview) return;
-    const parsed = parseTimeInputToSeconds(target === "start" ? audioClipStartDraft : audioClipEndDraft);
+    const parsed = parseTimeInputToSeconds(
+      target === "start" ? audioClipStartDraft : audioClipEndDraft
+    );
     if (parsed === null) {
       setAudioClipStartDraft(formatTimeLabel(safeClipStart));
       setAudioClipEndDraft(formatTimeLabel(safeClipEnd));
       return;
     }
-    const maxStart  = Math.max(0, timelineMax - AUDIO_PREVIEW_SECONDS);
-    const nextStart = target === "start"
-      ? clamp(parsed, 0, maxStart)
-      : clamp(parsed - AUDIO_PREVIEW_SECONDS, 0, maxStart);
+    const maxStart = Math.max(0, timelineMax - AUDIO_PREVIEW_SECONDS);
+    const nextStart =
+      target === "start"
+        ? clamp(parsed, 0, maxStart)
+        : clamp(parsed - AUDIO_PREVIEW_SECONDS, 0, maxStart);
     const nextEnd = nextStart + AUDIO_PREVIEW_SECONDS;
-    if (Math.round(nextStart) === Math.round(safeClipStart) && Math.round(nextEnd) === Math.round(safeClipEnd)) {
+    if (
+      Math.round(nextStart) === Math.round(safeClipStart) &&
+      Math.round(nextEnd) === Math.round(safeClipEnd)
+    ) {
       setAudioClipStartDraft(formatTimeLabel(safeClipStart));
       setAudioClipEndDraft(formatTimeLabel(safeClipEnd));
       return;
@@ -882,11 +1046,12 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     event.preventDefault();
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
-    clipActivePointerIdRef.current       = event.pointerId;
+    clipActivePointerIdRef.current = event.pointerId;
     clipWasPlayingOnDragStartRef.current = isClipPlaying;
     const rect = clipTrackRef.current?.getBoundingClientRect();
-    clipTrackMetricsRef.current = rect && rect.width > 0 ? { left: rect.left, width: rect.width } : null;
-    clipDragOffsetRef.current   = xToSeconds(event.clientX) - safeClipStart;
+    clipTrackMetricsRef.current =
+      rect && rect.width > 0 ? { left: rect.left, width: rect.width } : null;
+    clipDragOffsetRef.current = xToSeconds(event.clientX) - safeClipStart;
     setClipDragDisplayRange({ start: safeClipStart, end: safeClipEnd });
     setIsDraggingClip(true);
   };
@@ -901,7 +1066,9 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
       return;
     }
     const resumeTime = clipAudio.currentTime;
-    await playClipFrom(resumeTime > safeClipStart && resumeTime < safeClipEnd ? resumeTime : safeClipStart);
+    await playClipFrom(
+      resumeTime > safeClipStart && resumeTime < safeClipEnd ? resumeTime : safeClipStart
+    );
   };
 
   const handleClipTimeUpdate = () => {
@@ -921,17 +1088,24 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     if (!clipAudio || !Number.isFinite(clipAudio.duration) || clipAudio.duration <= 0) return;
     const duration = clipAudio.duration;
     setAudioDurationSeconds(duration);
-    if (duration <= AUDIO_PREVIEW_SECONDS) { setDraggedClipRange(0, duration); return; }
+    if (duration <= AUDIO_PREVIEW_SECONDS) {
+      setDraggedClipRange(0, duration);
+      return;
+    }
     const boundedStart = clamp(safeClipStart, 0, Math.max(0, duration - AUDIO_PREVIEW_SECONDS));
-    const boundedEnd   = boundedStart + AUDIO_PREVIEW_SECONDS;
-    if (boundedStart !== safeClipStart || boundedEnd !== safeClipEnd || clipDuration !== AUDIO_PREVIEW_SECONDS) {
+    const boundedEnd = boundedStart + AUDIO_PREVIEW_SECONDS;
+    if (
+      boundedStart !== safeClipStart ||
+      boundedEnd !== safeClipEnd ||
+      clipDuration !== AUDIO_PREVIEW_SECONDS
+    ) {
       setDraggedClipRange(boundedStart, boundedEnd);
     }
   };
 
   // Handlers: Form Submit
   const buildCreateTrackPayload = async (): Promise<CreateTrackRequest> => {
-    const permalinkInput    = permalink.trim();
+    const permalinkInput = permalink.trim();
     const permalinkSegments = permalinkInput
       .replace(/^https?:\/\/beatza\.me\//i, "")
       .replace(/^beatza\.me\//i, "")
@@ -939,35 +1113,69 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
       .replace(/\/+$/, "")
       .split("/")
       .filter(Boolean);
-    const permalinkValue    = permalinkSegments[permalinkSegments.length - 1] ?? "";
-    const mainArtists       = toList(artistName);
-    const parsedTags        = toList(tags);
+    const permalinkValue = permalinkSegments[permalinkSegments.length - 1] ?? "";
+    const mainArtists = toList(artistName);
+    const parsedTags = toList(tags);
     const parsedDescription = toOptionalTrimmed(description);
-    const parsedGenre       = toOptionalTrimmed(genre);
+    const parsedGenre = toOptionalTrimmed(genre);
     const parsedReleaseDate = toOptionalTrimmed(releaseDate);
-    const parsedIsrc        = toOptionalTrimmed(isrc);
-    const normalizedIsrc    = parsedIsrc ? parsedIsrc.replace(/[^a-zA-Z0-9]/g, "").toUpperCase() : undefined;
-    const canAttachAudioClip   = audioDurationSeconds > AUDIO_PREVIEW_SECONDS;
-    const parsedAudioClipStart = canAttachAudioClip ? toOptionalTrimmed(audioClipStartInput) : undefined;
-    const parsedAudioClipEnd   = canAttachAudioClip ? toOptionalTrimmed(audioClipEndInput)   : undefined;
-    const audioClipStartValue  = parsedAudioClipStart !== undefined ? Number(parsedAudioClipStart) : undefined;
-    const audioClipEndValue    = parsedAudioClipEnd   !== undefined ? Number(parsedAudioClipEnd)   : undefined;
+    const parsedIsrc = toOptionalTrimmed(isrc);
+    const normalizedIsrc = parsedIsrc
+      ? parsedIsrc.replace(/[^a-zA-Z0-9]/g, "").toUpperCase()
+      : undefined;
+    const canAttachAudioClip = audioDurationSeconds > AUDIO_PREVIEW_SECONDS;
+    const parsedAudioClipStart = canAttachAudioClip
+      ? toOptionalTrimmed(audioClipStartInput)
+      : undefined;
+    const parsedAudioClipEnd = canAttachAudioClip
+      ? toOptionalTrimmed(audioClipEndInput)
+      : undefined;
+    const audioClipStartValue =
+      parsedAudioClipStart !== undefined ? Number(parsedAudioClipStart) : undefined;
+    const audioClipEndValue =
+      parsedAudioClipEnd !== undefined ? Number(parsedAudioClipEnd) : undefined;
     const parsedTitle = trackTitle.trim();
 
-    if (!currentFile)                                                       throw new Error("An audio file is required.");
-    if (currentFile.size > MAX_FILE_SIZE_BYTES)                             throw new Error(`Audio file exceeds the ${formatBytes(MAX_FILE_SIZE_BYTES)} limit.`);
-    if (!parsedTitle)                                                       throw new Error("Track title is required.");
-    if (!permalinkInput)                                                     throw new Error("Permalink is required.");
-    if (!permalinkValue)                                                     throw new Error("Track permalink segment is required.");
-    if (!permaLinkRegex.test(permalinkValue))                                throw new Error("Permalink must contain only lowercase letters, numbers, hyphens (-), or underscores (_).");
-    if (mainArtists.length < 1)                                             throw new Error("At least one artist is required");
-    if (tags.trim().length > 0 && parsedTags.length < 1)                   throw new Error("At least one tag is required");
-    if (description.length > 0 && !parsedDescription)                      throw new Error("Description cannot be empty");
-    if (parsedReleaseDate && Number.isNaN(Date.parse(parsedReleaseDate)))   throw new Error("Invalid date format, must be ISO 8601");
-    if (normalizedIsrc && !isrcRegex.test(normalizedIsrc))                  throw new Error("An ISRC (International Standard Recording Code) is a unique identifier that is assigned to a track. Use the same ISRC for a given track wherever you distribute it.");
-    if (canAttachAudioClip && audioClipStartValue !== undefined && (!Number.isFinite(audioClipStartValue) || audioClipStartValue < 0)) throw new Error("Audio clip start must be a valid non-negative number.");
-    if (canAttachAudioClip && audioClipEndValue   !== undefined && (!Number.isFinite(audioClipEndValue)   || audioClipEndValue   <= 0)) throw new Error("Audio clip end must be a valid number greater than 0.");
-    if (canAttachAudioClip && audioClipStartValue !== undefined && audioClipEndValue !== undefined && audioClipEndValue <= audioClipStartValue) throw new Error("Audio clip end must be greater than audio clip start.");
+    if (!currentFile) throw new Error("An audio file is required.");
+    if (currentFile.size > MAX_FILE_SIZE_BYTES)
+      throw new Error(`Audio file exceeds the ${formatBytes(MAX_FILE_SIZE_BYTES)} limit.`);
+    if (!parsedTitle) throw new Error("Track title is required.");
+    if (!permalinkInput) throw new Error("Permalink is required.");
+    if (!permalinkValue) throw new Error("Track permalink segment is required.");
+    if (!permaLinkRegex.test(permalinkValue))
+      throw new Error(
+        "Permalink must contain only lowercase letters, numbers, hyphens (-), or underscores (_)."
+      );
+    if (mainArtists.length < 1) throw new Error("At least one artist is required");
+    if (tags.trim().length > 0 && parsedTags.length < 1)
+      throw new Error("At least one tag is required");
+    if (description.length > 0 && !parsedDescription)
+      throw new Error("Description cannot be empty");
+    if (parsedReleaseDate && Number.isNaN(Date.parse(parsedReleaseDate)))
+      throw new Error("Invalid date format, must be ISO 8601");
+    if (normalizedIsrc && !isrcRegex.test(normalizedIsrc))
+      throw new Error(
+        "An ISRC (International Standard Recording Code) is a unique identifier that is assigned to a track. Use the same ISRC for a given track wherever you distribute it."
+      );
+    if (
+      canAttachAudioClip &&
+      audioClipStartValue !== undefined &&
+      (!Number.isFinite(audioClipStartValue) || audioClipStartValue < 0)
+    )
+      throw new Error("Audio clip start must be a valid non-negative number.");
+    if (
+      canAttachAudioClip &&
+      audioClipEndValue !== undefined &&
+      (!Number.isFinite(audioClipEndValue) || audioClipEndValue <= 0)
+    )
+      throw new Error("Audio clip end must be a valid number greater than 0.");
+    if (
+      canAttachAudioClip &&
+      audioClipStartValue !== undefined &&
+      audioClipEndValue !== undefined &&
+      audioClipEndValue <= audioClipStartValue
+    )
+      throw new Error("Audio clip end must be greater than audio clip start.");
 
     const zoomCroppedArtwork = artworkFile
       ? await createZoomCroppedArtworkFile(artworkFile, artworkZoom, artworkPosition)
@@ -1007,10 +1215,11 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         explicitContent,
         pLine: toOptionalTrimmed(pline),
         audioClipStart: canAttachAudioClip ? audioClipStartValue : undefined,
-        audioClipEnd:   canAttachAudioClip ? audioClipEndValue   : undefined,
+        audioClipEnd: canAttachAudioClip ? audioClipEndValue : undefined,
       },
       geoBlocking: ((): CreateTrackRequest["geoBlocking"] => {
-        if (geoblockingOption === "worldwide") return { mode: "worldwide", regions: [], countries: [] };
+        if (geoblockingOption === "worldwide")
+          return { mode: "worldwide", regions: [], countries: [] };
         const continentNames = new Set(GEOBLOCKING_REGIONS.map((g) => g.continent));
         const regions = geoblockingRegions.filter((v) => continentNames.has(v));
         const countries = geoblockingRegions.filter((v) => !continentNames.has(v));
@@ -1055,7 +1264,9 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
 
   // ── Effects ───────────────────────────────────────────────────────────────
   useEffect(() => {
-    return () => { if (artworkUrl) URL.revokeObjectURL(artworkUrl); };
+    return () => {
+      if (artworkUrl) URL.revokeObjectURL(artworkUrl);
+    };
   }, [artworkUrl]);
 
   useEffect(() => {
@@ -1083,7 +1294,10 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         setGenreMenuOpen(false);
         setGenreSearch("");
       }
-      if (releaseCalendarRef.current && !releaseCalendarRef.current.contains(event.target as Node)) {
+      if (
+        releaseCalendarRef.current &&
+        !releaseCalendarRef.current.contains(event.target as Node)
+      ) {
         setReleaseCalendarOpen(false);
       }
     };
@@ -1096,9 +1310,9 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
 
     const onPointerMove = (event: PointerEvent) => {
       event.preventDefault();
-      const rangeStart    = xToSeconds(event.clientX) - clipDragOffsetRef.current;
-      const boundedStart  = clamp(rangeStart, 0, Math.max(0, timelineMax - clipDuration));
-      const boundedEnd    = boundedStart + clipDuration;
+      const rangeStart = xToSeconds(event.clientX) - clipDragOffsetRef.current;
+      const boundedStart = clamp(rangeStart, 0, Math.max(0, timelineMax - clipDuration));
+      const boundedEnd = boundedStart + clipDuration;
       clipPendingRangeRef.current = { start: boundedStart, end: boundedEnd };
       if (clipDragRafRef.current !== null) return;
       clipDragRafRef.current = window.requestAnimationFrame(() => {
@@ -1111,8 +1325,9 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
           if (
             prev &&
             Math.floor(prev.start) === Math.floor(pending.start) &&
-            Math.floor(prev.end)   === Math.floor(pending.end)
-          ) return prev;
+            Math.floor(prev.end) === Math.floor(pending.end)
+          )
+            return prev;
           return { start: pending.start, end: pending.end };
         });
       });
@@ -1129,7 +1344,7 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         }
       }
       clipActivePointerIdRef.current = null;
-      clipTrackMetricsRef.current    = null;
+      clipTrackMetricsRef.current = null;
       const pending = clipPendingRangeRef.current;
       if (pending) {
         setDraggedClipRange(pending.start, pending.end);
@@ -1139,8 +1354,8 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
         setAudioClipStartDraft(formatTimeLabel(safeClipStart));
         setAudioClipEndDraft(formatTimeLabel(safeClipEnd));
       }
-      clipPendingRangeRef.current          = null;
-      clipVisualRangeRef.current           = null;
+      clipPendingRangeRef.current = null;
+      clipVisualRangeRef.current = null;
       clipWasPlayingOnDragStartRef.current = false;
       setClipDragDisplayRange(null);
       setIsDraggingClip(false);
@@ -1150,11 +1365,14 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
     window.addEventListener("pointerup", onPointerUp);
     window.addEventListener("pointercancel", onPointerUp);
     return () => {
-      if (clipDragRafRef.current !== null) { window.cancelAnimationFrame(clipDragRafRef.current); clipDragRafRef.current = null; }
-      clipActivePointerIdRef.current       = null;
-      clipTrackMetricsRef.current          = null;
-      clipPendingRangeRef.current          = null;
-      clipVisualRangeRef.current           = null;
+      if (clipDragRafRef.current !== null) {
+        window.cancelAnimationFrame(clipDragRafRef.current);
+        clipDragRafRef.current = null;
+      }
+      clipActivePointerIdRef.current = null;
+      clipTrackMetricsRef.current = null;
+      clipPendingRangeRef.current = null;
+      clipVisualRangeRef.current = null;
       clipWasPlayingOnDragStartRef.current = false;
       setClipDragDisplayRange(null);
       window.removeEventListener("pointermove", onPointerMove);
@@ -1200,7 +1418,10 @@ export function TrackInfoForm(props: TrackInfoFormProps) {
       return;
     }
     const clipAudio = clipAudioRef.current;
-    if (clipAudio) { clipAudio.pause(); clipAudio.currentTime = 0; }
+    if (clipAudio) {
+      clipAudio.pause();
+      clipAudio.currentTime = 0;
+    }
     setClipPlaybackSeconds(0);
     setIsClipPlaying(false);
   }, [uploadedFileUrl]);

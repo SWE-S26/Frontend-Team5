@@ -1,10 +1,6 @@
 import axios from "axios";
 
-import {
-  repostService,
-  fetchTrackReposts,
-  fetchPlaylistReposts,
-} from "@/services/reposts.service";
+import { repostService, fetchTrackReposts, fetchPlaylistReposts } from "@/services/reposts.service";
 import {
   RepostTrackErrorResponse,
   RepostPlaylistErrorResponse,
@@ -15,16 +11,10 @@ import { useCallback, useEffect, useState } from "react";
 
 // ─── Track ────────────────────────────────────────────────────────────────────
 
-export function useRepostTrack(
-  trackId: string,
-  enabled = true,
-  initialNumReposts?: number,
-) {
+export function useRepostTrack(trackId: string, enabled = true, initialNumReposts?: number) {
   const [reposted, setReposted] = useState(false);
   const [caption, setCaption] = useState<string | null>(null);
-  const [numOfReposts, setNumOfReposts] = useState<number | null>(
-    initialNumReposts ?? null,
-  );
+  const [numOfReposts, setNumOfReposts] = useState<number | null>(initialNumReposts ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -97,7 +87,7 @@ export function useRepostTrack(
         setLoading(false);
       }
     },
-    [trackId, reposted, numOfReposts, caption, loading],
+    [trackId, reposted, numOfReposts, caption, loading]
   );
 
   return {
@@ -147,15 +137,9 @@ export function useTrackRepostsList(trackId: string) {
 
 // ─── Playlist ─────────────────────────────────────────────────────────────────
 
-export function useRepostPlaylist(
-  playlistId: string,
-  enabled = true,
-  initialNumReposts?: number,
-) {
+export function useRepostPlaylist(playlistId: string, enabled = true, initialNumReposts?: number) {
   const [reposted, setReposted] = useState(false);
-  const [numOfReposts, setNumOfReposts] = useState<number | null>(
-    initialNumReposts ?? null,
-  );
+  const [numOfReposts, setNumOfReposts] = useState<number | null>(initialNumReposts ?? null);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -204,7 +188,7 @@ export function useRepostPlaylist(
         setLoading(false);
       }
     },
-    [playlistId, reposted, numOfReposts, loading],
+    [playlistId, reposted, numOfReposts, loading]
   );
 
   return {

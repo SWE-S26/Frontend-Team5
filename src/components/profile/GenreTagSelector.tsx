@@ -1,1 +1,3 @@
-export default function GenreTagSelector() { return null; }
+export default function GenreTagSelector() {
+  return null;
+}

@@ -26,10 +26,22 @@ export interface RecordingSegment {
   timestamp: number;
 }
 
-
-export const ALLOWED_EXTENSIONS = ["wav", "flac", "aiff", "aif", "alac", "m4a", "mp3", "ogg", "webm", "aac", "wma"];
+export const ALLOWED_EXTENSIONS = [
+  "wav",
+  "flac",
+  "aiff",
+  "aif",
+  "alac",
+  "m4a",
+  "mp3",
+  "ogg",
+  "webm",
+  "aac",
+  "wma",
+];
 const maxUploadMbRaw = Number(100);
-const maxUploadMb = Number.isFinite(maxUploadMbRaw) && maxUploadMbRaw > 0 ? maxUploadMbRaw : 4 * 1024;
+const maxUploadMb =
+  Number.isFinite(maxUploadMbRaw) && maxUploadMbRaw > 0 ? maxUploadMbRaw : 4 * 1024;
 export const MAX_FILE_SIZE_BYTES = Math.floor(maxUploadMb * 1024 * 1024);
 export const TOTAL_TRACK_LIMIT = 3;
 export const MAX_RECORDING_SECONDS = 180;
@@ -43,7 +55,6 @@ export const BYTES_PER_MINUTE_BY_EXT: Record<string, number> = {
   alac: 6_000_000,
   m4a: 2_000_000,
 };
-
 
 export function generateId() {
   return Math.random().toString(36).slice(2, 9);
@@ -66,7 +77,9 @@ export function estimateMinutes(file: File): number {
 }
 
 export function formatRecordingTime(secs: number): string {
-  const m = Math.floor(secs / 60).toString().padStart(2, "0");
+  const m = Math.floor(secs / 60)
+    .toString()
+    .padStart(2, "0");
   const s = (secs % 60).toString().padStart(2, "0");
   return `${m}:${s}`;
 }

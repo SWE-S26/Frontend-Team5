@@ -28,11 +28,7 @@ export interface RegisterDetailsFormProps {
   submitError?: string | null;
   isSubmitting?: boolean;
   onBack: () => void;
-  onComplete: (details: {
-    displayName: string;
-    dob: string;
-    gender: string;
-  }) => void;
+  onComplete: (details: { displayName: string; dob: string; gender: string }) => void;
 }
 
 export interface DetailsValidationFormProps {
@@ -41,28 +37,28 @@ export interface DetailsValidationFormProps {
   onSendAgain?: () => Promise<unknown> | unknown;
 }
 export interface RefreshTokenResponse {
-  message: string
+  message: string;
   data: {
-    accessToken:  string
-    refreshToken: string
+    accessToken: string;
+    refreshToken: string;
     user: {
-      id:           string
-      displayName:  string
-      role:         string
-      profileLink:  string
-      profileImg:   {
-        imgLink:   string
-        publicId:  string
-      }
+      id: string;
+      displayName: string;
+      role: string;
+      profileLink: string;
+      profileImg: {
+        imgLink: string;
+        publicId: string;
+      };
       subscription: {
-        subscriptionType: string
+        subscriptionType: string;
         quota: {
-          unlimited:   boolean
-          usedSeconds: number
-        }
-      }
-    }
-  }
+          unlimited: boolean;
+          usedSeconds: number;
+        };
+      };
+    };
+  };
 }
 
 //* ======================== API Integration ======================== */
@@ -74,7 +70,7 @@ export interface FindEmailRequest {
 export interface FindEmailResponse {
   data: {
     exists: boolean;
-  }
+  };
   message: string;
 }
 
@@ -123,7 +119,7 @@ export interface ResetPasswordRequest {
 }
 
 export interface ResetPasswordResponse {
-  message: string
+  message: string;
 }
 
 /* (6) "/api/auth/v1/logout" */
@@ -164,25 +160,24 @@ export interface GoogleAuthFinalizeResponse {
 
 /* (10) "/api/auth/v1/verify-email" */
 export interface VerifyEmailRequest {
-  token: string  // sent as query param not body
+  token: string; // sent as query param not body
 }
 export interface VerifyEmailResponse {
-  message: string
+  message: string;
 }
 
 /* (11) "/api/auth/v1/resend-verification-email" */
 export interface ResendVerificationEmailRequest {
-  email: string
+  email: string;
 }
 export interface ResendVerificationEmailResponse {
-  message: string
+  message: string;
 }
 
 /* (12) "/api/auth/v1/cross/desktop" */
-export interface GenerateQRcodeRequest {
-}
+export interface GenerateQRcodeRequest {}
 export interface GenerateQRcodeResponse {
-  success?: boolean,
+  success?: boolean;
   message: string;
   pendingToken?: {
     qrCode: string;

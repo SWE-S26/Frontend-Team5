@@ -41,9 +41,7 @@ export default function LegalSidebar() {
       <div className="sticky top-10 space-y-8">
         {sidebarSections.map((section) => (
           <div key={section.title}>
-            <h3 className="text-white-smoke font-bold text-base mb-3">
-              {section.title}
-            </h3>
+            <h3 className="text-white-smoke font-bold text-base mb-3">{section.title}</h3>
 
             <ul className="space-y-2">
               {section.links.map((link, index) => (

@@ -6,16 +6,14 @@ import { playerEngine } from "@/lib/playerEngine";
 const SEEK_THROTTLE_MS = 100; // seek audio at most every 100ms while dragging
 
 export function useAudioProgress() {
-  const { isPlaying, currentTrackDuration } = useSelector(
-    (state: RootState) => state.player,
-  );
+  const { isPlaying, currentTrackDuration } = useSelector((state: RootState) => state.player);
   const [currentTime, setCurrentTime] = useState(0);
   const [duration, setDuration] = useState(currentTrackDuration);
 
-  const durationRef      = useRef(duration);
-  const animFrameRef     = useRef<number | null>(null);
-  const isDraggingRef    = useRef(false);
-  const lastSeekTimeRef  = useRef(0); // timestamp of last throttled Howler seek
+  const durationRef = useRef(duration);
+  const animFrameRef = useRef<number | null>(null);
+  const isDraggingRef = useRef(false);
+  const lastSeekTimeRef = useRef(0); // timestamp of last throttled Howler seek
 
   useEffect(() => {
     if (currentTrackDuration > 0) {
@@ -37,7 +35,7 @@ export function useAudioProgress() {
     const tick = () => {
       if (!isDraggingRef.current) {
         const time = playerEngine.getCurrentTime();
-        const dur  = playerEngine.getDuration();
+        const dur = playerEngine.getDuration();
         setCurrentTime(time);
         if (dur > 0 && durationRef.current !== dur) {
           durationRef.current = dur;
@@ -58,7 +56,7 @@ export function useAudioProgress() {
 
   // Freeze the RAF loop's position writes — called on mousedown
   const dragStart = useCallback(() => {
-    isDraggingRef.current   = true;
+    isDraggingRef.current = true;
     lastSeekTimeRef.current = 0; // allow immediate first seek
   }, []);
 
@@ -95,8 +93,7 @@ export function useAudioProgress() {
     if (dur > 0) setCurrentTime((percentage / 100) * dur);
   }, []);
 
-  const progress =
-    durationRef.current > 0 ? (currentTime / durationRef.current) * 100 : 0;
+  const progress = durationRef.current > 0 ? (currentTime / durationRef.current) * 100 : 0;
 
   return { currentTime, duration, progress, dragStart, dragMove, dragEnd, seekToPercentage };
 }

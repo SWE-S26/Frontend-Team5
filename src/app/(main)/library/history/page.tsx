@@ -94,8 +94,14 @@ function LibraryFooter() {
   return (
     <div className="text-xs text-silver leading-6 mt-10">
       {[
-        "Legal", "Privacy", "Cookie Policy", "Cookie Manager",
-        "Imprint", "Artist Resources", "Newsroom", "Charts",
+        "Legal",
+        "Privacy",
+        "Cookie Policy",
+        "Cookie Manager",
+        "Imprint",
+        "Artist Resources",
+        "Newsroom",
+        "Charts",
         "Transparency Reports",
       ].map((label, i, arr) => (
         <span key={label}>
@@ -124,35 +130,26 @@ export default function History() {
   }, [getTrackHistory, getPlaylistHistory]);
 
   // Dedupe by id — API returns duplicates when a track is played multiple times
-  const uniqueTracks = useMemo(
-    () => dedupeById(tracks ?? [], (t) => t.trackId),
-    [tracks],
-  );
+  const uniqueTracks = useMemo(() => dedupeById(tracks ?? [], (t) => t.trackId), [tracks]);
 
-  const uniquePlaylists = useMemo(
-    () => dedupeById(playlists ?? [], (p) => p._id),
-    [playlists],
-  );
+  const uniquePlaylists = useMemo(() => dedupeById(playlists ?? [], (p) => p._id), [playlists]);
 
   const filteredTracks = useMemo(
     () =>
       uniqueTracks.filter((t) =>
-        t.basicInfo.title.toLowerCase().includes(filterText.toLowerCase()),
+        t.basicInfo.title.toLowerCase().includes(filterText.toLowerCase())
       ),
-    [uniqueTracks, filterText],
+    [uniqueTracks, filterText]
   );
 
   const filteredPlaylists = useMemo(
-    () =>
-      uniquePlaylists.filter((p) =>
-        p.title.toLowerCase().includes(filterText.toLowerCase()),
-      ),
-    [uniquePlaylists, filterText],
+    () => uniquePlaylists.filter((p) => p.title.toLowerCase().includes(filterText.toLowerCase())),
+    [uniquePlaylists, filterText]
   );
 
   const allPlayerTracks: PlayerTrack[] = useMemo(
     () => filteredTracks.map(mapToPlayerTrack),
-    [filteredTracks],
+    [filteredTracks]
   );
 
   // Pad playlists grid to nearest multiple of GRID_COLS
@@ -191,12 +188,9 @@ export default function History() {
 
   return (
     <div className="flex flex-col min-h-full px-4 sm:px-6 lg:px-0">
-
       {/* ── Header row ── */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center justify-between mb-6 sm:mb-8">
-        <p className="font-bold text-sm text-white-smoke">
-          Recently played:
-        </p>
+        <p className="font-bold text-sm text-white-smoke">Recently played:</p>
 
         <div className="flex items-center gap-3">
           <div className="relative">
@@ -256,7 +250,7 @@ export default function History() {
               />
             ) : (
               <EmptyCard key={(slot as { type: "empty"; key: string }).key} />
-            ),
+            )
           )}
         </div>
       )}
@@ -290,9 +284,7 @@ export default function History() {
                   isLikedByUser={track.isLikedByUser}
                   isRepostedByUser={track.isRepostedByUser ?? false}
                   wfLink={track.audio.waveformLink}
-                  enableDirectDownload={
-                    track.permissions?.enableDirectDownload ?? false
-                  }
+                  enableDirectDownload={track.permissions?.enableDirectDownload ?? false}
                   allTracks={allPlayerTracks}
                 />
               ))}

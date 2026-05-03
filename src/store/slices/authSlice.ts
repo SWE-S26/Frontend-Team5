@@ -1,17 +1,18 @@
-import { createSlice, PayloadAction } from "@reduxjs/toolkit"
+import { createSlice, PayloadAction } from "@reduxjs/toolkit";
 
-export const DEFAULT_PROFILE_IMAGE_URL = "https://res.cloudinary.com/dr1sqiouu/image/upload/v1776357570/profile/file_ud25rn.png"
-export const DEFAULT_PROFILE_GRADIENT = "linear-gradient(to right, #c3adb4, #8f6f79)"
+export const DEFAULT_PROFILE_IMAGE_URL =
+  "https://res.cloudinary.com/dr1sqiouu/image/upload/v1776357570/profile/file_ud25rn.png";
+export const DEFAULT_PROFILE_GRADIENT = "linear-gradient(to right, #c3adb4, #8f6f79)";
 
 interface AuthState {
-  isAuthenticated: boolean
-  hasHydrated: boolean       // true once we've checked localStorage on first load
-  userId: string | null
-  displayName: string | null
-  profileImgLink: string | null
-  bannerImgLink: string | null
-  profileLink: string | null
-  role: string | null
+  isAuthenticated: boolean;
+  hasHydrated: boolean; // true once we've checked localStorage on first load
+  userId: string | null;
+  displayName: string | null;
+  profileImgLink: string | null;
+  bannerImgLink: string | null;
+  profileLink: string | null;
+  role: string | null;
 }
 
 const initialState: AuthState = {
@@ -23,7 +24,7 @@ const initialState: AuthState = {
   bannerImgLink: null,
   profileLink: null,
   role: null,
-}
+};
 
 const authSlice = createSlice({
   name: "auth",
@@ -31,27 +32,28 @@ const authSlice = createSlice({
   reducers: {
     // called after login — sets everything at once from the login response
     setAuth: (state, action: PayloadAction<Omit<AuthState, "isAuthenticated" | "hasHydrated">>) => {
-      state.isAuthenticated = true
-      state.hasHydrated = true
-      state.userId = action.payload.userId
-      state.displayName = action.payload.displayName
-      state.profileImgLink = action.payload.profileImgLink === DEFAULT_PROFILE_IMAGE_URL
-        ? null
-        : action.payload.profileImgLink
-      state.bannerImgLink = action.payload.bannerImgLink
-      state.profileLink = action.payload.profileLink
-      state.role = action.payload.role
+      state.isAuthenticated = true;
+      state.hasHydrated = true;
+      state.userId = action.payload.userId;
+      state.displayName = action.payload.displayName;
+      state.profileImgLink =
+        action.payload.profileImgLink === DEFAULT_PROFILE_IMAGE_URL
+          ? null
+          : action.payload.profileImgLink;
+      state.bannerImgLink = action.payload.bannerImgLink;
+      state.profileLink = action.payload.profileLink;
+      state.role = action.payload.role;
     },
 
     // called on logout — wipes everything
     clearAuth: (state) => {
-      state.isAuthenticated = false
-      state.userId = null
-      state.displayName = null
-      state.profileImgLink = null
-      state.bannerImgLink = null
-      state.profileLink = null
-      state.role = null
+      state.isAuthenticated = false;
+      state.userId = null;
+      state.displayName = null;
+      state.profileImgLink = null;
+      state.bannerImgLink = null;
+      state.profileLink = null;
+      state.role = null;
     },
 
     // called once on app load after reading localStorage
@@ -60,28 +62,28 @@ const authSlice = createSlice({
         ...state,
         ...action.payload,
         hasHydrated: true,
-        profileImgLink: (action.payload.profileImgLink ?? state.profileImgLink) === DEFAULT_PROFILE_IMAGE_URL
-          ? DEFAULT_PROFILE_GRADIENT
-          : (action.payload.profileImgLink ?? state.profileImgLink)
-      }
+        profileImgLink:
+          (action.payload.profileImgLink ?? state.profileImgLink) === DEFAULT_PROFILE_IMAGE_URL
+            ? DEFAULT_PROFILE_GRADIENT
+            : (action.payload.profileImgLink ?? state.profileImgLink),
+      };
     },
 
     // individual field updates — used when user edits profile pic, name, etc.
     setProfileImgLink: (state, action: PayloadAction<string | null>) => {
-      state.profileImgLink = action.payload === DEFAULT_PROFILE_IMAGE_URL
-        ? DEFAULT_PROFILE_GRADIENT
-        : action.payload
+      state.profileImgLink =
+        action.payload === DEFAULT_PROFILE_IMAGE_URL ? DEFAULT_PROFILE_GRADIENT : action.payload;
     },
 
     setBannerImgLink: (state, action: PayloadAction<string | null>) => {
-      state.bannerImgLink = action.payload
+      state.bannerImgLink = action.payload;
     },
 
     setDisplayName: (state, action: PayloadAction<string | null>) => {
-      state.displayName = action.payload
+      state.displayName = action.payload;
     },
   },
-})
+});
 
 export const {
   setAuth,
@@ -90,9 +92,9 @@ export const {
   setProfileImgLink,
   setBannerImgLink,
   setDisplayName,
-} = authSlice.actions
+} = authSlice.actions;
 
-export default authSlice.reducer
+export default authSlice.reducer;
 
 /*
 authSlice (your own data as the logged in user)

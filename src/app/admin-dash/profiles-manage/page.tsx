@@ -29,9 +29,7 @@ const RoleBadge = ({ role }: { role: AdminUser["role"] }) => {
     Admin: "bg-white/10 text-silver",
   };
   return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${styles[role]}`}>
-      {role}
-    </span>
+    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${styles[role]}`}>{role}</span>
   );
 };
 
@@ -110,7 +108,9 @@ export default function ProfilesManagement() {
         ].map(({ label, value, color }) => (
           <div key={label} className="bg-off-black rounded-xl p-3 md:p-4 border border-white/5">
             <p className="text-silver text-xs md:text-sm">{label}</p>
-            <p className={`text-2xl md:text-3xl font-bold mt-1 ${color ?? "text-white-smoke"}`}>{value}</p>
+            <p className={`text-2xl md:text-3xl font-bold mt-1 ${color ?? "text-white-smoke"}`}>
+              {value}
+            </p>
           </div>
         ))}
       </div>
@@ -135,7 +135,10 @@ export default function ProfilesManagement() {
             {(["all", "Listener", "Pro"] as const).map((f) => (
               <button
                 key={f}
-                onClick={() => { setRoleFilter(f); resetFilters(); }}
+                onClick={() => {
+                  setRoleFilter(f);
+                  resetFilters();
+                }}
                 className={`px-2 md:px-3 py-1 rounded-md text-xs md:text-sm capitalize transition-colors ${
                   roleFilter === f
                     ? "bg-brilliant-orange text-white"
@@ -151,7 +154,10 @@ export default function ProfilesManagement() {
             {(["all", "active", "suspended"] as const).map((f) => (
               <button
                 key={f}
-                onClick={() => { setStatusFilter(f); resetFilters(); }}
+                onClick={() => {
+                  setStatusFilter(f);
+                  resetFilters();
+                }}
                 className={`px-2 md:px-3 py-1 rounded-md text-xs md:text-sm capitalize transition-colors ${
                   statusFilter === f
                     ? "bg-brilliant-orange text-white"
@@ -175,7 +181,10 @@ export default function ProfilesManagement() {
           <p className="text-silver text-center py-10">No profiles found.</p>
         ) : (
           users.map((user) => (
-            <div key={user.userId} className="bg-off-black rounded-xl p-4 border border-white/5 space-y-3">
+            <div
+              key={user.userId}
+              className="bg-off-black rounded-xl p-4 border border-white/5 space-y-3"
+            >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-white-smoke font-medium truncate">{user.displayName}</p>

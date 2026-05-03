@@ -3,19 +3,10 @@
 import { useState, useEffect, useRef } from "react";
 import { useSelector, useDispatch } from "react-redux";
 import { RootState } from "@/store/store";
-import {
-  play,
-  pause,
-  playAudio,
-  playNext,
-  Track,
-} from "@/store/slices/playerSlice";
+import { play, pause, playAudio, playNext, Track } from "@/store/slices/playerSlice";
 import { useAudioProgress } from "@/hooks/useAudioProgress";
 import { useIsVisible } from "@/hooks/useIsVisible";
-import {
-  useLikeTrackOptimistic,
-  useLikePlaylistOptimistic,
-} from "@/hooks/useLikes";
+import { useLikeTrackOptimistic, useLikePlaylistOptimistic } from "@/hooks/useLikes";
 import { useRepostTrack, useRepostPlaylist } from "@/hooks/useReposts";
 import { useGetPlaylistById } from "@/hooks/usePlaylists";
 import { useGetProfile } from "@/hooks/useProfile";
@@ -76,8 +67,7 @@ type Props = {
 };
 
 function normalizePlaylistTrack(track: any, fallbackId: string): PlaylistTrack {
-  const imageLink =
-    track?.image?.imgLink ?? track?.img ?? "/app-logo/blacklogo.png";
+  const imageLink = track?.image?.imgLink ?? track?.img ?? "/app-logo/blacklogo.png";
   const audioLink = track?.audio?.audioLink ?? "";
   const waveformLink = track?.audio?.waveformLink ?? "/waveform.json";
 
@@ -86,9 +76,7 @@ function normalizePlaylistTrack(track: any, fallbackId: string): PlaylistTrack {
     poster: track?.poster ?? undefined,
     basicInfo: {
       title: track?.basicInfo?.title ?? track?.title ?? "Unknown Title",
-      mainArtists: track?.basicInfo?.mainArtists ?? [
-        track?.artist ?? "Unknown Artist",
-      ],
+      mainArtists: track?.basicInfo?.mainArtists ?? [track?.artist ?? "Unknown Artist"],
       permalink: track?.basicInfo?.permalink ?? "",
     },
     audio: {
@@ -140,11 +128,7 @@ export function TrackRow({
   const [isShareOpen, setIsShareOpen] = useState(false);
   const { likeTrack } = useLikeTrackOptimistic(track._id);
   const [isLiked, setIsLiked] = useState(track.isLiked);
-  const { repostTrack } = useRepostTrack(
-    track._id,
-    true,
-    track.isReposted ? 1 : 0,
-  );
+  const { repostTrack } = useRepostTrack(track._id, true, track.isReposted ? 1 : 0);
   const [isReposted, setIsReposted] = useState(track.isReposted);
 
   const dispatch = useDispatch();
@@ -184,13 +168,15 @@ export function TrackRow({
           img: track.image.imgLink,
           duration: track.durationInSeconds,
         },
-      }),
+      })
     );
   }
 
   const handleCopyLink = () => {
     if (!isAvailable || !track.poster?.profileLink || !track.basicInfo.permalink) return;
-    navigator.clipboard.writeText(`${getBaseUrl()}/${track.poster.profileLink}/${track.basicInfo.permalink}`);
+    navigator.clipboard.writeText(
+      `${getBaseUrl()}/${track.poster.profileLink}/${track.basicInfo.permalink}`
+    );
     interactiveToastBus.emit({ type: "copied" });
   };
 
@@ -214,10 +200,7 @@ export function TrackRow({
         className="relative w-12 sm:w-9 h-12 sm:h-9 shrink-0"
         style={!isAvailable ? { opacity: 0.3 } : undefined}
       >
-        <img
-          src={track.image.imgLink}
-          className="w-12 sm:w-9 h-12 sm:h-9 rounded object-cover"
-        />
+        <img src={track.image.imgLink} className="w-12 sm:w-9 h-12 sm:h-9 rounded object-cover" />
         {isAvailable && (hovered || isPlaying) && (
           <div
             className="absolute inset-0 flex items-center justify-center rounded"
@@ -272,11 +255,7 @@ export function TrackRow({
           href={`/track/${track.basicInfo.permalink ?? track._id}`}
           onClick={(e) => e.stopPropagation()}
           className={`flex-1 text-sm font-bold truncate min-w-0 no-underline transition-colors ${
-            isCurrent
-              ? "text-inferno"
-              : hovered
-                ? "text-silver"
-                : "text-white-smoke"
+            isCurrent ? "text-inferno" : hovered ? "text-silver" : "text-white-smoke"
           }`}
           style={!isAvailable ? { opacity: 0.3 } : undefined}
         >
@@ -291,10 +270,7 @@ export function TrackRow({
         )}
       </div>
 
-      <div
-        className="shrink-0 flex items-center justify-end"
-        onClick={(e) => e.stopPropagation()}
-      >
+      <div className="shrink-0 flex items-center justify-end" onClick={(e) => e.stopPropagation()}>
         <div className="hidden sm:block w-48">
           {isAvailable && (hovered || isPlaying) ? (
             <div className="flex items-center gap-3 justify-end">
@@ -302,22 +278,14 @@ export function TrackRow({
                 <Button
                   className={isPlaying ? "bg-off-black" : "bg-transparent"}
                   onClick={handleLikeClick}
-                  icon={
-                    <HiHeart
-                      className={`text-[15px] ${isLiked ? "text-inferno" : ""}`}
-                    />
-                  }
+                  icon={<HiHeart className={`text-[15px] ${isLiked ? "text-inferno" : ""}`} />}
                 />
               </Tooltip>
               <Tooltip label="Repost">
                 <Button
                   className={isPlaying ? "bg-off-black" : "bg-transparent"}
                   onClick={handleRepostClick}
-                  icon={
-                    <LuRepeat2
-                      className={`text-[15px] ${isReposted ? "text-inferno" : ""}`}
-                    />
-                  }
+                  icon={<LuRepeat2 className={`text-[15px] ${isReposted ? "text-inferno" : ""}`} />}
                 />
               </Tooltip>
               <Tooltip label="Share">
@@ -350,9 +318,7 @@ export function TrackRow({
                   },
                   {
                     label: "Add to Playlist",
-                    icon: (
-                      <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
-                    ),
+                    icon: <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />,
                     onClick: () => onAddToPlaylist(),
                   },
                   ...(onRemoveFromPlaylist
@@ -389,9 +355,7 @@ export function TrackRow({
             className="p-1"
             style={!isAvailable ? { opacity: 0.3, pointerEvents: "none" } : undefined}
           >
-            <HiHeart
-              className={`text-[16px] ${isLiked ? "text-inferno" : "text-white-smoke"}`}
-            />
+            <HiHeart className={`text-[16px] ${isLiked ? "text-inferno" : "text-white-smoke"}`} />
           </button>
           <MoreDropdown
             trigger={
@@ -408,9 +372,7 @@ export function TrackRow({
               },
               {
                 label: "Add to Playlist",
-                icon: (
-                  <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
-                ),
+                icon: <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />,
                 onClick: () => onAddToPlaylist(),
               },
               ...(onRemoveFromPlaylist
@@ -440,9 +402,11 @@ export function TrackRow({
       <SharePopup
         isOpen={isShareOpen}
         onClose={() => setIsShareOpen(false)}
-        prefilledMessage={track.poster?.profileLink && track.basicInfo.permalink
-          ? `${getBaseUrl()}/${track.poster.profileLink}/${track.basicInfo.permalink}`
-          : undefined}
+        prefilledMessage={
+          track.poster?.profileLink && track.basicInfo.permalink
+            ? `${getBaseUrl()}/${track.poster.profileLink}/${track.basicInfo.permalink}`
+            : undefined
+        }
       />
     </div>
   );
@@ -470,14 +434,11 @@ export default function PlaylistWaveformCard({
 }: Props) {
   const displayArtist = artist?.trim() || artistId?.trim() || "Unknown creator";
   const artistHref = artistId ? `/profile/${artistId}` : undefined;
-  const [addToPlaylistTrack, setAddToPlaylistTrack] =
-    useState<PlaylistTrack | null>(null);
+  const [addToPlaylistTrack, setAddToPlaylistTrack] = useState<PlaylistTrack | null>(null);
   const [isShareOpen, setIsShareOpen] = useState(false);
 
   const dispatch = useDispatch();
-  const { currentTrackId, isPlaying } = useSelector(
-    (state: RootState) => state.player,
-  );
+  const { currentTrackId, isPlaying } = useSelector((state: RootState) => state.player);
   const { progress, currentTime, seekToPercentage } = useAudioProgress();
   const { ref, isVisible } = useIsVisible("200px");
   const { getPlaylistById } = useGetPlaylistById();
@@ -491,11 +452,8 @@ export default function PlaylistWaveformCard({
 
   const [cachedTracks, setCachedTracks] = useState<PlaylistTrack[]>(
     (preloadedTracks ?? []).map((track, index) =>
-      normalizePlaylistTrack(
-        track,
-        track?._id ?? `${playlistId ?? "playlist"}-track-${index}`,
-      ),
-    ),
+      normalizePlaylistTrack(track, track?._id ?? `${playlistId ?? "playlist"}-track-${index}`)
+    )
   );
   const [tracksExpanded, setTracksExpanded] = useState(false);
   const [isLiked, setIsLiked] = useState(isLikedByUser);
@@ -509,16 +467,10 @@ export default function PlaylistWaveformCard({
   cachedTracksRef.current = cachedTracks;
 
   const { likePlaylist } = useLikePlaylistOptimistic(playlistId ?? "");
-  const { repostPlaylist } = useRepostPlaylist(
-    playlistId ?? "",
-    isVisible,
-    repostCount,
-  );
+  const { repostPlaylist } = useRepostPlaylist(playlistId ?? "", isVisible, repostCount);
 
-  const isThisPlaying =
-    isPlaying && cachedTracks.some((t) => t._id === currentTrackId);
-  const currentTrack =
-    cachedTracks.find((t) => t._id === currentTrackId) ?? cachedTracks[0];
+  const isThisPlaying = isPlaying && cachedTracks.some((t) => t._id === currentTrackId);
+  const currentTrack = cachedTracks.find((t) => t._id === currentTrackId) ?? cachedTracks[0];
 
   useEffect(() => {
     if (!currentTrackId || !isPlaying) return;
@@ -558,11 +510,8 @@ export default function PlaylistWaveformCard({
     if (preloadedTracks && preloadedTracks.length > 0)
       setCachedTracks(
         preloadedTracks.map((track, index) =>
-          normalizePlaylistTrack(
-            track,
-            track?._id ?? `${playlistId ?? "playlist"}-track-${index}`,
-          ),
-        ),
+          normalizePlaylistTrack(track, track?._id ?? `${playlistId ?? "playlist"}-track-${index}`)
+        )
       );
   }, [preloadedTracks]);
 
@@ -584,10 +533,7 @@ export default function PlaylistWaveformCard({
     const pl = res?.data?.playlist;
     const detail = Array.isArray(pl) ? pl[0] : pl;
     const tracks = (detail?.tracks ?? []).map((track: any, index: number) =>
-      normalizePlaylistTrack(
-        track,
-        track?._id ?? `${playlistId}-track-${index}`,
-      ),
+      normalizePlaylistTrack(track, track?._id ?? `${playlistId}-track-${index}`)
     );
     setCachedTracks(tracks);
     return tracks;
@@ -663,10 +609,7 @@ export default function PlaylistWaveformCard({
   };
 
   return (
-    <div
-      className="flex flex-col sm:flex-row items-stretch gap-3 sm:gap-0 px-4 sm:px-0"
-      ref={ref}
-    >
+    <div className="flex flex-col sm:flex-row items-stretch gap-3 sm:gap-0 px-4 sm:px-0" ref={ref}>
       <div className="hidden sm:block h-full overflow-hidden -m-1 -mb-1.75 sm:shrink-0">
         <PlaylistCard
           img={img}
@@ -775,9 +718,7 @@ export default function PlaylistWaveformCard({
             }}
             className="text-sm text-silver hover:text-white-smoke transition-colors mt-3 text-left"
           >
-            {tracksExpanded
-              ? "Show less"
-              : `View ${totalTracks ?? cachedTracks.length} tracks`}
+            {tracksExpanded ? "Show less" : `View ${totalTracks ?? cachedTracks.length} tracks`}
           </button>
         )}
 
@@ -865,12 +806,12 @@ export default function PlaylistWaveformCard({
         trackImage={addToPlaylistTrack?.image.imgLink}
       />
       <SharePopup
-      isOpen={isShareOpen}
-      onClose={() => setIsShareOpen(false)}
-      prefilledMessage={profileLink && permalink
-        ? `${getBaseUrl()}/${profileLink}/sets/${permalink}`
-        : undefined}
-    />
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        prefilledMessage={
+          profileLink && permalink ? `${getBaseUrl()}/${profileLink}/sets/${permalink}` : undefined
+        }
+      />
     </div>
   );
 }

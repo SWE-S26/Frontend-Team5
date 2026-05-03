@@ -47,9 +47,7 @@ export default function PlaylistCard({
   artistId,
 }: Props) {
   const dispatch = useDispatch();
-  const { currentTrackId, isPlaying } = useSelector(
-    (state: RootState) => state.player,
-  );
+  const { currentTrackId, isPlaying } = useSelector((state: RootState) => state.player);
   const { getPlaylistById } = useGetPlaylistById();
 
   const [isLiked, setIsLiked] = useState(isLikedByUser);
@@ -87,9 +85,7 @@ export default function PlaylistCard({
   >([]);
 
   const isThisPlaying =
-    isPlaying &&
-    cachedTracks.length > 0 &&
-    cachedTracks.some((t) => t.id === currentTrackId);
+    isPlaying && cachedTracks.length > 0 && cachedTracks.some((t) => t.id === currentTrackId);
   const playlistHref = playlistId ? `/playlist/${playlistId}` : "#";
 
   const handleLikeClick = (e: React.MouseEvent) => {
@@ -269,9 +265,7 @@ export default function PlaylistCard({
                     },
                     {
                       label: "Add to Playlist",
-                      icon: (
-                        <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
-                      ),
+                      icon: <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />,
                       onClick: () => setIsAddToPlaylistOpen(true),
                     },
                   ]}
@@ -327,7 +321,7 @@ export default function PlaylistCard({
             artistName={artist}
             trackImage={img}
           />,
-          document.body,
+          document.body
         )}
     </>
   );

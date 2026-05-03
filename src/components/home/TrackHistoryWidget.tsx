@@ -63,9 +63,7 @@ function RowSkeleton() {
 
 export default function TrackHistoryWidget() {
   const { getTrackHistory, tracks, loading } = useGetTrackHistory();
-  const [artistProfiles, setArtistProfiles] = useState<
-    Record<string, GetProfileResponse>
-  >({});
+  const [artistProfiles, setArtistProfiles] = useState<Record<string, GetProfileResponse>>({});
 
   const inFlightIdsRef = useRef<Set<string>>(new Set());
 
@@ -73,30 +71,20 @@ export default function TrackHistoryWidget() {
     void getTrackHistory();
   }, [getTrackHistory]);
 
-  const uniqueTracks = useMemo(
-    () => deduplicateByTrackId(tracks ?? []),
-    [tracks],
-  );
+  const uniqueTracks = useMemo(() => deduplicateByTrackId(tracks ?? []), [tracks]);
 
   const totalCount = uniqueTracks.length;
 
-  const previewTracks = useMemo(
-    () => uniqueTracks.slice(0, PREVIEW_COUNT),
-    [uniqueTracks],
-  );
+  const previewTracks = useMemo(() => uniqueTracks.slice(0, PREVIEW_COUNT), [uniqueTracks]);
 
   const previewTrackIds = useMemo(
     () => previewTracks.map((t) => t.posterId).join(","),
-    [previewTracks],
+    [previewTracks]
   );
 
   useEffect(() => {
-    const ids = Array.from(
-      new Set(previewTracks.map((t) => t.posterId).filter(Boolean)),
-    );
-    const missingIds = ids.filter(
-      (id) => !artistProfiles[id] && !inFlightIdsRef.current.has(id),
-    );
+    const ids = Array.from(new Set(previewTracks.map((t) => t.posterId).filter(Boolean)));
+    const missingIds = ids.filter((id) => !artistProfiles[id] && !inFlightIdsRef.current.has(id));
 
     if (missingIds.length === 0) return;
 
@@ -113,7 +101,7 @@ export default function TrackHistoryWidget() {
           } catch {
             return { id, data: null };
           }
-        }),
+        })
       );
 
       if (cancelled) return;
@@ -186,9 +174,7 @@ export default function TrackHistoryWidget() {
               profile?.city || profile?.country
                 ? [profile?.city, profile?.country].filter(Boolean)
                 : [];
-            const location = locationParts.length
-              ? locationParts.join(", ")
-              : undefined;
+            const location = locationParts.length ? locationParts.join(", ") : undefined;
 
             return (
               <TrackListRow

@@ -12,7 +12,7 @@ type BridgePayload = {
   accessToken?: string;
   refreshToken?: string;
   pendingToken?: string;
-  incompleteToken?:string;
+  incompleteToken?: string;
   displayName?: string;
 };
 
@@ -22,28 +22,17 @@ function CrossPlatformCallbackContent() {
 
   const tokenParams = useMemo(() => {
     const token = searchParams.get("token") || undefined;
-    const accessToken =
-      searchParams.get("accessToken") ||
-      token ||
-      undefined;
-    const refreshToken =
-      searchParams.get("refreshToken") ||
-      undefined;
-    const pendingToken =
-      searchParams.get("pendingToken") ||
-      undefined;
+    const accessToken = searchParams.get("accessToken") || token || undefined;
+    const refreshToken = searchParams.get("refreshToken") || undefined;
+    const pendingToken = searchParams.get("pendingToken") || undefined;
     const error = searchParams.get("error") || undefined;
     const errorDescription =
-      searchParams.get("error_description") ||
-      searchParams.get("message") ||
-      undefined;
-    const incompleteToken =
-      searchParams.get("incompleteToken") ||
-      undefined;
-    const displayName =
-      searchParams.get("displayName") ||
-      undefined;
-    const hasAnyToken = Boolean(token || accessToken || refreshToken || pendingToken || incompleteToken || displayName);
+      searchParams.get("error_description") || searchParams.get("message") || undefined;
+    const incompleteToken = searchParams.get("incompleteToken") || undefined;
+    const displayName = searchParams.get("displayName") || undefined;
+    const hasAnyToken = Boolean(
+      token || accessToken || refreshToken || pendingToken || incompleteToken || displayName
+    );
 
     return {
       token,
@@ -71,8 +60,9 @@ function CrossPlatformCallbackContent() {
         (window as Window & { ReactNativeWebView?: { postMessage: (value: string) => void } })
           .ReactNativeWebView
       ) {
-        (window as Window & { ReactNativeWebView?: { postMessage: (value: string) => void } })
-          .ReactNativeWebView?.postMessage(raw);
+        (
+          window as Window & { ReactNativeWebView?: { postMessage: (value: string) => void } }
+        ).ReactNativeWebView?.postMessage(raw);
       }
     };
 
@@ -120,7 +110,7 @@ function CrossPlatformCallbackContent() {
             incompleteToken: tokenParams.incompleteToken,
             pendingToken: tokenParams.pendingToken,
             displayName: tokenParams.displayName,
-          }),
+          })
         );
       }
 
@@ -141,7 +131,6 @@ function CrossPlatformCallbackContent() {
 
     return () => window.clearTimeout(timeoutId);
   }, [tokenParams, router]);
-
 
   return (
     <section className="mx-auto flex w-full max-w-3xl flex-1 items-center justify-center px-4 py-6">
@@ -191,7 +180,9 @@ export default function CrossPlatformCallbackPage() {
         </div>
       </header>
 
-      <Suspense fallback={<div className="flex flex-1 items-center justify-center">Loading...</div>}>
+      <Suspense
+        fallback={<div className="flex flex-1 items-center justify-center">Loading...</div>}
+      >
         <CrossPlatformCallbackContent />
       </Suspense>
     </main>

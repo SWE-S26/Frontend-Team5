@@ -58,9 +58,7 @@ function applyTrackMetadata(state: PlayerState, track: Track) {
 
 function buildShuffleQueue(tracks: Track[], currentId: string): string[] {
   const lastTrack = tracks[tracks.length - 1];
-  const pool = tracks
-    .filter((t) => t.id !== currentId && t.id !== lastTrack.id)
-    .map((t) => t.id);
+  const pool = tracks.filter((t) => t.id !== currentId && t.id !== lastTrack.id).map((t) => t.id);
   const shuffled = [...pool].sort(() => Math.random() - 0.5);
   if (lastTrack.id !== currentId) shuffled.push(lastTrack.id);
   return shuffled;
@@ -70,25 +68,18 @@ const playerSlice = createSlice({
   name: "player",
   initialState,
   reducers: {
-    playAudio(
-      state,
-      action: PayloadAction<{ tracks: Track[]; startId?: string }>,
-    ) {
+    playAudio(state, action: PayloadAction<{ tracks: Track[]; startId?: string }>) {
       const { tracks, startId } = action.payload;
 
       if (tracks.length > 1) {
         state.tracks = tracks;
-        const track = startId
-          ? (tracks.find((t) => t.id === startId) ?? tracks[0])
-          : tracks[0];
+        const track = startId ? (tracks.find((t) => t.id === startId) ?? tracks[0]) : tracks[0];
         applyTrackMetadata(state, track);
       } else {
         const incoming = tracks[0];
         if (!incoming) return;
 
-        const existingIndex = state.tracks.findIndex(
-          (t) => t.id === incoming.id,
-        );
+        const existingIndex = state.tracks.findIndex((t) => t.id === incoming.id);
 
         if (state.tracks.length === 0 || existingIndex === -1) {
           state.tracks = [incoming];
@@ -98,10 +89,7 @@ const playerSlice = createSlice({
       }
 
       if (state.shuffle && state.tracks.length > 1) {
-        state.shuffleQueue = buildShuffleQueue(
-          state.tracks,
-          state.currentTrackId!,
-        );
+        state.shuffleQueue = buildShuffleQueue(state.tracks, state.currentTrackId!);
         state.shuffleIndex = 0;
       }
     },
@@ -128,10 +116,7 @@ const playerSlice = createSlice({
 
         if (state.shuffleIndex >= state.shuffleQueue.length) {
           if (state.loop === "none") return;
-          state.shuffleQueue = buildShuffleQueue(
-            state.tracks,
-            state.currentTrackId!,
-          );
+          state.shuffleQueue = buildShuffleQueue(state.tracks, state.currentTrackId!);
           state.shuffleIndex = 0;
         }
 
@@ -139,9 +124,7 @@ const playerSlice = createSlice({
         nextTrack = state.tracks.find((t) => t.id === nextId)!;
         state.shuffleIndex += 1;
       } else {
-        const currentIndex = state.tracks.findIndex(
-          (t) => t.id === state.currentTrackId,
-        );
+        const currentIndex = state.tracks.findIndex((t) => t.id === state.currentTrackId);
         const isLast = currentIndex === state.tracks.length - 1;
 
         if (isLast && state.loop === "none") return;
@@ -155,17 +138,14 @@ const playerSlice = createSlice({
     prev(state) {
       if (!state.tracks.length) return;
 
-      const currentIndex = state.tracks.findIndex(
-        (t) => t.id === state.currentTrackId,
-      );
+      const currentIndex = state.tracks.findIndex((t) => t.id === state.currentTrackId);
 
       if (currentIndex === 0 && state.loop !== "all") {
         state.isPlaying = true;
         return;
       }
 
-      const prevIndex =
-        (currentIndex - 1 + state.tracks.length) % state.tracks.length;
+      const prevIndex = (currentIndex - 1 + state.tracks.length) % state.tracks.length;
       const prevTrack = state.tracks[prevIndex];
 
       applyTrackMetadata(state, prevTrack);
@@ -179,10 +159,7 @@ const playerSlice = createSlice({
     toggleShuffle(state) {
       state.shuffle = !state.shuffle;
       if (state.shuffle && state.tracks.length > 1) {
-        state.shuffleQueue = buildShuffleQueue(
-          state.tracks,
-          state.currentTrackId!,
-        );
+        state.shuffleQueue = buildShuffleQueue(state.tracks, state.currentTrackId!);
         state.shuffleIndex = 0;
       } else {
         state.shuffleQueue = [];
@@ -205,7 +182,6 @@ const playerSlice = createSlice({
       state.currentTrackLikeCount = action.payload.likeCount;
     },
 
-
     addToQueue(state, action: PayloadAction<Track>) {
       const exists = state.tracks.some((t) => t.id === action.payload.id);
       if (!exists) state.tracks.push(action.payload);
@@ -217,9 +193,7 @@ const playerSlice = createSlice({
       const incomingIds = new Set(incomingTracks.map((t) => t.id));
 
       // 1. Find where to insert (after current track)
-      const currentIndex = state.tracks.findIndex(
-        (t) => t.id === state.currentTrackId,
-      );
+      const currentIndex = state.tracks.findIndex((t) => t.id === state.currentTrackId);
       const insertAt = currentIndex === -1 ? 0 : currentIndex + 1;
 
       // 2. Filter out the incoming tracks from the current queue to prevent duplicates
@@ -232,10 +206,7 @@ const playerSlice = createSlice({
 
       // 4. If shuffle is on, we should technically rebuild or update the shuffle queue
       if (state.shuffle && state.tracks.length > 1) {
-        state.shuffleQueue = buildShuffleQueue(
-          state.tracks,
-          state.currentTrackId!,
-        );
+        state.shuffleQueue = buildShuffleQueue(state.tracks, state.currentTrackId!);
         state.shuffleIndex = 0;
       }
     },

@@ -9,7 +9,7 @@ import { IoChevronBack, IoEyeOutline, IoEyeOffOutline, IoQrCode } from "react-ic
 import ForgotPasswordForm from "./ForgotPasswordForm";
 import RegisterDetailsForm from "./RegisterDetailsForm";
 import DetailsValidationForm from "./DetailsValidationForm";
-import { z } from "zod"
+import { z } from "zod";
 
 import {
   useFindEmail,
@@ -18,7 +18,7 @@ import {
   useGoogleVerifyCode,
   useLogin,
   useSignup,
-  useResendVerificationEmail
+  useResendVerificationEmail,
 } from "@/hooks/useAuth";
 
 type Step =
@@ -59,11 +59,11 @@ export default function LoginForm({
   const [isEmailFocused, setIsEmailFocused] = useState(false);
   const [isPasswordFocused, setIsPasswordFocused] = useState(false);
 
-  const emailSchema = z.string().email("Please enter a valid email address")
-  const [emailError, setEmailError] = useState("")
+  const emailSchema = z.string().email("Please enter a valid email address");
+  const [emailError, setEmailError] = useState("");
 
   const [userExists, setUserExists] = useState(false);
-  const [passwordError, setPasswordError] = useState("")
+  const [passwordError, setPasswordError] = useState("");
 
   // ref to hold latest step so handleSubmit never captures a stale closure value
   const stepRef = useRef(step);
@@ -137,7 +137,7 @@ export default function LoginForm({
     captchaCode.split("").forEach((char, index) => {
       const x = startX + index * charGap + (Math.random() * 4 - 2);
       const y = canvas.height / 2 + (Math.random() * 10 - 5);
-      const rotation = (Math.random() * 0.6 - 0.3);
+      const rotation = Math.random() * 0.6 - 0.3;
 
       context.save();
       context.translate(x, y);
@@ -159,17 +159,17 @@ export default function LoginForm({
     .min(8, "Password must be at least 8 characters long")
     .regex(/[A-Z]/, "Password must contain at least one uppercase letter")
     .regex(/[0-9]/, "Password must contain at least one number")
-    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character")
+    .regex(/[^A-Za-z0-9]/, "Password must contain at least one special character");
 
   const validatePassword = (value: string) => {
-    const result = passwordSchema.safeParse(value)
+    const result = passwordSchema.safeParse(value);
     if (!result.success) {
-      setPasswordError(result.error.issues[0].message)
-      return false
+      setPasswordError(result.error.issues[0].message);
+      return false;
     }
-    setPasswordError("")
-    return true
-  }
+    setPasswordError("");
+    return true;
+  };
 
   const [googleIncompleteToken, setGoogleIncompleteToken] = useState("");
   const [googlePendingToken, setGooglePendingToken] = useState("");
@@ -196,41 +196,52 @@ export default function LoginForm({
     loading: googleVerifyLoading,
     error: googleVerifyError,
   } = useGoogleVerifyCode();
-  const { resendVerificationEmail, loading: resendLoading, success: resendSuccess } = useResendVerificationEmail();
-  const [isUnverified, setIsUnverified] = useState(false)
+  const {
+    resendVerificationEmail,
+    loading: resendLoading,
+    success: resendSuccess,
+  } = useResendVerificationEmail();
+  const [isUnverified, setIsUnverified] = useState(false);
   const router = useRouter();
 
   //refs for loading states so handleSubmit always reads fresh values
   const emailLoadingRef = useRef(emailLoading);
   const loginLoadingRef = useRef(loginLoading);
-  useEffect(() => { emailLoadingRef.current = emailLoading; }, [emailLoading]);
-  useEffect(() => { loginLoadingRef.current = loginLoading; }, [loginLoading]);
+  useEffect(() => {
+    emailLoadingRef.current = emailLoading;
+  }, [emailLoading]);
+  useEffect(() => {
+    loginLoadingRef.current = loginLoading;
+  }, [loginLoading]);
 
-  const navigateToPostAuth = useCallback((result?: any) => {
-    let target = redirectTo ?? "/home";
+  const navigateToPostAuth = useCallback(
+    (result?: any) => {
+      let target = redirectTo ?? "/home";
 
-    if (typeof window !== "undefined") {
-      const urlClient = new URLSearchParams(window.location.search).get("client")?.toLowerCase();
+      if (typeof window !== "undefined") {
+        const urlClient = new URLSearchParams(window.location.search).get("client")?.toLowerCase();
 
-      if (urlClient === "android") {
-        window.localStorage.setItem("beatza:auth-client", "Android");
-        const payload = result?.data ?? result ?? {};
-        const accessToken = payload.accessToken;
-        const refreshToken = payload.refreshToken;
+        if (urlClient === "android") {
+          window.localStorage.setItem("beatza:auth-client", "Android");
+          const payload = result?.data ?? result ?? {};
+          const accessToken = payload.accessToken;
+          const refreshToken = payload.refreshToken;
 
-        const params = new URLSearchParams();
-        if (accessToken) params.set("accessToken", String(accessToken));
-        if (refreshToken) params.set("refreshToken", String(refreshToken));
+          const params = new URLSearchParams();
+          if (accessToken) params.set("accessToken", String(accessToken));
+          if (refreshToken) params.set("refreshToken", String(refreshToken));
 
-        const suffix = params.toString();
-        target = suffix ? `/cross-callback?${suffix}` : "/cross-callback";
+          const suffix = params.toString();
+          target = suffix ? `/cross-callback?${suffix}` : "/cross-callback";
+        }
       }
-    }
 
-    startTransition(() => {
-      router.replace(target);
-    });
-  }, [router, startTransition, redirectTo]);
+      startTransition(() => {
+        router.replace(target);
+      });
+    },
+    [router, startTransition, redirectTo]
+  );
 
   const handleGoogleSignIn = useCallback(() => {
     const baseUrl = process.env.NEXT_PUBLIC_API_URL || "";
@@ -240,10 +251,7 @@ export default function LoginForm({
         : null;
     const isAndroidClient = urlClient?.toLowerCase() === "android";
 
-    const googleUrl = new URL(
-      "/api/auth/v1/google",
-      baseUrl || window.location.origin,
-    );
+    const googleUrl = new URL("/api/auth/v1/google", baseUrl || window.location.origin);
 
     if (isAndroidClient) {
       window.localStorage.setItem("beatza:auth-client", "Android");
@@ -257,18 +265,18 @@ export default function LoginForm({
 
   const handleContinueFromEmail = useCallback(async () => {
     setLoginSuccess(false);
-    
-    const result = emailSchema.safeParse(email)
-    if (!result.success) {
-      setEmailError(result.error.issues[0].message)
-      return
-    }
-    setEmailError("")
 
-    const res = await findEmail(email)
-    if (!res) return
-    setUserExists(res.data.exists)
-    setStep("password")
+    const result = emailSchema.safeParse(email);
+    if (!result.success) {
+      setEmailError(result.error.issues[0].message);
+      return;
+    }
+    setEmailError("");
+
+    const res = await findEmail(email);
+    if (!res) return;
+    setUserExists(res.data.exists);
+    setStep("password");
   }, [email, findEmail]);
 
   const handleContinueFromPassword = useCallback(async () => {
@@ -288,16 +296,16 @@ export default function LoginForm({
         setCaptchaToken("client-captcha-ok");
       }
 
-      setIsUnverified(false)
+      setIsUnverified(false);
       const res = await login(email, password);
       if (res?.message === "Authenticated successfully") {
         onAuthSuccess?.();
         setLoginSuccess(true);
         navigateToPostAuth(res);
-        return
+        return;
       }
     } else {
-      if (!validatePassword(password)) return
+      if (!validatePassword(password)) return;
       setRegisterError(null);
       setStep("register-details");
     }
@@ -351,18 +359,14 @@ export default function LoginForm({
   const handleGoogleComplete = useCallback(
     async (details: { displayName: string; dob: string; gender: string }) => {
       if (!googleIncompleteToken) return;
-      const res = await completeGoogleSignup(
-        googleIncompleteToken,
-        details.dob,
-        details.gender,
-      );
+      const res = await completeGoogleSignup(googleIncompleteToken, details.dob, details.gender);
       if (res) {
         onAuthSuccess?.();
         setLoginSuccess(true);
         navigateToPostAuth(res);
       }
     },
-    [completeGoogleSignup, googleIncompleteToken, onAuthSuccess, navigateToPostAuth],
+    [completeGoogleSignup, googleIncompleteToken, onAuthSuccess, navigateToPostAuth]
   );
 
   const handleGoogleVerify = useCallback(async () => {
@@ -380,13 +384,15 @@ export default function LoginForm({
   }, [router]);
 
   useEffect(() => {
-    if (loginError?.toLowerCase().includes("not verified") ||
-        loginError?.toLowerCase().includes("verify your email")) {
-      setIsUnverified(true)
+    if (
+      loginError?.toLowerCase().includes("not verified") ||
+      loginError?.toLowerCase().includes("verify your email")
+    ) {
+      setIsUnverified(true);
     } else {
-      setIsUnverified(false)
+      setIsUnverified(false);
     }
-  }, [loginError])
+  }, [loginError]);
 
   const isPasswordStep = step === "password";
   const isBusy = (isPasswordStep ? loginLoading : emailLoading) || isNavigating;
@@ -396,9 +402,7 @@ export default function LoginForm({
 
       const currentStep = stepRef.current;
       const currentlyBusy =
-        currentStep === "password"
-          ? loginLoadingRef.current
-          : emailLoadingRef.current;
+        currentStep === "password" ? loginLoadingRef.current : emailLoadingRef.current;
 
       if (currentlyBusy) return;
 
@@ -409,7 +413,7 @@ export default function LoginForm({
 
       await handleContinueFromEmail();
     },
-    [handleContinueFromEmail, handleContinueFromPassword],
+    [handleContinueFromEmail, handleContinueFromPassword]
   );
 
   if (step === "validation") {
@@ -485,7 +489,9 @@ export default function LoginForm({
         >
           <IoChevronBack size={26} />
         </button>
-        <h1 className="text-[28px] font-bold leading-tight mb-3 text-left">Verify your Google sign-in</h1>
+        <h1 className="text-[28px] font-bold leading-tight mb-3 text-left">
+          Verify your Google sign-in
+        </h1>
         <p className="text-sm text-gray-400 mb-6">
           We sent a 6-digit code to {googleEmail || "your email"}. Enter it below to continue.
         </p>
@@ -570,11 +576,21 @@ export default function LoginForm({
       {!isPasswordStep && !isEmailEverFocused && (
         <div className="animate-in fade-in duration-500">
           <p className="text-[13px] text-gray-400 mb-6 leading-relaxed">
-            By clicking on any of the "Continue" buttons below, you agree to
-            BeatZa's
-            <span className="text-[#699FFF] cursor-pointer ml-1" onClick={() => router.push("/legal")}>Terms of Use</span>{" "}
+            By clicking on any of the "Continue" buttons below, you agree to BeatZa's
+            <span
+              className="text-[#699FFF] cursor-pointer ml-1"
+              onClick={() => router.push("/legal")}
+            >
+              Terms of Use
+            </span>{" "}
             and
-            <span className="text-[#699FFF] cursor-pointer ml-1" onClick={() => router.push("/privacy-policy")}>Privacy Policy</span>.
+            <span
+              className="text-[#699FFF] cursor-pointer ml-1"
+              onClick={() => router.push("/privacy-policy")}
+            >
+              Privacy Policy
+            </span>
+            .
           </p>
           <div className="space-y-2 mb-8">
             <button
@@ -613,9 +629,7 @@ export default function LoginForm({
         >
           <label
             className={`absolute left-3 transition-all duration-200 text-gray-400 font-bold tracking-wider pointer-events-none ${
-              isEmailActive
-                ? "text-[10px] top-2"
-                : "text-[12px] top-1/2 -translate-y-1/2"
+              isEmailActive ? "text-[10px] top-2" : "text-[12px] top-1/2 -translate-y-1/2"
             }`}
           >
             Your email address or profile URL
@@ -634,24 +648,23 @@ export default function LoginForm({
               setIsEmailEverFocused(true);
             }}
             onBlur={() => setIsEmailFocused(false)}
-            onChange={(e) => { setEmail(e.target.value); if (emailError) setEmailError("") }}
+            onChange={(e) => {
+              setEmail(e.target.value);
+              if (emailError) setEmailError("");
+            }}
             className={`w-full bg-transparent p-2 border-none outline-none text-white-smoke text-base ${
               isEmailActive ? "pt-4" : "pt-0"
             } ${isPasswordStep ? "opacity-80" : ""}`}
           />
         </div>
 
-        {!isPasswordStep && emailError && (
-          <p className="text-red-500 text-xs">{emailError}</p>
-        )}
+        {!isPasswordStep && emailError && <p className="text-red-500 text-xs">{emailError}</p>}
 
         {isPasswordStep && (
           <div className="relative bg-chinese-black border border-white/30 rounded p-3 h-16 flex flex-col justify-center animate-in slide-in-from-top-2">
             <label
               className={`absolute left-3 transition-all duration-200 text-gray-400 font-bold tracking-wider pointer-events-none ${
-                isPasswordActive
-                  ? "text-[10px] top-2"
-                  : "text-[12px] top-1/2 -translate-y-1/2"
+                isPasswordActive ? "text-[10px] top-2" : "text-[12px] top-1/2 -translate-y-1/2"
               }`}
             >
               {userExists
@@ -669,8 +682,8 @@ export default function LoginForm({
                 spellCheck={false}
                 enterKeyHint="go"
                 onChange={(e) => {
-                  setPassword(e.target.value)
-                  if (!userExists && passwordError) validatePassword(e.target.value)
+                  setPassword(e.target.value);
+                  if (!userExists && passwordError) validatePassword(e.target.value);
                 }}
                 onFocus={() => setIsPasswordFocused(true)}
                 onBlur={() => setIsPasswordFocused(false)}
@@ -696,7 +709,9 @@ export default function LoginForm({
 
         {isPasswordStep && userExists && (
           <div className="rounded border border-white/20 bg-chinese-black p-3">
-            <p className="text-[11px] font-semibold tracking-wide text-gray-400">CAPTCHA verification</p>
+            <p className="text-[11px] font-semibold tracking-wide text-gray-400">
+              CAPTCHA verification
+            </p>
 
             {isCaptchaEnabled ? (
               <div className="mt-2 overflow-x-auto" data-testid="captcha-image">
@@ -751,7 +766,9 @@ export default function LoginForm({
                 ) : null}
               </div>
             ) : (
-              <p className="mt-2 text-xs text-yellow-300">CAPTCHA is available after the page finishes loading.</p>
+              <p className="mt-2 text-xs text-yellow-300">
+                CAPTCHA is available after the page finishes loading.
+              </p>
             )}
 
             {captchaError && (
@@ -777,10 +794,7 @@ export default function LoginForm({
         <button
           data-testid="continue-button-login"
           type="submit"
-          disabled={
-            isBusy ||
-            (isPasswordStep ? !password.trim() : !email.trim())
-          }
+          disabled={isBusy || (isPasswordStep ? !password.trim() : !email.trim())}
           className={`w-full h-12 font-bold rounded transition-all duration-200 ${
             isBusy || !email.trim() || (isPasswordStep && !password.trim())
               ? "bg-white-smoke/60 text-chinese-black"
@@ -793,7 +807,9 @@ export default function LoginForm({
 
       {loginSuccess && isPasswordStep && (
         <p className="mt-3 text-sm text-green-400">
-          {isNavigating ? "Signed in successfully. Loading your home page..." : "Signed in successfully."}
+          {isNavigating
+            ? "Signed in successfully. Loading your home page..."
+            : "Signed in successfully."}
         </p>
       )}
 
@@ -810,7 +826,9 @@ export default function LoginForm({
             </button>
           )}
           {resendSuccess && (
-            <p className="mt-2 text-sm text-green-400">Verification email sent! Check your inbox.</p>
+            <p className="mt-2 text-sm text-green-400">
+              Verification email sent! Check your inbox.
+            </p>
           )}
         </div>
       )}
@@ -830,7 +848,11 @@ export default function LoginForm({
       )}
 
       {!isPasswordStep && (
-        <button onClick={() => router.push("/need-help")} data-testid="need-help-button" className="mt-6 text-sm cursor-pointer text-[#699FFF] hover:underline font-medium">
+        <button
+          onClick={() => router.push("/need-help")}
+          data-testid="need-help-button"
+          className="mt-6 text-sm cursor-pointer text-[#699FFF] hover:underline font-medium"
+        >
           Need help?
         </button>
       )}

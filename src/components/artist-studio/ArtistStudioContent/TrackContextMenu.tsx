@@ -67,7 +67,7 @@ export function TrackContextMenu({
   });
 
   const click = useClick(context);
-  const dismiss = useDismiss(context, { outsidePressEvent: 'click' });
+  const dismiss = useDismiss(context, { outsidePressEvent: "click" });
   const role = useRole(context, { role: "menu" });
   const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
@@ -82,13 +82,50 @@ export function TrackContextMenu({
   };
 
   const menuItems = [
-    { icon: PiPencilSimple, label: "Edit", action: () => { onEdit(trackId); setIsOpen(false); } },
-    { icon: FiPlusSquare, label: "Add to playlist", action: () => { onAddToPlaylist(trackId); setIsOpen(false); } },
+    {
+      icon: PiPencilSimple,
+      label: "Edit",
+      action: () => {
+        onEdit(trackId);
+        setIsOpen(false);
+      },
+    },
+    {
+      icon: FiPlusSquare,
+      label: "Add to playlist",
+      action: () => {
+        onAddToPlaylist(trackId);
+        setIsOpen(false);
+      },
+    },
     ...(isArtistPro
-      ? [{ icon: FiDownload, label: "Download file", action: () => { if (canDownload) onDownload(trackId); setIsOpen(false); }, disabled: !canDownload }]
+      ? [
+          {
+            icon: FiDownload,
+            label: "Download file",
+            action: () => {
+              if (canDownload) onDownload(trackId);
+              setIsOpen(false);
+            },
+            disabled: !canDownload,
+          },
+        ]
       : []),
-    { icon: FiLink, label: "Copy link", action: handleCopyLink, disabled: !permalink || !profileLink },
-    { icon: FiTrash2, label: "Delete track", action: () => { onDelete(trackId); setIsOpen(false); }, danger: true },
+    {
+      icon: FiLink,
+      label: "Copy link",
+      action: handleCopyLink,
+      disabled: !permalink || !profileLink,
+    },
+    {
+      icon: FiTrash2,
+      label: "Delete track",
+      action: () => {
+        onDelete(trackId);
+        setIsOpen(false);
+      },
+      danger: true,
+    },
   ];
 
   const menuContent = menuItems.map(({ icon: Icon, label, action, danger, disabled }) => (

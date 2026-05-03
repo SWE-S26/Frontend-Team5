@@ -2,16 +2,23 @@ import { useState, useEffect, useRef } from "react";
 
 import {
   PrivacySettings,
-  NotificationSettings, UpdateNotificationSettingsRequest,
-  AccountSettings, UpdateAccountSettingsRequest,
-  ContentSettings, UpdateContentSettingsRequest,
+  NotificationSettings,
+  UpdateNotificationSettingsRequest,
+  AccountSettings,
+  UpdateAccountSettingsRequest,
+  ContentSettings,
+  UpdateContentSettingsRequest,
 } from "@/types/settings.types";
 
 import {
-  getPrivacySettings, updatePrivacySettings,
-  getNotificationSettings, updateNotificationSettings,
-  getAccountSettings, updateAccountSettings,
-  getContentSettings, updateContentSettings,
+  getPrivacySettings,
+  updatePrivacySettings,
+  getNotificationSettings,
+  updateNotificationSettings,
+  getAccountSettings,
+  updateAccountSettings,
+  getContentSettings,
+  updateContentSettings,
 } from "@/services/settings.service";
 
 type SaveStatus = "idle" | "saving" | "saved" | "error";
@@ -68,8 +75,6 @@ export const usePrivacySettings = (): UsePrivacySettingsReturn => {
   return { settings, loading, saveStatus, updateSetting };
 };
 
-
-
 /* --------------- Notifications --------------- */
 interface UseNotificationSettingsReturn {
   settings: NotificationSettings | null;
@@ -108,7 +113,10 @@ export const useNotificationSettings = (): UseNotificationSettingsReturn => {
         return {
           ...prev,
           ...data,
-          newMessage: { ...prev.newMessage, ...data.newMessage } as NotificationSettings["newMessage"],
+          newMessage: {
+            ...prev.newMessage,
+            ...data.newMessage,
+          } as NotificationSettings["newMessage"],
         };
       }
       return { ...prev, ...data } as NotificationSettings;
@@ -131,8 +139,6 @@ export const useNotificationSettings = (): UseNotificationSettingsReturn => {
 
   return { settings, loading, saveStatus, updateSettings };
 };
-
-
 
 /* --------------- Account --------------- */
 interface UseAccountSettingsReturn {
@@ -185,8 +191,6 @@ export const useAccountSettings = (): UseAccountSettingsReturn => {
 
   return { settings, loading, saveStatus, updateSettings };
 };
-
-
 
 /* --------------- Content --------------- */
 interface UseContentSettingsReturn {

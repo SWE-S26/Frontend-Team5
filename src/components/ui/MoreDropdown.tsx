@@ -64,8 +64,11 @@ export default function MoreDropdown({
   const click = useClick(dropdownContext);
   const dismiss = useDismiss(dropdownContext);
   const role = useRole(dropdownContext, { role: "menu" });
-  const { getReferenceProps: getDropdownRefProps, getFloatingProps } =
-    useInteractions([click, dismiss, role]);
+  const { getReferenceProps: getDropdownRefProps, getFloatingProps } = useInteractions([
+    click,
+    dismiss,
+    role,
+  ]);
 
   // Tooltip floating
   const {
@@ -81,10 +84,8 @@ export default function MoreDropdown({
   });
 
   const hover = useHover(tooltipContext);
-  const {
-    getReferenceProps: getTooltipRefProps,
-    getFloatingProps: getTooltipFloatingProps,
-  } = useInteractions([hover]);
+  const { getReferenceProps: getTooltipRefProps, getFloatingProps: getTooltipFloatingProps } =
+    useInteractions([hover]);
 
   function mergeRefs(...refs: any[]) {
     return (node: any) =>
@@ -146,9 +147,7 @@ export default function MoreDropdown({
                   data-testid={item.testId}
                   className="flex items-center gap-3 pl-3 pr-6 py-1.5 text-left text-white-smoke hover:text-white-smoke/50 transition-colors"
                 >
-                  {item.icon && (
-                    <span className="text-lg shrink-0">{item.icon}</span>
-                  )}
+                  {item.icon && <span className="text-lg shrink-0">{item.icon}</span>}
                   <span className="text-sm font-bold">{item.label}</span>
                 </Link>
               ) : (
@@ -167,12 +166,10 @@ export default function MoreDropdown({
                       : "text-white-smoke hover:text-white-smoke/50 cursor-pointer"
                   }`}
                 >
-                  {item.icon && (
-                    <span className="text-lg shrink-0">{item.icon}</span>
-                  )}
+                  {item.icon && <span className="text-lg shrink-0">{item.icon}</span>}
                   <span className="text-sm font-bold">{item.label}</span>
                 </button>
-              ),
+              )
             )}
           </div>
         )}

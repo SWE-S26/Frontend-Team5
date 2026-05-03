@@ -14,8 +14,6 @@ export const EXCLUDED_ROUTES = [
   "/track",
   "/playlist",
   "/search",
-]
+];
 
-export const ADMIN_ROUTES = [
-  "/admin-dash",
-]
+export const ADMIN_ROUTES = ["/admin-dash"];

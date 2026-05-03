@@ -5,43 +5,42 @@ import { motion, AnimatePresence } from "framer-motion";
 import Cropper from "react-easy-crop";
 import type { Area } from "react-easy-crop";
 
-import { useAppSelector, useAppDispatch } from "@/store/hooks"
-
-
+import { useAppSelector, useAppDispatch } from "@/store/hooks";
 
 interface AvatarPositionModalProps {
-  isOpen:       boolean;
-  imageUrl:     string;
+  isOpen: boolean;
+  imageUrl: string;
   originalFile: File | null;
-  onSave:       (file: File, croppedDataUrl: string) => void;
-  onCancel:     () => void;
+  onSave: (file: File, croppedDataUrl: string) => void;
+  onCancel: () => void;
 }
 
-async function getCroppedImage(imageSrc: string, croppedAreaPixels: Area, fileName: string): Promise<{ file: File; dataUrl: string }> {
-  
-    
-  
-    const image = await new Promise<HTMLImageElement>((resolve, reject) => {
+async function getCroppedImage(
+  imageSrc: string,
+  croppedAreaPixels: Area,
+  fileName: string
+): Promise<{ file: File; dataUrl: string }> {
+  const image = await new Promise<HTMLImageElement>((resolve, reject) => {
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.onload  = () => resolve(img);
+    img.onload = () => resolve(img);
     img.onerror = reject;
-    img.src     = imageSrc;
+    img.src = imageSrc;
   });
 
   const canvas = document.createElement("canvas");
-  canvas.width  = croppedAreaPixels.width;
+  canvas.width = croppedAreaPixels.width;
   canvas.height = croppedAreaPixels.height;
   const ctx = canvas.getContext("2d");
   if (!ctx) throw new Error("No canvas context");
 
   ctx.beginPath();
   ctx.arc(
-    croppedAreaPixels.width  / 2,
+    croppedAreaPixels.width / 2,
     croppedAreaPixels.height / 2,
     Math.min(croppedAreaPixels.width, croppedAreaPixels.height) / 2,
     0,
-    Math.PI * 2,
+    Math.PI * 2
   );
   ctx.clip();
 
@@ -54,12 +53,12 @@ async function getCroppedImage(imageSrc: string, croppedAreaPixels: Area, fileNa
     0,
     0,
     croppedAreaPixels.width,
-    croppedAreaPixels.height,
+    croppedAreaPixels.height
   );
 
   const dataUrl = canvas.toDataURL("image/png");
-  const blob    = await (await fetch(dataUrl)).blob();
-  const file    = new File([blob], fileName, { type: "image/png" });
+  const blob = await (await fetch(dataUrl)).blob();
+  const file = new File([blob], fileName, { type: "image/png" });
   return { file, dataUrl };
 }
 
@@ -70,8 +69,8 @@ export default function AvatarPositionModal({
   onSave,
   onCancel,
 }: AvatarPositionModalProps) {
-  const [crop,        setCrop]        = useState({ x: 0, y: 0 });
-  const [zoom,        setZoom]        = useState(1);
+  const [crop, setCrop] = useState({ x: 0, y: 0 });
+  const [zoom, setZoom] = useState(1);
   const [croppedArea, setCroppedArea] = useState<Area | null>(null);
 
   const onCropComplete = useCallback((_: Area, croppedAreaPixels: Area) => {
@@ -84,7 +83,7 @@ export default function AvatarPositionModal({
     onSave(file, dataUrl);
   }, [croppedArea, originalFile, imageUrl, onSave]);
 
-   const displayName    = useAppSelector((state) => state.profile.displayName)
+  const displayName = useAppSelector((state) => state.profile.displayName);
 
   return (
     <AnimatePresence>
@@ -93,7 +92,8 @@ export default function AvatarPositionModal({
           className="fixed inset-0 bg-white/30 z-[1001] flex items-start pt-25 justify-center"
           onClick={onCancel}
         >
-          <button data-testid="cancel-button-popup"
+          <button
+            data-testid="cancel-button-popup"
             className="fixed top-4 right-4 text-white text-2xl font-bold bg-off-black rounded-full w-11 h-11 flex items-center justify-center z-[1002] hover:text-silver cursor-pointer"
             onClick={onCancel}
           >
@@ -108,9 +108,7 @@ export default function AvatarPositionModal({
             className="flex flex-col w-110  p-6 bg-black rounded-md relative"
             onClick={(e) => e.stopPropagation()}
           >
-            <p className="text-xl text-white-smoke font-bold mb-1">
-               {displayName}
-            </p>
+            <p className="text-xl text-white-smoke font-bold mb-1">{displayName}</p>
             <p className="text-sm text-silver mb-6">
               For best results, upload images of at least 1000x1000 pixels. 2MB file-size limit.
             </p>
@@ -124,7 +122,7 @@ export default function AvatarPositionModal({
                 aspect={1}
                 cropShape="round"
                 showGrid={false}
-                cropSize={{ width: 280, height: 280 }}  
+                cropSize={{ width: 280, height: 280 }}
                 onCropChange={setCrop}
                 onZoomChange={setZoom}
                 onCropComplete={onCropComplete}
@@ -143,13 +141,15 @@ export default function AvatarPositionModal({
             </div>
 
             <div className="flex justify-end gap-3 mt-2">
-              <button data-testid="cancel-button-AvatarPositionModalPopup"
+              <button
+                data-testid="cancel-button-AvatarPositionModalPopup"
                 onClick={onCancel}
                 className="bg-off-black text-white-smoke px-4 py-2 rounded cursor-pointer hover:text-silver transition-colors"
               >
                 Cancel
               </button>
-              <button data-testid="save-button-AvatarPositionModalPopup"
+              <button
+                data-testid="save-button-AvatarPositionModalPopup"
                 onClick={handleSave}
                 className="bg-white text-black px-4 py-2 rounded cursor-pointer hover:bg-gray-200 transition-colors font-semibold"
               >

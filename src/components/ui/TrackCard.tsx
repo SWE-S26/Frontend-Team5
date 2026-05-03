@@ -49,9 +49,7 @@ export default function TrackCard({
 
   const dispatch = useDispatch();
 
-  const { currentTrackId, isPlaying } = useSelector(
-    (state: RootState) => state.player,
-  );
+  const { currentTrackId, isPlaying } = useSelector((state: RootState) => state.player);
 
   useEffect(() => {
     if (!isMoreOpen) return;
@@ -76,7 +74,7 @@ export default function TrackCard({
           ? allTracks
           : [{ id: trackId, url: trackUrl, title, artist, img, duration }],
         startId: trackId,
-      }),
+      })
     );
     setTimeout(() => {
       dispatch(play());
@@ -106,7 +104,7 @@ export default function TrackCard({
           img,
           duration,
         },
-      }),
+      })
     );
   }
 
@@ -191,9 +189,7 @@ export default function TrackCard({
                     },
                     {
                       label: "Add to Playlist",
-                      icon: (
-                        <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />
-                      ),
+                      icon: <RiPlayListAddLine className="text-lg scale-x-[-1] scale-y-[-1]" />,
                       onClick: () => setIsAddToPlaylistOpen(true),
                     },
                   ]}
@@ -240,7 +236,7 @@ export default function TrackCard({
             artistName={artist}
             trackImage={img}
           />,
-          document.body,
+          document.body
         )}
     </>
   );

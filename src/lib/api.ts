@@ -1,7 +1,7 @@
 // This file should not be changed and is defined only once
 // this is an instance from axios created using axios.create()
 
-import axios from "axios"
+import axios from "axios";
 
 const PUBLIC_ROUTES = [
   "/api/auth/v1/find-email",
@@ -28,7 +28,7 @@ const PUBLIC_ROUTES = [
   "/api/v1/playlists",
   "/api/public/feed/v1",
   "/api/feed/v1/search",
-]
+];
 
 const api = axios.create({
   baseURL: process.env.NEXT_PUBLIC_API_URL,
@@ -36,26 +36,25 @@ const api = axios.create({
   headers: {
     "Content-Type": "application/json",
   },
-})
+});
 
 // 401: token expired, attempt refresh (skip public routes)
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
-    const originalRequest = error.config
-    const isPublic = PUBLIC_ROUTES.some(route => originalRequest?.url?.includes(route))
+    const originalRequest = error.config;
+    const isPublic = PUBLIC_ROUTES.some((route) => originalRequest?.url?.includes(route));
 
     if (error.response?.status === 401 && !isPublic && !originalRequest._retry) {
-      originalRequest._retry = true
+      originalRequest._retry = true;
 
-      await axios.get(
-        `${process.env.NEXT_PUBLIC_API_URL}/api/auth/v1/refresh-token`,
-        { withCredentials: true }
-      )
-      return api(originalRequest)
+      await axios.get(`${process.env.NEXT_PUBLIC_API_URL}/api/auth/v1/refresh-token`, {
+        withCredentials: true,
+      });
+      return api(originalRequest);
     }
-    return Promise.reject(error)
+    return Promise.reject(error);
   }
-)
+);
 
-export default api
+export default api;

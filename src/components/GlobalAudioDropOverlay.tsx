@@ -89,8 +89,12 @@ export default function GlobalAudioDropOverlay() {
   return (
     <div className="pointer-events-none fixed inset-0 z-1200 flex items-center justify-center bg-black/55 px-4 backdrop-blur-[2px] sm:px-6">
       <div className="w-full max-w-5xl rounded-xl border-2 border-dashed border-white-smoke bg-chinese-black/92 px-6 py-16 text-center shadow-2xl sm:px-10 sm:py-20">
-        <p className="text-[22px] font-semibold leading-tight text-white-smoke sm:text-[28px]">Drop audio file to upload</p>
-        <p className="mt-3 text-[13px] text-white/80 sm:text-[14px]">You&apos;ll be taken to Track Info automatically.</p>
+        <p className="text-[22px] font-semibold leading-tight text-white-smoke sm:text-[28px]">
+          Drop audio file to upload
+        </p>
+        <p className="mt-3 text-[13px] text-white/80 sm:text-[14px]">
+          You&apos;ll be taken to Track Info automatically.
+        </p>
       </div>
     </div>
   );

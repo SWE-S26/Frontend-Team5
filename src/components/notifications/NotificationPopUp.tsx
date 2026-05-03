@@ -1,20 +1,19 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import NotificationItem from "./NotificationItem"
-import type { Notification } from "@/types/notification.types"
+import Link from "next/link";
+import NotificationItem from "./NotificationItem";
+import type { Notification } from "@/types/notification.types";
 
 interface NotificationPopupProps {
-  notifications: Notification[]
-  onClose:       () => void
+  notifications: Notification[];
+  onClose: () => void;
 }
 
 export default function NotificationPopup({ notifications, onClose }: NotificationPopupProps) {
-  const isEmpty = notifications.length === 0
+  const isEmpty = notifications.length === 0;
 
   return (
     <div className="w-112.5 bg-chinese-black border border-silver/20 rounded-sm shadow-2xl flex flex-col overflow-hidden">
-
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-silver/20">
         <h2 className="text-white-smoke font-bold text-base">Notifications</h2>
@@ -33,11 +32,7 @@ export default function NotificationPopup({ notifications, onClose }: Notificati
           <p className="text-silver text-sm text-center py-10">No notifications</p>
         ) : (
           notifications.map((n) => (
-            <NotificationItem
-              key={n.notificationId}
-              notification={n}
-              showFollowBack
-            />
+            <NotificationItem key={n.notificationId} notification={n} showFollowBack />
           ))
         )}
       </div>
@@ -52,7 +47,6 @@ export default function NotificationPopup({ notifications, onClose }: Notificati
           View all notifications
         </Link>
       </div>
-
     </div>
-  )
+  );
 }

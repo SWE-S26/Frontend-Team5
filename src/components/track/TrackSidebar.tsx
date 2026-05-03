@@ -1,12 +1,12 @@
-"use client"
+"use client";
 import { PiInfo } from "react-icons/pi";
-import TabsNavbar from "@/components/layout/navbar/TabsNavbar"
+import TabsNavbar from "@/components/layout/navbar/TabsNavbar";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Avatar } from "antd";
 import { useLikeTrack } from "@/hooks/useLikes";
 import { useTrackRepostsList } from "@/hooks/useReposts";
 import ProfilePopover from "../layout/track-cards/ProfilePopover";
-import { useGetTrackAlbums, useGetTrackPlaylists, useGetTrackStats } from "@/hooks/useTracks"
+import { useGetTrackAlbums, useGetTrackPlaylists, useGetTrackStats } from "@/hooks/useTracks";
 import PlaylistCard from "@/components/track/PlaylistCard";
 import FanCard from "./FanCard";
 import LeaderboardActions from "./LeaderboardActions";
@@ -21,99 +21,106 @@ interface TrackSidebarProps {
   className?: string;
 }
 
-export default function TrackSidebar({ trackId,   track, onRepeatPlay, className }: TrackSidebarProps) {
+export default function TrackSidebar({
+  trackId,
+  track,
+  onRepeatPlay,
+  className,
+}: TrackSidebarProps) {
   const [activeTab, setActiveTab] = useState("top");
 
-  const { users, total: LikesCount, loadLikes } = useLikeTrack()
-  const { users: repostUsers, total: RepostsCount, loadReposts } = useTrackRepostsList(trackId)
-  const { playlists: trackPlaylists, getTrackPlaylists, loading: playlistsLoading } = useGetTrackPlaylists()
-  const { albums: trackAlbums, getTrackAlbums } = useGetTrackAlbums()
-  const { topFans, firstFans, loading: fansLoading, getTrackStats } = useGetTrackStats()
-  const [userProfiles, setUserProfiles] = useState<Record<string, GetProfileResponse>>({})
-  const [followOverrides, setFollowOverrides] = useState<Record<string, boolean>>({})
-  const inFlightIdsRef = useRef<Set<string>>(new Set())
+  const { users, total: LikesCount, loadLikes } = useLikeTrack();
+  const { users: repostUsers, total: RepostsCount, loadReposts } = useTrackRepostsList(trackId);
+  const {
+    playlists: trackPlaylists,
+    getTrackPlaylists,
+    loading: playlistsLoading,
+  } = useGetTrackPlaylists();
+  const { albums: trackAlbums, getTrackAlbums } = useGetTrackAlbums();
+  const { topFans, firstFans, loading: fansLoading, getTrackStats } = useGetTrackStats();
+  const [userProfiles, setUserProfiles] = useState<Record<string, GetProfileResponse>>({});
+  const [followOverrides, setFollowOverrides] = useState<Record<string, boolean>>({});
+  const inFlightIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
-    if (!trackId) return
-    void getTrackPlaylists(trackId)
-    void getTrackAlbums(trackId)
-    loadLikes(trackId)
-    loadReposts()
-    void getTrackStats(trackId)
-  }, [trackId])
+    if (!trackId) return;
+    void getTrackPlaylists(trackId);
+    void getTrackAlbums(trackId);
+    loadLikes(trackId);
+    loadReposts();
+    void getTrackStats(trackId);
+  }, [trackId]);
 
   const sidebarUserIds = useMemo(
     () =>
       Array.from(
-        new Set([
-          ...users.map((user) => user.userId),
-          ...repostUsers.map((user) => user.userId),
-        ].filter(Boolean)),
+        new Set(
+          [...users.map((user) => user.userId), ...repostUsers.map((user) => user.userId)].filter(
+            Boolean
+          )
+        )
       ),
-    [users, repostUsers],
-  )
+    [users, repostUsers]
+  );
 
   useEffect(() => {
     const missingIds = sidebarUserIds.filter(
-      (id) => !userProfiles[id] && !inFlightIdsRef.current.has(id),
-    )
-    if (missingIds.length === 0) return
+      (id) => !userProfiles[id] && !inFlightIdsRef.current.has(id)
+    );
+    if (missingIds.length === 0) return;
 
-    missingIds.forEach((id) => inFlightIdsRef.current.add(id))
+    missingIds.forEach((id) => inFlightIdsRef.current.add(id));
 
-    let cancelled = false
+    let cancelled = false;
 
     void (async () => {
-      const BATCH_SIZE = 3
-      const delay = (ms: number) =>
-        new Promise((resolve) => setTimeout(resolve, ms))
+      const BATCH_SIZE = 3;
+      const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
       for (let start = 0; start < missingIds.length; start += BATCH_SIZE) {
-        const batch = missingIds.slice(start, start + BATCH_SIZE)
+        const batch = missingIds.slice(start, start + BATCH_SIZE);
         const results = await Promise.all(
           batch.map(async (id) => {
             try {
-              const data = await profileService.getProfileAuthCached(id)
-              return data
+              const data = await profileService.getProfileAuthCached(id);
+              return data;
             } catch {
-              return null
+              return null;
             }
-          }),
-        )
+          })
+        );
 
-        if (cancelled) return
+        if (cancelled) return;
 
         setUserProfiles((prev) => {
-          const next = { ...prev }
+          const next = { ...prev };
           batch.forEach((id, index) => {
-            const profile = results[index]
-            if (profile) next[id] = profile
-            inFlightIdsRef.current.delete(id)
-          })
-          return next
-        })
+            const profile = results[index];
+            if (profile) next[id] = profile;
+            inFlightIdsRef.current.delete(id);
+          });
+          return next;
+        });
 
         if (start + BATCH_SIZE < missingIds.length) {
-          await delay(250)
+          await delay(250);
         }
       }
-    })()
+    })();
 
     return () => {
-      cancelled = true
-    }
-  }, [sidebarUserIds, userProfiles])
+      cancelled = true;
+    };
+  }, [sidebarUserIds, userProfiles]);
 
-  
   const SideTabs = [
     { href: "", label: "Top", value: "top" },
     { href: "", label: "First", value: "first" },
-  ]
+  ];
 
-  const activeFans = activeTab === "top" ? topFans : firstFans
+  const activeFans = activeTab === "top" ? topFans : firstFans;
 
   return (
     <aside className="w-85  top-20 h-fit flex flex-col gap-10 text-white">
-
       <section className="flex flex-col gap-3 mt-5">
         <div className="flex">
           <h2 className="text-sm font-bold uppercase tracking-wide text-white-smoke">Fans</h2>
@@ -164,12 +171,9 @@ export default function TrackSidebar({ trackId,   track, onRepeatPlay, className
         />
       </section>
 
-      
-
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase text-white-smoke">In Playlists</h2>
-          
         </div>
         <div className="flex flex-col gap-3">
           {playlistsLoading ? (
@@ -190,29 +194,28 @@ export default function TrackSidebar({ trackId,   track, onRepeatPlay, className
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase text-white-smoke">{LikesCount} Likes</h2>
-          
         </div>
         <Avatar.Group className="w-100">
           {users.map((user) => {
-            const profile = userProfiles[user.userId]
-            const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false
+            const profile = userProfiles[user.userId];
+            const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false;
 
             return (
-            <ProfilePopover
-              key={user.userId}
-              id={`like-${user.userId}`}
-              artistName={user.displayName}
-              followCount={user.followersCount}
-              profileImgLink={user.avatarUrl}
-              userId={user.userId}
-              isFollowing={isFollowing}
-              onFollowChange={(next) =>
-                setFollowOverrides((prev) => ({ ...prev, [user.userId]: next }))
-              }
-            >
-              <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
-            </ProfilePopover>
-            )
+              <ProfilePopover
+                key={user.userId}
+                id={`like-${user.userId}`}
+                artistName={user.displayName}
+                followCount={user.followersCount}
+                profileImgLink={user.avatarUrl}
+                userId={user.userId}
+                isFollowing={isFollowing}
+                onFollowChange={(next) =>
+                  setFollowOverrides((prev) => ({ ...prev, [user.userId]: next }))
+                }
+              >
+                <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
+              </ProfilePopover>
+            );
           })}
         </Avatar.Group>
       </section>
@@ -220,29 +223,28 @@ export default function TrackSidebar({ trackId,   track, onRepeatPlay, className
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
           <h2 className="text-sm font-bold uppercase text-white-smoke">{RepostsCount} Reposts</h2>
- 
         </div>
         <Avatar.Group className="w-100">
           {repostUsers.map((user) => {
-            const profile = userProfiles[user.userId]
-            const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false
+            const profile = userProfiles[user.userId];
+            const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false;
 
             return (
-            <ProfilePopover
-              key={user.userId}
-              id={`repost-${user.userId}`}
-              artistName={user.displayName}
-              followCount={user.followersCount}
-              profileImgLink={user.avatarUrl}
-              userId={user.userId}
-              isFollowing={isFollowing}
-              onFollowChange={(next) =>
-                setFollowOverrides((prev) => ({ ...prev, [user.userId]: next }))
-              }
-            >
-              <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
-            </ProfilePopover>
-            )
+              <ProfilePopover
+                key={user.userId}
+                id={`repost-${user.userId}`}
+                artistName={user.displayName}
+                followCount={user.followersCount}
+                profileImgLink={user.avatarUrl}
+                userId={user.userId}
+                isFollowing={isFollowing}
+                onFollowChange={(next) =>
+                  setFollowOverrides((prev) => ({ ...prev, [user.userId]: next }))
+                }
+              >
+                <Avatar src={user.avatarUrl} size={48} style={{ cursor: "pointer" }} />
+              </ProfilePopover>
+            );
           })}
         </Avatar.Group>
       </section>
@@ -251,8 +253,14 @@ export default function TrackSidebar({ trackId,   track, onRepeatPlay, className
 
       <div className=" text-xs text-silver leading-6">
         {[
-          "Legal", "Privacy", "Cookie Policy", "Cookie Manager",
-          "Imprint", "Artist Resources", "Newsroom", "Charts",
+          "Legal",
+          "Privacy",
+          "Cookie Policy",
+          "Cookie Manager",
+          "Imprint",
+          "Artist Resources",
+          "Newsroom",
+          "Charts",
           "Transparency Reports",
         ].map((label, i, arr) => (
           <span key={label}>
@@ -261,9 +269,6 @@ export default function TrackSidebar({ trackId,   track, onRepeatPlay, className
           </span>
         ))}
       </div>
-
-      
     </aside>
   );
 }
-

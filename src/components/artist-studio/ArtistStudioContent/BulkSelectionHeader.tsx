@@ -34,9 +34,7 @@ export function BulkSelectionHeader({
       </div>
 
       <div className="flex items-center gap-3">
-        <span className="text-[13px] font-bold text-white-smoke">
-          {selectedCount} SELECTED
-        </span>
+        <span className="text-[13px] font-bold text-white-smoke">{selectedCount} SELECTED</span>
 
         <button onClick={onEditSelected} data-testid="artist-bulk-edit-selected">
           <PiPencilSimple className="text-[15px] text-white-smoke cursor-pointer" />

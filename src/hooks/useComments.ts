@@ -1,7 +1,6 @@
 import { useCallback, useState } from "react";
 
 import {
-  
   fetchCommentReplies,
   postComment,
   likeComment,
@@ -10,10 +9,8 @@ import {
   postCommentStateless,
 } from "@/services/comment.service";
 import { PostCommentPayload, TrackComment } from "@/types/comments.types";
-import { fetchMentionSuggestions } from "@/services/comment.service"
-import { MentionUser } from "@/types/comments.types"
-
-
+import { fetchMentionSuggestions } from "@/services/comment.service";
+import { MentionUser } from "@/types/comments.types";
 
 export const useStatelessComments = () => {
   const [comments, setComments] = useState<TrackComment[]>([]);
@@ -30,11 +27,7 @@ export const useStatelessComments = () => {
       setError(null);
 
       const currentOffset = reset ? 1 : offset;
-      const res = await fetchTrackCommentsStateless(
-        trackId,
-        currentOffset,
-        limit,
-      );
+      const res = await fetchTrackCommentsStateless(trackId, currentOffset, limit);
 
       if (reset) {
         setComments(res.comments);
@@ -58,7 +51,7 @@ export const useStatelessComments = () => {
   const submitComment = async (
     trackId: string,
     payload: PostCommentPayload,
-    meta?: { displayName: string; avatarUrl: string },
+    meta?: { displayName: string; avatarUrl: string }
   ) => {
     try {
       const comment = await postCommentStateless(trackId, payload);
@@ -67,8 +60,8 @@ export const useStatelessComments = () => {
           ...comment,
           mentionedUserId: payload.mentionedUserId,
           displayName: comment.displayName || meta?.displayName || "",
-          avatarUrl:   comment.avatarUrl   || meta?.avatarUrl   || "",
-          timestamp:   comment.timestamp   ?? payload.timestamp,
+          avatarUrl: comment.avatarUrl || meta?.avatarUrl || "",
+          timestamp: comment.timestamp ?? payload.timestamp,
           isOwnComment: comment.isOwnComment ?? true,
         },
         ...prev,
@@ -85,10 +78,8 @@ export const useStatelessComments = () => {
       const res = await likeComment(commentId);
       setComments((prev) =>
         prev.map((c) =>
-          c.commentId === commentId
-            ? { ...c, isLikedByUser: res.liked, numLikes: res.numLikes }
-            : c,
-        ),
+          c.commentId === commentId ? { ...c, isLikedByUser: res.liked, numLikes: res.numLikes } : c
+        )
       );
     } catch (err: any) {
       setError(err.message);
@@ -97,22 +88,22 @@ export const useStatelessComments = () => {
 
   const postReply = async (trackId: string, payload: PostCommentPayload) => {
     try {
-      const reply = await postCommentStateless(trackId, payload)
-      return reply
+      const reply = await postCommentStateless(trackId, payload);
+      return reply;
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message);
     }
-  }
+  };
 
   const deleteCommentById = async (commentId: string) => {
     try {
-      await deleteComment(commentId)
-      setComments((prev) => prev.filter((c) => c.commentId !== commentId))
-      setTotal((prev) => prev - 1)
+      await deleteComment(commentId);
+      setComments((prev) => prev.filter((c) => c.commentId !== commentId));
+      setTotal((prev) => prev - 1);
     } catch (err: any) {
-      setError(err.message)
+      setError(err.message);
     }
-  }
+  };
 
   return {
     comments,
@@ -139,9 +130,7 @@ export const useReplies = () => {
     try {
       setLoadingR(true);
       const res = await fetchCommentReplies(commentId, offset, limit);
-      setReplies((prev) =>
-        offset === 1 ? res.replies : [...prev, ...res.replies],
-      );
+      setReplies((prev) => (offset === 1 ? res.replies : [...prev, ...res.replies]));
       setTotal(res.total);
     } catch (err: any) {
       setErrorR(err.message);
@@ -155,10 +144,8 @@ export const useReplies = () => {
       const res = await likeComment(commentId);
       setReplies((prev) =>
         prev.map((r) =>
-          r.commentId === commentId
-            ? { ...r, isLikedByUser: res.liked, numLikes: res.numLikes }
-            : r,
-        ),
+          r.commentId === commentId ? { ...r, isLikedByUser: res.liked, numLikes: res.numLikes } : r
+        )
       );
     } catch (err: any) {
       setErrorR(err.message);
@@ -167,13 +154,13 @@ export const useReplies = () => {
 
   const deleteReply = async (commentId: string) => {
     try {
-      await deleteComment(commentId)
-      setReplies((prev) => prev.filter((r) => r.commentId !== commentId))
-      setTotal((prev) => prev - 1)
+      await deleteComment(commentId);
+      setReplies((prev) => prev.filter((r) => r.commentId !== commentId));
+      setTotal((prev) => prev - 1);
     } catch (err: any) {
-      setErrorR(err.message)
+      setErrorR(err.message);
     }
-  }
+  };
 
   return {
     replies,
@@ -188,34 +175,37 @@ export const useReplies = () => {
 };
 
 export const useMentions = () => {
-  const [suggestions, setSuggestions] = useState<MentionUser[]>([])
-  const [allFollowers, setAllFollowers] = useState<MentionUser[]>([])
-  const [loading, setLoading] = useState(false)
+  const [suggestions, setSuggestions] = useState<MentionUser[]>([]);
+  const [allFollowers, setAllFollowers] = useState<MentionUser[]>([]);
+  const [loading, setLoading] = useState(false);
 
   const loadSuggestions = useCallback(async () => {
-    if (allFollowers.length > 0) return
-    setLoading(true)
+    if (allFollowers.length > 0) return;
+    setLoading(true);
     try {
-      const data = await fetchMentionSuggestions()
-      setAllFollowers(data)
+      const data = await fetchMentionSuggestions();
+      setAllFollowers(data);
     } catch {
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }, [allFollowers])
+  }, [allFollowers]);
 
-  const filterSuggestions = useCallback((query: string) => {
-    if (!query) {
-      setSuggestions([])
-      return
-    }
-    const filtered = allFollowers.filter((u) =>
-      u.displayName.toLowerCase().includes(query.toLowerCase())
-    )
-    setSuggestions(filtered)
-  }, [allFollowers])
+  const filterSuggestions = useCallback(
+    (query: string) => {
+      if (!query) {
+        setSuggestions([]);
+        return;
+      }
+      const filtered = allFollowers.filter((u) =>
+        u.displayName.toLowerCase().includes(query.toLowerCase())
+      );
+      setSuggestions(filtered);
+    },
+    [allFollowers]
+  );
 
-  const clearSuggestions = useCallback(() => setSuggestions([]), [])
+  const clearSuggestions = useCallback(() => setSuggestions([]), []);
 
-  return { suggestions, loading, loadSuggestions, filterSuggestions, clearSuggestions }
-}
+  return { suggestions, loading, loadSuggestions, filterSuggestions, clearSuggestions };
+};

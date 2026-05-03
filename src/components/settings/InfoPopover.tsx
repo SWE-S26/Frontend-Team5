@@ -9,7 +9,12 @@ interface InfoPopoverProps {
   position?: "left" | "right";
 }
 
-export default function InfoPopover({ text, className, size = 16, position = "left" }: InfoPopoverProps) {
+export default function InfoPopover({
+  text,
+  className,
+  size = 16,
+  position = "left",
+}: InfoPopoverProps) {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 

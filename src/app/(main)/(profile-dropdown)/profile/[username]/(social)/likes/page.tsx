@@ -1,4 +1,4 @@
-'use client'
+"use client";
 
 import { useEffect, useMemo } from "react";
 import { LuShare } from "react-icons/lu";
@@ -51,7 +51,7 @@ function ListSkeleton() {
 const Page = () => {
   const [open, setOpen] = useState(false);
 
-  const isOwn       = useAppSelector((state) => state.profile.isOwnProfile);
+  const isOwn = useAppSelector((state) => state.profile.isOwnProfile);
   const displayName = useAppSelector((state) => state.profile.displayName);
   const profileUserId = useAppSelector((state) => state.profile.userId);
 
@@ -61,14 +61,11 @@ const Page = () => {
     if (profileUserId) void getLikedTracks(profileUserId);
   }, [profileUserId, getLikedTracks]);
 
-  const orderedTracks = useMemo(
-    () => (tracks ?? []).slice().reverse(),
-    [tracks],
-  );
+  const orderedTracks = useMemo(() => (tracks ?? []).slice().reverse(), [tracks]);
 
   const allPlayerTracks: PlayerTrack[] = useMemo(
     () => orderedTracks.map(mapToPlayerTrack),
-    [orderedTracks],
+    [orderedTracks]
   );
 
   return (
@@ -94,11 +91,7 @@ const Page = () => {
 
       {/* ── Empty state ── */}
       {!loading && orderedTracks.length === 0 && (
-        <EmptySocial
-          type="likes"
-          isOwn={isOwn}
-          displayName={displayName ?? ""}
-        />
+        <EmptySocial type="likes" isOwn={isOwn} displayName={displayName ?? ""} />
       )}
 
       {/* ── Track list ── */}
@@ -125,9 +118,7 @@ const Page = () => {
                 isLikedByUser={track.isLikedByUser}
                 isRepostedByUser={track.isRepostedByUser ?? false}
                 wfLink={track.audio.waveformLink}
-                enableDirectDownload={
-                  track.permissions?.enableDirectDownload ?? false
-                }
+                enableDirectDownload={track.permissions?.enableDirectDownload ?? false}
                 allTracks={allPlayerTracks}
               />
             ))}

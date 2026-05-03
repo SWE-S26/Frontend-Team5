@@ -10,30 +10,16 @@ function OAuthContinueDetailsForm() {
   const searchParams = useSearchParams();
   const { completeGoogleSignup, loading, error } = useGoogleComplete();
 
-  const incompleteToken = useMemo(
-    () => searchParams.get("incompleteToken") || "",
-    [searchParams],
-  );
+  const incompleteToken = useMemo(() => searchParams.get("incompleteToken") || "", [searchParams]);
 
-  const email = useMemo(
-    () => searchParams.get("email") || "your email",
-    [searchParams],
-  );
+  const email = useMemo(() => searchParams.get("email") || "your email", [searchParams]);
 
-  const handleComplete = async (details: {
-    displayName: string;
-    dob: string;
-    gender: string;
-  }) => {
+  const handleComplete = async (details: { displayName: string; dob: string; gender: string }) => {
     if (!incompleteToken) {
       return;
     }
 
-    const result = await completeGoogleSignup(
-      incompleteToken,
-      details.dob,
-      details.gender,
-    );
+    const result = await completeGoogleSignup(incompleteToken, details.dob, details.gender);
 
     if (result) {
       router.push("/home");

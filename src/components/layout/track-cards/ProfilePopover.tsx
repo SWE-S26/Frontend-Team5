@@ -6,7 +6,7 @@ import { Avatar } from "antd";
 import { FaUser } from "react-icons/fa6";
 import { usePopover } from "./PopoverContext";
 import FollowButton from "@/components/ui/FollowButton";
-import ProfileImage from "@/components/ui/ProfileImage"
+import ProfileImage from "@/components/ui/ProfileImage";
 
 import {
   useFloating,
@@ -30,7 +30,7 @@ interface ProfilePopoverProps {
   location?: string;
   profileHref?: string;
   followersHref?: string;
-  userId?: string;         
+  userId?: string;
   isFollowing?: boolean;
   onFollowChange?: (isFollowing: boolean) => void;
 }
@@ -50,7 +50,7 @@ export default function ProfilePopover({
 }: ProfilePopoverProps) {
   const { openId, setOpenId, scheduleClose, cancelClose } = usePopover();
   const isOpen = openId === id;
- 
+
   const arrowRef = useRef(null);
 
   const { refs, floatingStyles, context, middlewareData } = useFloating({
@@ -70,21 +70,14 @@ export default function ProfilePopover({
 
   const hover = useHover(context, { delay: { open: 0, close: 0 } });
   const dismiss = useDismiss(context);
-  const { getReferenceProps, getFloatingProps } = useInteractions([
-    hover,
-    dismiss,
-  ]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([hover, dismiss]);
 
   const arrowX = middlewareData.arrow?.x;
   const arrowY = middlewareData.arrow?.y;
 
   return (
     <>
-      <span
-        ref={refs.setReference}
-        {...getReferenceProps()}
-        className="inline-block"
-      >
+      <span ref={refs.setReference} {...getReferenceProps()} className="inline-block">
         {children}
       </span>
 
@@ -125,9 +118,7 @@ export default function ProfilePopover({
                   {artistName}
                 </Link>
               ) : (
-                <span className="font-bold mt-2 text-white-smoke">
-                  {artistName}
-                </span>
+                <span className="font-bold mt-2 text-white-smoke">{artistName}</span>
               )}
               {followersHref ? (
                 <Link
@@ -141,11 +132,7 @@ export default function ProfilePopover({
                   <FaUser /> {followCount.toLocaleString()}
                 </span>
               )}
-              {location && (
-                <p className="text-gray-400 font-bold text-sm pb-2">
-                  {location}
-                </p>
-              )}
+              {location && <p className="text-gray-400 font-bold text-sm pb-2">{location}</p>}
               <FollowButton
                 userId={userId}
                 initialIsFollowing={isFollowing}
@@ -158,4 +145,3 @@ export default function ProfilePopover({
     </>
   );
 }
-

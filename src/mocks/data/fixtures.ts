@@ -1,10 +1,10 @@
-import type { Track } from "@/types/tracks.types"
-import type { PlaylistDetail, PlaylistTrack, Playlist } from "@/types/playlists.types"
-import type { TrackPlaylist } from "@/types/tracks.types"
-import type { HistoryPlaylist } from "@/types/history.types"
+import type { Track } from "@/types/tracks.types";
+import type { PlaylistDetail, PlaylistTrack, Playlist } from "@/types/playlists.types";
+import type { TrackPlaylist } from "@/types/tracks.types";
+import type { HistoryPlaylist } from "@/types/history.types";
 
-export const POSTER_ID = "mock-user-id-123"
-export const MOCK_PROFILE_LINK = "omds2005-1774126647643"
+export const POSTER_ID = "mock-user-id-123";
+export const MOCK_PROFILE_LINK = "omds2005-1774126647643";
 
 export function mockTrack(trackId: string, permalink: string, title: string): Track {
   return {
@@ -40,16 +40,16 @@ export function mockTrack(trackId: string, permalink: string, title: string): Tr
     isLikedByUser: false,
     isRepostedByUser: false,
     isAvailableForUser: true,
-  }
+  };
 }
 
 export const MOCK_TRACKS: Track[] = [
   mockTrack("track-mock-001", "summer-vibes", "Summer Vibes"),
   mockTrack("track-mock-002", "night-drive", "Night Drive"),
-]
+];
 
 export function getTrackOrDefault(id: string): Track {
-  return MOCK_TRACKS.find((t) => t.trackId === id) ?? { ...MOCK_TRACKS[0], trackId: id }
+  return MOCK_TRACKS.find((t) => t.trackId === id) ?? { ...MOCK_TRACKS[0], trackId: id };
 }
 
 function toPlaylistTrack(track: Track): PlaylistTrack {
@@ -64,12 +64,12 @@ function toPlaylistTrack(track: Track): PlaylistTrack {
     isAvailableForUser: true,
     isLiked: false,
     isReposted: false,
-  }
+  };
 }
 
 export function mockPlaylistDetail(_id: string, title: string, tracks: Track[]): PlaylistDetail {
-  const pts = tracks.map(toPlaylistTrack)
-  const len = pts.reduce((s, p) => s + p.durationInSeconds, 0)
+  const pts = tracks.map(toPlaylistTrack);
+  const len = pts.reduce((s, p) => s + p.durationInSeconds, 0);
   return {
     _id,
     artistId: POSTER_ID,
@@ -94,18 +94,18 @@ export function mockPlaylistDetail(_id: string, title: string, tracks: Track[]):
     totalPages: 1,
     page: 1,
     tracks: pts,
-  }
+  };
 }
 
 export const MOCK_PLAYLIST_DETAIL = mockPlaylistDetail(
   "playlist-mock-001",
   "Mock Playlist One",
-  MOCK_TRACKS,
-)
+  MOCK_TRACKS
+);
 
 export function toPlaylistSummary(d: PlaylistDetail): Playlist {
-  const { totalTracks, totalPages, page, tracks, ...rest } = d
-  return rest
+  const { totalTracks, totalPages, page, tracks, ...rest } = d;
+  return rest;
 }
 
 export function mockTrackPlaylistAlbum(_id: string, title: string): TrackPlaylist {
@@ -133,7 +133,7 @@ export function mockTrackPlaylistAlbum(_id: string, title: string): TrackPlaylis
     image: { imgLink: "https://picsum.photos/seed/album/400", publicId: `alb/${_id}` },
     createdAt: new Date().toISOString(),
     updatedAt: new Date().toISOString(),
-  }
+  };
 }
 
 export function mockHistoryPlaylistFromDetail(d: PlaylistDetail): HistoryPlaylist {
@@ -157,5 +157,5 @@ export function mockHistoryPlaylistFromDetail(d: PlaylistDetail): HistoryPlaylis
     isRepostedByUser: d.isReposted,
     rssFeedLink: "",
     recordLabel: "",
-  }
+  };
 }

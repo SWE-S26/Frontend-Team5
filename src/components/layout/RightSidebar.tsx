@@ -1,1 +1,3 @@
-export default function RightSidebar() { return null; }
+export default function RightSidebar() {
+  return null;
+}

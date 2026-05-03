@@ -2,11 +2,7 @@
 import { AntdRegistry } from "@ant-design/nextjs-registry";
 import { ConfigProvider, App } from "antd";
 
-export default function AntProviders({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function AntProviders({ children }: { children: React.ReactNode }) {
   return (
     <AntdRegistry>
       <ConfigProvider

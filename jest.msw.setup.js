@@ -6,15 +6,15 @@
  * MSW resolves relative paths like `/api/...` against `location.href`. Node has no
  * `location`, so handlers would not match `http://localhost/api/...` without this.
  */
-globalThis.location = { href: "http://localhost/" }
+globalThis.location = { href: "http://localhost/" };
 
-const { TextDecoder, TextEncoder } = require("util")
-const { ReadableStream, TransformStream } = require("stream/web")
-const { MessageChannel, MessagePort } = require("worker_threads")
+const { TextDecoder, TextEncoder } = require("util");
+const { ReadableStream, TransformStream } = require("stream/web");
+const { MessageChannel, MessagePort } = require("worker_threads");
 
-global.TextDecoder = TextDecoder
-global.TextEncoder = TextEncoder
-global.ReadableStream = ReadableStream
-global.TransformStream = TransformStream
-global.MessageChannel = MessageChannel
-global.MessagePort = MessagePort
+global.TextDecoder = TextDecoder;
+global.TextEncoder = TextEncoder;
+global.ReadableStream = ReadableStream;
+global.TransformStream = TransformStream;
+global.MessageChannel = MessageChannel;
+global.MessagePort = MessagePort;

@@ -48,10 +48,7 @@ function VerifyGoogleCodeInner() {
     }
   };
 
-  const handleKeyDown = (
-    index: number,
-    event: React.KeyboardEvent<HTMLInputElement>,
-  ) => {
+  const handleKeyDown = (index: number, event: React.KeyboardEvent<HTMLInputElement>) => {
     if (event.key === "Backspace" && !digits[index] && index > 0) {
       inputRefs.current[index - 1]?.focus();
     }
@@ -67,11 +64,7 @@ function VerifyGoogleCodeInner() {
 
   const handlePaste = (event: React.ClipboardEvent<HTMLInputElement>) => {
     event.preventDefault();
-    const pasted = event.clipboardData
-      .getData("text")
-      .replace(/\D/g, "")
-      .slice(0, 6)
-      .split("");
+    const pasted = event.clipboardData.getData("text").replace(/\D/g, "").slice(0, 6).split("");
 
     if (pasted.length === 0) {
       return;
@@ -122,7 +115,10 @@ function VerifyGoogleCodeInner() {
   };
 
   return (
-    <main data-testid="Verify-Google-Code" className="min-h-dvh bg-chinese-black px-3 py-6 sm:px-6 sm:py-10">
+    <main
+      data-testid="Verify-Google-Code"
+      className="min-h-dvh bg-chinese-black px-3 py-6 sm:px-6 sm:py-10"
+    >
       <div className="mx-auto flex min-h-[calc(100dvh-3rem)] w-full max-w-105 items-center justify-center">
         <section className="w-full rounded-md border border-white/30 bg-chinese-black px-6 py-8 text-white-smoke shadow-[0_18px_60px_rgba(0,0,0,0.45)] sm:px-7 sm:py-9">
           <h1 className="text-center text-[48px] font-bold tracking-[-0.03em] text-white-smoke leading-none sm:text-[32px]">
@@ -130,7 +126,8 @@ function VerifyGoogleCodeInner() {
           </h1>
 
           <p className="mx-auto mt-8 max-w-110 text-center text-[14px] leading-tight text-white-smoke/90 sm:text-[14px]">
-            We found an account for <span className="font-semibold">{email}</span>. Enter the code sent to your email to link your Google login and continue.
+            We found an account for <span className="font-semibold">{email}</span>. Enter the code
+            sent to your email to link your Google login and continue.
           </p>
 
           <div className="mt-8 flex items-center justify-between gap-2.5 sm:gap-2">
@@ -179,7 +176,11 @@ function VerifyGoogleCodeInner() {
             disabled={isResendDisabled}
             className="mt-3 block h-12 w-full rounded-md bg-off-black px-6 text-[20px] font-semibold text-white-smoke disabled:cursor-not-allowed disabled:opacity-70 enabled:cursor-pointer enabled:hover:bg-back"
           >
-            {resendLoading ? "Resending..." : resendCooldown > 0 ? `Resend in ${resendCooldown}s` : "Resend"}
+            {resendLoading
+              ? "Resending..."
+              : resendCooldown > 0
+                ? `Resend in ${resendCooldown}s`
+                : "Resend"}
           </button>
 
           <p className="mt-5 text-left text-[14px] text-silver">

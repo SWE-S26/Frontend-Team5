@@ -14,11 +14,11 @@ export default function LibraryLayout({ children }: { children: React.ReactNode 
           pathname={pathname}
           className="pb-4 text-sm sm:text-xl overflow-x-auto tabs-scrollable"
           tabs={[
-            { href: "/library",           label: "Overview"  },
-            { href: "/library/likes",     label: "Likes"     },
+            { href: "/library", label: "Overview" },
+            { href: "/library/likes", label: "Likes" },
             { href: "/library/playlists", label: "Playlists" },
             { href: "/library/following", label: "Following" },
-            { href: "/library/history",   label: "History"   },
+            { href: "/library/history", label: "History" },
           ]}
         />
         {children}

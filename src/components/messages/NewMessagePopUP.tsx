@@ -25,28 +25,28 @@ interface NewMessagePopUPProps {
   onSent?: (chatId: string) => void;
 }
 
-type SearchStatus = 'idle' | 'searching' | 'found' | 'not_found'
+type SearchStatus = "idle" | "searching" | "found" | "not_found";
 
 // ── Each suggestion item resolves its own profile photo via useGetProfile ──
 // Same pattern WaveformCard uses for artistId
 interface UserSuggestionItemProps {
-  userId:      string
-  displayName: string
-  onClick:     (user: PrefilledUser) => void
+  userId: string;
+  displayName: string;
+  onClick: (user: PrefilledUser) => void;
 }
 
 function UserSuggestionItem({ userId, displayName, onClick }: UserSuggestionItemProps) {
-  const { getProfile, profile } = useGetProfile()
+  const { getProfile, profile } = useGetProfile();
 
   useEffect(() => {
-    if (userId) getProfile(userId)
-  }, [userId])
+    if (userId) getProfile(userId);
+  }, [userId]);
 
-  const photoUrl = profile?.profileImgLink ?? '/profpic.jpg'
+  const photoUrl = profile?.profileImgLink ?? "/profpic.jpg";
 
   const handleClick = () => {
-    onClick({ userId, displayName, photoUrl })
-  }
+    onClick({ userId, displayName, photoUrl });
+  };
 
   return (
     <button
@@ -62,132 +62,131 @@ function UserSuggestionItem({ userId, displayName, onClick }: UserSuggestionItem
       />
       <span className="text-sm text-white-smoke font-bold">{displayName}</span>
     </button>
-  )
+  );
 }
 
 // ── Main component ──────────────────────────────────────────────────────────
 
-const NewMessagePopUP = ({
-  isOpen,
-  onClose,
-  prefilledUser,
-  onSent,
-}: NewMessagePopUPProps) => {
-  const [content, setContent]         = useState("")
-  const [recipient, setRecipient]     = useState<PrefilledUser | null>(prefilledUser ?? null)
-  const [searchQuery, setSearchQuery] = useState("")
-  const [results, setResults]         = useState<{ userId: string; displayName: string }[]>([])
-  const [status, setStatus]           = useState<SearchStatus>('idle')
+const NewMessagePopUP = ({ isOpen, onClose, prefilledUser, onSent }: NewMessagePopUPProps) => {
+  const [content, setContent] = useState("");
+  const [recipient, setRecipient] = useState<PrefilledUser | null>(prefilledUser ?? null);
+  const [searchQuery, setSearchQuery] = useState("");
+  const [results, setResults] = useState<{ userId: string; displayName: string }[]>([]);
+  const [status, setStatus] = useState<SearchStatus>("idle");
 
-  const debouncedQuery = useDebounce(searchQuery, 350)
-  const { getSuggestions } = useSearch()
-  const searchRef          = useRef<HTMLDivElement>(null)
-  const { updateFromLocalSend, conversations } = useMessagesContext()
-  const currentUserId = useAppSelector((state) => state.auth.userId) ?? ""
+  const debouncedQuery = useDebounce(searchQuery, 350);
+  const { getSuggestions } = useSearch();
+  const searchRef = useRef<HTMLDivElement>(null);
+  const { updateFromLocalSend, conversations } = useMessagesContext();
+  const currentUserId = useAppSelector((state) => state.auth.userId) ?? "";
 
   // Sync every time the popup opens (unchanged)
   useEffect(() => {
     if (isOpen) {
-      setRecipient(prefilledUser ?? null)
-      setContent("")
-      setSearchQuery("")
-      setResults([])
-      setStatus('idle')
+      setRecipient(prefilledUser ?? null);
+      setContent("");
+      setSearchQuery("");
+      setResults([]);
+      setStatus("idle");
     }
-  }, [isOpen, prefilledUser?.userId])
+  }, [isOpen, prefilledUser?.userId]);
 
   // Close dropdown on outside click
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (!searchRef.current?.contains(e.target as Node)) {
-        setStatus((s) => (s === 'found' ? 'idle' : s))
+        setStatus((s) => (s === "found" ? "idle" : s));
       }
-    }
-    document.addEventListener("mousedown", handler)
-    return () => document.removeEventListener("mousedown", handler)
-  }, [])
+    };
+    document.addEventListener("mousedown", handler);
+    return () => document.removeEventListener("mousedown", handler);
+  }, []);
 
   // Search when debounced query settles
   useEffect(() => {
-    if (recipient) return
-    if (!debouncedQuery.trim()) { setStatus('idle'); setResults([]); return }
+    if (recipient) return;
+    if (!debouncedQuery.trim()) {
+      setStatus("idle");
+      setResults([]);
+      return;
+    }
 
-    let cancelled = false
+    let cancelled = false;
     const run = async () => {
-      setStatus('searching')
+      setStatus("searching");
       try {
-        const body = await getSuggestions(debouncedQuery)
-        if (cancelled) return
+        const body = await getSuggestions(debouncedQuery);
+        if (cancelled) return;
 
-        const raw = Array.isArray(body) ? body : []
+        const raw = Array.isArray(body) ? body : [];
 
         // Filter to user-type items and map to minimal shape
         // Photo is NOT extracted here — UserSuggestionItem fetches it via useGetProfile
         const users = raw
           .filter((item: any) => {
-            const t = String(item.type ?? '').toLowerCase()
-            return t === 'user' || t === 'users'
+            const t = String(item.type ?? "").toLowerCase();
+            return t === "user" || t === "users";
           })
           .map((item: any) => ({
-            userId:      String(item.id ?? item._id ?? ''),
-            displayName: String(item.title ?? item.displayName ?? ''),
+            userId: String(item.id ?? item._id ?? ""),
+            displayName: String(item.title ?? item.displayName ?? ""),
           }))
-          .filter((u) => u.userId && u.displayName)
+          .filter((u) => u.userId && u.displayName);
 
-        if (cancelled) return
+        if (cancelled) return;
         if (users.length > 0) {
-          setResults(users)
-          setStatus('found')
+          setResults(users);
+          setStatus("found");
         } else {
-          setResults([])
-          setStatus('not_found')
+          setResults([]);
+          setStatus("not_found");
         }
       } catch {
-        if (!cancelled) setStatus('not_found')
+        if (!cancelled) setStatus("not_found");
       }
-    }
+    };
 
-    run()
-    return () => { cancelled = true }
-  }, [debouncedQuery, recipient, getSuggestions])
+    run();
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedQuery, recipient, getSuggestions]);
 
   const handleSelectUser = useCallback((user: PrefilledUser) => {
-    setRecipient(user)
-    setSearchQuery("")
-    setResults([])
-    setStatus('idle')
-  }, [])
+    setRecipient(user);
+    setSearchQuery("");
+    setResults([]);
+    setStatus("idle");
+  }, []);
 
   const handleClearRecipient = useCallback(() => {
-    setRecipient(null)
-    setSearchQuery("")
-    setStatus('idle')
-  }, [])
+    setRecipient(null);
+    setSearchQuery("");
+    setStatus("idle");
+  }, []);
 
   // Send logic — unchanged
   const { send, isSending } = useSendMessage(({ conversation }) => {
-    updateFromLocalSend(conversation)
-    onSent?.(conversation.chat)
+    updateFromLocalSend(conversation);
+    onSent?.(conversation.chat);
     if (recipient) {
       messageToastBus.emit({
         type: "sent",
         recipientName: recipient.displayName,
         recipientPhoto: recipient.photoUrl,
-      })
+      });
     }
-    setContent("")
-    setRecipient(null)
-    onClose()
-  })
+    setContent("");
+    setRecipient(null);
+    onClose();
+  });
 
   const handleSend = async () => {
-    if (!recipient || !content.trim()) return
-    const trimmed = content.trim()
-    const existingChatId = conversations.find(
-      (c) => c.receiverId === recipient.userId,
-    )?.chatId
+    if (!recipient || !content.trim()) return;
+    const trimmed = content.trim();
+    const existingChatId = conversations.find((c) => c.receiverId === recipient.userId)?.chatId;
 
-    const clientId = `client-${Date.now()}-${Math.random().toString(16).slice(2)}`
+    const clientId = `client-${Date.now()}-${Math.random().toString(16).slice(2)}`;
 
     if (existingChatId && currentUserId) {
       messageLocalBus.emit({
@@ -202,14 +201,14 @@ const NewMessagePopUP = ({
           seenBy: [currentUserId],
           createdAt: new Date().toISOString(),
         },
-      })
+      });
     }
 
     await send(recipient.userId, trimmed, {
       clientId,
       chatId: existingChatId,
-    })
-  }
+    });
+  };
 
   return (
     <AnimatePresence>
@@ -270,23 +269,21 @@ const NewMessagePopUP = ({
                     placeholder="Search for a user..."
                     value={searchQuery}
                     onChange={(e) => {
-                      setSearchQuery(e.target.value)
-                      if (status !== 'searching') setStatus('idle')
+                      setSearchQuery(e.target.value);
+                      if (status !== "searching") setStatus("idle");
                     }}
                     className={`w-full h-12 bg-off-black px-3 text-white-smoke text-sm rounded outline-none caret-crusta ring-1 transition-all duration-200 ${
-                      status === 'not_found'
-                        ? 'ring-red-500'
-                        : 'ring-transparent focus:ring-silver'
+                      status === "not_found" ? "ring-red-500" : "ring-transparent focus:ring-silver"
                     }`}
                   />
 
                   {/* Error — mutually exclusive with dropdown via status */}
-                  {status === 'not_found' && (
+                  {status === "not_found" && (
                     <p className="text-red-500 text-xs mt-1">User not found</p>
                   )}
 
                   {/* Dropdown — each item fetches its own photo via useGetProfile */}
-                  {status === 'found' && results.length > 0 && (
+                  {status === "found" && results.length > 0 && (
                     <ul className="absolute left-0 right-0 bg-chinese-black border border-off-black mt-1 rounded z-50 max-h-60 overflow-auto">
                       {results.map((user) => (
                         <li key={user.userId}>
@@ -330,7 +327,7 @@ const NewMessagePopUP = ({
         </div>
       )}
     </AnimatePresence>
-  )
-}
+  );
+};
 
-export default NewMessagePopUP
+export default NewMessagePopUP;

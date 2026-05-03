@@ -5,8 +5,18 @@ import { IoChevronBack } from "react-icons/io5";
 import { RegisterDetailsFormProps } from "@/types/auth.types";
 
 const MONTHS = [
-  "January", "February", "March", "April", "May", "June",
-  "July", "August", "September", "October", "November", "December",
+  "January",
+  "February",
+  "March",
+  "April",
+  "May",
+  "June",
+  "July",
+  "August",
+  "September",
+  "October",
+  "November",
+  "December",
 ];
 
 const GENDERS = ["Male", "Female"];
@@ -49,9 +59,13 @@ export default function RegisterDetailsForm({
   };
 
   return (
-    <div data-testid="Register-Details-Form" className="w-full text-white-smoke transition-all duration-300">
+    <div
+      data-testid="Register-Details-Form"
+      className="w-full text-white-smoke transition-all duration-300"
+    >
       <div className="mb-6 flex items-center gap-2">
-        <button data-testid="back-to-login-button-details"
+        <button
+          data-testid="back-to-login-button-details"
           onClick={onBack}
           className="shrink-0 rounded-full bg-[#303030] p-2 transition-colors cursor-pointer"
         >
@@ -106,13 +120,24 @@ export default function RegisterDetailsForm({
                 onChange={(e) => setMonth(e.target.value)}
                 className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer text-white-smoke"
               >
-                <option value="" disabled className="bg-chinese-black text-white-smoke">Month</option>
+                <option value="" disabled className="bg-chinese-black text-white-smoke">
+                  Month
+                </option>
                 {MONTHS.map((m) => (
-                  <option key={m} value={m} className="bg-chinese-black text-white-smoke">{m}</option>
+                  <option key={m} value={m} className="bg-chinese-black text-white-smoke">
+                    {m}
+                  </option>
                 ))}
               </select>
               <div className="pointer-events-none absolute right-3 text-gray-400">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
               </div>
@@ -125,13 +150,24 @@ export default function RegisterDetailsForm({
                 onChange={(e) => setDay(e.target.value)}
                 className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer text-white-smoke"
               >
-                <option value="" disabled className="bg-chinese-black text-white-smoke">Day</option>
+                <option value="" disabled className="bg-chinese-black text-white-smoke">
+                  Day
+                </option>
                 {DAYS.map((d) => (
-                  <option key={d} value={d} className="bg-chinese-black text-white-smoke">{d}</option>
+                  <option key={d} value={d} className="bg-chinese-black text-white-smoke">
+                    {d}
+                  </option>
                 ))}
               </select>
               <div className="pointer-events-none absolute right-3 text-gray-400">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
               </div>
@@ -144,13 +180,24 @@ export default function RegisterDetailsForm({
                 onChange={(e) => setYear(e.target.value)}
                 className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer text-white-smoke"
               >
-                <option value="" disabled className="bg-chinese-black text-white-smoke">Year</option>
+                <option value="" disabled className="bg-chinese-black text-white-smoke">
+                  Year
+                </option>
                 {YEARS.map((y) => (
-                  <option key={y} value={y} className="bg-chinese-black text-white-smoke">{y}</option>
+                  <option key={y} value={y} className="bg-chinese-black text-white-smoke">
+                    {y}
+                  </option>
                 ))}
               </select>
               <div className="pointer-events-none absolute right-3 text-gray-400">
-                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  stroke="currentColor"
+                  strokeWidth="2.5"
+                >
                   <polyline points="6 9 12 15 18 9" />
                 </svg>
               </div>
@@ -168,13 +215,24 @@ export default function RegisterDetailsForm({
             onChange={(e) => setGender(e.target.value)}
             className="w-full bg-transparent text-sm outline-none appearance-none cursor-pointer text-white-smoke"
           >
-            <option value="" disabled className="bg-chinese-black text-white-smoke">Gender (required)</option>
+            <option value="" disabled className="bg-chinese-black text-white-smoke">
+              Gender (required)
+            </option>
             {GENDERS.map((g) => (
-              <option key={g} value={g} className="bg-chinese-black text-white-smoke">{g}</option>
+              <option key={g} value={g} className="bg-chinese-black text-white-smoke">
+                {g}
+              </option>
             ))}
           </select>
           <div className="pointer-events-none absolute right-3 text-gray-400">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5">
+            <svg
+              width="14"
+              height="14"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+            >
               <polyline points="6 9 12 15 18 9" />
             </svg>
           </div>
@@ -183,7 +241,8 @@ export default function RegisterDetailsForm({
         {/* Continue Button */}
         {submitError ? <p className="text-red-400 text-sm">{submitError}</p> : null}
 
-        <button data-testid="continue-button-details"
+        <button
+          data-testid="continue-button-details"
           onClick={handleContinue}
           disabled={!isValid || isSubmitting}
           className={`w-full h-12 font-bold rounded transition-all duration-200 ${

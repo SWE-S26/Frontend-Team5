@@ -7,15 +7,12 @@ import Image from "next/image";
 import { useGetPostedTracks, useGetUploadQuota } from "@/hooks/useTracks";
 import { useAppSelector } from "@/store/hooks";
 import UploadUsageBar from "@/app/(artist)/upload/UploadUsageBar";
-
 import { ArtistStudioHeader } from "./ArtistStudioContent/ArtistStudioHeader";
 import { TracksTab } from "./ArtistStudioContent/TracksTab";
 import { DistributionTab } from "./ArtistStudioContent/DistributionTab";
 import { VinylTab } from "./ArtistStudioContent/VinylTab";
 import { CommentsTab } from "./ArtistStudioContent/CommentsTab";
 import { PromotionsTab } from "./ArtistStudioContent/PromotionsTab";
-
-import { PrettyCheckbox } from "@/components/upload/TrackInfoForm";
 
 export type ArtistTab = "tracks" | "distribution" | "vinyl" | "comments" | "promotions";
 
@@ -46,7 +43,6 @@ export type ArtistTrackRow = {
 
 export type SortField = "date" | "plays" | "duration" | "likes";
 
-
 export const formatDuration = (durationInSeconds?: number | null) => {
   if (!durationInSeconds || durationInSeconds <= 0) return "--";
   const mins = Math.floor(durationInSeconds / 60);
@@ -56,9 +52,12 @@ export const formatDuration = (durationInSeconds?: number | null) => {
 
 export const formatDate = (date?: string) => {
   if (!date) return "--";
-  return new Date(date).toLocaleDateString("en-US", { month: "short", day: "2-digit", year: "numeric" });
+  return new Date(date).toLocaleDateString("en-US", {
+    month: "short",
+    day: "2-digit",
+    year: "numeric",
+  });
 };
-
 
 const HeartPath = () => (
   <path
@@ -91,7 +90,8 @@ const HeartPath = () => (
 
 const HeartListeningPaths = () => (
   <>
-    <path d="m62.22 30.076-2.2-.5c-.93-13.21-10.7-25.6-22.45-28.34-5.9-1.38-11.48-.16-15.75 
+    <path
+      d="m62.22 30.076-2.2-.5c-.93-13.21-10.7-25.6-22.45-28.34-5.9-1.38-11.48-.16-15.75 
     3.42-6.03 1.89-10.4 6.85-12.07 13.66-.61.06-1.23.23-1.86.55-3.99 2.03-7.1 8.79-7.08 15.37.02 4.81 1.82 8.33 
     4.59 8.96l5.28 1.21c.3.07.6.1.91.1.74 0 1.49-.2 2.26-.59.41-.21.82-.49 1.21-.8l11.76 15.89c1.01 1.36 2.37 2.29 
     3.82 2.63.39.09.78.13 1.16.13.75 0 1.47-.18 2.12-.53l7.43-4.07c.27-.16.53-.32.77-.53l6.12-5.33c.77 1.26 1.81 2.1 
@@ -106,8 +106,13 @@ const HeartListeningPaths = () => (
     17.34c-.69.38-1.5.47-2.36.27-.14-.03-.27-.09-.4-.14l5.34-2.92c-.89-.42-1.74-1.1-2.43-2.03l-5.51 3.02s-.04-.04-.06-.07l-11.83-15.99c1.62-1.69 
     2.98-4.18 3.85-6.97.34.61.71 1.2 1.12 1.75l13.26 17.92c.99 1.33 2.31 2.24 3.72 2.6h-.01l-4.67 2.56h-.02Zm25.83-6.85c-.66.34-1.3.47-1.9.42.18-.07.35-.13.54-.23 
     2.38-1.21 4.46-4.34 5.66-8.07l-3.62-.83c-1.2 3.73-3.28 6.86-5.66 8.07-.2.1-.4.18-.6.25l-1.99-.46c-.92-.21-1.71-.91-2.32-1.98l6.37-5.54c3.7-3.22 
-    4.53-9.08 2.48-14.44l3.85.88c2.16.49 3.56 3.51 3.58 7.7.02 6.04-2.84 12.42-6.38 14.22l-.01.01Z" fill="currentColor" />
-    <path d="M8.2 22.536c-2.72 1.38-4.91 6.2-4.89 10.76.02 4.56 2.24 7.13 4.95 5.74 2.72-1.39 4.91-6.2 4.89-10.76-.02-4.56-2.24-7.12-4.96-5.74h.01Z" fill="currentColor" />
+    4.53-9.08 2.48-14.44l3.85.88c2.16.49 3.56 3.51 3.58 7.7.02 6.04-2.84 12.42-6.38 14.22l-.01.01Z"
+      fill="currentColor"
+    />
+    <path
+      d="M8.2 22.536c-2.72 1.38-4.91 6.2-4.89 10.76.02 4.56 2.24 7.13 4.95 5.74 2.72-1.39 4.91-6.2 4.89-10.76-.02-4.56-2.24-7.12-4.96-5.74h.01Z"
+      fill="currentColor"
+    />
   </>
 );
 
@@ -135,14 +140,10 @@ function RisingFillIcon({
       aria-hidden="true"
     >
       <defs>
-        <clipPath id={clipId}>
-          {svgContent}
-        </clipPath>
+        <clipPath id={clipId}>{svgContent}</clipPath>
       </defs>
 
-      <g fill="currentColor">
-        {svgContent}
-      </g>
+      <g fill="currentColor">{svgContent}</g>
 
       <rect
         x="0"
@@ -160,15 +161,47 @@ function RisingFillIcon({
   );
 }
 
-export const InsightsIcon = ({ className = "", hovered }: { className?: string; hovered?: boolean }) => (
-  <Image src="/artists-icons/insights.svg" alt="Insights" width={24} height={24} className={`theme-invert w-12 h-12 ${className}`} />
+export const InsightsIcon = ({
+  className = "",
+  hovered,
+}: {
+  className?: string;
+  hovered?: boolean;
+}) => (
+  <Image
+    src="/artists-icons/insights.svg"
+    alt="Insights"
+    width={24}
+    height={24}
+    className={`theme-invert w-12 h-12 ${className}`}
+  />
 );
 
-export const CoinIcon = ({ className = "", hovered }: { className?: string; hovered?: boolean }) => (
-  <Image src="/artists-icons/coin.svg" alt="Coin" width={24} height={24} className={`theme-invert w-12 h-12 ${className}`} />
+export const CoinIcon = ({
+  className = "",
+  hovered,
+}: {
+  className?: string;
+  hovered?: boolean;
+}) => (
+  <Image
+    src="/artists-icons/coin.svg"
+    alt="Coin"
+    width={24}
+    height={24}
+    className={`theme-invert w-12 h-12 ${className}`}
+  />
 );
 
-export const PurpleHeartIcon = ({ hovered = false, className = "", showStar = true }: { hovered?: boolean; className?: string; showStar?: boolean }) => (
+export const PurpleHeartIcon = ({
+  hovered = false,
+  className = "",
+  showStar = true,
+}: {
+  hovered?: boolean;
+  className?: string;
+  showStar?: boolean;
+}) => (
   <div className={`relative w-12 h-12 ${className}`}>
     <RisingFillIcon
       svgContent={<HeartPath />}
@@ -178,12 +211,26 @@ export const PurpleHeartIcon = ({ hovered = false, className = "", showStar = tr
       className="text-white-smoke"
     />
     {showStar && (
-      <Image src="/artists-icons/purple-star.svg" alt="Star" width={16} height={16} className="absolute top-0 ml-11 w-4 h-4" />
+      <Image
+        src="/artists-icons/purple-star.svg"
+        alt="Star"
+        width={16}
+        height={16}
+        className="absolute top-0 ml-11 w-4 h-4"
+      />
     )}
   </div>
 );
 
-export const GoldenHeartIcon = ({ hovered = false, className = "", showStar = true }: { hovered?: boolean; className?: string; showStar?: boolean }) => (
+export const GoldenHeartIcon = ({
+  hovered = false,
+  className = "",
+  showStar = true,
+}: {
+  hovered?: boolean;
+  className?: string;
+  showStar?: boolean;
+}) => (
   <div className={`relative w-12 h-12 ${className}`}>
     <RisingFillIcon
       svgContent={<HeartListeningPaths />}
@@ -193,23 +240,72 @@ export const GoldenHeartIcon = ({ hovered = false, className = "", showStar = tr
       className="text-white-smoke"
     />
     {showStar && (
-      <Image src="/artists-icons/golden-star.svg" alt="Star" width={16} height={16} className="absolute top-0 ml-11 w-4 h-4" />
+      <Image
+        src="/artists-icons/golden-star.svg"
+        alt="Star"
+        width={16}
+        height={16}
+        className="absolute top-0 ml-11 w-4 h-4"
+      />
     )}
   </div>
 );
 
-function TabBar({ activeTab, onChangeTab }: { activeTab: ArtistTab; onChangeTab: (tab: ArtistTab) => void }) {
+function TabBar({
+  activeTab,
+  onChangeTab,
+}: {
+  activeTab: ArtistTab;
+  onChangeTab: (tab: ArtistTab) => void;
+}) {
   const tabClass = (id: ArtistTab) =>
     `-mb-px whitespace-nowrap border-b-2 px-4 py-3 text-[13px] transition-colors cursor-pointer ${
-      activeTab === id ? "border-white-smoke font-semibold text-white-smoke" : "border-transparent text-white-smoke hover:text-upload-select"
+      activeTab === id
+        ? "border-white-smoke font-semibold text-white-smoke"
+        : "border-transparent text-white-smoke hover:text-upload-select"
     }`;
   return (
     <div className="sticky top-13 z-100 flex overflow-x-auto overflow-y-hidden border-b border-[#222] bg-chinese-black [scrollbar-width:none] [&::-webkit-scrollbar]:hidden">
-      <button type="button" onClick={() => onChangeTab("tracks")}       data-testid="artist-tab-tracks" className={tabClass("tracks")}>BeatZa Tracks</button>
-      <button type="button" onClick={() => onChangeTab("distribution")} data-testid="artist-tab-distribution" className={tabClass("distribution")}>Distribution</button>
-      <button type="button" onClick={() => onChangeTab("vinyl")}        data-testid="artist-tab-vinyl" className={tabClass("vinyl")}>Vinyl Records</button>
-      <button type="button" onClick={() => onChangeTab("comments")}     data-testid="artist-tab-comments" className={tabClass("comments")}>Comments</button>
-      <button type="button" onClick={() => onChangeTab("promotions")}   data-testid="artist-tab-promotions" className={tabClass("promotions")}>Promotions</button>
+      <button
+        type="button"
+        onClick={() => onChangeTab("tracks")}
+        data-testid="artist-tab-tracks"
+        className={tabClass("tracks")}
+      >
+        BeatZa Tracks
+      </button>
+      <button
+        type="button"
+        onClick={() => onChangeTab("distribution")}
+        data-testid="artist-tab-distribution"
+        className={tabClass("distribution")}
+      >
+        Distribution
+      </button>
+      <button
+        type="button"
+        onClick={() => onChangeTab("vinyl")}
+        data-testid="artist-tab-vinyl"
+        className={tabClass("vinyl")}
+      >
+        Vinyl Records
+      </button>
+      <button
+        type="button"
+        onClick={() => onChangeTab("comments")}
+        data-testid="artist-tab-comments"
+        className={tabClass("comments")}
+      >
+        Comments
+      </button>
+      <button
+        type="button"
+        onClick={() => onChangeTab("promotions")}
+        data-testid="artist-tab-promotions"
+        className={tabClass("promotions")}
+      >
+        Promotions
+      </button>
     </div>
   );
 }
@@ -240,10 +336,10 @@ export default function ArtistStudioContent({ activeTab, onChangeTab }: ArtistSt
   const stats = useMemo(() => {
     const tracks = postedTracks ?? [];
     return {
-      plays:     tracks.reduce((sum, t) => sum + (t.numPlays    ?? 0), 0),
-      reposts:   tracks.reduce((sum, t) => sum + (t.numReposts  ?? 0), 0),
-      likes:     tracks.reduce((sum, t) => sum + (t.numLikes    ?? 0), 0),
-      comments:  tracks.reduce((sum, t) => sum + (t.numComments ?? 0), 0),
+      plays: tracks.reduce((sum, t) => sum + (t.numPlays ?? 0), 0),
+      reposts: tracks.reduce((sum, t) => sum + (t.numReposts ?? 0), 0),
+      likes: tracks.reduce((sum, t) => sum + (t.numLikes ?? 0), 0),
+      comments: tracks.reduce((sum, t) => sum + (t.numComments ?? 0), 0),
       downloads: 0,
     };
   }, [postedTracks]);
@@ -260,11 +356,11 @@ export default function ArtistStudioContent({ activeTab, onChangeTab }: ArtistSt
       <ArtistStudioHeader stats={stats} isArtistPro={isArtistPro} />
       <TabBar activeTab={activeTab} onChangeTab={onChangeTab} />
       <div className="py-5">
-        {activeTab === "tracks"       && <TracksTab isMobile={isMobile} isArtistPro={isArtistPro} />}
+        {activeTab === "tracks" && <TracksTab isMobile={isMobile} isArtistPro={isArtistPro} />}
         {activeTab === "distribution" && <DistributionTab isArtistPro={isArtistPro} />}
-        {activeTab === "vinyl"        && <VinylTab isArtistPro={isArtistPro} />}
-        {activeTab === "comments"     && <CommentsTab isArtistPro={isArtistPro} />}
-        {activeTab === "promotions"   && <PromotionsTab isArtistPro={isArtistPro} />}
+        {activeTab === "vinyl" && <VinylTab isArtistPro={isArtistPro} />}
+        {activeTab === "comments" && <CommentsTab isArtistPro={isArtistPro} />}
+        {activeTab === "promotions" && <PromotionsTab isArtistPro={isArtistPro} />}
       </div>
     </section>
   );

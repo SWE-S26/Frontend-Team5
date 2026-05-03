@@ -56,13 +56,7 @@ interface ReportPopUpProps {
   violatorType: "user" | "track";
 }
 
-const ReportPopUp = ({
-  isOpen,
-  onClose,
-  username,
-  violatorId,
-  violatorType,
-}: ReportPopUpProps) => {
+const ReportPopUp = ({ isOpen, onClose, username, violatorId, violatorType }: ReportPopUpProps) => {
   const [activeReason, setActiveReason] = useState<ReasonKey | null>(null);
 
   const handleClose = () => {

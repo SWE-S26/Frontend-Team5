@@ -1,27 +1,27 @@
-'use client'
-import { useEffect, useState, useMemo } from 'react'
-import { useAppSelector } from '@/store/hooks'
-import { useGetFollowing } from '@/hooks/useSocial'
-import UserCardGrid from '@/components/social-graph/UserCardGrid'
+"use client";
+import { useEffect, useState, useMemo } from "react";
+import { useAppSelector } from "@/store/hooks";
+import { useGetFollowing } from "@/hooks/useSocial";
+import UserCardGrid from "@/components/social-graph/UserCardGrid";
 
 export default function Following() {
-  const authUserId = useAppSelector((state) => state.auth.userId)
-  const isOwn      = true
+  const authUserId = useAppSelector((state) => state.auth.userId);
+  const isOwn = true;
 
-  const { getFollowing, following, loading } = useGetFollowing()
-  const [filterText, setFilterText] = useState('')
+  const { getFollowing, following, loading } = useGetFollowing();
+  const [filterText, setFilterText] = useState("");
 
   useEffect(() => {
     if (authUserId) {
-      getFollowing(authUserId)
+      getFollowing(authUserId);
     }
-  }, [authUserId])
+  }, [authUserId]);
 
   const filteredUsers = useMemo(() => {
-    return (following ?? []).filter(user =>
+    return (following ?? []).filter((user) =>
       user.displayName.toLowerCase().includes(filterText.toLowerCase())
-    )
-  }, [following, filterText])
+    );
+  }, [following, filterText]);
 
   return (
     <div className="px-4 sm:px-6 lg:px-0">
@@ -47,5 +47,5 @@ export default function Following() {
         cols={6}
       />
     </div>
-  )
+  );
 }

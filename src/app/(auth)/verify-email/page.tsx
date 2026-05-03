@@ -12,17 +12,14 @@ function VerifyEmailContent() {
   const { verifyEmail, loading, error, success } = useVerifyEmail();
 
   useEffect(() => {
-    if (token) verifyEmail(token)
-  }, [token, verifyEmail])
+    if (token) verifyEmail(token);
+  }, [token, verifyEmail]);
 
   return (
     <section className="mx-auto flex w-full max-w-7xl flex-1 items-center justify-center px-4 py-5 sm:py-7">
       <div className="text-center w-full max-w-2xl border border-[#d7d7d7] bg-[#f5f5f5] px-5 pb-6 pt-8 shadow-[0_0_0_1px_rgba(255,255,255,0.3)_inset] sm:px-10 sm:pb-8 sm:pt-10">
-        
         {/* Loading */}
-        {loading && (
-          <p className="text-[#9d9d9d] text-lg">Verifying your email...</p>
-        )}
+        {loading && <p className="text-[#9d9d9d] text-lg">Verifying your email...</p>}
 
         {/* Error */}
         {!loading && error && (
@@ -84,16 +81,26 @@ export default function VerifyEmailPage() {
         </div>
       </header>
 
-      <Suspense fallback={<div className="flex flex-1 items-center justify-center">Loading...</div>}>
+      <Suspense
+        fallback={<div className="flex flex-1 items-center justify-center">Loading...</div>}
+      >
         <VerifyEmailContent />
       </Suspense>
 
       <footer className="mx-auto w-full max-w-7xl border-t border-[#e3e3e3] px-4 py-3 sm:py-4">
         <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#636363] sm:text-base">
-          <Link href="#" className="hover:underline">Legal</Link>
-          <Link href="#" className="hover:underline">Privacy</Link>
-          <Link href="#" className="hover:underline">Cookies</Link>
-          <Link href="#" className="hover:underline">Imprint</Link>
+          <Link href="#" className="hover:underline">
+            Legal
+          </Link>
+          <Link href="#" className="hover:underline">
+            Privacy
+          </Link>
+          <Link href="#" className="hover:underline">
+            Cookies
+          </Link>
+          <Link href="#" className="hover:underline">
+            Imprint
+          </Link>
         </nav>
       </footer>
     </main>

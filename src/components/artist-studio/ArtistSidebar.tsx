@@ -6,7 +6,6 @@ import { useEffect, useState } from "react";
 import { BiCollection } from "react-icons/bi";
 import { GoHome } from "react-icons/go";
 import { LuLibraryBig } from "react-icons/lu";
-import { PiShootingStar } from "react-icons/pi";
 import { TbGridDots } from "react-icons/tb";
 
 type ArtistSidebarProps = {
@@ -71,24 +70,72 @@ export default function ArtistSidebar({ open = false, onClose }: ArtistSidebarPr
         } lg:translate-x-0`}
       >
         <div className="flex w-full flex-col items-stretch gap-1 px-3 lg:w-full lg:items-center lg:px-0">
-          <button onClick={() => navigate("/home")} type="button" data-testid="artist-sidebar-logo" className="mb-1 flex h-11 w-full items-center justify-center cursor-pointer" aria-label="Beatza">
-            <Image src="/app-logo/whitelogo.png" alt="Beatza" width={26} height={26} className="h-12 w-12 logo-dark object-contain" />
-            <Image src="/app-logo/blacklogo.png" alt="Beatza" width={26} height={26} className="h-12 w-12 logo-light object-contain" />
+          <button
+            onClick={() => navigate("/home")}
+            type="button"
+            data-testid="artist-sidebar-logo"
+            className="mb-1 flex h-11 w-full items-center justify-center cursor-pointer"
+            aria-label="Beatza"
+          >
+            <Image
+              src="/app-logo/whitelogo.png"
+              alt="Beatza"
+              width={26}
+              height={26}
+              className="h-12 w-12 logo-dark object-contain"
+            />
+            <Image
+              src="/app-logo/blacklogo.png"
+              alt="Beatza"
+              width={26}
+              height={26}
+              className="h-12 w-12 logo-light object-contain"
+            />
           </button>
 
-          <button onClick={() => navigate("/home")} type="button" data-testid="artist-sidebar-home" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Home">
-            <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1"><GoHome /></span>
-            <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">Home</span>
+          <button
+            onClick={() => navigate("/home")}
+            type="button"
+            data-testid="artist-sidebar-home"
+            className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0"
+            aria-label="Home"
+          >
+            <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1">
+              <GoHome />
+            </span>
+            <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">
+              Home
+            </span>
           </button>
 
-          <button onClick={() => navigate("/feed")} type="button" data-testid="artist-sidebar-feed" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Feed">
-            <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1"><BiCollection /></span>
-            <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">Feed</span>
+          <button
+            onClick={() => navigate("/feed")}
+            type="button"
+            data-testid="artist-sidebar-feed"
+            className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0"
+            aria-label="Feed"
+          >
+            <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1">
+              <BiCollection />
+            </span>
+            <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">
+              Feed
+            </span>
           </button>
 
-          <button onClick={() => navigate("/library")} type="button" data-testid="artist-sidebar-library" className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0" aria-label="Library">
-            <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1"><LuLibraryBig /></span>
-            <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">Library</span>
+          <button
+            onClick={() => navigate("/library")}
+            type="button"
+            data-testid="artist-sidebar-library"
+            className="group flex h-12 w-full items-center gap-3 rounded-xl bg-transparent px-3 text-white-smoke transition-colors cursor-pointer lg:flex-col lg:justify-center lg:gap-1 lg:px-0"
+            aria-label="Library"
+          >
+            <span className="inline-flex text-[28px] transition-transform duration-200 group-hover:-translate-y-1">
+              <LuLibraryBig />
+            </span>
+            <span className="text-[13px] font-medium leading-none text-white-smoke/90 lg:pointer-events-none lg:text-[10px] lg:font-bold lg:opacity-0 lg:translate-y-1 lg:transition-all lg:duration-200 lg:group-hover:translate-y-0 lg:group-hover:opacity-100">
+              Library
+            </span>
           </button>
         </div>
 
@@ -104,7 +151,8 @@ export default function ArtistSidebar({ open = false, onClose }: ArtistSidebarPr
                 <TbGridDots />
               </button>
               <div className="absolute bottom-0 left-full w-3 h-10" />
-              <div className="
+              <div
+                className="
                 pointer-events-none absolute bottom-0 left-full ml-3
                 w-52 rounded-lg border border-white/10 bg-chinese-black p-3
                 text-[11px] text-white-smoke/70
@@ -112,10 +160,11 @@ export default function ArtistSidebar({ open = false, onClose }: ArtistSidebarPr
                 transition-all duration-150
                 group-hover:opacity-100 group-hover:translate-x-0 group-hover:pointer-events-auto
                 delay-400 group-hover:delay-[0ms]
-              ">
+              "
+              >
                 <FooterLinks />
               </div>
-          </div>
+            </div>
           )}
 
           {!isDesktop && (

@@ -1,6 +1,5 @@
 import api from "@/lib/api";
-import { MentionUser } from "@/types/comments.types"
-
+import { MentionUser } from "@/types/comments.types";
 
 import {
   TrackComment,
@@ -13,41 +12,34 @@ import {
 export const fetchTrackComments = async (
   trackId: string,
   offset = 1,
-  limit = 50,
+  limit = 50
 ): Promise<CommentsResponse> => {
-  const res = await api.get(
-    `/api/public/engagement/tracks/v1/${trackId}/comments`,
-    { params: { offset, limit } },
-  );
+  const res = await api.get(`/api/public/engagement/tracks/v1/${trackId}/comments`, {
+    params: { offset, limit },
+  });
   return res.data;
 };
 
 export const fetchCommentReplies = async (
   commentId: string,
   offset = 1,
-  limit = 20,
+  limit = 20
 ): Promise<RepliesResponse> => {
-  const res = await api.get(
-    `/api/public/engagement/comments/v1/${commentId}/replies`,
-    { params: { offset, limit } },
-  );
+  const res = await api.get(`/api/public/engagement/comments/v1/${commentId}/replies`, {
+    params: { offset, limit },
+  });
   return res.data;
 };
 
 export const postComment = async (
   trackId: string,
-  payload: PostCommentPayload,
+  payload: PostCommentPayload
 ): Promise<TrackComment> => {
-  const res = await api.post(
-    `/api/engagement/tracks/v1/${trackId}/comments`,
-    payload,
-  );
+  const res = await api.post(`/api/engagement/tracks/v1/${trackId}/comments`, payload);
   return res.data;
 };
 
-export const likeComment = async (
-  commentId: string,
-): Promise<LikeCommentResponse> => {
+export const likeComment = async (commentId: string): Promise<LikeCommentResponse> => {
   const res = await api.post(`/api/engagement/comments/v1/${commentId}/like`);
   return res.data;
 };
@@ -61,27 +53,23 @@ export const deleteComment = async (commentId: string): Promise<void> => {
 export const fetchTrackCommentsStateless = async (
   trackId: string,
   offset = 1,
-  limit = 50,
+  limit = 50
 ): Promise<CommentsResponse> => {
-  const res = await api.get(
-    `/api/public/engagement/tracks/v1/${trackId}/comments`,
-    { params: { offset, limit } },
-  );
+  const res = await api.get(`/api/public/engagement/tracks/v1/${trackId}/comments`, {
+    params: { offset, limit },
+  });
   return res.data;
 };
 
 export const postCommentStateless = async (
   trackId: string,
-  payload: PostCommentPayload,
+  payload: PostCommentPayload
 ): Promise<TrackComment> => {
-  const res = await api.post(
-    `/api/engagement/tracks/v1/${trackId}/comments`,
-    payload,
-  );
+  const res = await api.post(`/api/engagement/tracks/v1/${trackId}/comments`, payload);
   return res.data;
 };
 
 export const fetchMentionSuggestions = async (): Promise<MentionUser[]> => {
-  const res = await api.get("/api/engagement/mentions/v1/followers")
-  return res.data
-}
+  const res = await api.get("/api/engagement/mentions/v1/followers");
+  return res.data;
+};

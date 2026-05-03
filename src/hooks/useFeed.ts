@@ -10,40 +10,34 @@ export function useGetFeed() {
   const [error, setError] = useState<string | null>(null);
   const [hasMore, setHasMore] = useState(true);
 
-  const getFeed = useCallback(
-    async (offset = 0, limit = 20, includeReposts = true) => {
-      setLoading(true);
-      setError(null);
-      if (offset === 0) {
-        setHasMore(true); // reset hasMore on fresh fetch
-      }
-      try {
-        const res = await feedService.getFeed(offset, limit, includeReposts);
-        const incoming = res.data;
+  const getFeed = useCallback(async (offset = 0, limit = 20, includeReposts = true) => {
+    setLoading(true);
+    setError(null);
+    if (offset === 0) {
+      setHasMore(true); // reset hasMore on fresh fetch
+    }
+    try {
+      const res = await feedService.getFeed(offset, limit, includeReposts);
+      const incoming = res.data;
 
-        setItems((prev) =>
-          offset === 0
-            ? incoming // ← replace on reset
-            : [
-                ...prev,
-                ...incoming.filter((i) => !prev.some((p) => p.id === i.id)),
-              ],
-        );
+      setItems((prev) =>
+        offset === 0
+          ? incoming // ← replace on reset
+          : [...prev, ...incoming.filter((i) => !prev.some((p) => p.id === i.id))]
+      );
 
-        setHasMore(incoming.length >= limit);
-        return incoming;
-      } catch (err) {
-        if (axios.isAxiosError<GetFeedErrorResponse>(err)) {
-          setError(err.response?.data?.message || "Failed to load feed");
-        } else {
-          setError("Failed to load feed");
-        }
-      } finally {
-        setLoading(false);
+      setHasMore(incoming.length >= limit);
+      return incoming;
+    } catch (err) {
+      if (axios.isAxiosError<GetFeedErrorResponse>(err)) {
+        setError(err.response?.data?.message || "Failed to load feed");
+      } else {
+        setError("Failed to load feed");
       }
-    },
-    [],
-  );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   const reset = useCallback(() => {
     setItems([]);

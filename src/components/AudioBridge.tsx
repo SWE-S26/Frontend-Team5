@@ -48,12 +48,7 @@ export default function PlayerController() {
   }, [currentTrackId]);
 
   useEffect(() => {
-    if (
-      !isPlaying ||
-      !currentTrackId ||
-      !trackUrl ||
-      listenTrackedForCurrentRef.current
-    ) {
+    if (!isPlaying || !currentTrackId || !trackUrl || listenTrackedForCurrentRef.current) {
       if (listenTimerRef.current) {
         clearInterval(listenTimerRef.current);
         listenTimerRef.current = null;
@@ -78,9 +73,7 @@ export default function PlayerController() {
 
       if (!historyTrackedForCurrentRef.current) {
         historyTrackedForCurrentRef.current = true;
-        void tracksService
-          .addTrackToHistory(currentTrackId)
-          .catch(() => undefined);
+        void tracksService.addTrackToHistory(currentTrackId).catch(() => undefined);
       }
 
       const dur = duration || 0;
@@ -93,9 +86,9 @@ export default function PlayerController() {
             return (crypto as any).randomUUID();
           }
         } catch (e) {}
-        return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
+        return "xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx".replace(/[xy]/g, function (c) {
           const r = (Math.random() * 16) | 0;
-          const v = c === 'x' ? r : (r & 0x3) | 0x8;
+          const v = c === "x" ? r : (r & 0x3) | 0x8;
           return v.toString(16);
         });
       };

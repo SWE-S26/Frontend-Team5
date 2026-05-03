@@ -10,12 +10,7 @@ interface ConversationInputProps {
   disabled: boolean;
 }
 
-const ConversationInput = ({
-  receiverId,
-  onSend,
-  isSending,
-  disabled,
-}: ConversationInputProps) => {
+const ConversationInput = ({ receiverId, onSend, isSending, disabled }: ConversationInputProps) => {
   const [content, setContent] = useState("");
 
   const handleSend = async () => {

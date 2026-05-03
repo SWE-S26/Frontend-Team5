@@ -1,5 +1,3 @@
-export default function Distribute() {
-  return (
-    <div>Distribute</div>
-  )
+export default function DistributePage() {
+  return <div>Distribute</div>
 }

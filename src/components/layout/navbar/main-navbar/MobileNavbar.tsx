@@ -30,13 +30,14 @@ interface MobileNavbarProps {
   isLoggedIn: boolean;
 }
 
-const MENU_LINK_CLASS = "flex items-center gap-3 text-white-smoke font-bold py-3 border-b border-off-black hover:text-silver transition-all duration-300 cursor-pointer w-full text-left";
+const MENU_LINK_CLASS =
+  "flex items-center gap-3 text-white-smoke font-bold py-3 border-b border-off-black hover:text-silver transition-all duration-300 cursor-pointer w-full text-left";
 
 const BOTTOM_TABS = [
-  { href: "/home",    label: "Home",    icon: <GoHome className="text-2xl" />                },
-  { href: "/feed",    label: "Feed",    icon: <MdOutlineFeed className="text-2xl" />         },
+  { href: "/home", label: "Home", icon: <GoHome className="text-2xl" /> },
+  { href: "/feed", label: "Feed", icon: <MdOutlineFeed className="text-2xl" /> },
   { href: "/library", label: "Library", icon: <MdOutlineLibraryMusic className="text-2xl" /> },
-  { href: "/search",  label: "Search",  icon: <CiSearch className="text-2xl" />              },
+  { href: "/search", label: "Search", icon: <CiSearch className="text-2xl" /> },
 ];
 
 export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
@@ -45,26 +46,26 @@ export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
   const { logout, loading, success } = useLogout();
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
-  const userId         = useAppSelector((state) => state.auth.userId);
-  const displayName    = useAppSelector((state) => state.auth.displayName);
-  const role           = useAppSelector((state) => state.auth.role);
+  const userId = useAppSelector((state) => state.auth.userId);
+  const displayName = useAppSelector((state) => state.auth.displayName);
+  const role = useAppSelector((state) => state.auth.role);
 
-  const [isMenuOpen,      setIsMenuOpen]      = useState(false);
-  const [isProfileOpen,   setIsProfileOpen]   = useState(false);
+  const [isMenuOpen, setIsMenuOpen] = useState(false);
+  const [isProfileOpen, setIsProfileOpen] = useState(false);
   const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
-  const [isMessagesOpen,  setIsMessagesOpen]  = useState(false);
+  const [isMessagesOpen, setIsMessagesOpen] = useState(false);
 
   const profileTarget = userId ? `/profile/${userId}` : "/home";
 
   const PROFILE_ITEMS = [
-    { label: "Profile",        icon: <FaUser />,                 href: profileTarget        },
-    { label: "Likes",          icon: <FaHeart />,                href: "/library/likes"     },
-    { label: "Playlists",      icon: <BiSolidCopy />,            href: "/library/playlists" },
-    { label: "Stations",       icon: <HiMiniSignal />,           href: "/library/stations"  },
-    { label: "Following",      icon: <FaUserCheck />,            href: "/library/following" },
-    { label: "Who to follow",  icon: <FaUserPlus />,             href: "/home"              },
+    { label: "Profile", icon: <FaUser />, href: profileTarget },
+    { label: "Likes", icon: <FaHeart />, href: "/library/likes" },
+    { label: "Playlists", icon: <BiSolidCopy />, href: "/library/playlists" },
+    { label: "Stations", icon: <HiMiniSignal />, href: "/library/stations" },
+    { label: "Following", icon: <FaUserCheck />, href: "/library/following" },
+    { label: "Who to follow", icon: <FaUserPlus />, href: "/home" },
     ...(role !== "Pro" ? [{ label: "Try Artist Pro", icon: <FaStar />, href: "/artist" }] : []),
-    { label: "Tracks",         icon: <PiWaveformBold />,         href: "/artists"           },
+    { label: "Tracks", icon: <PiWaveformBold />, href: "/artists" },
   ];
 
   const closeAll = () => {
@@ -85,7 +86,6 @@ export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
     <>
       {/* Fixed top bar */}
       <div className="fixed top-0 left-0 right-0 z-40 bg-chinese-black flex items-center justify-between px-4 py-2 w-full gap-3">
-
         {/* Left — hamburger */}
         <button
           onClick={() => setIsMenuOpen(true)}
@@ -102,11 +102,8 @@ export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
         {/* Right — notifications + profile image or auth buttons */}
         {isLoggedIn ? (
           <div className="flex items-center gap-3 shrink-0">
-            <NotificationBell routeOnClick/>
-            <button
-              onClick={() => setIsProfileOpen((prev) => !prev)}
-              className="cursor-pointer"
-            >
+            <NotificationBell routeOnClick />
+            <button onClick={() => setIsProfileOpen((prev) => !prev)} className="cursor-pointer">
               <ProfileImage
                 src={profileImgLink}
                 alt="Profile"
@@ -153,14 +150,18 @@ export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
       )}
 
       {/* Hamburger slide-in menu — LEFT side */}
-      <div className={`fixed top-0 left-0 h-full w-72 bg-chinese-black z-50 flex flex-col p-6 overflow-y-auto transition-transform duration-300 ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}`}>
-
+      <div
+        className={`fixed top-0 left-0 h-full w-72 bg-chinese-black z-50 flex flex-col p-6 overflow-y-auto transition-transform duration-300 ${isMenuOpen ? "translate-x-0" : "-translate-x-full"}`}
+      >
         {/* Close + Logo */}
         <div className="flex items-center justify-between mb-6">
           <Link href={isLoggedIn ? "/home" : "/"} onClick={() => setIsMenuOpen(false)}>
             <Image src="/app-logo/beatza.png" alt="BeatZa" width={40} height={40} />
           </Link>
-          <button onClick={() => setIsMenuOpen(false)} className="text-white-smoke text-3xl cursor-pointer">
+          <button
+            onClick={() => setIsMenuOpen(false)}
+            className="text-white-smoke text-3xl cursor-pointer"
+          >
             <IoCloseOutline />
           </button>
         </div>
@@ -176,45 +177,84 @@ export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
             <div className="w-full h-px bg-off-black mb-2" />
 
             {role !== "Pro" && (
-              <button onClick={() => navigate("/artist")} className={`${MENU_LINK_CLASS} text-anger`}>
+              <button
+                onClick={() => navigate("/artist")}
+                className={`${MENU_LINK_CLASS} text-anger`}
+              >
                 <FaStar className="text-anger" />
                 Try Artist Pro
               </button>
             )}
-            <button onClick={() => navigate("/artists")}  className={MENU_LINK_CLASS}>Artist Studio</button>
-            <button onClick={() => navigate("/upload")}   className={MENU_LINK_CLASS}>Upload</button>
-            <button onClick={() => navigate("/settings")} className={MENU_LINK_CLASS}>Settings</button>
-            <button onClick={() => navigate("/subscriptions")} className={MENU_LINK_CLASS}>Subscriptions</button>
-            <button onClick={() => navigate("/legal")}    className={MENU_LINK_CLASS}>Legal</button>
-            <button onClick={() => navigate("/copyright")} className={MENU_LINK_CLASS}>Copyright</button>
-            <button onClick={() => navigate("/about-us")}  className={MENU_LINK_CLASS}>About us</button>
-            <button onClick={() => navigate("/need-help")} className={MENU_LINK_CLASS}>Support</button>
+            <button onClick={() => navigate("/artists")} className={MENU_LINK_CLASS}>
+              Artist Studio
+            </button>
+            <button onClick={() => navigate("/upload")} className={MENU_LINK_CLASS}>
+              Upload
+            </button>
+            <button onClick={() => navigate("/settings")} className={MENU_LINK_CLASS}>
+              Settings
+            </button>
+            <button onClick={() => navigate("/subscriptions")} className={MENU_LINK_CLASS}>
+              Subscriptions
+            </button>
+            <button onClick={() => navigate("/legal")} className={MENU_LINK_CLASS}>
+              Legal
+            </button>
+            <button onClick={() => navigate("/copyright")} className={MENU_LINK_CLASS}>
+              Copyright
+            </button>
+            <button onClick={() => navigate("/about-us")} className={MENU_LINK_CLASS}>
+              About us
+            </button>
+            <button onClick={() => navigate("/need-help")} className={MENU_LINK_CLASS}>
+              Support
+            </button>
 
             <button
-              onClick={() => { logout(); closeAll(); }}
+              onClick={() => {
+                logout();
+                closeAll();
+              }}
               disabled={loading}
               className={`${MENU_LINK_CLASS} text-anger border-none`}
             >
               {loading ? "Signing out..." : "Sign out"}
             </button>
-
           </>
         ) : (
           <>
             <div className="flex flex-col gap-3 mb-6">
-              <Button className="w-full py-2 bg-white-smoke text-chinese-black cursor-pointer" onClick={() => { setIsAuthModalOpen(true); setIsMenuOpen(false); }}>
+              <Button
+                className="w-full py-2 bg-white-smoke text-chinese-black cursor-pointer"
+                onClick={() => {
+                  setIsAuthModalOpen(true);
+                  setIsMenuOpen(false);
+                }}
+              >
                 Sign In
               </Button>
-              <Button className="w-full py-2 bg-off-black text-white-smoke cursor-pointer" onClick={() => { setIsAuthModalOpen(true); setIsMenuOpen(false); }}>
+              <Button
+                className="w-full py-2 bg-off-black text-white-smoke cursor-pointer"
+                onClick={() => {
+                  setIsAuthModalOpen(true);
+                  setIsMenuOpen(false);
+                }}
+              >
                 Create Account
               </Button>
             </div>
 
             <div className="w-full h-px bg-off-black mb-4" />
 
-            <button onClick={() => navigate("/legal")}     className={MENU_LINK_CLASS}>Legal</button>
-            <button onClick={() => navigate("/copyright")} className={MENU_LINK_CLASS}>Copyright</button>
-            <button onClick={() => navigate("/artists")}   className={MENU_LINK_CLASS}>About us</button>
+            <button onClick={() => navigate("/legal")} className={MENU_LINK_CLASS}>
+              Legal
+            </button>
+            <button onClick={() => navigate("/copyright")} className={MENU_LINK_CLASS}>
+              Copyright
+            </button>
+            <button onClick={() => navigate("/artists")} className={MENU_LINK_CLASS}>
+              About us
+            </button>
           </>
         )}
       </div>
@@ -231,7 +271,9 @@ export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
               height={36}
               className="rounded-full w-9 h-9 object-cover shrink-0"
             />
-            <span className="text-white-smoke font-bold text-sm truncate">{displayName || "No Name"}</span>
+            <span className="text-white-smoke font-bold text-sm truncate">
+              {displayName || "No Name"}
+            </span>
           </div>
 
           {/* Profile items */}
@@ -239,7 +281,7 @@ export default function MobileNavbar({ isLoggedIn }: MobileNavbarProps) {
             {PROFILE_ITEMS.map((item) => (
               <button
                 key={item.label}
-                onClick={() => item.href ? navigate(item.href) : closeAll()}
+                onClick={() => (item.href ? navigate(item.href) : closeAll())}
                 className="flex items-center gap-3 px-4 py-2.5 text-sm text-white-smoke hover:bg-white/5 transition-colors cursor-pointer"
               >
                 <span className="text-silver">{item.icon}</span>

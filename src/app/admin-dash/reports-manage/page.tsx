@@ -4,7 +4,11 @@ import { useState, useMemo } from "react";
 import { CheckCircle, AlertTriangle, Trash2 } from "lucide-react";
 import { useAdminReports } from "@/hooks/admin-dash/useAdminReports";
 import { useAdminReportActions } from "@/hooks/admin-dash/useAdminReportActions";
-import { AdminReport, ReportStatus, ReportViolatorType } from "@/types/admin-dash/adminReports.types";
+import {
+  AdminReport,
+  ReportStatus,
+  ReportViolatorType,
+} from "@/types/admin-dash/adminReports.types";
 
 const LIMIT = 20;
 
@@ -26,9 +30,7 @@ const TypeBadge = ({ type }: { type: ReportViolatorType }) => {
     user: "bg-white/10 text-silver",
   };
   return (
-    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${styles[type]}`}>
-      {type}
-    </span>
+    <span className={`px-2 py-0.5 rounded-full text-xs font-medium ${styles[type]}`}>{type}</span>
   );
 };
 
@@ -77,7 +79,9 @@ export default function ReportsManagement() {
             <button
               title={`Delete ${report.violatorType} & resolve`}
               disabled={loadingId === report.reportId}
-              onClick={() => deleteAndResolve(report.reportId, report.violatorId, report.violatorType)}
+              onClick={() =>
+                deleteAndResolve(report.reportId, report.violatorId, report.violatorType)
+              }
               className="p-1.5 rounded-lg text-silver hover:text-anger hover:bg-anger/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
             >
               <Trash2 size={15} />
@@ -101,7 +105,9 @@ export default function ReportsManagement() {
         ].map(({ label, value, color }) => (
           <div key={label} className="bg-off-black rounded-xl p-3 md:p-4 border border-white/5">
             <p className="text-silver text-xs md:text-sm">{label}</p>
-            <p className={`text-2xl md:text-3xl font-bold mt-1 ${color ?? "text-white-smoke"}`}>{value}</p>
+            <p className={`text-2xl md:text-3xl font-bold mt-1 ${color ?? "text-white-smoke"}`}>
+              {value}
+            </p>
           </div>
         ))}
       </div>
@@ -113,9 +119,14 @@ export default function ReportsManagement() {
           {(["all", "pending", "done"] as const).map((f) => (
             <button
               key={f}
-              onClick={() => { setStatusFilter(f); setOffset(1); }}
+              onClick={() => {
+                setStatusFilter(f);
+                setOffset(1);
+              }}
               className={`px-2 md:px-3 py-1 rounded-md text-xs md:text-sm capitalize transition-colors ${
-                statusFilter === f ? "bg-brilliant-orange text-white" : "text-silver hover:text-white-smoke"
+                statusFilter === f
+                  ? "bg-brilliant-orange text-white"
+                  : "text-silver hover:text-white-smoke"
               }`}
             >
               {f}
@@ -128,9 +139,14 @@ export default function ReportsManagement() {
           {(["all", "track", "user"] as const).map((f) => (
             <button
               key={f}
-              onClick={() => { setTypeFilter(f); setOffset(1); }}
+              onClick={() => {
+                setTypeFilter(f);
+                setOffset(1);
+              }}
               className={`px-2 md:px-3 py-1 rounded-md text-xs md:text-sm capitalize transition-colors ${
-                typeFilter === f ? "bg-brilliant-orange text-white" : "text-silver hover:text-white-smoke"
+                typeFilter === f
+                  ? "bg-brilliant-orange text-white"
+                  : "text-silver hover:text-white-smoke"
               }`}
             >
               {f}
@@ -149,7 +165,10 @@ export default function ReportsManagement() {
           <p className="text-silver text-center py-10">No reports found.</p>
         ) : (
           reports.map((report) => (
-            <div key={report.reportId} className="bg-off-black rounded-xl p-4 border border-white/5 space-y-3">
+            <div
+              key={report.reportId}
+              className="bg-off-black rounded-xl p-4 border border-white/5 space-y-3"
+            >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-white-smoke font-medium truncate">{report.violatorName}</p>

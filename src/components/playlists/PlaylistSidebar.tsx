@@ -1,4 +1,4 @@
-"use client"
+"use client";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Avatar } from "antd";
 import ProfilePopover from "../layout/track-cards/ProfilePopover";
@@ -16,11 +16,15 @@ interface PlaylistSidebarProps {
 
 export default function PlaylistSidebar({ playlistId, playlist, className }: PlaylistSidebarProps) {
   // ── data ──────────────────────────────────────────────────────────────────
-  const { users: likeUsers,   total: LikesCount,   loadLikes   } = usePlaylistLikesList(playlistId);
-  const { users: repostUsers, total: RepostsCount, loadReposts } = usePlaylistRepostsList(playlistId);
+  const { users: likeUsers, total: LikesCount, loadLikes } = usePlaylistLikesList(playlistId);
+  const {
+    users: repostUsers,
+    total: RepostsCount,
+    loadReposts,
+  } = usePlaylistRepostsList(playlistId);
 
   // ── profile batch-fetch (identical pattern to TrackSidebar) ───────────────
-  const [userProfiles,    setUserProfiles]   = useState<Record<string, GetProfileResponse>>({});
+  const [userProfiles, setUserProfiles] = useState<Record<string, GetProfileResponse>>({});
   const [followOverrides, setFollowOverrides] = useState<Record<string, boolean>>({});
   const inFlightIdsRef = useRef<Set<string>>(new Set());
 
@@ -33,17 +37,16 @@ export default function PlaylistSidebar({ playlistId, playlist, className }: Pla
   const sidebarUserIds = useMemo(
     () =>
       Array.from(
-        new Set([
-          ...likeUsers.map((u) => u.userId),
-          ...repostUsers.map((u) => u.userId),
-        ].filter(Boolean)),
+        new Set(
+          [...likeUsers.map((u) => u.userId), ...repostUsers.map((u) => u.userId)].filter(Boolean)
+        )
       ),
-    [likeUsers, repostUsers],
+    [likeUsers, repostUsers]
   );
 
   useEffect(() => {
     const missingIds = sidebarUserIds.filter(
-      (id) => !userProfiles[id] && !inFlightIdsRef.current.has(id),
+      (id) => !userProfiles[id] && !inFlightIdsRef.current.has(id)
     );
     if (missingIds.length === 0) return;
 
@@ -58,9 +61,12 @@ export default function PlaylistSidebar({ playlistId, playlist, className }: Pla
         const batch = missingIds.slice(start, start + BATCH_SIZE);
         const results = await Promise.all(
           batch.map(async (id) => {
-            try   { return await profileService.getProfileAuthCached(id); }
-            catch { return null; }
-          }),
+            try {
+              return await profileService.getProfileAuthCached(id);
+            } catch {
+              return null;
+            }
+          })
         );
 
         if (cancelled) return;
@@ -79,19 +85,20 @@ export default function PlaylistSidebar({ playlistId, playlist, className }: Pla
       }
     })();
 
-    return () => { cancelled = true; };
+    return () => {
+      cancelled = true;
+    };
   }, [sidebarUserIds, userProfiles]);
 
   // ── render ─────────────────────────────────────────────────────────────────
   return (
-    <aside className={`w-full max-w-full top-20 h-fit flex flex-col gap-10 text-white ${className ?? ""} md:max-w-85`}>
-
+    <aside
+      className={`w-full max-w-full top-20 h-fit flex flex-col gap-10 text-white ${className ?? ""} md:max-w-85`}
+    >
       {/* Likes */}
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold uppercase text-white-smoke">
-            {LikesCount} Likes
-          </h2>
+          <h2 className="text-sm font-bold uppercase text-white-smoke">{LikesCount} Likes</h2>
         </div>
 
         {likeUsers.length === 0 ? (
@@ -99,7 +106,7 @@ export default function PlaylistSidebar({ playlistId, playlist, className }: Pla
         ) : (
           <Avatar.Group className="w-full max-w-full overflow-x-auto">
             {likeUsers.map((user) => {
-              const profile     = userProfiles[user.userId];
+              const profile = userProfiles[user.userId];
               const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false;
 
               return (
@@ -126,9 +133,7 @@ export default function PlaylistSidebar({ playlistId, playlist, className }: Pla
       {/* Reposts */}
       <section className="flex flex-col gap-3">
         <div className="flex items-center justify-between">
-          <h2 className="text-sm font-bold uppercase text-white-smoke">
-            {RepostsCount} Reposts
-          </h2>
+          <h2 className="text-sm font-bold uppercase text-white-smoke">{RepostsCount} Reposts</h2>
         </div>
 
         {repostUsers.length === 0 ? (
@@ -136,7 +141,7 @@ export default function PlaylistSidebar({ playlistId, playlist, className }: Pla
         ) : (
           <Avatar.Group className="w-full max-w-full overflow-x-auto">
             {repostUsers.map((user) => {
-              const profile     = userProfiles[user.userId];
+              const profile = userProfiles[user.userId];
               const isFollowing = followOverrides[user.userId] ?? profile?.isFollowed ?? false;
 
               return (
@@ -164,8 +169,14 @@ export default function PlaylistSidebar({ playlistId, playlist, className }: Pla
 
       <div className="text-xs text-silver leading-6">
         {[
-          "Legal", "Privacy", "Cookie Policy", "Cookie Manager",
-          "Imprint", "Artist Resources", "Newsroom", "Charts",
+          "Legal",
+          "Privacy",
+          "Cookie Policy",
+          "Cookie Manager",
+          "Imprint",
+          "Artist Resources",
+          "Newsroom",
+          "Charts",
           "Transparency Reports",
         ].map((label, i, arr) => (
           <span key={label}>
@@ -174,7 +185,6 @@ export default function PlaylistSidebar({ playlistId, playlist, className }: Pla
           </span>
         ))}
       </div>
-
     </aside>
   );
 }

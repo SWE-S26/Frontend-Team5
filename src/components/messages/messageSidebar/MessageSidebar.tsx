@@ -1,36 +1,44 @@
-'use client'
-import { useState } from 'react'
-import NewMessagePopUP from '../NewMessagePopUP'
-import MessagePerview from './MessagePerview'
-import Button from '@/components/ui/Button'
-import type { Conversation } from '@/types/message.types'
-import EmptyMessages from '@/components/messages/EmptyMessages'
+"use client";
+import { useState } from "react";
+import NewMessagePopUP from "../NewMessagePopUP";
+import MessagePerview from "./MessagePerview";
+import Button from "@/components/ui/Button";
+import type { Conversation } from "@/types/message.types";
+import EmptyMessages from "@/components/messages/EmptyMessages";
 
 interface MessageSidebarProps {
-  onSelect:       (chatId: string) => void
-  selectedChatId: string | null
-  conversations:  Conversation[]
-  markAsRead:     (chatId: string) => Promise<void>
+  onSelect: (chatId: string) => void;
+  selectedChatId: string | null;
+  conversations: Conversation[];
+  markAsRead: (chatId: string) => Promise<void>;
 }
 
-const MessageSidebar = ({ onSelect, selectedChatId, conversations, markAsRead }: MessageSidebarProps) => {
-  const [isOpen, setIsOpen] = useState(false)
+const MessageSidebar = ({
+  onSelect,
+  selectedChatId,
+  conversations,
+  markAsRead,
+}: MessageSidebarProps) => {
+  const [isOpen, setIsOpen] = useState(false);
 
   const handleSelect = (chatId: string) => {
-    markAsRead(chatId)
-    onSelect(chatId)
-  }
+    markAsRead(chatId);
+    onSelect(chatId);
+  };
 
   const sortedConversations = [...conversations].sort(
     (a, b) => new Date(b.lastMessageAt).getTime() - new Date(a.lastMessageAt).getTime()
-  )
+  );
 
   return (
     <>
-      <div className='flex flex-col w-full px-2 py-3'>
-        <div className='flex justify-between ml-2 mb-4'>
-          <p className='text-3xl font-bold text-white-smoke'>Messages</p>
-          <Button className="bg-white-smoke text-chinese-black cursor-pointer" onClick={() => setIsOpen(true)}>
+      <div className="flex flex-col w-full px-2 py-3">
+        <div className="flex justify-between ml-2 mb-4">
+          <p className="text-3xl font-bold text-white-smoke">Messages</p>
+          <Button
+            className="bg-white-smoke text-chinese-black cursor-pointer"
+            onClick={() => setIsOpen(true)}
+          >
             New
           </Button>
         </div>
@@ -39,8 +47,8 @@ const MessageSidebar = ({ onSelect, selectedChatId, conversations, markAsRead }:
           isOpen={isOpen}
           onClose={() => setIsOpen(false)}
           onSent={(chatId) => {
-            markAsRead(chatId)
-            onSelect(chatId)
+            markAsRead(chatId);
+            onSelect(chatId);
           }}
         />
 
@@ -65,7 +73,7 @@ const MessageSidebar = ({ onSelect, selectedChatId, conversations, markAsRead }:
         )}
       </div>
     </>
-  )
-}
+  );
+};
 
-export default MessageSidebar
+export default MessageSidebar;

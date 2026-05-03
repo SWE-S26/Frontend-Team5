@@ -4,8 +4,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Suspense, useState } from "react";
 import { useResetPassword } from "@/hooks/useAuth";
-import { useAppDispatch } from "@/store/hooks"
-import { clearAuth } from "@/store/slices/authSlice"
+import { useAppDispatch } from "@/store/hooks";
+import { clearAuth } from "@/store/slices/authSlice";
 import { useSearchParams } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { z } from "zod";
@@ -33,41 +33,41 @@ function ResetPasswordForm() {
 
   const { resetPassword, loading, error } = useResetPassword();
 
-  const dispatch = useAppDispatch()
+  const dispatch = useAppDispatch();
 
   const validatePassword = (value: string) => {
-    const result = passwordSchema.safeParse(value)
+    const result = passwordSchema.safeParse(value);
     if (!result.success) {
-      setPasswordError(result.error.issues[0].message)
-      return false
+      setPasswordError(result.error.issues[0].message);
+      return false;
     }
-    setPasswordError("")
-    return true
-  }
+    setPasswordError("");
+    return true;
+  };
 
   const handleSave = async () => {
-    const isPasswordValid = validatePassword(password)
-    if (!isPasswordValid) return
+    const isPasswordValid = validatePassword(password);
+    if (!isPasswordValid) return;
 
     if (password !== confirmPassword) {
-      setConfirmPasswordError("Passwords do not match.")
-      return
+      setConfirmPasswordError("Passwords do not match.");
+      return;
     }
 
     if (!token) {
-      setConfirmPasswordError("Missing or invalid token!")
-      return
+      setConfirmPasswordError("Missing or invalid token!");
+      return;
     }
 
-    setConfirmPasswordError("")
+    setConfirmPasswordError("");
 
-    const result = await resetPassword(token, password, signOutEverywhere)
+    const result = await resetPassword(token, password, signOutEverywhere);
     if (result?.message === "Password reset successfully") {
-      setIsSuccess(true)
-      dispatch(clearAuth()) // wipe Redux auth state
-      setTimeout(() => router.push("/"), 2000)
+      setIsSuccess(true);
+      dispatch(clearAuth()); // wipe Redux auth state
+      setTimeout(() => router.push("/"), 2000);
     }
-  }
+  };
 
   return (
     <main className="min-h-dvh bg-[#f2f2f2] text-[#333] flex flex-col">
@@ -91,13 +91,22 @@ function ResetPasswordForm() {
 
       <section className="mx-auto flex w-full max-w-7xl flex-1 items-center justify-center px-4 py-5 sm:py-7">
         <div className="w-full max-w-2xl border border-[#d7d7d7] bg-[#f5f5f5] px-5 pb-6 pt-8 shadow-[0_0_0_1px_rgba(255,255,255,0.3)_inset] sm:px-10 sm:pb-8 sm:pt-10">
-          
           {isSuccess ? (
             // ── Success State ──
             <div className="flex flex-col items-center justify-center py-8 gap-4">
               <div className="flex h-16 w-16 items-center justify-center rounded-full bg-green-100">
-                <svg className="h-8 w-8 text-green-600" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                <svg
+                  className="h-8 w-8 text-green-600"
+                  fill="none"
+                  viewBox="0 0 24 24"
+                  stroke="currentColor"
+                >
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M5 13l4 4L19 7"
+                  />
                 </svg>
               </div>
               <h1 className="text-center text-2xl font-semibold text-[#2b2b2b]">
@@ -134,12 +143,14 @@ function ResetPasswordForm() {
                     type="password"
                     value={password}
                     onChange={(e) => {
-                      setPassword(e.target.value)
-                      if (passwordError) validatePassword(e.target.value)
-                      if (confirmPasswordError) setConfirmPasswordError("")
+                      setPassword(e.target.value);
+                      if (passwordError) validatePassword(e.target.value);
+                      if (confirmPasswordError) setConfirmPasswordError("");
                     }}
                     className={`h-11 w-full rounded-md border bg-[#e9e9e9] px-4 pr-10 text-base text-[#2b2b2b] outline-none sm:h-12 ${
-                      passwordError ? "border-[#d91c5c] focus:border-[#d91c5c]" : "border-[#e6e6e6] focus:border-[#b8b8b8]"
+                      passwordError
+                        ? "border-[#d91c5c] focus:border-[#d91c5c]"
+                        : "border-[#e6e6e6] focus:border-[#b8b8b8]"
                     }`}
                   />
                   {passwordError && (
@@ -148,9 +159,7 @@ function ResetPasswordForm() {
                     </span>
                   )}
                 </div>
-                {passwordError && (
-                  <p className="mt-2 text-sm text-[#d02f2f]">{passwordError}</p>
-                )}
+                {passwordError && <p className="mt-2 text-sm text-[#d02f2f]">{passwordError}</p>}
 
                 {/* Confirm Password */}
                 <label className="mt-5 block text-base font-medium text-[#2b2b2b] sm:mt-5 sm:text-[18px] sm:leading-tight">
@@ -162,11 +171,13 @@ function ResetPasswordForm() {
                     type="password"
                     value={confirmPassword}
                     onChange={(e) => {
-                      setConfirmPassword(e.target.value)
-                      if (confirmPasswordError) setConfirmPasswordError("")
+                      setConfirmPassword(e.target.value);
+                      if (confirmPasswordError) setConfirmPasswordError("");
                     }}
                     className={`h-11 w-full rounded-md border bg-[#e9e9e9] px-4 pr-10 text-base text-[#2b2b2b] outline-none sm:h-12 ${
-                      confirmPasswordError ? "border-[#d91c5c] focus:border-[#d91c5c]" : "border-[#e6e6e6] focus:border-[#b8b8b8]"
+                      confirmPasswordError
+                        ? "border-[#d91c5c] focus:border-[#d91c5c]"
+                        : "border-[#e6e6e6] focus:border-[#b8b8b8]"
                     }`}
                   />
                   {confirmPasswordError && (
@@ -180,9 +191,7 @@ function ResetPasswordForm() {
                 )}
 
                 {/* API error */}
-                {error && (
-                  <p className="mt-2 text-sm text-[#d02f2f]">{error}</p>
-                )}
+                {error && <p className="mt-2 text-sm text-[#d02f2f]">{error}</p>}
 
                 {/* Sign out everywhere */}
                 <label className="mt-5 flex cursor-pointer items-center gap-3 text-base text-[#2b2b2b] sm:mt-6 sm:text-[18px]">
@@ -212,10 +221,18 @@ function ResetPasswordForm() {
 
       <footer className="mx-auto w-full max-w-7xl border-t border-[#e3e3e3] px-4 py-3 sm:py-4">
         <nav className="flex flex-wrap gap-x-6 gap-y-2 text-sm text-[#636363] sm:text-base">
-          <Link href="#" className="hover:underline">Legal</Link>
-          <Link href="#" className="hover:underline">Privacy</Link>
-          <Link href="#" className="hover:underline">Cookies</Link>
-          <Link href="#" className="hover:underline">Imprint</Link>
+          <Link href="#" className="hover:underline">
+            Legal
+          </Link>
+          <Link href="#" className="hover:underline">
+            Privacy
+          </Link>
+          <Link href="#" className="hover:underline">
+            Cookies
+          </Link>
+          <Link href="#" className="hover:underline">
+            Imprint
+          </Link>
         </nav>
       </footer>
     </main>

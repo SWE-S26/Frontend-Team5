@@ -1,9 +1,9 @@
-"use client"
-import { usePathname } from "next/navigation"
-import TabsNavbar from "@/components/layout/navbar/TabsNavbar"
+"use client";
+import { usePathname } from "next/navigation";
+import TabsNavbar from "@/components/layout/navbar/TabsNavbar";
 
 export default function SettingsLayoutClient({ children }: { children: React.ReactNode }) {
-  const pathname = usePathname()
+  const pathname = usePathname();
 
   return (
     <div className="px-8 sm:px-0">
@@ -12,13 +12,13 @@ export default function SettingsLayoutClient({ children }: { children: React.Rea
         pathname={pathname}
         className="pb-4 text-sm sm:text-xl overflow-x-auto"
         tabs={[
-          { href: "/settings",               label: "Account"       },
-          { href: "/settings/content",       label: "Content"       },
+          { href: "/settings", label: "Account" },
+          { href: "/settings/content", label: "Content" },
           { href: "/settings/notifications", label: "Notifications" },
-          { href: "/settings/privacy",       label: "Privacy"       },
+          { href: "/settings/privacy", label: "Privacy" },
         ]}
       />
       {children}
     </div>
-  )
+  );
 }

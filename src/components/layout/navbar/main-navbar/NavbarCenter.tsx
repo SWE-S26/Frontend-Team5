@@ -1,86 +1,85 @@
-import React, { useState, useEffect, useRef, useCallback } from 'react'
-import { CiSearch } from 'react-icons/ci'
-import { useRouter } from 'next/navigation'
-import useDebounce from '@/hooks/useDebounce'
-import useSearch from '@/hooks/useSearch'
+import React, { useState, useEffect, useRef, useCallback } from "react";
+import { CiSearch } from "react-icons/ci";
+import { useRouter } from "next/navigation";
+import useDebounce from "@/hooks/useDebounce";
+import useSearch from "@/hooks/useSearch";
 
 export default function NavbarCenter() {
-  const router = useRouter()
-  const [q, setQ]                   = useState('')
-  const debouncedQ                  = useDebounce(q, 250)
-  const { getSuggestions, addToHistory } = useSearch()
-  const [suggestions, setSuggestions]   = useState<any[] | null>(null)
-  const [showDropdown, setShowDropdown] = useState(false)
-  const containerRef = useRef<HTMLDivElement | null>(null)
+  const router = useRouter();
+  const [q, setQ] = useState("");
+  const debouncedQ = useDebounce(q, 250);
+  const { getSuggestions, addToHistory } = useSearch();
+  const [suggestions, setSuggestions] = useState<any[] | null>(null);
+  const [showDropdown, setShowDropdown] = useState(false);
+  const containerRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
-    let cancelled = false
+    let cancelled = false;
 
     const load = async () => {
       if (!debouncedQ.trim()) {
-        setSuggestions(null)
-        setShowDropdown(false)
-        return
+        setSuggestions(null);
+        setShowDropdown(false);
+        return;
       }
-      const res = await getSuggestions(debouncedQ)
+      const res = await getSuggestions(debouncedQ);
       if (!cancelled) {
-        const list = Array.isArray(res) ? res : null
-        setSuggestions(list)
-        setShowDropdown(!!list && list.length > 0)
+        const list = Array.isArray(res) ? res : null;
+        setSuggestions(list);
+        setShowDropdown(!!list && list.length > 0);
       }
-    }
+    };
 
-    load()
-    return () => { cancelled = true }
-  }, [debouncedQ, getSuggestions])
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, [debouncedQ, getSuggestions]);
 
   useEffect(() => {
     const onClickOutside = (e: MouseEvent) => {
       if (!containerRef.current?.contains(e.target as Node)) {
-        setShowDropdown(false)
+        setShowDropdown(false);
       }
-    }
-    document.addEventListener('mousedown', onClickOutside)
-    return () => document.removeEventListener('mousedown', onClickOutside)
-  }, [])
+    };
+    document.addEventListener("mousedown", onClickOutside);
+    return () => document.removeEventListener("mousedown", onClickOutside);
+  }, []);
 
   const handleSubmit = useCallback(
     (e?: React.FormEvent) => {
-      e?.preventDefault()
-      const trimmed = q.trim()
-      if (!trimmed) return
-      setShowDropdown(false)
-      router.push(`/search?q=${encodeURIComponent(trimmed)}`)
+      e?.preventDefault();
+      const trimmed = q.trim();
+      if (!trimmed) return;
+      setShowDropdown(false);
+      router.push(`/search?q=${encodeURIComponent(trimmed)}`);
     },
     [q, router]
-  )
+  );
 
-  const sanitize = (value: string) => value.replace(/[()\[\]{}]/g, '')
+  const sanitize = (value: string) => value.replace(/[()\[\]{}]/g, "");
 
   const handleInputChange = useCallback((e: React.ChangeEvent<HTMLInputElement>) => {
-    const cleaned = sanitize(e.target.value)
+    const cleaned = sanitize(e.target.value);
 
-    setQ(cleaned)
-    if (cleaned.trim()) setShowDropdown(true)
-  }, [])
+    setQ(cleaned);
+    if (cleaned.trim()) setShowDropdown(true);
+  }, []);
 
   const handleSuggestionClick = useCallback(
     (item: any) => {
-      const title = item.title || item.id || ''
-      setQ(title)
-      setShowDropdown(false)
-      if (item.id && item.type) addToHistory({ id: item.id, type: item.type })
-      router.push(`/search?q=${encodeURIComponent(title)}`)
+      const title = item.title || item.id || "";
+      setQ(title);
+      setShowDropdown(false);
+      if (item.id && item.type) addToHistory({ id: item.id, type: item.type });
+      router.push(`/search?q=${encodeURIComponent(title)}`);
     },
     [addToHistory, router]
-  )
+  );
 
-  const handleKeyDown = useCallback(
-    (e: React.KeyboardEvent<HTMLInputElement>) => {
-      if (e.key === 'Escape') setShowDropdown(false)
-    },
-    []
-  )
+  const handleKeyDown = useCallback((e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "Escape") setShowDropdown(false);
+  }, []);
 
   return (
     <div className="relative w-full" ref={containerRef}>
@@ -125,5 +124,5 @@ export default function NavbarCenter() {
         </ul>
       )}
     </div>
-  )
+  );
 }

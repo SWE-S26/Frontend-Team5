@@ -1,44 +1,44 @@
-"use client"
+"use client";
 
-import { useRef, useState, useEffect } from "react"
-import { useRouter } from "next/navigation"
-import { SlBell } from "react-icons/sl"
-import NotificationPopup from "@/components/notifications/NotificationPopUp"
-import { useNotificationsContext } from "@/components/notifications/NotificationsContext"
+import { useRef, useState, useEffect } from "react";
+import { useRouter } from "next/navigation";
+import { SlBell } from "react-icons/sl";
+import NotificationPopup from "@/components/notifications/NotificationPopUp";
+import { useNotificationsContext } from "@/components/notifications/NotificationsContext";
 
 interface NotificationBellProps {
-  routeOnClick?: boolean
+  routeOnClick?: boolean;
 }
 
 export default function NotificationBell({ routeOnClick = false }: NotificationBellProps) {
-  const [isOpen, setIsOpen] = useState(false)
-  const containerRef        = useRef<HTMLDivElement>(null)
-  const router              = useRouter()
+  const [isOpen, setIsOpen] = useState(false);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const router = useRouter();
 
-  const { notifications, unreadCount, markVisibleAsRead } = useNotificationsContext()
+  const { notifications, unreadCount, markVisibleAsRead } = useNotificationsContext();
 
   useEffect(() => {
     function handleClickOutside(e: MouseEvent) {
       if (containerRef.current && !containerRef.current.contains(e.target as Node)) {
-        setIsOpen(false)
+        setIsOpen(false);
       }
     }
-    document.addEventListener("mousedown", handleClickOutside)
-    return () => document.removeEventListener("mousedown", handleClickOutside)
-  }, [])
+    document.addEventListener("mousedown", handleClickOutside);
+    return () => document.removeEventListener("mousedown", handleClickOutside);
+  }, []);
 
   function handleOpen() {
     if (routeOnClick) {
-      router.push("/notifications")
-      return
+      router.push("/notifications");
+      return;
     }
     setIsOpen((prev) => {
       if (!prev) {
-        const visibleIds = notifications.slice(0, 5).map((n) => n.notificationId)
-        markVisibleAsRead(visibleIds)
+        const visibleIds = notifications.slice(0, 5).map((n) => n.notificationId);
+        markVisibleAsRead(visibleIds);
       }
-      return !prev
-    })
+      return !prev;
+    });
   }
 
   return (
@@ -65,5 +65,5 @@ export default function NotificationBell({ routeOnClick = false }: NotificationB
         </div>
       )}
     </div>
-  )
+  );
 }

@@ -10,10 +10,7 @@ interface ButtonProps {
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  (
-    { children, onClick, className = "", type = "button", icon, disabled },
-    ref,
-  ) => {
+  ({ children, onClick, className = "", type = "button", icon, disabled }, ref) => {
     return (
       <button
         type={type}
@@ -33,7 +30,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         </span>
       </button>
     );
-  },
+  }
 );
 
 Button.displayName = "Button";

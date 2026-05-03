@@ -2,10 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import {
-  messageToastBus,
-  MessageToastData,
-} from "@/lib/sockets/messageToastBus";
+import { messageToastBus, MessageToastData } from "@/lib/sockets/messageToastBus";
 import { MdErrorOutline } from "react-icons/md";
 
 export default function MessageToast() {
@@ -34,17 +31,14 @@ export default function MessageToast() {
           onClick={() => setToast(null)}
         >
           <MdErrorOutline className="text-red-500 text-xl shrink-0" />
-          <p className="text-white-smoke text-sm font-bold leading-snug">
-            {toast.message}
-          </p>
+          <p className="text-white-smoke text-sm font-bold leading-snug">{toast.message}</p>
         </motion.div>
       </AnimatePresence>
     );
   }
 
   // ── Sent / Received toast ──────────────────────────────────────────────────
-  const photoUrl =
-    toast.type === "sent" ? toast.recipientPhoto : toast.senderPhoto;
+  const photoUrl = toast.type === "sent" ? toast.recipientPhoto : toast.senderPhoto;
   const text =
     toast.type === "sent"
       ? `Your message to ${toast.recipientName} was sent successfully`
@@ -65,9 +59,7 @@ export default function MessageToast() {
           alt="avatar"
           className="w-10 h-10 rounded-full object-cover shrink-0"
         />
-        <p className="text-white-smoke text-sm font-bold leading-snug">
-          {text}
-        </p>
+        <p className="text-white-smoke text-sm font-bold leading-snug">{text}</p>
       </motion.div>
     </AnimatePresence>
   );

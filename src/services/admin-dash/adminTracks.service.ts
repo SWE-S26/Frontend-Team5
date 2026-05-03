@@ -1,5 +1,3 @@
-// src/services/admin/adminTracksService.ts
-
 import api from "@/lib/api";
 import {
   AdminTracksParams,

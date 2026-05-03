@@ -53,9 +53,7 @@ function RowSkeleton() {
 
 export default function LikedTracksWidget({ userId }: LikedTracksWidgetProps) {
   const { getLikedTracks, tracks, loading } = useGetLikedTracks();
-  const [artistProfiles, setArtistProfiles] = useState<
-    Record<string, GetProfileResponse>
-  >({});
+  const [artistProfiles, setArtistProfiles] = useState<Record<string, GetProfileResponse>>({});
   const inFlightIdsRef = useRef<Set<string>>(new Set());
 
   useEffect(() => {
@@ -64,28 +62,18 @@ export default function LikedTracksWidget({ userId }: LikedTracksWidgetProps) {
 
   const totalCount = tracks?.length ?? 0;
 
-  const orderedTracks = useMemo(
-    () => (tracks ?? []).slice().reverse(),
-    [tracks],
-  );
+  const orderedTracks = useMemo(() => (tracks ?? []).slice().reverse(), [tracks]);
 
-  const previewTracks = useMemo(
-    () => orderedTracks.slice(0, PREVIEW_COUNT),
-    [orderedTracks],
-  );
+  const previewTracks = useMemo(() => orderedTracks.slice(0, PREVIEW_COUNT), [orderedTracks]);
 
   const previewTrackIds = useMemo(
     () => previewTracks.map((t) => t.posterId).join(","),
-    [previewTracks],
+    [previewTracks]
   );
 
   useEffect(() => {
-    const ids = Array.from(
-      new Set(previewTracks.map((track) => track.posterId).filter(Boolean)),
-    );
-    const missingIds = ids.filter(
-      (id) => !artistProfiles[id] && !inFlightIdsRef.current.has(id),
-    );
+    const ids = Array.from(new Set(previewTracks.map((track) => track.posterId).filter(Boolean)));
+    const missingIds = ids.filter((id) => !artistProfiles[id] && !inFlightIdsRef.current.has(id));
     if (missingIds.length === 0) return;
 
     missingIds.forEach((id) => inFlightIdsRef.current.add(id));
@@ -94,8 +82,7 @@ export default function LikedTracksWidget({ userId }: LikedTracksWidgetProps) {
 
     void (async () => {
       const BATCH_SIZE = 3;
-      const delay = (ms: number) =>
-        new Promise((resolve) => setTimeout(resolve, ms));
+      const delay = (ms: number) => new Promise((resolve) => setTimeout(resolve, ms));
       for (let start = 0; start < missingIds.length; start += BATCH_SIZE) {
         const batch = missingIds.slice(start, start + BATCH_SIZE);
         const results = await Promise.all(
@@ -106,7 +93,7 @@ export default function LikedTracksWidget({ userId }: LikedTracksWidgetProps) {
             } catch {
               return null;
             }
-          }),
+          })
         );
 
         if (cancelled) return;
@@ -184,9 +171,7 @@ export default function LikedTracksWidget({ userId }: LikedTracksWidgetProps) {
               profile?.city || profile?.country
                 ? [profile?.city, profile?.country].filter(Boolean)
                 : [];
-            const location = locationParts.length
-              ? locationParts.join(", ")
-              : undefined;
+            const location = locationParts.length ? locationParts.join(", ") : undefined;
 
             return (
               <TrackListRow

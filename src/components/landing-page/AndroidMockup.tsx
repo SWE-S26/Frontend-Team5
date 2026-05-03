@@ -1,8 +1,8 @@
-import Image from "next/image"
+import Image from "next/image";
 
 interface AndroidMockupProps {
-  className?: string
-  screenImage?: string
+  className?: string;
+  screenImage?: string;
 }
 
 export default function AndroidMockup({ className = "", screenImage }: AndroidMockupProps) {
@@ -10,7 +10,6 @@ export default function AndroidMockup({ className = "", screenImage }: AndroidMo
     <div className={`relative ${className}`}>
       {/* Outer shell */}
       <div className="relative w-50 h-116 rounded-[40px] border-[3px] border-[#FF5500] bg-white shadow-md">
-
         {/* Right side volume buttons */}
         <div className="absolute -right-1.25 top-20 w-1 h-5.5 rounded-r-sm bg-[#FF5500]" />
         <div className="absolute -right-1.25 top-27.5 w-1 h-5.5 rounded-r-sm bg-[#FF5500]" />
@@ -29,5 +28,5 @@ export default function AndroidMockup({ className = "", screenImage }: AndroidMo
         </div>
       </div>
     </div>
-  )
+  );
 }

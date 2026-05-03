@@ -26,9 +26,7 @@ export default function FeedHeader({
   isRepost,
 }: FeedHeaderProps) {
   function timeAgo(dateStr: string): string {
-    const seconds = Math.floor(
-      (Date.now() - new Date(dateStr).getTime()) / 1000,
-    );
+    const seconds = Math.floor((Date.now() - new Date(dateStr).getTime()) / 1000);
 
     if (seconds < 60) return "just now";
 
@@ -43,8 +41,7 @@ export default function FeedHeader({
 
     for (const interval of intervals) {
       const count = Math.floor(seconds / interval.seconds);
-      if (count >= 1)
-        return `${count} ${interval.label}${count !== 1 ? "s" : ""} ago`;
+      if (count >= 1) return `${count} ${interval.label}${count !== 1 ? "s" : ""} ago`;
     }
 
     return "just now";

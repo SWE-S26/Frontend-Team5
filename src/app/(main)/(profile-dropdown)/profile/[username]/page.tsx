@@ -1,9 +1,9 @@
-import ProfilePageContent from "@/components/profile/ProfilePageContent"
+import ProfilePageContent from "@/components/profile/ProfilePageContent";
 
 interface Props {
-  params: { username: string }
+  params: { username: string };
 }
 
 export default function ProfilePage({ params }: Props) {
-  return <ProfilePageContent params={params} />
+  return <ProfilePageContent params={params} />;
 }

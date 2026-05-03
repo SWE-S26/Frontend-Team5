@@ -1,4 +1,5 @@
 "use client";
+
 import AuthGuard from "@/components/layout/guards/AuthGuard";
 import Navbar from "@/components/layout/navbar/main-navbar/Navbar";
 import PlayerBar from "@/components/layout/player/PlayerBar";
@@ -38,11 +39,7 @@ function SocketInitializer() {
   return null;
 }
 
-export default function MainLayout({
-  children,
-}: {
-  children: React.ReactNode;
-}) {
+export default function MainLayout({ children }: { children: React.ReactNode }) {
   return (
     <SocketProvider>
       <NotificationsProvider>

@@ -78,8 +78,13 @@ export default function TracksManagement() {
     setLocalTracks((prev) => (prev ?? fetchedTracks).filter((t) => t.id !== trackId));
   };
 
-  const { banTrack, unbanTrack, deleteTrack, loadingId, error: actionError } =
-    useAdminTrackActions(refetch);
+  const {
+    banTrack,
+    unbanTrack,
+    deleteTrack,
+    loadingId,
+    error: actionError,
+  } = useAdminTrackActions(refetch);
 
   const handleBan = async (trackId: string) => {
     optimisticToggleBan(trackId, true);
@@ -132,7 +137,7 @@ export default function TracksManagement() {
       <button
         title={track.banned ? "Unban" : "Ban"}
         disabled={loadingId === track.id}
-        onClick={() => track.banned ? handleUnban(track.id) : handleBan(track.id)}
+        onClick={() => (track.banned ? handleUnban(track.id) : handleBan(track.id))}
         className="p-1.5 rounded-lg text-silver hover:text-brilliant-orange hover:bg-brilliant-orange/10 transition-colors disabled:opacity-40 disabled:cursor-not-allowed"
       >
         {track.banned ? <ShieldCheck size={15} /> : <ShieldOff size={15} />}
@@ -160,7 +165,9 @@ export default function TracksManagement() {
         ].map(({ label, value, color }) => (
           <div key={label} className="bg-off-black rounded-xl p-3 md:p-4 border border-white/5">
             <p className="text-silver text-xs md:text-sm">{label}</p>
-            <p className={`text-2xl md:text-3xl font-bold mt-1 ${color ?? "text-white-smoke"}`}>{value}</p>
+            <p className={`text-2xl md:text-3xl font-bold mt-1 ${color ?? "text-white-smoke"}`}>
+              {value}
+            </p>
           </div>
         ))}
       </div>
@@ -215,9 +222,7 @@ export default function TracksManagement() {
         </div>
       </div>
 
-      {(error || actionError) && (
-        <p className="text-anger text-sm">{error ?? actionError}</p>
-      )}
+      {(error || actionError) && <p className="text-anger text-sm">{error ?? actionError}</p>}
 
       {/* Mobile cards */}
       <div className="md:hidden space-y-3">
@@ -227,7 +232,10 @@ export default function TracksManagement() {
           <p className="text-silver text-center py-10">No tracks found.</p>
         ) : (
           processed.map((track) => (
-            <div key={track.id} className="bg-off-black rounded-xl p-4 border border-white/5 space-y-3">
+            <div
+              key={track.id}
+              className="bg-off-black rounded-xl p-4 border border-white/5 space-y-3"
+            >
               <div className="flex items-start justify-between gap-2">
                 <div className="min-w-0">
                   <p className="text-white-smoke font-medium truncate">{track.title}</p>

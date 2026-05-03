@@ -30,8 +30,7 @@ const Conversation = ({
   onBack,
 }: ConversationProps) => {
   const currentUserId = useAppSelector((state) => state.auth.userId) ?? "";
-  const myAvatar =
-    useAppSelector((state) => state.auth.profileImgLink) ?? "/profpic.jpg";
+  const myAvatar = useAppSelector((state) => state.auth.profileImgLink) ?? "/profpic.jpg";
   const bottomRef = useRef<HTMLDivElement>(null);
 
   const { messages, isReceiverBlocked, addMessage } = useMessages(chatId);
@@ -48,7 +47,7 @@ const Conversation = ({
       content: string;
       seenBy: string[];
       createdAt: string;
-    }>,
+    }>
   );
 
   // useChatRoom handles join/leave/message:send — lives in useSocket.ts
@@ -79,7 +78,7 @@ const Conversation = ({
                   seenBy: msg.seenBy,
                   createdAt: msg.createdAt,
                 },
-              ],
+              ]
         );
         return;
       }
@@ -102,11 +101,11 @@ const Conversation = ({
   }, [addMessage, chatId]);
 
   const sortedMessages = [...messages].sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   );
 
   const displayMessages = [...sortedMessages, ...pendingMessages].sort(
-    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime(),
+    (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
   );
 
   useEffect(() => {

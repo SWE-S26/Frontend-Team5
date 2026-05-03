@@ -2,21 +2,27 @@ import { useRef, useState } from "react";
 import type { ArtistTrackRow } from "../ArtistStudioContent";
 import { RiLockFill } from "react-icons/ri";
 
-export function BulkEditPanel({ selectedIds, tracks, onClose }: {
+export function BulkEditPanel({
+  selectedIds,
+  tracks,
+  onClose,
+}: {
   selectedIds: Set<string>;
   tracks: ArtistTrackRow[];
   onClose: () => void;
 }) {
   const count = selectedIds.size;
-  const [artworkSrc, setArtworkSrc]             = useState<string | null>(null);
-  const [genre, setGenre]                       = useState("");
-  const [tags, setTags]                         = useState("");
-  const [privacy, setPrivacy]                   = useState<"dont-change" | "all-public" | "all-private">("dont-change");
-  const [downloads, setDownloads]               = useState<"dont-change" | "all-on" | "all-off">("dont-change");
-  const [allowComments, setAllowComments]       = useState(true);
-  const [showComments, setShowComments]         = useState(true);
-  const [showStats, setShowStats]               = useState(true);
-  const [advancedOpen, setAdvancedOpen]         = useState(false);
+  const [artworkSrc, setArtworkSrc] = useState<string | null>(null);
+  const [genre, setGenre] = useState("");
+  const [tags, setTags] = useState("");
+  const [privacy, setPrivacy] = useState<"dont-change" | "all-public" | "all-private">(
+    "dont-change"
+  );
+  const [downloads, setDownloads] = useState<"dont-change" | "all-on" | "all-off">("dont-change");
+  const [allowComments, setAllowComments] = useState(true);
+  const [showComments, setShowComments] = useState(true);
+  const [showStats, setShowStats] = useState(true);
+  const [advancedOpen, setAdvancedOpen] = useState(false);
   const artworkInputRef = useRef<HTMLInputElement | null>(null);
 
   const handleArtworkChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,14 +31,24 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
     setArtworkSrc(URL.createObjectURL(file));
   };
 
-  const Toggle = ({ value, onChange, testId }: { value: boolean; onChange: (v: boolean) => void; testId: string }) => (
+  const Toggle = ({
+    value,
+    onChange,
+    testId,
+  }: {
+    value: boolean;
+    onChange: (v: boolean) => void;
+    testId: string;
+  }) => (
     <button
       type="button"
       onClick={() => onChange(!value)}
       data-testid={testId}
       className={`relative inline-flex h-5 w-9 shrink-0 cursor-pointer items-center rounded-full transition-colors ${value ? "bg-[#1db954]" : "bg-[#444]"}`}
     >
-      <span className={`inline-block h-4 w-4 transform rounded-full bg-white-smoke shadow transition-transform ${value ? "translate-x-4" : "translate-x-0.5"}`} />
+      <span
+        className={`inline-block h-4 w-4 transform rounded-full bg-white-smoke shadow transition-transform ${value ? "translate-x-4" : "translate-x-0.5"}`}
+      />
     </button>
   );
 
@@ -40,18 +56,23 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
     <>
       <div className="fixed inset-0 z-100 bg-chinese-black/40" onClick={onClose} />
       <div className="fixed right-0 top-0 z-110 flex h-full w-full max-w-150 flex-col bg-chinese-black shadow-2xl">
-
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#2a2a2a] px-4 py-3.5 sm:px-5">
           <div className="flex items-center gap-3">
-            <button type="button" onClick={onClose} data-testid="artist-bulk-edit-close" className="text-white-smoke hover:text-[#aaa] transition-colors text-[20px] leading-none cursor-pointer">✕</button>
+            <button
+              type="button"
+              onClick={onClose}
+              data-testid="artist-bulk-edit-close"
+              className="text-white-smoke hover:text-[#aaa] transition-colors text-[20px] leading-none cursor-pointer"
+            >
+              ✕
+            </button>
             <h2 className="text-[15px] font-bold text-white-smoke">Edit {count} tracks</h2>
           </div>
         </div>
 
         {/* Body */}
         <div className="flex-1 space-y-6 overflow-y-auto px-4 py-5 sm:px-6">
-
           {/* Artwork */}
           <div>
             <button
@@ -65,20 +86,40 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
               ) : (
                 <>
                   <div className="flex h-14 w-14 items-center justify-center rounded border border-[#444] text-[#888]">
-                    <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-                      <rect x="3" y="3" width="18" height="18" rx="2" /><circle cx="8.5" cy="8.5" r="1.5" /><polyline points="21 15 16 10 5 21" />
+                    <svg
+                      width="28"
+                      height="28"
+                      viewBox="0 0 24 24"
+                      fill="none"
+                      stroke="currentColor"
+                      strokeWidth="1.5"
+                    >
+                      <rect x="3" y="3" width="18" height="18" rx="2" />
+                      <circle cx="8.5" cy="8.5" r="1.5" />
+                      <polyline points="21 15 16 10 5 21" />
                     </svg>
                   </div>
-                  <span className="text-[13px] font-semibold text-white-smoke">Add new artwork</span>
+                  <span className="text-[13px] font-semibold text-white-smoke">
+                    Add new artwork
+                  </span>
                 </>
               )}
             </button>
-            <input ref={artworkInputRef} type="file" accept="image/*" className="hidden" onChange={handleArtworkChange} data-testid="artist-bulk-edit-artwork-input" />
+            <input
+              ref={artworkInputRef}
+              type="file"
+              accept="image/*"
+              className="hidden"
+              onChange={handleArtworkChange}
+              data-testid="artist-bulk-edit-artwork-input"
+            />
           </div>
 
           {/* Primary genre */}
           <div>
-            <label className="mb-1 block text-[13px] font-semibold text-white-smoke">Primary genre</label>
+            <label className="mb-1 block text-[13px] font-semibold text-white-smoke">
+              Primary genre
+            </label>
             <button
               type="button"
               data-testid="artist-bulk-edit-genre"
@@ -107,18 +148,22 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
           <div>
             <p className="mb-2 text-[13px] font-semibold text-white-smoke">Tracks privacy</p>
             <div className="flex items-center gap-0 rounded-lg border border-[#2a2a2a] overflow-hidden text-[12px] font-semibold">
-              {([
-                { key: "dont-change",  label: "Don't Change" },
-                { key: "all-public",   label: "All Public"   },
-                { key: "all-private",  label: "All Private"  },
-              ] as const).map(({ key, label }) => (
+              {(
+                [
+                  { key: "dont-change", label: "Don't Change" },
+                  { key: "all-public", label: "All Public" },
+                  { key: "all-private", label: "All Private" },
+                ] as const
+              ).map(({ key, label }) => (
                 <button
                   key={key}
                   type="button"
                   onClick={() => setPrivacy(key)}
                   data-testid={`artist-bulk-edit-privacy-${key}`}
                   className={`flex-1 py-2.5 transition-colors cursor-pointer ${
-                    privacy === key ? "bg-white-smoke text-chinese-black" : "bg-transparent text-[#888] hover:text-white-smoke"
+                    privacy === key
+                      ? "bg-white-smoke text-chinese-black"
+                      : "bg-transparent text-[#888] hover:text-white-smoke"
                   }`}
                 >
                   {label}
@@ -142,20 +187,26 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
               <div className="border-t border-[#2a2a2a] px-4 py-4 space-y-5">
                 {/* Enable direct downloads */}
                 <div>
-                  <p className="text-[13px] font-semibold text-white-smoke mb-2">Enable direct downloads</p>
+                  <p className="text-[13px] font-semibold text-white-smoke mb-2">
+                    Enable direct downloads
+                  </p>
                   <div className="flex items-center gap-0 rounded-lg border border-[#2a2a2a] overflow-hidden text-[12px] font-semibold">
-                    {([
-                      { key: "dont-change", label: "Don't Change" },
-                      { key: "all-on",      label: "All on"       },
-                      { key: "all-off",     label: "All off"      },
-                    ] as const).map(({ key, label }) => (
+                    {(
+                      [
+                        { key: "dont-change", label: "Don't Change" },
+                        { key: "all-on", label: "All on" },
+                        { key: "all-off", label: "All off" },
+                      ] as const
+                    ).map(({ key, label }) => (
                       <button
                         key={key}
                         type="button"
                         onClick={() => setDownloads(key)}
                         data-testid={`artist-bulk-edit-downloads-${key}`}
                         className={`flex-1 py-2 transition-colors cursor-pointer ${
-                          downloads === key ? "bg-white-smoke text-chinese-black" : "bg-transparent text-[#888] hover:text-white-smoke"
+                          downloads === key
+                            ? "bg-white-smoke text-chinese-black"
+                            : "bg-transparent text-[#888] hover:text-white-smoke"
                         }`}
                       >
                         {label}
@@ -165,15 +216,27 @@ export function BulkEditPanel({ selectedIds, tracks, onClose }: {
                 </div>
                 {/* Toggles */}
                 {[
-                  { label: "Allow people to comment on your track", value: allowComments, onChange: setAllowComments },
-                  { label: "Show track comments to public",         value: showComments,  onChange: setShowComments  },
-                  { label: "Show track stats to public",            value: showStats,     onChange: setShowStats     },
+                  {
+                    label: "Allow people to comment on your track",
+                    value: allowComments,
+                    onChange: setAllowComments,
+                  },
+                  {
+                    label: "Show track comments to public",
+                    value: showComments,
+                    onChange: setShowComments,
+                  },
+                  { label: "Show track stats to public", value: showStats, onChange: setShowStats },
                 ].map(({ label, value, onChange }) => (
                   <div key={label} className="flex items-center justify-between">
                     <span className="text-[13px] text-white-smoke">{label}</span>
                     <div className="flex items-center gap-2">
                       <RiLockFill className="text-[#555] text-[13px]" />
-                      <Toggle value={value} onChange={onChange} testId={`artist-bulk-edit-toggle-${label.toLowerCase().replace(/\s+/g, "-")}`} />
+                      <Toggle
+                        value={value}
+                        onChange={onChange}
+                        testId={`artist-bulk-edit-toggle-${label.toLowerCase().replace(/\s+/g, "-")}`}
+                      />
                     </div>
                   </div>
                 ))}

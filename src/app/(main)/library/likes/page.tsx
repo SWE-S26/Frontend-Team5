@@ -74,9 +74,7 @@ function LikesEmptyState({ filtered }: { filtered: boolean }) {
   return (
     <div className="flex justify-center items-center h-64">
       <p className="text-white-smoke font-bold text-2xl">
-        {filtered
-          ? "No tracks match your filter."
-          : "You haven't liked any tracks yet."}
+        {filtered ? "No tracks match your filter." : "You haven't liked any tracks yet."}
       </p>
     </div>
   );
@@ -120,9 +118,7 @@ function ViewToggle({ view, onChange }: ViewToggleProps) {
       <button
         onClick={() => onChange("grid")}
         className={`p-2 rounded transition-colors ${
-          view === "grid"
-            ? "text-crusta"
-            : "text-silver hover:text-white-smoke"
+          view === "grid" ? "text-crusta" : "text-silver hover:text-white-smoke"
         }`}
         aria-label="Grid view"
         data-testid="view-toggle-grid"
@@ -132,9 +128,7 @@ function ViewToggle({ view, onChange }: ViewToggleProps) {
       <button
         onClick={() => onChange("list")}
         className={`p-2 rounded transition-colors ${
-          view === "list"
-            ? "text-crusta"
-            : "text-silver hover:text-white-smoke"
+          view === "list" ? "text-crusta" : "text-silver hover:text-white-smoke"
         }`}
         aria-label="List view"
         data-testid="view-toggle-list"
@@ -159,23 +153,20 @@ export default function Likes() {
   }, [authUserId, getLikedTracks]);
 
   // Most-recently-liked first
-  const orderedTracks = useMemo(
-    () => (tracks ?? []).slice().reverse(),
-    [tracks],
-  );
+  const orderedTracks = useMemo(() => (tracks ?? []).slice().reverse(), [tracks]);
 
   const filteredTracks = useMemo(
     () =>
       orderedTracks.filter((t) =>
-        t.basicInfo.title.toLowerCase().includes(filterText.toLowerCase()),
+        t.basicInfo.title.toLowerCase().includes(filterText.toLowerCase())
       ),
-    [orderedTracks, filterText],
+    [orderedTracks, filterText]
   );
 
   // Full queue for the player
   const allPlayerTracks: PlayerTrack[] = useMemo(
     () => filteredTracks.map(mapToPlayerTrack),
-    [filteredTracks],
+    [filteredTracks]
   );
 
   // Grid: pad to nearest multiple of GRID_COLS so the last row looks neat
@@ -198,9 +189,7 @@ export default function Likes() {
     <div className="flex flex-col min-h-full px-4 sm:px-6 lg:px-0">
       {/* ── Header row ── */}
       <div className="flex flex-col gap-3 sm:flex-row sm:items-center justify-between mb-6 sm:mb-8">
-        <p className="font-bold text-sm text-white-smoke">
-          Hear the tracks you&apos;ve liked:
-        </p>
+        <p className="font-bold text-sm text-white-smoke">Hear the tracks you&apos;ve liked:</p>
 
         <div className="flex items-center gap-3">
           <span className="text-silver text-xs font-semibold">View</span>
@@ -219,15 +208,11 @@ export default function Likes() {
 
       {/* ── Loading ── */}
       {loading && (
-        <div className="flex-1">
-          {view === "grid" ? <GridSkeleton /> : <ListSkeleton />}
-        </div>
+        <div className="flex-1">{view === "grid" ? <GridSkeleton /> : <ListSkeleton />}</div>
       )}
 
       {/* ── Empty state ── */}
-      {!loading && filteredTracks.length === 0 && (
-        <LikesEmptyState filtered={hasFilter} />
-      )}
+      {!loading && filteredTracks.length === 0 && <LikesEmptyState filtered={hasFilter} />}
 
       {/* ── Grid view ── */}
       {!loading && filteredTracks.length > 0 && view === "grid" && (
@@ -247,7 +232,7 @@ export default function Likes() {
               />
             ) : (
               <EmptyCard key={(slot as { type: "empty"; key: string }).key} />
-            ),
+            )
           )}
         </div>
       )}

@@ -1,7 +1,7 @@
-'use client'
+"use client";
 
-import Suggested from './Suggested'
+import Suggested from "./Suggested";
 
 export default function SuggestedWrapper() {
-  return <Suggested />
+  return <Suggested />;
 }

@@ -58,7 +58,6 @@ export default function Privacy() {
 
   return (
     <div className="w-full max-w-3xl text-white-smoke mb-10">
-
       {/* Privacy settings */}
       <div className="flex items-center justify-between mb-6">
         <h2 className="text-lg font-bold">Privacy settings</h2>
@@ -82,9 +81,7 @@ export default function Privacy() {
               Changes saved
             </>
           )}
-          {saveStatus === "error" && (
-            <span className="text-red-400">Failed to save</span>
-          )}
+          {saveStatus === "error" && <span className="text-red-400">Failed to save</span>}
         </span>
       </div>
 
@@ -122,7 +119,6 @@ export default function Privacy() {
           </div>
         )}
       </div>
-
     </div>
   );
 }

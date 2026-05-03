@@ -87,9 +87,7 @@ export const adminUsersHandlers = [
 
     if (query) {
       filtered = filtered.filter(
-        (u) =>
-          u.displayName.toLowerCase().includes(query) ||
-          u.email.toLowerCase().includes(query)
+        (u) => u.displayName.toLowerCase().includes(query) || u.email.toLowerCase().includes(query)
       );
     }
 

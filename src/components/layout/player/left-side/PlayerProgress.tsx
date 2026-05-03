@@ -22,8 +22,7 @@ export default function PlayerProgress({
   const progress = duration > 0 ? (currentTime / duration) * 100 : 0;
   const isDraggingRef = useRef(false);
 
-  const pctFromValue = (value: number) =>
-    duration > 0 ? (value / duration) * 100 : 0;
+  const pctFromValue = (value: number) => (duration > 0 ? (value / duration) * 100 : 0);
 
   const handleMouseDown = () => {
     isDraggingRef.current = true;
@@ -37,7 +36,9 @@ export default function PlayerProgress({
   };
 
   // Commit the single seek on release
-  const handlePointerUp = (e: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>) => {
+  const handlePointerUp = (
+    e: React.MouseEvent<HTMLInputElement> | React.TouchEvent<HTMLInputElement>
+  ) => {
     if (!isDraggingRef.current) return;
     isDraggingRef.current = false;
     onDragEnd(pctFromValue(Number((e.currentTarget as HTMLInputElement).value)));
@@ -46,9 +47,7 @@ export default function PlayerProgress({
   return (
     <div className="flex items-center w-full gap-2">
       <div className="flex items-center space-x-2 w-full">
-        <span className="text-xs w-10 text-right">
-          {formatTime(currentTime || 0)}
-        </span>
+        <span className="text-xs w-10 text-right">{formatTime(currentTime || 0)}</span>
 
         <style>{`
           .progress-range {
@@ -103,9 +102,7 @@ export default function PlayerProgress({
           style={{ "--progress": `${progress}%` } as React.CSSProperties}
         />
 
-        <span className="text-xs w-10 text-left">
-          {formatTime(duration || 0)}
-        </span>
+        <span className="text-xs w-10 text-left">{formatTime(duration || 0)}</span>
       </div>
     </div>
   );

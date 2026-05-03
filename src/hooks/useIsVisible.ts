@@ -12,7 +12,7 @@ export function useIsVisible(rootMargin = "0px") {
           observer.disconnect();
         }
       },
-      { rootMargin },
+      { rootMargin }
     );
     if (ref.current) observer.observe(ref.current);
     return () => observer.disconnect();

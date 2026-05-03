@@ -1,39 +1,46 @@
 import api from "@/lib/api";
 import {
-  FindEmailRequest, FindEmailResponse,
-  LoginRequest, LoginResponse,
-  SignupRequest, SignupResponse,
-  ForgetPasswordRequest, ForgetPasswordResponse,
-  ResetPasswordRequest, ResetPasswordResponse,
+  FindEmailRequest,
+  FindEmailResponse,
+  LoginRequest,
+  LoginResponse,
+  SignupRequest,
+  SignupResponse,
+  ForgetPasswordRequest,
+  ForgetPasswordResponse,
+  ResetPasswordRequest,
+  ResetPasswordResponse,
   LogoutResponse,
-  GoogleCallbackRequest, GoogleCallbackResponse,
+  GoogleCallbackRequest,
+  GoogleCallbackResponse,
   GoogleCompleteRequest,
-  GoogleVerifyCodeRequest,GoogleAuthFinalizeResponse,
-  VerifyEmailRequest, VerifyEmailResponse,
-  ResendVerificationEmailRequest, ResendVerificationEmailResponse,
-  GenerateQRcodeResponse, LoginWithQRcodeRequest, LoginWithQRcodeResponse,
+  GoogleVerifyCodeRequest,
+  GoogleAuthFinalizeResponse,
+  VerifyEmailRequest,
+  VerifyEmailResponse,
+  ResendVerificationEmailRequest,
+  ResendVerificationEmailResponse,
+  GenerateQRcodeResponse,
+  LoginWithQRcodeRequest,
+  LoginWithQRcodeResponse,
   RefreshTokenResponse,
   DeleteAccountResponse,
   ResendVerificationCodeRequest,
-  ResendVerificationCodeResponse
+  ResendVerificationCodeResponse,
 } from "@/types/auth.types";
 
 export const authService = {
-
-  refreshToken: () =>
-    api.get<RefreshTokenResponse>("/api/auth/v1/refresh-token"),
+  refreshToken: () => api.get<RefreshTokenResponse>("/api/auth/v1/refresh-token"),
 
   /* (1) */
   findEmail: (data: FindEmailRequest) =>
     api.post<FindEmailResponse>("/api/auth/v1/find-email", data),
 
   /* (2) */
-  login: (data: LoginRequest) =>
-    api.post<LoginResponse>("/api/auth/v1/login", data),
+  login: (data: LoginRequest) => api.post<LoginResponse>("/api/auth/v1/login", data),
 
   /* (3) */
-  signup: (data: SignupRequest) =>
-    api.post<SignupResponse>("/api/auth/v1/sign-up", data),
+  signup: (data: SignupRequest) => api.post<SignupResponse>("/api/auth/v1/sign-up", data),
 
   /* (4) */
   forgetPassword: (data: ForgetPasswordRequest) =>
@@ -44,12 +51,11 @@ export const authService = {
     api.post<ResetPasswordResponse>("/api/auth/v1/reset-password", data),
 
   /* (6) */
-  logout: () =>
-    api.get<LogoutResponse>("/api/auth/v1/logout"),
+  logout: () => api.get<LogoutResponse>("/api/auth/v1/logout"),
 
   /* (7) */
   googleCallback: (params: GoogleCallbackRequest) =>
-    api.get<GoogleCallbackResponse>("/api/auth/v1/google/callback", {params,}),
+    api.get<GoogleCallbackResponse>("/api/auth/v1/google/callback", { params }),
 
   /* (8) */
   googleComplete: (data: GoogleCompleteRequest) =>
@@ -68,20 +74,17 @@ export const authService = {
     api.post<ResendVerificationEmailResponse>("/api/auth/v1/resend-verification-email", data),
 
   /* (12) */
-  generateQRcode: () =>
-    api.get<GenerateQRcodeResponse>("/api/auth/v1/cross/desktop",),
+  generateQRcode: () => api.get<GenerateQRcodeResponse>("/api/auth/v1/cross/desktop"),
 
   /* (13) */
   loginWithQRcode: (data: LoginWithQRcodeRequest) =>
     api.post<LoginWithQRcodeResponse>("/api/auth/v1/cross/desktop/poll", data),
 
   /* (14) */
-  deleteAccount: () =>
-    api.delete<DeleteAccountResponse>("/api/auth/v1/delete-account"),
+  deleteAccount: () => api.delete<DeleteAccountResponse>("/api/auth/v1/delete-account"),
 
   /* (15) */
-  forgotPasswordLoggedIn: () =>
-  api.get("/api/auth/v1/forgot-password/logged-in"),
+  forgotPasswordLoggedIn: () => api.get("/api/auth/v1/forgot-password/logged-in"),
 
   /* (16) */
   resendVerificationCode: (data: ResendVerificationCodeRequest) =>

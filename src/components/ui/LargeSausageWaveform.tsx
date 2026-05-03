@@ -91,21 +91,13 @@ function CommentAvatar({
       >
         {isLeft ? (
           <>
-            <span className="font-semibold truncate shrink-0 max-w-20">
-              {comment.displayName}
-            </span>
-            <span className="text-white-smoke/60 truncate">
-              {comment.content}
-            </span>
+            <span className="font-semibold truncate shrink-0 max-w-20">{comment.displayName}</span>
+            <span className="text-white-smoke/60 truncate">{comment.content}</span>
           </>
         ) : (
           <>
-            <span className="text-white-smoke/60 truncate">
-              {comment.content}
-            </span>
-            <span className="font-semibold truncate shrink-0 max-w-20">
-              {comment.displayName}
-            </span>
+            <span className="text-white-smoke/60 truncate">{comment.content}</span>
+            <span className="font-semibold truncate shrink-0 max-w-20">{comment.displayName}</span>
           </>
         )}
       </div>
@@ -150,10 +142,7 @@ function PendingAvatar({
     const handleMouseMove = (e: MouseEvent) => {
       if (!containerRef.current) return;
       const rect = containerRef.current.getBoundingClientRect();
-      const pct = Math.max(
-        0,
-        Math.min(100, ((e.clientX - rect.left) / rect.width) * 100),
-      );
+      const pct = Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
       onDrag?.(pct);
     };
     const handleMouseUp = () => {
@@ -180,9 +169,7 @@ function PendingAvatar({
         style={{
           maxWidth: 220,
           opacity: visible ? 1 : 0,
-          ...(isLeft
-            ? { left: "calc(-50% + 10px)" }
-            : { right: "calc(-50% + 10px)" }),
+          ...(isLeft ? { left: "calc(-50% + 10px)" } : { right: "calc(-50% + 10px)" }),
         }}
       >
         <span className="text-white-smoke/60 truncate">{flashText ?? ""}</span>
@@ -283,7 +270,7 @@ export default function SausageWaveform({
   const progress =
     dragProgress !== null
       ? dragProgress
-      : (isPlaying ? externalProgress : lastProgressRef.current) ?? 0;
+      : ((isPlaying ? externalProgress : lastProgressRef.current) ?? 0);
 
   const { comments, loadComments } = useStatelessComments();
   useEffect(() => {
@@ -292,8 +279,7 @@ export default function SausageWaveform({
 
   const [hoveredId, setHoveredId] = useState<string | null>(null);
   const atCurrentTime = isPlaying
-    ? (comments.find((c) => Math.floor(c.timestamp) === Math.floor(currentTime))
-        ?.commentId ?? null)
+    ? (comments.find((c) => Math.floor(c.timestamp) === Math.floor(currentTime))?.commentId ?? null)
     : null;
   const isActive = isCommenting || flashComment !== null;
   const expandedId = isActive ? hoveredId : (hoveredId ?? atCurrentTime);
@@ -309,7 +295,7 @@ export default function SausageWaveform({
         .catch(() =>
           fetch("/waveform.json")
             .then((r) => r.json())
-            .then(generateAll),
+            .then(generateAll)
         );
     });
   }, [samplesUrl]);
@@ -331,11 +317,41 @@ export default function SausageWaveform({
     const bgTopColor = theme === "dark" ? "#ffffff" : "#121212";
     const bgBottomColor = theme === "dark" ? "#e5e5e5" : "#b2b2b2";
     const layers: [string, (png: string) => void][] = [
-      [bgTopColor, (png) => { setBgTop(png); markLoaded(); }],
-      [bgBottomColor, (png) => { setBgBottom(png); markLoaded(); }],
-      ["gradient", (png) => { setFgTopGradient(png); markLoaded(); }],
-      ["#faad87", (png) => { setFgTopFlat(png); markLoaded(); }],
-      ["#faad87", (png) => { setFgBottom(png); markLoaded(); }],
+      [
+        bgTopColor,
+        (png) => {
+          setBgTop(png);
+          markLoaded();
+        },
+      ],
+      [
+        bgBottomColor,
+        (png) => {
+          setBgBottom(png);
+          markLoaded();
+        },
+      ],
+      [
+        "gradient",
+        (png) => {
+          setFgTopGradient(png);
+          markLoaded();
+        },
+      ],
+      [
+        "#faad87",
+        (png) => {
+          setFgTopFlat(png);
+          markLoaded();
+        },
+      ],
+      [
+        "#faad87",
+        (png) => {
+          setFgBottom(png);
+          markLoaded();
+        },
+      ],
     ];
     const halves = ["top", "bottom", "top", "top", "bottom"];
     layers.forEach(([wave_color, onComplete], i) => {
@@ -351,10 +367,7 @@ export default function SausageWaveform({
   const getPct = (e: React.MouseEvent | MouseEvent) => {
     if (!containerRef.current) return 0;
     const rect = containerRef.current.getBoundingClientRect();
-    return Math.max(
-      0,
-      Math.min(100, ((e.clientX - rect.left) / rect.width) * 100),
-    );
+    return Math.max(0, Math.min(100, ((e.clientX - rect.left) / rect.width) * 100));
   };
 
   const formatTime = (time: number) => {
@@ -488,10 +501,7 @@ export default function SausageWaveform({
             z="z-20"
             extra={`pointer-events-none ${fadeIn}`}
             style={{
-              ...maskWindow(
-                Math.min(progress, previewPct!),
-                Math.max(progress, previewPct!),
-              ),
+              ...maskWindow(Math.min(progress, previewPct!), Math.max(progress, previewPct!)),
               opacity: LAYER_OPACITIES.fgTopFlat * hoverFade,
             }}
           />

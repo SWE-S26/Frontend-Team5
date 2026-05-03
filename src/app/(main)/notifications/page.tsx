@@ -1,18 +1,14 @@
-"use client"
+"use client";
 
-import { useEffect } from "react"
-import Link from "next/link"
-import NotificationItem from "@/components/notifications/NotificationItem"
-import NotificationFilterDropdown from "@/components/notifications/NotificationFilterDropdown"
-import User from "@/components/layout/User"
-import { useNotificationsContext } from "@/components/notifications/NotificationsContext"
-import { useGetFollowers } from "@/hooks/useSocial"
-import { useAppSelector } from "@/store/hooks"
-import {
-  type NotificationFilterType,
-  FILTER_EMPTY_MESSAGES,
-} from "@/types/notification.types"
-import type { SocialUser } from "@/types/social.types"
+import { useEffect } from "react";
+import Link from "next/link";
+import NotificationItem from "@/components/notifications/NotificationItem";
+import NotificationFilterDropdown from "@/components/notifications/NotificationFilterDropdown";
+import User from "@/components/layout/User";
+import { useNotificationsContext } from "@/components/notifications/NotificationsContext";
+import { useGetFollowers } from "@/hooks/useSocial";
+import { useAppSelector } from "@/store/hooks";
+import { type NotificationFilterType, FILTER_EMPTY_MESSAGES } from "@/types/notification.types";
 
 // ─── Empty State ──────────────────────────────────────────────────────────────
 
@@ -20,14 +16,12 @@ function EmptyState({
   filter,
   onShowAll,
 }: {
-  filter:    NotificationFilterType
-  onShowAll: () => void
+  filter: NotificationFilterType;
+  onShowAll: () => void;
 }) {
   return (
     <div className="flex flex-col items-center justify-center py-32 gap-5">
-      <p className="text-white-smoke font-bold text-base">
-        {FILTER_EMPTY_MESSAGES[filter]}
-      </p>
+      <p className="text-white-smoke font-bold text-base">{FILTER_EMPTY_MESSAGES[filter]}</p>
       {filter !== "all" && (
         <button
           onClick={onShowAll}
@@ -37,29 +31,29 @@ function EmptyState({
         </button>
       )}
     </div>
-  )
+  );
 }
 
 // ─── Sidebar ──────────────────────────────────────────────────────────────────
 
 function RecentFollowersSidebar() {
-  const userId                          = useAppSelector((state) => state.auth.userId)
-  const { getFollowers, followers, loading } = useGetFollowers()
+  const userId = useAppSelector((state) => state.auth.userId);
+  const { getFollowers, followers, loading } = useGetFollowers();
 
   useEffect(() => {
-    if (userId) getFollowers(userId)
-  }, [userId])
+    if (userId) getFollowers(userId);
+  }, [userId]);
 
-  const recentFollowers = (followers ?? []).slice(0, 5)
+  const recentFollowers = (followers ?? []).slice(0, 5);
 
   return (
     <aside className="hidden md:block md:w-[27.75%] shrink-0">
       <div className="flex items-center justify-between mb-4">
         <Link
-        href={`/profile/${userId}/followers`}
-        className="text-white-smoke text-xs font-bold uppercase hover:text-silver transition-colors"
+          href={`/profile/${userId}/followers`}
+          className="text-white-smoke text-xs font-bold uppercase hover:text-silver transition-colors"
         >
-        Recent Followers
+          Recent Followers
         </Link>
         <Link
           href={`/profile/${userId}/followers`}
@@ -74,15 +68,19 @@ function RecentFollowersSidebar() {
       ) : recentFollowers.length === 0 ? (
         <p className="text-silver text-sm">No recent followers yet.</p>
       ) : (
-        recentFollowers.map((user) => (
-          <User key={user.userId} user={user} />
-        ))
+        recentFollowers.map((user) => <User key={user.userId} user={user} />)
       )}
 
       <div className="mt-8 text-xs text-silver leading-6">
         {[
-          "Legal", "Privacy", "Cookie Policy", "Cookie Manager",
-          "Imprint", "Artist Resources", "Newsroom", "Charts",
+          "Legal",
+          "Privacy",
+          "Cookie Policy",
+          "Cookie Manager",
+          "Imprint",
+          "Artist Resources",
+          "Newsroom",
+          "Charts",
           "Transparency Reports",
         ].map((label, i, arr) => (
           <span key={label}>
@@ -92,38 +90,29 @@ function RecentFollowersSidebar() {
         ))}
       </div>
     </aside>
-  )
+  );
 }
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
 
 export default function NotificationsPage() {
-  const {
-    notifications,
-    loading,
-    hasMore,
-    filter,
-    setFilter,
-    markLoadedAsRead,
-    loadMore,
-  } = useNotificationsContext()
+  const { notifications, loading, hasMore, filter, setFilter, markLoadedAsRead, loadMore } =
+    useNotificationsContext();
 
-  const hasUnread = notifications.some((n) => !n.read)
+  const hasUnread = notifications.some((n) => !n.read);
 
   useEffect(() => {
-    markLoadedAsRead()
-  }, [])
+    markLoadedAsRead();
+  }, []);
 
   async function handleLoadMore() {
-    await loadMore()
-    markLoadedAsRead()
+    await loadMore();
+    markLoadedAsRead();
   }
 
   return (
     <div className="flex justify-between px-4 pb-4 md:px-0 md:pb-0">
-
       <div className="w-full md:w-[68%]">
-
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-white-smoke text-3xl font-bold">Notifications</h1>
           <div className="flex items-center gap-3">
@@ -149,12 +138,7 @@ export default function NotificationsPage() {
           <>
             <div className="flex flex-col divide-y divide-silver/10">
               {notifications.map((n) => (
-                <NotificationItem
-                  key={n.notificationId}
-                  notification={n}
-                  showFollowBack
-                  showMore
-                />
+                <NotificationItem key={n.notificationId} notification={n} showFollowBack showMore />
               ))}
             </div>
 
@@ -169,11 +153,9 @@ export default function NotificationsPage() {
             )}
           </>
         )}
-
       </div>
 
       <RecentFollowersSidebar />
-
     </div>
-  )
+  );
 }

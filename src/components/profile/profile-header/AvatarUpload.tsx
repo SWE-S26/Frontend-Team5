@@ -1,8 +1,7 @@
 "use client";
 
 import React, { useRef, useState, forwardRef, useImperativeHandle } from "react";
-import { useAppSelector } from "@/store/hooks"
-
+import { useAppSelector } from "@/store/hooks";
 
 interface AvatarProps {
   children?: React.ReactNode;
@@ -19,7 +18,7 @@ export interface AvatarUploadHandle {
 const AvatarUpload = forwardRef<AvatarUploadHandle, AvatarProps>(
   ({ children, className, onImageChange, avatarImage, disableClick = false }, ref) => {
     // const [image, setImage] = useState<string | null>(null);
-    const fileInputRef = useRef<HTMLInputElement >(null);
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const openFilePicker = () => {
       fileInputRef.current?.click();
@@ -42,8 +41,7 @@ const AvatarUpload = forwardRef<AvatarUploadHandle, AvatarProps>(
       onImageChange(file, previewUrl);
     };
 
-    const isOwn     = useAppSelector((state) => state.profile.isOwnProfile)
-
+    const isOwn = useAppSelector((state) => state.profile.isOwnProfile);
 
     return (
       <div
@@ -52,7 +50,7 @@ const AvatarUpload = forwardRef<AvatarUploadHandle, AvatarProps>(
         {avatarImage && (
           <img src={avatarImage} alt="avatar" className="w-full h-full object-cover" />
         )}
-       {isOwn && (
+        {isOwn && (
           <>
             <div
               onClick={disableClick ? undefined : openFilePicker}
@@ -61,7 +59,8 @@ const AvatarUpload = forwardRef<AvatarUploadHandle, AvatarProps>(
               {children}
             </div>
 
-            <input data-testid="Avatar-input"
+            <input
+              data-testid="Avatar-input"
               type="file"
               accept="image/*"
               ref={fileInputRef}
@@ -71,7 +70,6 @@ const AvatarUpload = forwardRef<AvatarUploadHandle, AvatarProps>(
           </>
         )}
       </div>
-      
     );
   }
 );

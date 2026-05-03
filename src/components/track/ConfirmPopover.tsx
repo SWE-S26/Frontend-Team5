@@ -42,18 +42,13 @@ export default function ConfirmPopover({
   const dismiss = useDismiss(context);
   const role = useRole(context);
 
-  const { getReferenceProps, getFloatingProps } = useInteractions([
-    click,
-    dismiss,
-    role,
-  ]);
+  const { getReferenceProps, getFloatingProps } = useInteractions([click, dismiss, role]);
 
   const arrowX = middlewareData.arrow?.x;
   const arrowY = middlewareData.arrow?.y;
 
   return (
     <>
-     
       <span ref={refs.setReference} {...getReferenceProps()}>
         {children}
       </span>
@@ -79,9 +74,7 @@ export default function ConfirmPopover({
             {/* Card */}
             <div className="w-72 rounded-s bg-chinese-black border border-white-smoke/10 shadow-2xl p-5">
               {/* Message */}
-              <p className="text-white-smoke text-sm font-medium leading-relaxed">
-                {message}
-              </p>
+              <p className="text-white-smoke text-sm font-medium leading-relaxed">{message}</p>
 
               {/* Buttons */}
               <div className="flex justify-end gap-3 mt-5">

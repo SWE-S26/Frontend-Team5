@@ -10,12 +10,7 @@ import { LuSearch } from "react-icons/lu";
 import { LoadingOutlined } from "@ant-design/icons";
 import { Spin } from "antd";
 import { PrettyCheckbox } from "@/components/upload/TrackInfoForm";
-import {
-  formatDuration,
-  formatDate,
-  SortField,
-  ArtistTrackRow,
-} from "../ArtistStudioContent";
+import { formatDuration, formatDate, SortField, ArtistTrackRow } from "../ArtistStudioContent";
 import { BulkSelectionHeader } from "./BulkSelectionHeader";
 import { TrackRow } from "./TrackRow";
 import { ArtistProBenefits } from "./ArtistProBenefits";
@@ -37,16 +32,13 @@ function TracksTableHeader({
     <div
       className="mt-4 grid min-w-175 border-b border-[#2a2a2a] px-3 pb-2"
       style={{
-        gridTemplateColumns:
-          "32px minmax(200px, 1fr) 80px 120px 220px 80px 130px 30px",
+        gridTemplateColumns: "32px minmax(200px, 1fr) 80px 120px 220px 80px 130px 30px",
       }}
     >
       <div className="flex items-center">
         <PrettyCheckbox checked={allSelected} onChange={onSelectAll} />
       </div>
-      <div className="text-[11px] font-bold tracking-[0.8px] text-white-smoke">
-        TRACKS
-      </div>
+      <div className="text-[11px] font-bold tracking-[0.8px] text-white-smoke">TRACKS</div>
       <div className="text-center text-[11px] font-bold tracking-[0.8px] text-white-smoke">
         DURATION
       </div>
@@ -139,8 +131,7 @@ function SortDropdown({
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node))
-        setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
     };
     document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -312,9 +303,7 @@ function MobileSelectionBar({
           checked={allSelected}
           onChange={(v) => (v ? onSelectAll() : onDeselectAll())}
         />
-        <span className="text-[12px] font-bold text-white-smoke">
-          {selectedCount} SELECTED
-        </span>
+        <span className="text-[12px] font-bold text-white-smoke">{selectedCount} SELECTED</span>
       </div>
       <div className="mt-2.5 grid grid-cols-2 gap-2">
         <button
@@ -338,29 +327,13 @@ function MobileSelectionBar({
   );
 }
 
-export function TracksTab({
-  isMobile,
-  isArtistPro,
-}: {
-  isMobile: boolean;
-  isArtistPro: boolean;
-}) {
+export function TracksTab({ isMobile, isArtistPro }: { isMobile: boolean; isArtistPro: boolean }) {
   const router = useRouter();
   const userId = useAppSelector((state) => state.auth.userId);
   const hasHydrated = useAppSelector((state) => state.auth.hasHydrated);
   const isAuthenticated = useAppSelector((state) => state.auth.isAuthenticated);
-  const {
-    getPostedTracks,
-    tracks: postedTracks,
-    loading,
-    error,
-  } = useGetPostedTracks();
-  const {
-    deleteTrack,
-    loading: loadingDelete,
-    error: errorDelete,
-    success,
-  } = useDeleteTrack();
+  const { getPostedTracks, tracks: postedTracks, loading, error } = useGetPostedTracks();
+  const { deleteTrack, loading: loadingDelete, error: errorDelete, success } = useDeleteTrack();
   const [filter, setFilter] = useState<"public" | "private">("public");
   const [search, setSearch] = useState("");
   const [sortField, setSortField] = useState<SortField>("date");
@@ -368,9 +341,7 @@ export function TracksTab({
   const [durationById, setDurationById] = useState<Record<string, string>>({});
   const [deletingId, setDeletingId] = useState<string | null>(null);
   const [deletedIds, setDeletedIds] = useState<Set<string>>(new Set());
-  const [localOverrides, setLocalOverrides] = useState<
-    Record<string, Partial<ArtistTrackRow>>
-  >({});
+  const [localOverrides, setLocalOverrides] = useState<Record<string, Partial<ArtistTrackRow>>>({});
 
   // Selection
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
@@ -386,33 +357,19 @@ export function TracksTab({
   const [editTrackId, setEditTrackId] = useState<string | null>(null);
   const [bulkEditOpen, setBulkEditOpen] = useState(false);
   const [addToPlaylistOpen, setAddToPlaylistOpen] = useState(false);
-  const [pendingDeleteTrackId, setPendingDeleteTrackId] = useState<
-    string | null
-  >(null);
+  const [pendingDeleteTrackId, setPendingDeleteTrackId] = useState<string | null>(null);
 
   useEffect(() => {
     if (isArtistPro) setAmplifyOpen(false);
   }, [isArtistPro]);
 
   useEffect(() => {
-    if (
-      !hasHydrated ||
-      !userId ||
-      typeof userId !== "string" ||
-      userId.trim() === ""
-    )
-      return;
+    if (!hasHydrated || !userId || typeof userId !== "string" || userId.trim() === "") return;
     void getPostedTracks(userId);
   }, [userId, getPostedTracks, hasHydrated]);
 
   useEffect(() => {
-    if (
-      !hasHydrated ||
-      !userId ||
-      typeof userId !== "string" ||
-      userId.trim() === ""
-    )
-      return;
+    if (!hasHydrated || !userId || typeof userId !== "string" || userId.trim() === "") return;
 
     const intervalId = window.setInterval(() => {
       void getPostedTracks(userId, { silent: true });
@@ -448,17 +405,14 @@ export function TracksTab({
         return trackId !== undefined && !deletedIds.has(trackId);
       })
       .map((track) => {
-        const trackId = (track.trackId ??
-          (track as { _id?: string })._id) as string;
+        const trackId = (track.trackId ?? (track as { _id?: string })._id) as string;
         const base: ArtistTrackRow = {
           id: trackId,
           title: track.basicInfo?.title ?? "",
           label: track.basicInfo.mainArtists?.length
             ? track.basicInfo.mainArtists.join(", ")
             : "Unknown Artist",
-          duration: formatDuration(
-            (track as { durationInSeconds?: number }).durationInSeconds,
-          ),
+          duration: formatDuration((track as { durationInSeconds?: number }).durationInSeconds),
           date: formatDate(track.releaseDate),
           plays: track.numPlays ?? 0,
           likes: track.numLikes ?? 0,
@@ -471,8 +425,7 @@ export function TracksTab({
           downloadUrl: track.audio?.downloadLink,
           isPrivate: Boolean(track.basicInfo.isPrivate),
           rawDate: track.releaseDate ?? "",
-          rawDuration:
-            (track as { durationInSeconds?: number }).durationInSeconds ?? 0,
+          rawDuration: (track as { durationInSeconds?: number }).durationInSeconds ?? 0,
         };
         return { ...base, ...localOverrides[trackId] };
       })
@@ -481,24 +434,13 @@ export function TracksTab({
       .sort((a, b) => {
         let diff = 0;
         if (sortField === "date")
-          diff =
-            new Date(a.rawDate ?? "").getTime() -
-            new Date(b.rawDate ?? "").getTime();
+          diff = new Date(a.rawDate ?? "").getTime() - new Date(b.rawDate ?? "").getTime();
         else if (sortField === "plays") diff = a.plays - b.plays;
-        else if (sortField === "duration")
-          diff = (a.rawDuration ?? 0) - (b.rawDuration ?? 0);
+        else if (sortField === "duration") diff = (a.rawDuration ?? 0) - (b.rawDuration ?? 0);
         else if (sortField === "likes") diff = a.likes - b.likes;
         return sortDir === "asc" ? diff : -diff;
       });
-  }, [
-    postedTracks,
-    filter,
-    search,
-    sortField,
-    sortDir,
-    deletedIds,
-    localOverrides,
-  ]);
+  }, [postedTracks, filter, search, sortField, sortDir, deletedIds, localOverrides]);
 
   useEffect(() => {
     rows.forEach((row) => {
@@ -512,7 +454,7 @@ export function TracksTab({
             [row.id]: formatDuration(audio.duration),
           }));
         },
-        { once: true },
+        { once: true }
       );
     });
   }, [rows, durationById]);
@@ -549,9 +491,11 @@ export function TracksTab({
       try {
         const key = "downloadSessionId";
         const stored = localStorage.getItem(key);
-        const id = stored ?? (typeof crypto !== "undefined" && typeof (crypto as any).randomUUID === "function"
-          ? (crypto as any).randomUUID()
-          : `sess-${Math.random().toString(36).slice(2)}`);
+        const id =
+          stored ??
+          (typeof crypto !== "undefined" && typeof (crypto as any).randomUUID === "function"
+            ? (crypto as any).randomUUID()
+            : `sess-${Math.random().toString(36).slice(2)}`);
         localStorage.setItem(key, id);
         return id;
       } catch {
@@ -563,7 +507,9 @@ export function TracksTab({
     // fire-and-forget increment request
     try {
       import("@/services/tracks.service").then(({ tracksService }) => {
-        void tracksService.incrementDownloadCount({ trackId: id, sessionIdDownload: sessionId }).catch(() => undefined);
+        void tracksService
+          .incrementDownloadCount({ trackId: id, sessionIdDownload: sessionId })
+          .catch(() => undefined);
       });
     } catch {
       // ignore
@@ -639,14 +585,7 @@ export function TracksTab({
 
         {loading && (
           <div className="px-3 py-6">
-            <Spin
-              indicator={
-                <LoadingOutlined
-                  style={{ fontSize: 32, color: "white" }}
-                  spin
-                />
-              }
-            />
+            <Spin indicator={<LoadingOutlined style={{ fontSize: 32, color: "white" }} spin />} />
           </div>
         )}
         {!loading && !isAuthenticated && (
@@ -660,9 +599,7 @@ export function TracksTab({
           </div>
         )}
         {!loading && isAuthenticated && !error && rows.length === 0 && (
-          <div className="px-3 py-6 text-[13px] text-[#888]">
-            No tracks found.
-          </div>
+          <div className="px-3 py-6 text-[13px] text-[#888]">No tracks found.</div>
         )}
         {!loading &&
           isAuthenticated &&
@@ -699,9 +636,7 @@ export function TracksTab({
             />
           ))}
       </div>
-      {errorDelete && (
-        <div className="px-3 py-2 text-[13px] text-red-400">{errorDelete}</div>
-      )}
+      {errorDelete && <div className="px-3 py-2 text-[13px] text-red-400">{errorDelete}</div>}
 
       {!isArtistPro && <ArtistProBenefits isArtistPro={isArtistPro} />}
 
@@ -719,9 +654,7 @@ export function TracksTab({
         onClose={() => setPendingDeleteTrackId(null)}
         onConfirm={() => {
           if (!pendingDeleteTrackId) return;
-          void handleDelete(pendingDeleteTrackId).finally(() =>
-            setPendingDeleteTrackId(null),
-          );
+          void handleDelete(pendingDeleteTrackId).finally(() => setPendingDeleteTrackId(null));
         }}
       />
       {editTrack && (

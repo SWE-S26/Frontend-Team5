@@ -25,7 +25,7 @@ import {
   GetPlaylistByProfilePermalinkResponse,
   AddPlaylistToHistoryResponse,
   Playlist,
-  GetRepostedPlaylistsResponse
+  GetRepostedPlaylistsResponse,
 } from "@/types/playlists.types";
 
 export const playlistsService = {
@@ -43,15 +43,13 @@ export const playlistsService = {
         listOfTracks: data.listOfTracks,
         buyLink: data.buyLink,
         recordLabel: data.recordLabel,
-      }),
+      })
     );
     if (data.image) formData.append("image", data.image);
 
-    return api.post<CreatePlaylistResponse>(
-      "/api/playlists/v1/with-image",
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } },
-    );
+    return api.post<CreatePlaylistResponse>("/api/playlists/v1/with-image", formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
   },
 
   getPlaylists: (limit?: number, offset?: number) => {
@@ -59,18 +57,14 @@ export const playlistsService = {
     if (limit !== undefined) params.append("limit", String(limit));
     if (offset !== undefined) params.append("offset", String(offset));
     const query = params.toString();
-    return api.get<GetPlaylistsResponse>(
-      `/api/playlists/v1${query ? `?${query}` : ""}`
-    );
+    return api.get<GetPlaylistsResponse>(`/api/playlists/v1${query ? `?${query}` : ""}`);
   },
 
   getMyPlaylists: (limit?: number, offset?: number) => {
     const params = new URLSearchParams();
     if (limit !== undefined) params.append("limit", String(limit));
-    const normalizedOffset =
-      offset !== undefined ? Math.max(1, Math.floor(offset)) : undefined;
-    if (normalizedOffset !== undefined)
-      params.append("offset", String(normalizedOffset));
+    const normalizedOffset = offset !== undefined ? Math.max(1, Math.floor(offset)) : undefined;
+    if (normalizedOffset !== undefined) params.append("offset", String(normalizedOffset));
     const query = params.toString();
     return api.get<GetMyPlaylistsResponse>(
       `/api/playlists/v1/my-playlists${query ? `?${query}` : ""}`
@@ -91,19 +85,19 @@ export const playlistsService = {
     const formData = new FormData();
 
     const jsonPayload: Record<string, any> = {};
-    if (data.title !== undefined)        jsonPayload.title        = data.title;
-    if (data.permalink !== undefined)    jsonPayload.permalink    = data.permalink;
-    if (data.type !== undefined)         jsonPayload.type         = data.type;
+    if (data.title !== undefined) jsonPayload.title = data.title;
+    if (data.permalink !== undefined) jsonPayload.permalink = data.permalink;
+    if (data.type !== undefined) jsonPayload.type = data.type;
     if (data.playlistType !== undefined) jsonPayload.playlistType = data.playlistType;
-    if (data.releaseDate !== undefined)  jsonPayload.releaseDate  = data.releaseDate;
-    if (data.genre !== undefined)        jsonPayload.genre        = data.genre;
-    if (data.description !== undefined)  jsonPayload.description  = data.description;
-    if (data.isPrivate !== undefined)    jsonPayload.isPrivate    = data.isPrivate;
-    if (data.buyLink !== undefined)      jsonPayload.buyLink      = data.buyLink;
-    if (data.recordLabel !== undefined)  jsonPayload.recordLabel  = data.recordLabel;
+    if (data.releaseDate !== undefined) jsonPayload.releaseDate = data.releaseDate;
+    if (data.genre !== undefined) jsonPayload.genre = data.genre;
+    if (data.description !== undefined) jsonPayload.description = data.description;
+    if (data.isPrivate !== undefined) jsonPayload.isPrivate = data.isPrivate;
+    if (data.buyLink !== undefined) jsonPayload.buyLink = data.buyLink;
+    if (data.recordLabel !== undefined) jsonPayload.recordLabel = data.recordLabel;
     if (data.additionalTags !== undefined) jsonPayload.additionalTags = data.additionalTags;
-    if (data.tags !== undefined)         jsonPayload.tags         = data.tags;
-    if (data.licensing !== undefined)    jsonPayload.licensing    = data.licensing;
+    if (data.tags !== undefined) jsonPayload.tags = data.tags;
+    if (data.licensing !== undefined) jsonPayload.licensing = data.licensing;
     if (data.lengthOfRecievedTracks !== undefined)
       jsonPayload.lengthOfRecievedTracks = data.lengthOfRecievedTracks;
 
@@ -112,20 +106,16 @@ export const playlistsService = {
 
     formData.append("data", JSON.stringify(jsonPayload));
 
-    return api.put<UpdatePlaylistResponse>(
-      `/api/playlists/v1/${playlistId}`,
-      formData,
-      { headers: { "Content-Type": "multipart/form-data" } }
-    );
+    return api.put<UpdatePlaylistResponse>(`/api/playlists/v1/${playlistId}`, formData, {
+      headers: { "Content-Type": "multipart/form-data" },
+    });
   },
 
   deletePlaylist: (playlistId: string) =>
     api.delete<DeletePlaylistResponse>(`/api/playlists/v1/${playlistId}`),
 
   addTrackToPlaylist: (playlistId: string, trackId: string) =>
-    api.patch<AddTrackToPlaylistResponse>(
-      `/api/playlists/v1/${playlistId}/tracks/${trackId}`
-    ),
+    api.patch<AddTrackToPlaylistResponse>(`/api/playlists/v1/${playlistId}/tracks/${trackId}`),
 
   removeTrackFromPlaylist: (playlistId: string, trackId: string) =>
     api.delete<RemoveTrackFromPlaylistResponse>(
@@ -165,11 +155,14 @@ export const playlistsService = {
   },
 
   getPublicPlaylistCreator: (artistId: string) =>
-    api.get<GetPlaylistCreatorResponse>(
-      `/api/public/playlists/v1/creator/${artistId}`
-    ),
+    api.get<GetPlaylistCreatorResponse>(`/api/public/playlists/v1/creator/${artistId}`),
 
-  getPublicRecommendedPlaylists: (playlistId: string, artistId: string, limit?: number, offset?: number) => {
+  getPublicRecommendedPlaylists: (
+    playlistId: string,
+    artistId: string,
+    limit?: number,
+    offset?: number
+  ) => {
     const params = new URLSearchParams();
     if (limit !== undefined) params.append("limit", String(limit));
     if (offset !== undefined) params.append("offset", String(offset));
@@ -217,11 +210,14 @@ export const playlistsService = {
   },
 
   getPlaylistCreator: (creatorId: string) =>
-    api.get<GetPlaylistCreatorResponse>(
-      `/api/playlists/v1/creator/${creatorId}`
-    ),
+    api.get<GetPlaylistCreatorResponse>(`/api/playlists/v1/creator/${creatorId}`),
 
-  getRecommendedPlaylists: (playlistId: string, creatorId: string, limit?: number, offset?: number) => {
+  getRecommendedPlaylists: (
+    playlistId: string,
+    creatorId: string,
+    limit?: number,
+    offset?: number
+  ) => {
     const params = new URLSearchParams();
     if (limit !== undefined) params.append("limit", String(limit));
     if (offset !== undefined) params.append("offset", String(offset));
@@ -242,30 +238,24 @@ export const playlistsService = {
   },
 
   reorderPlaylistTracks: (playlistId: string, data: ReorderPlaylistTracksRequest) =>
-    api.patch<ReorderPlaylistTracksResponse>(
-      `/api/playlists/v1/${playlistId}/tracks/order`,
-      data
-    ),
+    api.patch<ReorderPlaylistTracksResponse>(`/api/playlists/v1/${playlistId}/tracks/order`, data),
 
   addPlaylistToHistory: (playlistId: string) =>
-    api.post<AddPlaylistToHistoryResponse>(
-      `/api/v1/playlists/${playlistId}/history`
+    api.post<AddPlaylistToHistoryResponse>(`/api/v1/playlists/${playlistId}/history`),
+
+  getTrackPlaylists: async (trackId: string) => {
+    const res = await api.get(`/api/tracks/v1/playlists/${trackId}`);
+    return res.data.data as Playlist[];
+  },
+
+  getTrackAlbums: async (trackId: string) => {
+    const res = await api.get(`/api/tracks/v1/albums/${trackId}`);
+    return res.data.data as Playlist[];
+  },
+
+  getRepostedPlaylists: (userId: string, offset = 1, limit = 20) =>
+    api.get<GetRepostedPlaylistsResponse>(
+      `/api/public/engagement/playlists/v1/users/${userId}/reposted`,
+      { params: { offset, limit } }
     ),
-
-    getTrackPlaylists: async (trackId: string) => {
-      const res = await api.get(`/api/tracks/v1/playlists/${trackId}`);
-      return res.data.data as Playlist[];
-    },
-
-    getTrackAlbums: async (trackId: string) => {
-      const res = await api.get(`/api/tracks/v1/albums/${trackId}`);
-      return res.data.data as Playlist[];
-    },
-
-    getRepostedPlaylists: (userId: string, offset = 1, limit = 20) =>
-      api.get<GetRepostedPlaylistsResponse>(
-        `/api/public/engagement/playlists/v1/users/${userId}/reposted`,
-        { params: { offset, limit } },
-      ),
-
 };

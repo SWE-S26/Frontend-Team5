@@ -32,8 +32,7 @@ export function useCreatePlaylist() {
       setSuccess(true);
       return res.data;
     } catch (err: any) {
-      const message =
-        err.response?.data?.message || "Failed to create playlist";
+      const message = err.response?.data?.message || "Failed to create playlist";
       setError(message);
       setSuccess(false);
       throw err;
@@ -48,9 +47,9 @@ export function useCreatePlaylist() {
 export function useGetPlaylists() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [playlists, setPlaylists] = useState<
-    GetPlaylistsResponse["data"]["playlists"] | null
-  >(null);
+  const [playlists, setPlaylists] = useState<GetPlaylistsResponse["data"]["playlists"] | null>(
+    null
+  );
   const isAuthenticated = usePlaylistAuthState();
 
   const getPlaylists = useCallback(async (limit?: number, offset?: number) => {
@@ -81,33 +80,28 @@ export function useGetPlaylists() {
 export function useGetMyPlaylists() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [playlists, setPlaylists] = useState<
-    GetMyPlaylistsResponse["data"]["playlists"] | null
-  >(null);
-
-  const getMyPlaylists = useCallback(
-    async (limit?: number, offset?: number) => {
-      setLoading(true);
-      setError(null);
-      setPlaylists(null);
-      try {
-        const res = await playlistsService.getMyPlaylists(limit, offset);
-        setPlaylists(res.data.data.playlists);
-        return res.data;
-      } catch (err) {
-        if (axios.isAxiosError(err)) {
-          setError(
-            err.response?.data?.message || "Failed to fetch your playlists",
-          );
-        } else {
-          setError("Something went wrong");
-        }
-      } finally {
-        setLoading(false);
-      }
-    },
-    [],
+  const [playlists, setPlaylists] = useState<GetMyPlaylistsResponse["data"]["playlists"] | null>(
+    null
   );
+
+  const getMyPlaylists = useCallback(async (limit?: number, offset?: number) => {
+    setLoading(true);
+    setError(null);
+    setPlaylists(null);
+    try {
+      const res = await playlistsService.getMyPlaylists(limit, offset);
+      setPlaylists(res.data.data.playlists);
+      return res.data;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Failed to fetch your playlists");
+      } else {
+        setError("Something went wrong");
+      }
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return { getMyPlaylists, loading, error, playlists };
 }
@@ -148,7 +142,7 @@ export function useGetPlaylistById() {
         setLoading(false);
       }
     },
-    [],
+    []
   );
 
   return { getPlaylistById, loading, error, playlist, hasFetched };
@@ -159,27 +153,23 @@ export function useUpdatePlaylist() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
 
-  const updatePlaylist = useCallback(
-    async (playlistId: string, data: UpdatePlaylistRequest) => {
-      setLoading(true);
-      setError(null);
-      setSuccess(null);
-      try {
-        const res = await playlistsService.updatePlaylist(playlistId, data);
-        setSuccess(true);
-        return res.data;
-      } catch (err: any) {
-        const message =
-          err.response?.data?.message || "Failed to update playlist";
-        setError(message);
-        setSuccess(false);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [],
-  );
+  const updatePlaylist = useCallback(async (playlistId: string, data: UpdatePlaylistRequest) => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await playlistsService.updatePlaylist(playlistId, data);
+      setSuccess(true);
+      return res.data;
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Failed to update playlist";
+      setError(message);
+      setSuccess(false);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return { updatePlaylist, loading, error, success };
 }
@@ -198,8 +188,7 @@ export function useDeletePlaylist() {
       setSuccess(true);
       return res.data;
     } catch (err: any) {
-      const message =
-        err.response?.data?.message || "Failed to delete playlist";
+      const message = err.response?.data?.message || "Failed to delete playlist";
       setError(message);
       setSuccess(false);
       throw err;
@@ -216,30 +205,23 @@ export function useAddTrackToPlaylist() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
 
-  const addTrackToPlaylist = useCallback(
-    async (playlistId: string, trackId: string) => {
-      setLoading(true);
-      setError(null);
-      setSuccess(null);
-      try {
-        const res = await playlistsService.addTrackToPlaylist(
-          playlistId,
-          trackId,
-        );
-        setSuccess(true);
-        return res.data;
-      } catch (err: any) {
-        const message =
-          err.response?.data?.message || "Failed to add track to playlist";
-        setError(message);
-        setSuccess(false);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [],
-  );
+  const addTrackToPlaylist = useCallback(async (playlistId: string, trackId: string) => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await playlistsService.addTrackToPlaylist(playlistId, trackId);
+      setSuccess(true);
+      return res.data;
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Failed to add track to playlist";
+      setError(message);
+      setSuccess(false);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return { addTrackToPlaylist, loading, error, success };
 }
@@ -249,30 +231,23 @@ export function useRemoveTrackFromPlaylist() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
 
-  const removeTrackFromPlaylist = useCallback(
-    async (playlistId: string, trackId: string) => {
-      setLoading(true);
-      setError(null);
-      setSuccess(null);
-      try {
-        const res = await playlistsService.removeTrackFromPlaylist(
-          playlistId,
-          trackId,
-        );
-        setSuccess(true);
-        return res.data;
-      } catch (err: any) {
-        const message =
-          err.response?.data?.message || "Failed to remove track from playlist";
-        setError(message);
-        setSuccess(false);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [],
-  );
+  const removeTrackFromPlaylist = useCallback(async (playlistId: string, trackId: string) => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await playlistsService.removeTrackFromPlaylist(playlistId, trackId);
+      setSuccess(true);
+      return res.data;
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Failed to remove track from playlist";
+      setError(message);
+      setSuccess(false);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return { removeTrackFromPlaylist, loading, error, success };
 }
@@ -284,29 +259,24 @@ export function useGetPublicPlaylists() {
     GetPublicPlaylistsResponse["data"]["playlists"] | null
   >(null);
 
-  const getPublicPlaylists = useCallback(
-    async (limit?: number, offset?: number) => {
-      setLoading(true);
-      setError(null);
-      setPlaylists(null);
-      try {
-        const res = await playlistsService.getPublicPlaylists(limit, offset);
-        setPlaylists(res.data.data.playlists);
-        return res.data;
-      } catch (err) {
-        if (axios.isAxiosError(err)) {
-          setError(
-            err.response?.data?.message || "Failed to fetch public playlists",
-          );
-        } else {
-          setError("Something went wrong");
-        }
-      } finally {
-        setLoading(false);
+  const getPublicPlaylists = useCallback(async (limit?: number, offset?: number) => {
+    setLoading(true);
+    setError(null);
+    setPlaylists(null);
+    try {
+      const res = await playlistsService.getPublicPlaylists(limit, offset);
+      setPlaylists(res.data.data.playlists);
+      return res.data;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Failed to fetch public playlists");
+      } else {
+        setError("Something went wrong");
       }
-    },
-    [],
-  );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return { getPublicPlaylists, loading, error, playlists };
 }
@@ -323,15 +293,9 @@ export function useGetPublicPlaylistById() {
       setError(null);
       setPlaylist(null);
       try {
-        const res = await playlistsService.getPublicPlaylistById(
-          playlistId,
-          limit,
-          offset,
-        );
+        const res = await playlistsService.getPublicPlaylistById(playlistId, limit, offset);
         const payload = res.data?.data?.playlist;
-        const data = Array.isArray(payload)
-          ? (payload[0] ?? null)
-          : (payload ?? null);
+        const data = Array.isArray(payload) ? (payload[0] ?? null) : (payload ?? null);
         setPlaylist(data);
         return res.data;
       } catch (err) {
@@ -344,7 +308,7 @@ export function useGetPublicPlaylistById() {
         setLoading(false);
       }
     },
-    [],
+    []
   );
 
   return { getPublicPlaylistById, loading, error, playlist };
@@ -357,12 +321,7 @@ export function useGetArtistPlaylists() {
   const isAuthenticated = usePlaylistAuthState();
 
   const getArtistPlaylists = useCallback(
-    async (
-      artistId: string,
-      isPublic = false,
-      limit?: number,
-      offset?: number,
-    ) => {
+    async (artistId: string, isPublic = false, limit?: number, offset?: number) => {
       if (!artistId) return;
       setLoading(true);
       setError(null);
@@ -370,19 +329,13 @@ export function useGetArtistPlaylists() {
       try {
         const usePublic = isPublic || !isAuthenticated;
         const res = usePublic
-          ? await playlistsService.getPublicArtistPlaylists(
-              artistId,
-              limit,
-              offset,
-            )
+          ? await playlistsService.getPublicArtistPlaylists(artistId, limit, offset)
           : await playlistsService.getArtistPlaylists(artistId, limit, offset);
         setPlaylists(res.data.data.playlists);
         return res.data;
       } catch (err) {
         if (axios.isAxiosError(err)) {
-          setError(
-            err.response?.data?.message || "Failed to fetch artist playlists",
-          );
+          setError(err.response?.data?.message || "Failed to fetch artist playlists");
         } else {
           setError("Something went wrong");
         }
@@ -390,7 +343,7 @@ export function useGetArtistPlaylists() {
         setLoading(false);
       }
     },
-    [],
+    []
   );
 
   return { getArtistPlaylists, loading, error, playlists };
@@ -402,34 +355,29 @@ export function useGetPlaylistCreator() {
   const [creator, setCreator] = useState<PlaylistCreatorInfo | null>(null);
   const isAuthenticated = usePlaylistAuthState();
 
-  const getPlaylistCreator = useCallback(
-    async (creatorId: string, isPublic = false) => {
-      if (!creatorId) return;
-      setLoading(true);
-      setError(null);
-      setCreator(null);
-      try {
-        const usePublic = isPublic || !isAuthenticated;
-        const res = usePublic
-          ? await playlistsService.getPublicPlaylistCreator(creatorId)
-          : await playlistsService.getPlaylistCreator(creatorId);
-        const artist = res.data.data.artist;
-        setCreator(Array.isArray(artist) ? (artist[0] ?? null) : artist);
-        return res.data;
-      } catch (err) {
-        if (axios.isAxiosError(err)) {
-          setError(
-            err.response?.data?.message || "Failed to fetch creator info",
-          );
-        } else {
-          setError("Something went wrong");
-        }
-      } finally {
-        setLoading(false);
+  const getPlaylistCreator = useCallback(async (creatorId: string, isPublic = false) => {
+    if (!creatorId) return;
+    setLoading(true);
+    setError(null);
+    setCreator(null);
+    try {
+      const usePublic = isPublic || !isAuthenticated;
+      const res = usePublic
+        ? await playlistsService.getPublicPlaylistCreator(creatorId)
+        : await playlistsService.getPlaylistCreator(creatorId);
+      const artist = res.data.data.artist;
+      setCreator(Array.isArray(artist) ? (artist[0] ?? null) : artist);
+      return res.data;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Failed to fetch creator info");
+      } else {
+        setError("Something went wrong");
       }
-    },
-    [],
-  );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return { getPlaylistCreator, loading, error, creator };
 }
@@ -446,7 +394,7 @@ export function useGetRecommendedPlaylists() {
       artistId: string,
       isPublic = false,
       limit?: number,
-      offset?: number,
+      offset?: number
     ) => {
       if (!playlistId || !artistId) return;
       setLoading(true);
@@ -459,22 +407,14 @@ export function useGetRecommendedPlaylists() {
               playlistId,
               artistId,
               limit,
-              offset,
+              offset
             )
-          : await playlistsService.getRecommendedPlaylists(
-              playlistId,
-              artistId,
-              limit,
-              offset,
-            );
+          : await playlistsService.getRecommendedPlaylists(playlistId, artistId, limit, offset);
         setPlaylists(res.data.data.playlists);
         return res.data;
       } catch (err) {
         if (axios.isAxiosError(err)) {
-          setError(
-            err.response?.data?.message ||
-              "Failed to fetch recommended playlists",
-          );
+          setError(err.response?.data?.message || "Failed to fetch recommended playlists");
         } else {
           setError("Something went wrong");
         }
@@ -482,7 +422,7 @@ export function useGetRecommendedPlaylists() {
         setLoading(false);
       }
     },
-    [],
+    []
   );
 
   return { getRecommendedPlaylists, loading, error, playlists };
@@ -493,32 +433,25 @@ export function useGetArtistAlbums() {
   const [error, setError] = useState<string | null>(null);
   const [albums, setAlbums] = useState<Playlist[] | null>(null);
 
-  const getArtistAlbums = useCallback(
-    async (artistId: string, limit?: number, offset?: number) => {
-      if (!artistId) return;
-      setLoading(true);
-      setError(null);
-      setAlbums(null);
-      try {
-        const res = await playlistsService.getArtistAlbums(
-          artistId,
-          limit,
-          offset,
-        );
-        setAlbums(res.data.data.playlists);
-        return res.data;
-      } catch (err) {
-        if (axios.isAxiosError(err)) {
-          setError(err.response?.data?.message || "Failed to fetch albums");
-        } else {
-          setError("Something went wrong");
-        }
-      } finally {
-        setLoading(false);
+  const getArtistAlbums = useCallback(async (artistId: string, limit?: number, offset?: number) => {
+    if (!artistId) return;
+    setLoading(true);
+    setError(null);
+    setAlbums(null);
+    try {
+      const res = await playlistsService.getArtistAlbums(artistId, limit, offset);
+      setAlbums(res.data.data.playlists);
+      return res.data;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Failed to fetch albums");
+      } else {
+        setError("Something went wrong");
       }
-    },
-    [],
-  );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return { getArtistAlbums, loading, error, albums };
 }
@@ -535,11 +468,7 @@ export function useGetPlaylistByPermalink() {
       setError(null);
       setPlaylist(null);
       try {
-        const res = await playlistsService.getPlaylistByPermalink(
-          permalink,
-          limit,
-          offset,
-        );
+        const res = await playlistsService.getPlaylistByPermalink(permalink, limit, offset);
         setPlaylist(res.data.data.playlists?.[0] ?? null);
         return res.data;
       } catch (err) {
@@ -552,7 +481,7 @@ export function useGetPlaylistByPermalink() {
         setLoading(false);
       }
     },
-    [],
+    []
   );
 
   return { getPlaylistByPermalink, loading, error, playlist };
@@ -563,30 +492,22 @@ export function useUpdatePlaylistImage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
 
-  const updatePlaylistImage = useCallback(
-    async (playlistId: string, image: File) => {
-      setLoading(true);
-      setError(null);
-      setSuccess(null);
-      try {
-        const res = await playlistsService.updatePlaylistImage(
-          playlistId,
-          image,
-        );
-        setSuccess(true);
-        return res.data;
-      } catch (err: any) {
-        setError(
-          err.response?.data?.message || "Failed to update playlist image",
-        );
-        setSuccess(false);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [],
-  );
+  const updatePlaylistImage = useCallback(async (playlistId: string, image: File) => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await playlistsService.updatePlaylistImage(playlistId, image);
+      setSuccess(true);
+      return res.data;
+    } catch (err: any) {
+      setError(err.response?.data?.message || "Failed to update playlist image");
+      setSuccess(false);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return { updatePlaylistImage, loading, error, success };
 }
@@ -602,10 +523,7 @@ export function useReorderPlaylistTracks() {
       setError(null);
       setSuccess(null);
       try {
-        const res = await playlistsService.reorderPlaylistTracks(
-          playlistId,
-          data,
-        );
+        const res = await playlistsService.reorderPlaylistTracks(playlistId, data);
         setSuccess(true);
         return res.data;
       } catch (err: any) {
@@ -616,7 +534,7 @@ export function useReorderPlaylistTracks() {
         setLoading(false);
       }
     },
-    [],
+    []
   );
 
   return { reorderPlaylistTracks, loading, error, success };
@@ -636,9 +554,7 @@ export function useAddPlaylistToHistory() {
       setSuccess(true);
       return res.data;
     } catch (err: any) {
-      setError(
-        err.response?.data?.message || "Failed to add playlist to history",
-      );
+      setError(err.response?.data?.message || "Failed to add playlist to history");
       setSuccess(false);
       throw err;
     } finally {
@@ -654,27 +570,23 @@ export function useCreatePlaylistWithImage() {
   const [error, setError] = useState<string | null>(null);
   const [success, setSuccess] = useState<boolean | null>(null);
 
-  const createPlaylistWithImage = useCallback(
-    async (data: CreatePlaylistWithImageRequest) => {
-      setLoading(true);
-      setError(null);
-      setSuccess(null);
-      try {
-        const res = await playlistsService.createPlaylistWithImage(data);
-        setSuccess(true);
-        return res.data;
-      } catch (err: any) {
-        const message =
-          err.response?.data?.message || "Failed to create playlist";
-        setError(message);
-        setSuccess(false);
-        throw err;
-      } finally {
-        setLoading(false);
-      }
-    },
-    [],
-  );
+  const createPlaylistWithImage = useCallback(async (data: CreatePlaylistWithImageRequest) => {
+    setLoading(true);
+    setError(null);
+    setSuccess(null);
+    try {
+      const res = await playlistsService.createPlaylistWithImage(data);
+      setSuccess(true);
+      return res.data;
+    } catch (err: any) {
+      const message = err.response?.data?.message || "Failed to create playlist";
+      setError(message);
+      setSuccess(false);
+      throw err;
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return { createPlaylistWithImage, loading, error, success };
 }
@@ -682,43 +594,32 @@ export function useCreatePlaylistWithImage() {
 export function useGetRepostedPlaylists() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [playlists, setPlaylists] = useState<
-    GetRepostedPlaylistsResponse["playlists"]
-  >([]);
+  const [playlists, setPlaylists] = useState<GetRepostedPlaylistsResponse["playlists"]>([]);
   const [total, setTotal] = useState(0);
   const [offset, setOffset] = useState(1);
   const [limit, setLimit] = useState(20);
 
-  const getRepostedPlaylists = useCallback(
-    async (userId: string, offset = 1, limit = 20) => {
-      if (!userId) return;
-      setLoading(true);
-      setError(null);
-      try {
-        const res = await playlistsService.getRepostedPlaylists(
-          userId,
-          offset,
-          limit,
-        );
-        setPlaylists(res.data.playlists ?? []);
-        setTotal(res.data.total ?? 0);
-        setOffset(res.data.offset ?? offset);
-        setLimit(res.data.limit ?? limit);
-        return res.data;
-      } catch (err) {
-        if (axios.isAxiosError(err)) {
-          setError(
-            err.response?.data?.message || "Failed to fetch reposted playlists",
-          );
-        } else {
-          setError("Something went wrong");
-        }
-      } finally {
-        setLoading(false);
+  const getRepostedPlaylists = useCallback(async (userId: string, offset = 1, limit = 20) => {
+    if (!userId) return;
+    setLoading(true);
+    setError(null);
+    try {
+      const res = await playlistsService.getRepostedPlaylists(userId, offset, limit);
+      setPlaylists(res.data.playlists ?? []);
+      setTotal(res.data.total ?? 0);
+      setOffset(res.data.offset ?? offset);
+      setLimit(res.data.limit ?? limit);
+      return res.data;
+    } catch (err) {
+      if (axios.isAxiosError(err)) {
+        setError(err.response?.data?.message || "Failed to fetch reposted playlists");
+      } else {
+        setError("Something went wrong");
       }
-    },
-    [],
-  );
+    } finally {
+      setLoading(false);
+    }
+  }, []);
 
   return {
     getRepostedPlaylists,
@@ -732,6 +633,4 @@ export function useGetRepostedPlaylists() {
 }
 
 const usePlaylistAuthState = () =>
-  useAppSelector(
-    (state) => state.auth.isAuthenticated && state.auth.hasHydrated,
-  );
+  useAppSelector((state) => state.auth.isAuthenticated && state.auth.hasHydrated);

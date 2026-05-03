@@ -8,10 +8,20 @@ function StreamingPlatformItem({ mark, className }: { mark: string; className: s
   );
 }
 
-function DistributionHowItWorksStep({ num, title, body }: { num: string; title: string; body: string }) {
+function DistributionHowItWorksStep({
+  num,
+  title,
+  body,
+}: {
+  num: string;
+  title: string;
+  body: string;
+}) {
   return (
     <div className="flex items-start gap-3 sm:gap-4">
-      <span className="shrink-0 text-[44px] font-black leading-none text-white-smoke sm:text-[60px]">{num}</span>
+      <span className="shrink-0 text-[44px] font-black leading-none text-white-smoke sm:text-[60px]">
+        {num}
+      </span>
       <div className="pt-1.5 sm:pt-3">
         <h4 className="text-[15px] font-bold text-white-smoke">{title}</h4>
         <p className="mt-1.5 text-[13px] leading-relaxed text-[#888]">{body}</p>
@@ -33,7 +43,9 @@ export function DistributionTab({ isArtistPro }: { isArtistPro: boolean }) {
                 Distribute your music to Spotify, Apple Music, YouTube, and more
               </h2>
               <p className="mt-3 text-[14px] leading-relaxed text-[#aaa]">
-                As an Artist Pro subscriber, you get unlimited music distribution to all the major streaming platforms like Spotify, YouTube Music, Apple Music, TIDAL, and more all around the world.
+                As an Artist Pro subscriber, you get unlimited music distribution to all the major
+                streaming platforms like Spotify, YouTube Music, Apple Music, TIDAL, and more all
+                around the world.
               </p>
             </>
           ) : (
@@ -42,14 +54,20 @@ export function DistributionTab({ isArtistPro }: { isArtistPro: boolean }) {
                 Your distributed releases will be visible here soon
               </h2>
               <p className="mt-3 text-[14px] leading-relaxed text-[#aaa]">
-                We're building a new all-in-one artist experience on BeatZa — designed to make managing your music easier and more seamless than ever.
-                While we finish things up, you can still manage your releases and view performance data on BeatZa for Artists.
+                We're building a new all-in-one artist experience on BeatZa — designed to make
+                managing your music easier and more seamless than ever. While we finish things up,
+                you can still manage your releases and view performance data on BeatZa for Artists.
                 Stay tuned — exciting updates are on the way.
               </p>
             </>
           )}
           {!isArtistPro ? (
-            <button type="button" onClick={() => router.push("/artist")} data-testid="artist-distribution-upgrade" className="mt-4 rounded-full bg-white-smoke px-7 py-2.5 text-[14px] font-bold text-chinese-black hover:bg-[#eee] transition-colors">
+            <button
+              type="button"
+              onClick={() => router.push("/artist")}
+              data-testid="artist-distribution-upgrade"
+              className="mt-4 rounded-full bg-white-smoke px-7 py-2.5 text-[14px] font-bold text-chinese-black hover:bg-[#eee] transition-colors"
+            >
               Get Artist Pro
             </button>
           ) : (
@@ -67,27 +85,39 @@ export function DistributionTab({ isArtistPro }: { isArtistPro: boolean }) {
       {!isArtistPro && (
         <>
           <div className="mt-2 grid grid-cols-2 gap-x-4 gap-y-5 border-b border-[#262626] pb-8 sm:grid-cols-3 sm:gap-x-8 sm:gap-y-6 md:grid-cols-5 lg:grid-cols-9">
-            <StreamingPlatformItem mark="Spotify"      className="font-bold" />
-            <StreamingPlatformItem mark="Apple Music"  className="font-medium" />
-            <StreamingPlatformItem mark="DEEZER"       className="font-semibold tracking-[1px]" />
+            <StreamingPlatformItem mark="Spotify" className="font-bold" />
+            <StreamingPlatformItem mark="Apple Music" className="font-medium" />
+            <StreamingPlatformItem mark="DEEZER" className="font-semibold tracking-[1px]" />
             <StreamingPlatformItem mark="amazon music" className="font-semibold lowercase" />
-            <StreamingPlatformItem mark="TikTok"       className="font-bold" />
-            <StreamingPlatformItem mark="Instagram"    className="font-medium" />
-            <StreamingPlatformItem mark="YouTube"      className="font-bold" />
-            <StreamingPlatformItem mark="TIDAL"        className="font-semibold tracking-[2px]" />
-            <StreamingPlatformItem mark="pandora"      className="font-semibold lowercase" />
+            <StreamingPlatformItem mark="TikTok" className="font-bold" />
+            <StreamingPlatformItem mark="Instagram" className="font-medium" />
+            <StreamingPlatformItem mark="YouTube" className="font-bold" />
+            <StreamingPlatformItem mark="TIDAL" className="font-semibold tracking-[2px]" />
+            <StreamingPlatformItem mark="pandora" className="font-semibold lowercase" />
           </div>
 
           <div className="mt-2 border-t border-[#262626] pt-8">
             <h3 className="mb-6 text-[18px] font-bold text-white-smoke">How it works</h3>
             <div className="grid gap-8 md:grid-cols-3">
-              <DistributionHowItWorksStep num="1" title="Select your membership"    body="Choose the membership plan that works best for you. Get started with distribution for as little as $3.25 a month." />
-              <DistributionHowItWorksStep num="2" title="Create your release"       body="We'll guide you through the simple steps to add credits and release information to make sure you get paid for your plays." />
-              <DistributionHowItWorksStep num="3" title="We'll deliver your tracks" body="We'll double-check your release to help ensure it is successfully delivered to Spotify, Apple Music, TIDAL and so many more." />
+              <DistributionHowItWorksStep
+                num="1"
+                title="Select your membership"
+                body="Choose the membership plan that works best for you. Get started with distribution for as little as $3.25 a month."
+              />
+              <DistributionHowItWorksStep
+                num="2"
+                title="Create your release"
+                body="We'll guide you through the simple steps to add credits and release information to make sure you get paid for your plays."
+              />
+              <DistributionHowItWorksStep
+                num="3"
+                title="We'll deliver your tracks"
+                body="We'll double-check your release to help ensure it is successfully delivered to Spotify, Apple Music, TIDAL and so many more."
+              />
             </div>
           </div>
         </>
-    )}
+      )}
     </div>
   );
 }

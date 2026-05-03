@@ -27,8 +27,6 @@ export interface UpdatePrivacySettingsResponse {
   showTrackTopFans: boolean;
 }
 
-
-
 /* --------------- Notifications --------------- */
 export type NotificationChannel = "email" | "devices" | "both" | "off";
 export type NewMessageDevices = "everyone" | "followed" | "off";
@@ -72,8 +70,6 @@ export interface UpdateNotificationSettingsRequest {
 
 export interface UpdateNotificationSettingsResponse extends NotificationSettings {}
 
-
-
 /* --------------- Account --------------- */
 export type Theme = "Light" | "Dark" | "Automatic";
 export type Gender = "Male" | "Female";
@@ -93,8 +89,6 @@ export interface UpdateAccountSettingsRequest {
 }
 
 export interface UpdateAccountSettingsResponse extends AccountSettings {}
-
-
 
 /* --------------- Content --------------- */
 export interface ContentSettings {

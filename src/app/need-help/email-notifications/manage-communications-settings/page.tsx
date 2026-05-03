@@ -1,12 +1,14 @@
-import Link from "next/link"
-import { ChevronLeft } from "lucide-react"
+import Link from "next/link";
+import { ChevronLeft } from "lucide-react";
 
 export default function ManageCommunicationsSettings() {
   return (
     <div className="flex flex-col gap-8">
-
       <div className="flex items-center gap-2 text-xs text-gray-400">
-        <Link href="/need-help/email-notifications" className="hover:text-black transition-colors flex items-center gap-1">
+        <Link
+          href="/need-help/email-notifications"
+          className="hover:text-black transition-colors flex items-center gap-1"
+        >
           <ChevronLeft size={12} />
           Email & Notifications
         </Link>
@@ -24,10 +26,12 @@ export default function ManageCommunicationsSettings() {
         </p>
         <div className="space-y-4 mb-10">
           <div>
-            <h3 className="text-black text-sm font-semibold mb-1">Access the Communications tab in your profile settings</h3>
+            <h3 className="text-black text-sm font-semibold mb-1">
+              Access the Communications tab in your profile settings
+            </h3>
             <p className="text-gray-700 text-sm leading-relaxed">
-              Visit your Communications Settings on the BeatZa website or mobile app. Here, you can select your
-              preferences for receiving personalized news, tips, and offers from BeatZa.
+              Visit your Communications Settings on the BeatZa website or mobile app. Here, you can
+              select your preferences for receiving personalized news, tips, and offers from BeatZa.
             </p>
           </div>
           <div>
@@ -43,12 +47,12 @@ export default function ManageCommunicationsSettings() {
           What should users understand about GDPR compliance on BeatZa?
         </h2>
         <p className="text-gray-700 text-sm leading-relaxed">
-          BeatZa complies with the General Data Protection Regulation (GDPR) to protect user data. For more detailed
-          information about GDPR and how your data is managed, please refer to our Privacy Policy. For further
-          information about how to manage your BeatZa account, visit your Account Settings.
+          BeatZa complies with the General Data Protection Regulation (GDPR) to protect user data.
+          For more detailed information about GDPR and how your data is managed, please refer to our
+          Privacy Policy. For further information about how to manage your BeatZa account, visit
+          your Account Settings.
         </p>
       </article>
-
     </div>
-  )
+  );
 }

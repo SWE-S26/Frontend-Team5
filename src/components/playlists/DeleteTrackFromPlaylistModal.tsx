@@ -63,7 +63,10 @@ export default function DeleteTrackFromPlaylistModal({
           </div>
 
           <p className="text-silver text-sm leading-relaxed">
-            Are you sure you want to remove <span className="text-white-smoke font-semibold">{displayTrack}</span> from <span className="text-white-smoke font-semibold">{displayPlaylist}</span>? This action <span className="text-white-smoke font-semibold">cannot be undone</span>.
+            Are you sure you want to remove{" "}
+            <span className="text-white-smoke font-semibold">{displayTrack}</span> from{" "}
+            <span className="text-white-smoke font-semibold">{displayPlaylist}</span>? This action{" "}
+            <span className="text-white-smoke font-semibold">cannot be undone</span>.
           </p>
 
           <ul className="text-silver text-sm space-y-1 list-disc list-inside">

@@ -3,9 +3,9 @@ import { setupWorker } from "msw/browser";
 import { authHandlers } from "./handlers/auth.handlers";
 import { messageHandlers } from "./handlers/messageHandlers";
 import { tracksHandlers } from "./handlers/tracks.handlers";
-import { profileHandlers } from "./handlers/profile.handlers"
-import { socialHandlers } from "./handlers/social.handlers"
-import { paymentHandlers } from "./handlers/payment.handlers"
+import { profileHandlers } from "./handlers/profile.handlers";
+import { socialHandlers } from "./handlers/social.handlers";
+import { paymentHandlers } from "./handlers/payment.handlers";
 import { adminUsersHandlers } from "./handlers/admin-dash/adminUsersHandlers";
 import { adminTracksHandlers } from "./handlers/admin-dash/adminTracksHandlers";
 import { adminAnalyticsHandlers } from "./handlers/admin-dash/adminAnalyticsHandlers";
@@ -15,12 +15,12 @@ import { playlistsHandlers } from "./handlers/playlists.handlers";
 import { playbackHandlers } from "./handlers/playback.handlers";
 import { feedSearchHandlers } from "./handlers/feed-search.handlers";
 import { engagementHandlers } from "./handlers/engagement.handlers";
-import { 
-  privacyHandlers, 
-  notificationHandlers, 
+import {
+  privacyHandlers,
+  notificationHandlers,
   accountHandlers,
   contentHandlers,
- } from "./handlers/settings.handlers";
+} from "./handlers/settings.handlers";
 
 export const worker = setupWorker(
   ...authHandlers,
@@ -41,5 +41,5 @@ export const worker = setupWorker(
   ...adminTracksHandlers,
   ...adminAnalyticsHandlers,
   ...adminArtistAnalyticsHandlers,
-  ...adminReportsHandlers,
+  ...adminReportsHandlers
 );

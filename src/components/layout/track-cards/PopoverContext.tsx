@@ -26,9 +26,7 @@ export function PopoverProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <PopoverContext.Provider
-      value={{ openId, setOpenId, scheduleClose, cancelClose }}
-    >
+    <PopoverContext.Provider value={{ openId, setOpenId, scheduleClose, cancelClose }}>
       {children}
     </PopoverContext.Provider>
   );

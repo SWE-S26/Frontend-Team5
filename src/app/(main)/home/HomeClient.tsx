@@ -29,24 +29,14 @@ function pickRandomUsers<T>(items: T[], count: number): T[] {
 export default function HomeClient() {
   const userId = useAppSelector((state) => state.auth.userId);
   const isAuthenticated = useAppSelector(
-    (state) => state.auth.isAuthenticated && state.auth.hasHydrated,
+    (state) => state.auth.isAuthenticated && state.auth.hasHydrated
   );
 
-  const {
-    getTracks,
-    loading: newTracksLoading,
-    tracks: newTracks,
-  } = useGetTracks();
-  const {
-    getPlaylists,
-    loading: newPlaylistsLoading,
-    playlists: newPlaylists,
-  } = useGetPlaylists();
+  const { getTracks, loading: newTracksLoading, tracks: newTracks } = useGetTracks();
+  const { getPlaylists, loading: newPlaylistsLoading, playlists: newPlaylists } = useGetPlaylists();
   const { getFollowing, loading, following } = useGetFollowing();
 
-  const followedUsers = isAuthenticated
-    ? ((following ?? []) as FollowedUser[])
-    : [];
+  const followedUsers = isAuthenticated ? ((following ?? []) as FollowedUser[]) : [];
 
   const followedTrackUsers = useMemo(
     () =>
@@ -54,11 +44,11 @@ export default function HomeClient() {
         ? []
         : pickRandomUsers(
             followedUsers.filter((user) =>
-              newTracks?.some((track) => track.posterId === user.userId),
+              newTracks?.some((track) => track.posterId === user.userId)
             ),
-            3,
+            3
           ),
-    [isAuthenticated, followedUsers, newTracks],
+    [isAuthenticated, followedUsers, newTracks]
   );
 
   const followedPlaylistUsers = useMemo(
@@ -67,13 +57,11 @@ export default function HomeClient() {
         ? []
         : pickRandomUsers(
             followedUsers.filter((user) =>
-              newPlaylists?.some(
-                (playlist) => playlist.artistId === user.userId,
-              ),
+              newPlaylists?.some((playlist) => playlist.artistId === user.userId)
             ),
-            3,
+            3
           ),
-    [isAuthenticated, followedUsers, newPlaylists],
+    [isAuthenticated, followedUsers, newPlaylists]
   );
 
   const followedTrackGroups = useMemo(
@@ -82,11 +70,9 @@ export default function HomeClient() {
         ? []
         : followedTrackUsers.map((user) => ({
             user,
-            tracks:
-              newTracks?.filter((track) => track.posterId === user.userId) ??
-              [],
+            tracks: newTracks?.filter((track) => track.posterId === user.userId) ?? [],
           })),
-    [isAuthenticated, followedTrackUsers, newTracks],
+    [isAuthenticated, followedTrackUsers, newTracks]
   );
 
   const followedPlaylistGroups = useMemo(
@@ -95,12 +81,9 @@ export default function HomeClient() {
         ? []
         : followedPlaylistUsers.map((user) => ({
             user,
-            playlists:
-              newPlaylists?.filter(
-                (playlist) => playlist.artistId === user.userId,
-              ) ?? [],
+            playlists: newPlaylists?.filter((playlist) => playlist.artistId === user.userId) ?? [],
           })),
-    [isAuthenticated, followedPlaylistUsers, newPlaylists],
+    [isAuthenticated, followedPlaylistUsers, newPlaylists]
   );
 
   const followedTracksLoading = newTracksLoading || loading;

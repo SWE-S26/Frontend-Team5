@@ -93,23 +93,17 @@ function buildSlots<T>(
   items: T[],
   viewAllHref: string,
   renderItem: (item: T, index: number) => React.ReactNode,
-  circular = false,
+  circular = false
 ): React.ReactNode[] {
   if (items.length === 0) {
-    return Array.from({ length: GRID_COLS }, (_, i) => (
-      <EmptyCard key={`empty-${i}`} />
-    ));
+    return Array.from({ length: GRID_COLS }, (_, i) => <EmptyCard key={`empty-${i}`} />);
   }
 
   const preview = items.slice(0, MAX_PREVIEW);
-  const slots: React.ReactNode[] = preview.map((item, i) =>
-    renderItem(item, i),
-  );
+  const slots: React.ReactNode[] = preview.map((item, i) => renderItem(item, i));
 
   // 6th slot is always View all when there are items
-  slots.push(
-    <ViewAllCard key="view-all" href={viewAllHref} circular={circular} />,
-  );
+  slots.push(<ViewAllCard key="view-all" href={viewAllHref} circular={circular} />);
 
   return slots;
 }
@@ -120,8 +114,14 @@ function LibraryFooter() {
   return (
     <div className="text-xs text-silver leading-6 mt-10">
       {[
-        "Legal", "Privacy", "Cookie Policy", "Cookie Manager",
-        "Imprint", "Artist Resources", "Newsroom", "Charts",
+        "Legal",
+        "Privacy",
+        "Cookie Policy",
+        "Cookie Manager",
+        "Imprint",
+        "Artist Resources",
+        "Newsroom",
+        "Charts",
         "Transparency Reports",
       ].map((label, i, arr) => (
         <span key={label}>
@@ -138,14 +138,14 @@ function LibraryFooter() {
 export default function Overview() {
   const userId = useAppSelector((state) => state.auth.userId);
 
-  const { getPlaylistHistory, playlists: historyPlaylists, loading: historyLoading } =
-    useGetPlaylistHistory();
-  const { getLikedTracks, tracks: likedTracks, loading: likesLoading } =
-    useGetLikedTracks();
-  const { getMyPlaylists, playlists: myPlaylists, loading: playlistsLoading } =
-    useGetMyPlaylists();
-  const { getFollowing, following, loading: followingLoading } =
-    useGetFollowing();
+  const {
+    getPlaylistHistory,
+    playlists: historyPlaylists,
+    loading: historyLoading,
+  } = useGetPlaylistHistory();
+  const { getLikedTracks, tracks: likedTracks, loading: likesLoading } = useGetLikedTracks();
+  const { getMyPlaylists, playlists: myPlaylists, loading: playlistsLoading } = useGetMyPlaylists();
+  const { getFollowing, following, loading: followingLoading } = useGetFollowing();
 
   useEffect(() => {
     void getPlaylistHistory();
@@ -167,77 +167,61 @@ export default function Overview() {
   }, [historyPlaylists]);
 
   // Most-recently-liked first
-  const orderedLikes = useMemo(
-    () => (likedTracks ?? []).slice().reverse(),
-    [likedTracks],
-  );
+  const orderedLikes = useMemo(() => (likedTracks ?? []).slice().reverse(), [likedTracks]);
 
   return (
     <div className="flex flex-col min-h-full px-4 sm:px-6 lg:px-0">
-
       {/* ── Recently Played ── */}
       <Section title="Recently played" loading={historyLoading}>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-2">
-          {buildSlots<HistoryPlaylist>(
-            uniqueHistoryPlaylists,
-            "/library/history",
-            (p) => (
-              <PlaylistCard
-                key={p._id}
-                playlistId={p._id}
-                title={p.title}
-                artist={p.description}
-                img={p.image?.url || undefined}
-                isLikedByUser={p.isLikedByUser}
-                type={p.playlistType}
-                artistId={p.artistId}
-              />
-            ),
-          )}
+          {buildSlots<HistoryPlaylist>(uniqueHistoryPlaylists, "/library/history", (p) => (
+            <PlaylistCard
+              key={p._id}
+              playlistId={p._id}
+              title={p.title}
+              artist={p.description}
+              img={p.image?.url || undefined}
+              isLikedByUser={p.isLikedByUser}
+              type={p.playlistType}
+              artistId={p.artistId}
+            />
+          ))}
         </div>
       </Section>
 
       {/* ── Likes ── */}
       <Section title="Likes" loading={likesLoading}>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-2">
-          {buildSlots<Track>(
-            orderedLikes,
-            "/library/likes",
-            (track) => (
-              <TrackCard
-                key={track.trackId}
-                trackId={track.trackId}
-                trackUrl={track.audio.audioLink}
-                title={track.basicInfo.title}
-                artist={track.basicInfo.mainArtists?.[0]}
-                img={track.image?.imgLink}
-                duration={track.durationInSeconds}
-                isLikedByUser={track.isLikedByUser}
-              />
-            ),
-          )}
+          {buildSlots<Track>(orderedLikes, "/library/likes", (track) => (
+            <TrackCard
+              key={track.trackId}
+              trackId={track.trackId}
+              trackUrl={track.audio.audioLink}
+              title={track.basicInfo.title}
+              artist={track.basicInfo.mainArtists?.[0]}
+              img={track.image?.imgLink}
+              duration={track.durationInSeconds}
+              isLikedByUser={track.isLikedByUser}
+            />
+          ))}
         </div>
       </Section>
 
       {/* ── Playlists ── */}
       <Section title="Playlists" loading={playlistsLoading}>
         <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-6 gap-3 sm:gap-2">
-          {buildSlots<Playlist>(
-            myPlaylists ?? [],
-            "/library/playlists",
-            (p) => (
-              <PlaylistCard
-                key={p._id}
-                playlistId={p._id}
-                title={p.title}
-                artist={p.description}
-                img={p.image?.imgLink || undefined}
-                isLikedByUser={p.isLiked}
-                type={p.playlistType}
-                artistId={p.artistId}
-              />
-            ),
-          )}
+          {buildSlots<Playlist>(myPlaylists ?? [], "/library/playlists", (p) => (
+            <PlaylistCard
+              key={p._id}
+              playlistId={p._id}
+              title={p.title}
+              artist={p.description}
+              img={p.image?.imgLink || undefined}
+              isLikedByUser={p.isLiked}
+              type={p.playlistType}
+              artistId={p.artistId}
+            />
+          ))}
         </div>
       </Section>
 
@@ -250,7 +234,7 @@ export default function Overview() {
             (user) => (
               <UserCard key={user.userId} user={user} />
             ),
-            true,
+            true
           )}
         </div>
       </Section>

@@ -1,5 +1,8 @@
 import api from "@/lib/api";
-import { AdminAnalyticsOverview, AdminAnalyticsStorage } from "@/types/admin-dash/adminAnalytics.types";
+import {
+  AdminAnalyticsOverview,
+  AdminAnalyticsStorage,
+} from "@/types/admin-dash/adminAnalytics.types";
 
 export const adminAnalyticsService = {
   getOverview: async (): Promise<AdminAnalyticsOverview> => {

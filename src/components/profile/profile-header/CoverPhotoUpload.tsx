@@ -1,43 +1,43 @@
-"use client"
+"use client";
 
-import React, { useRef, forwardRef, useImperativeHandle } from "react"
-import { useAppSelector } from "@/store/hooks"
+import React, { useRef, forwardRef, useImperativeHandle } from "react";
+import { useAppSelector } from "@/store/hooks";
 
 interface CoverProps {
-  children?: React.ReactNode
-  onImageChange: (file: File, previewUrl: string) => void
-  disableClick?: boolean
+  children?: React.ReactNode;
+  onImageChange: (file: File, previewUrl: string) => void;
+  disableClick?: boolean;
 }
 
 export interface CoverUploadHandle {
-  openFilePicker: () => void
+  openFilePicker: () => void;
 }
 
 const CoverPhotoUpload = forwardRef<CoverUploadHandle, CoverProps>(
   ({ children, onImageChange, disableClick = false }, ref) => {
-    const fileInputRef = useRef<HTMLInputElement>(null)
+    const fileInputRef = useRef<HTMLInputElement>(null);
 
     const openFilePicker = () => {
-      fileInputRef.current?.click()
-    }
+      fileInputRef.current?.click();
+    };
 
-    useImperativeHandle(ref, () => ({ openFilePicker }))
+    useImperativeHandle(ref, () => ({ openFilePicker }));
 
     const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-      const file = e.target.files?.[0]
-      if (!file) return
+      const file = e.target.files?.[0];
+      if (!file) return;
 
       if (!file.type.startsWith("image/")) {
-        alert("Only image files are allowed.")
-        e.target.value = ""
-        return
+        alert("Only image files are allowed.");
+        e.target.value = "";
+        return;
       }
 
-      const previewUrl = URL.createObjectURL(file)
-      onImageChange(file, previewUrl)
-    }
+      const previewUrl = URL.createObjectURL(file);
+      onImageChange(file, previewUrl);
+    };
 
-    const isOwn = useAppSelector((state) => state.profile.isOwnProfile)
+    const isOwn = useAppSelector((state) => state.profile.isOwnProfile);
 
     return (
       <div>
@@ -50,7 +50,8 @@ const CoverPhotoUpload = forwardRef<CoverUploadHandle, CoverProps>(
               {children}
             </div>
 
-            <input data-testid="Cover-input"
+            <input
+              data-testid="Cover-input"
               type="file"
               accept="image/*"
               ref={fileInputRef}
@@ -60,10 +61,9 @@ const CoverPhotoUpload = forwardRef<CoverUploadHandle, CoverProps>(
           </>
         )}
       </div>
-    )
+    );
   }
-)
+);
 
-CoverPhotoUpload.displayName = "CoverPhotoUpload"
-export default CoverPhotoUpload
-
+CoverPhotoUpload.displayName = "CoverPhotoUpload";
+export default CoverPhotoUpload;

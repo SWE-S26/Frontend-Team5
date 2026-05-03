@@ -2,7 +2,11 @@
 
 import { useRef, useState, useEffect } from "react";
 import { IoClose } from "react-icons/io5";
-import { useCreatePlaylistWithImage, useGetMyPlaylists, useAddTrackToPlaylist } from "@/hooks/usePlaylists";
+import {
+  useCreatePlaylistWithImage,
+  useGetMyPlaylists,
+  useAddTrackToPlaylist,
+} from "@/hooks/usePlaylists";
 import { ArtworkPanel } from "@/components/upload/TrackInfoForm/ArtworkPanel";
 import { createZoomCroppedArtworkFile } from "@/components/upload/TrackInfoForm";
 import { Spin } from "antd";
@@ -13,7 +17,13 @@ interface CreatePlaylistFormState {
   isPrivate: boolean;
 }
 
-export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { onClose: () => void; selectedTrackIds?: Set<string> }) {
+export function AddToPlaylistPanel({
+  onClose,
+  selectedTrackIds = new Set(),
+}: {
+  onClose: () => void;
+  selectedTrackIds?: Set<string>;
+}) {
   const [isCreating, setIsCreating] = useState(false);
   const [formData, setFormData] = useState<CreatePlaylistFormState>({
     title: "",
@@ -22,7 +32,12 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
   });
   const artworkInputRef = useRef<HTMLInputElement | null>(null);
   const artworkFrameRef = useRef<HTMLDivElement | null>(null);
-  const artworkPanStartRef = useRef<{ clientX: number; clientY: number; startX: number; startY: number } | null>(null);
+  const artworkPanStartRef = useRef<{
+    clientX: number;
+    clientY: number;
+    startX: number;
+    startY: number;
+  } | null>(null);
 
   const { getMyPlaylists, playlists, loading: playlistsLoading } = useGetMyPlaylists();
   const { createPlaylistWithImage, loading: createLoading } = useCreatePlaylistWithImage();
@@ -66,7 +81,10 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
       });
       setFormData({ title: "", description: "", isPrivate: false });
       setArtworkFile(null);
-      setArtworkUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
+      setArtworkUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return null;
+      });
       setArtworkZoom(1);
       setArtworkPosition({ x: 0, y: 0 });
       setIsPanningArtwork(false);
@@ -124,7 +142,10 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
   const applyArtworkFile = (file: File) => {
     setArtworkFile(file);
     const url = URL.createObjectURL(file);
-    setArtworkUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return url; });
+    setArtworkUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return url;
+    });
     setArtworkZoom(1);
     setArtworkPosition({ x: 0, y: 0 });
   };
@@ -151,7 +172,10 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
 
   const handleDeleteArtwork = () => {
     setArtworkFile(null);
-    setArtworkUrl((prev) => { if (prev) URL.revokeObjectURL(prev); return null; });
+    setArtworkUrl((prev) => {
+      if (prev) URL.revokeObjectURL(prev);
+      return null;
+    });
     setArtworkZoom(1);
     setArtworkPosition({ x: 0, y: 0 });
     setIsPanningArtwork(false);
@@ -186,8 +210,8 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
     const width = Math.max(1, frame.clientWidth);
     const height = Math.max(1, frame.clientHeight);
     setArtworkPosition({
-      x: clampArtworkPosition(artworkPanStartRef.current.startX + (dx / width)),
-      y: clampArtworkPosition(artworkPanStartRef.current.startY + (dy / height)),
+      x: clampArtworkPosition(artworkPanStartRef.current.startX + dx / width),
+      y: clampArtworkPosition(artworkPanStartRef.current.startY + dy / height),
     });
   };
 
@@ -212,7 +236,6 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
 
       {/* Panel */}
       <div className="fixed right-0 top-0 z-1010 flex h-full w-full max-w-140 flex-col bg-chinese-black">
-
         {/* Header */}
         <div className="flex items-center gap-3 border-b border-white-smoke/10 px-6 py-5">
           <button
@@ -230,7 +253,6 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
 
         {/* Body */}
         <div className="flex-1 overflow-y-auto px-6 py-5 space-y-3">
-
           {/* Messages */}
           {errorMessage && (
             <div className="rounded-lg bg-[#4a1a1a] px-3 py-2 border border-[#8a3a3a]">
@@ -347,7 +369,6 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
                 </button>
               </div>
             </div>
-
           ) : (
             <>
               <button
@@ -364,10 +385,12 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
 
               {playlistsLoading ? (
                 <div className="flex justify-center py-10">
-                  <Spin className="text-white-smoke"/>
+                  <Spin className="text-white-smoke" />
                 </div>
               ) : !playlists || playlists.length === 0 ? (
-                <p className="text-[13px] text-white-smoke/30 py-4 px-1">No playlists yet. Create one to get started!</p>
+                <p className="text-[13px] text-white-smoke/30 py-4 px-1">
+                  No playlists yet. Create one to get started!
+                </p>
               ) : (
                 <div className="space-y-1">
                   {playlists.map((playlist) => (
@@ -385,14 +408,19 @@ export function AddToPlaylistPanel({ onClose, selectedTrackIds = new Set() }: { 
                             />
                           ) : (
                             <div className="flex h-full w-full items-center justify-center">
-                              <span className="text-[10px] font-semibold text-white-smoke/30">No art</span>
+                              <span className="text-[10px] font-semibold text-white-smoke/30">
+                                No art
+                              </span>
                             </div>
                           )}
                         </div>
                         <div className="min-w-0">
-                          <p className="text-[14px] font-semibold text-white-smoke truncate">{playlist.title}</p>
+                          <p className="text-[14px] font-semibold text-white-smoke truncate">
+                            {playlist.title}
+                          </p>
                           <p className="text-[12px] text-white-smoke/40">
-                            {playlist.listOfTracks.length} track{playlist.listOfTracks.length !== 1 ? "s" : ""}
+                            {playlist.listOfTracks.length} track
+                            {playlist.listOfTracks.length !== 1 ? "s" : ""}
                           </p>
                         </div>
                       </div>

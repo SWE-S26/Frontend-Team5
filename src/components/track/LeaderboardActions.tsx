@@ -72,10 +72,12 @@ export default function LeaderboardActions({
     try {
       await likeTrack();
       const nextLiked = !isCurrentTrackLiked;
-      dispatch(setTrackLiked({
-        liked: nextLiked,
-        likeCount: nextLiked ? currentTrackLikeCount + 1 : currentTrackLikeCount - 1,
-      }));
+      dispatch(
+        setTrackLiked({
+          liked: nextLiked,
+          likeCount: nextLiked ? currentTrackLikeCount + 1 : currentTrackLikeCount - 1,
+        })
+      );
     } catch (err) {
       console.error(err);
     }
@@ -96,9 +98,10 @@ export default function LeaderboardActions({
         <button
           disabled={hasAvatar}
           className={`w-17 h-17 rounded-xl flex flex-col items-center justify-center text-gray-400 gap-1 transition
-            ${hasAvatar
-              ? "bg-off-black opacity-40 shadow-inner cursor-not-allowed"
-              : "bg-off-black hover:bg-[#262626] active:scale-95 cursor-pointer"
+            ${
+              hasAvatar
+                ? "bg-off-black opacity-40 shadow-inner cursor-not-allowed"
+                : "bg-off-black hover:bg-[#262626] active:scale-95 cursor-pointer"
             }`}
         >
           <Avatar src={profileImgLink ?? undefined} size={30} />
@@ -110,9 +113,10 @@ export default function LeaderboardActions({
           onClick={handleLike}
           disabled={loading || isCurrentTrackLiked}
           className={`w-17 h-17 rounded-xl flex flex-col items-center justify-center gap-2 transition
-            ${isCurrentTrackLiked
-              ? "bg-off-black opacity-40 shadow-inner cursor-not-allowed"
-              : "bg-off-black active:scale-95 cursor-pointer"
+            ${
+              isCurrentTrackLiked
+                ? "bg-off-black opacity-40 shadow-inner cursor-not-allowed"
+                : "bg-off-black active:scale-95 cursor-pointer"
             }
             ${loading ? "opacity-50 cursor-not-allowed" : ""}`}
         >
@@ -124,24 +128,20 @@ export default function LeaderboardActions({
         </button>
 
         {/* Follow */}
-        <LeaderboardFollowButton
-          userId={posterId ?? undefined}
-          initialIsFollowing={isFollowed}
-        />
+        <LeaderboardFollowButton userId={posterId ?? undefined} initialIsFollowing={isFollowed} />
 
         {/* Play on repeat */}
         <button
           onClick={handlePlay}
           className={`w-17 h-17 rounded-xl flex flex-col items-center justify-center gap-2 transition cursor-pointer
-            ${isActive
-              ? "bg-off-black opacity-40 shadow-inner cursor-not-allowed"
-              : "bg-off-black cursor-pointer"
+            ${
+              isActive
+                ? "bg-off-black opacity-40 shadow-inner cursor-not-allowed"
+                : "bg-off-black cursor-pointer"
             }`}
         >
           <Play size={20} className="text-silver" />
-          <span className="text-sm text-silver">
-            {isActive ? "Repeating" : "Play"}
-          </span>
+          <span className="text-sm text-silver">{isActive ? "Repeating" : "Play"}</span>
         </button>
       </div>
     </div>

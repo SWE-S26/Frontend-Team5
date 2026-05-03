@@ -1,12 +1,11 @@
-"use client"
+"use client";
 
-import Link from "next/link"
-import Button from "@/components/ui/Button"
+import Link from "next/link";
+import Button from "@/components/ui/Button";
 
 export default function GoPlus() {
   return (
     <div className="min-h-screen bg-gray-100">
-
       {/* Hero — same width as content below */}
       <div className="w-full flex justify-center pt-12">
         <div className="w-[80%] relative h-80 sm:h-105 overflow-hidden rounded-xl">
@@ -41,20 +40,21 @@ export default function GoPlus() {
           </h2>
           <div className="w-12 h-0.5 bg-linear-to-r from-purple-700 to-orange-400 mb-5 rounded-full" />
           <p className="text-gray-700 text-base leading-relaxed">
-            Until we can bring you offline and advert-free listening, check out some of the most buzzed about tracks trending in the BeatZa community.
+            Until we can bring you offline and advert-free listening, check out some of the most
+            buzzed about tracks trending in the BeatZa community.
           </p>
-            <div className="my-10"></div>
+          <div className="my-10"></div>
           <h2 className="text-black text-sm font-black tracking-widest uppercase mb-3">
             Your subscription supports artists
           </h2>
           <div className="w-12 h-0.5 bg-linear-to-r from-purple-700 to-orange-400 mb-5 rounded-full" />
           <p className="text-gray-700 text-base leading-relaxed">
-            When you listen as a Go+ subscriber, you contribute to fan-powered royalties that directly support and help break the next big independent artists growing their careers on SoundCloud.
+            When you listen as a Go+ subscriber, you contribute to fan-powered royalties that
+            directly support and help break the next big independent artists growing their careers
+            on SoundCloud.
           </p>
-
         </div>
       </div>
-
     </div>
-  )
+  );
 }

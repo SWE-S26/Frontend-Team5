@@ -1,38 +1,44 @@
-"use client"
-import { useState, useMemo } from "react"
-import { Avatar } from "antd"
-import { AiOutlineHeart, AiFillHeart } from "react-icons/ai"
-import { useReplies, useMentions } from "@/hooks/useComments"
-import { formatDistanceToNow } from "date-fns"
-import { TrackComment } from "@/types/comments.types"
-import SortDropdown, { SortOption } from "./SortDropdown"
-import { PostCommentPayload } from "@/types/comments.types"
-import { useRouter } from "next/navigation"
-import { LuSend } from "react-icons/lu"
-import { useAppSelector } from "@/store/hooks"
-import { CgTrash } from "react-icons/cg"
-import ConfirmPopover from "@/components/track/ConfirmPopover"
-import { MentionUser } from "@/types/comments.types"
-import MentionDropdown from "@/components/track/MentionDropdown"
+"use client";
+import { useState, useMemo } from "react";
+import { Avatar } from "antd";
+import { AiOutlineHeart, AiFillHeart } from "react-icons/ai";
+import { useReplies, useMentions } from "@/hooks/useComments";
+import { formatDistanceToNow } from "date-fns";
+import { TrackComment } from "@/types/comments.types";
+import SortDropdown, { SortOption } from "./SortDropdown";
+import { PostCommentPayload } from "@/types/comments.types";
+import { useRouter } from "next/navigation";
+import { LuSend } from "react-icons/lu";
+import { useAppSelector } from "@/store/hooks";
+import { CgTrash } from "react-icons/cg";
+import ConfirmPopover from "@/components/track/ConfirmPopover";
+import { MentionUser } from "@/types/comments.types";
+import MentionDropdown from "@/components/track/MentionDropdown";
 
 interface CommentListProps {
-  trackId: string
-  comments: TrackComment[]
-  total: number
-  loading: boolean
-  loadComments: (trackId: string, reset?: boolean) => Promise<void>
-  loadMore: (trackId: string) => void
-  toggleLike: (commentId: string) => Promise<void>
-  submitComment: (trackId: string, payload: PostCommentPayload, meta?: { displayName: string; avatarUrl: string }) => Promise<any>
-  postReply: (trackId: string, payload: PostCommentPayload) => Promise<any>
-  deleteCommentById: (commentId: string) => Promise<void>
+  trackId: string;
+  comments: TrackComment[];
+  total: number;
+  loading: boolean;
+  loadComments: (trackId: string, reset?: boolean) => Promise<void>;
+  loadMore: (trackId: string) => void;
+  toggleLike: (commentId: string) => Promise<void>;
+  submitComment: (
+    trackId: string,
+    payload: PostCommentPayload,
+    meta?: { displayName: string; avatarUrl: string }
+  ) => Promise<any>;
+  postReply: (trackId: string, payload: PostCommentPayload) => Promise<any>;
+  deleteCommentById: (commentId: string) => Promise<void>;
 }
 
 const formatTimestamp = (seconds: number) => {
-  const m = Math.floor(seconds / 60).toString().padStart(2, "0")
-  const s = (seconds % 60).toString().padStart(2, "0")
-  return `${m}:${s}`
-}
+  const m = Math.floor(seconds / 60)
+    .toString()
+    .padStart(2, "0");
+  const s = (seconds % 60).toString().padStart(2, "0");
+  return `${m}:${s}`;
+};
 
 /**
  * Main comment @mentions.
@@ -45,24 +51,23 @@ const renderMentionContent = (
   mentionedUserId?: string
 ) => {
   return text.split(/(@[\w-]+)/g).map((part, i) => {
-    if (!/^@[\w-]+$/.test(part)) return part
+    if (!/^@[\w-]+$/.test(part)) return part;
 
     return (
       <span
         key={i}
         onClick={() => {
-          console.log("CLICKED") // debug
-          router.push(`/profile/${mentionedUserId}`)
+          console.log("CLICKED"); // debug
+          router.push(`/profile/${mentionedUserId}`);
         }}
         className="text-blue-400 cursor-pointer hover:text-blue-300"
         style={{ pointerEvents: "auto" }}
       >
         {part}
       </span>
-    )
-  })
-}
-
+    );
+  });
+};
 
 const renderReplyContent = (
   text: string,
@@ -71,15 +76,14 @@ const renderReplyContent = (
   mentionedUserId?: string,
   mentionedDisplayName?: string
 ) => {
-  const parts = text.split(/(@[\w-]+)/g)
-  let firstMentionSeen = false
+  const parts = text.split(/(@[\w-]+)/g);
+  let firstMentionSeen = false;
 
   return parts.map((part, i) => {
-    if (!/^@[\w-]+$/.test(part)) return part
+    if (!/^@[\w-]+$/.test(part)) return part;
 
-    
     if (mentionedUserId && mentionedDisplayName) {
-      const firstName = mentionedDisplayName.split(" ")[0].toLowerCase()
+      const firstName = mentionedDisplayName.split(" ")[0].toLowerCase();
       if (part.toLowerCase() === `@${firstName}:`) {
         return (
           <span
@@ -89,7 +93,7 @@ const renderReplyContent = (
           >
             {part}
           </span>
-        )
+        );
       }
       // Anything else is the author
       return (
@@ -100,12 +104,12 @@ const renderReplyContent = (
         >
           {part}
         </span>
-      )
+      );
     }
 
     // Strategy 2: position-based fallback (first @ = author, second @ = mentionedUser)
     if (!firstMentionSeen) {
-      firstMentionSeen = true
+      firstMentionSeen = true;
       return (
         <span
           key={i}
@@ -114,26 +118,24 @@ const renderReplyContent = (
         >
           {part}
         </span>
-      )
+      );
     }
 
     return (
       <span
         key={i}
         onClick={() => {
-          if (mentionedUserId) router.push(`/profile/${mentionedUserId}`)
+          if (mentionedUserId) router.push(`/profile/${mentionedUserId}`);
         }}
         className={`font-medium ${
-          mentionedUserId
-            ? "text-blue-400 hover:text-blue-300 cursor-pointer"
-            : "text-blue-400"
+          mentionedUserId ? "text-blue-400 hover:text-blue-300 cursor-pointer" : "text-blue-400"
         }`}
       >
         {part}
       </span>
-    )
-  })
-}
+    );
+  });
+};
 
 function ReplySection({
   comment,
@@ -141,84 +143,83 @@ function ReplySection({
   postReply,
   onDeleteComment,
 }: {
-  comment: TrackComment
-  trackId: string
-  postReply: (trackId: string, payload: PostCommentPayload) => Promise<any>
-  onDeleteComment: (commentId: string) => Promise<void>
+  comment: TrackComment;
+  trackId: string;
+  postReply: (trackId: string, payload: PostCommentPayload) => Promise<any>;
+  onDeleteComment: (commentId: string) => Promise<void>;
 }) {
-  const router = useRouter()
-  const profileImgLink = useAppSelector((state) => state.auth.profileImgLink)
-  const { replies, loading, loadReplies, toggleLike, deleteReply } = useReplies()
-  const [showReplies, setShowReplies] = useState(false)
-  const [replyInput, setReplyInput] = useState("")
-  const [showInput, setShowInput] = useState(false)
-  const { suggestions, loadSuggestions, filterSuggestions, clearSuggestions } = useMentions()
-  const [mentionedUser, setMentionedUser] = useState<MentionUser | null>(null)
+  const router = useRouter();
+  const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
+  const { replies, loading, loadReplies, toggleLike, deleteReply } = useReplies();
+  const [showReplies, setShowReplies] = useState(false);
+  const [replyInput, setReplyInput] = useState("");
+  const [showInput, setShowInput] = useState(false);
+  const { suggestions, loadSuggestions, filterSuggestions, clearSuggestions } = useMentions();
+  const [mentionedUser, setMentionedUser] = useState<MentionUser | null>(null);
 
   const handleLoadReplies = () => {
-    if (!showReplies) loadReplies(comment.commentId)
-    setShowReplies((prev) => !prev)
-  }
+    if (!showReplies) loadReplies(comment.commentId);
+    setShowReplies((prev) => !prev);
+  };
 
   const handleReplyChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const val = e.target.value
-    setReplyInput(val)
+    const val = e.target.value;
+    setReplyInput(val);
 
     // Find the last @ that could be a new mention being typed
     // Skip the very first @ (index 0) since that's the auto-prefilled author mention
-    const firstAtIndex = val.indexOf("@")
-    const lastAtIndex = val.lastIndexOf("@")
+    const firstAtIndex = val.indexOf("@");
+    const lastAtIndex = val.lastIndexOf("@");
 
     if (lastAtIndex !== -1 && lastAtIndex !== firstAtIndex) {
       // User is typing a second @mention
-      loadSuggestions()
-      filterSuggestions(val.slice(lastAtIndex + 1))
+      loadSuggestions();
+      filterSuggestions(val.slice(lastAtIndex + 1));
     } else if (lastAtIndex !== -1 && lastAtIndex === firstAtIndex) {
       // Only one @ exists — could be user clearing the input and retyping
       // Only show suggestions if user is actively typing after the @
-      const query = val.slice(lastAtIndex + 1)
+      const query = val.slice(lastAtIndex + 1);
       if (query.length > 0) {
-        loadSuggestions()
-        filterSuggestions(query)
+        loadSuggestions();
+        filterSuggestions(query);
       } else {
-        clearSuggestions()
+        clearSuggestions();
       }
     } else {
-      clearSuggestions()
+      clearSuggestions();
     }
 
     // Clear mentionedUser only if their @name was removed from the text
     if (mentionedUser) {
-      const mentionName = `@${mentionedUser.displayName.split(" ")[0]}`
+      const mentionName = `@${mentionedUser.displayName.split(" ")[0]}`;
       if (!val.includes(mentionName)) {
-        
       }
     }
-  }
+  };
 
   const handleSelectMention = (user: MentionUser) => {
-    const atIndex = replyInput.lastIndexOf("@")
-    const before = replyInput.slice(0, atIndex)
-    setReplyInput(`${before}@${user.displayName.split(" ")[0]} `)
-    setMentionedUser(user)
-    clearSuggestions()
-  }
+    const atIndex = replyInput.lastIndexOf("@");
+    const before = replyInput.slice(0, atIndex);
+    setReplyInput(`${before}@${user.displayName.split(" ")[0]} `);
+    setMentionedUser(user);
+    clearSuggestions();
+  };
 
   const handleSubmitReply = async () => {
-    if (!replyInput.trim()) return
+    if (!replyInput.trim()) return;
     await postReply(trackId, {
       content: replyInput,
       timestamp: comment.timestamp,
       parentCommentId: comment.commentId,
       mentionedUserId: mentionedUser?.userId,
-    })
-    setReplyInput("")
-    setShowInput(false)
-    setShowReplies(true)
-    
-    clearSuggestions()
-    setTimeout(() => loadReplies(comment.commentId), 300)
-  }
+    });
+    setReplyInput("");
+    setShowInput(false);
+    setShowReplies(true);
+
+    clearSuggestions();
+    setTimeout(() => loadReplies(comment.commentId), 300);
+  };
 
   return (
     <div className="flex flex-col gap-2 mt-1">
@@ -226,8 +227,8 @@ function ReplySection({
         <div className="flex gap-5 items-center">
           <button
             onClick={() => {
-              setReplyInput(`@${comment.displayName.split(" ")[0]}: `)
-              setShowInput((prev) => !prev)
+              setReplyInput(`@${comment.displayName.split(" ")[0]}: `);
+              setShowInput((prev) => !prev);
             }}
             className="text-white-smoke font-semibold text-sm hover:text-white-smoke w-fit cursor-pointer"
           >
@@ -272,12 +273,21 @@ function ReplySection({
               className="w-full bg-off-black text-white-smoke text-sm outline-none placeholder-silver px-3 py-2 pr-8 rounded-md"
             />
             <button
-              onClick={() => { setShowInput(false); setReplyInput(""); clearSuggestions() }}
+              onClick={() => {
+                setShowInput(false);
+                setReplyInput("");
+                clearSuggestions();
+              }}
               className="absolute right-2 top-1/2 -translate-y-1/2 text-silver hover:text-white-smoke transition cursor-pointer"
               aria-label="Close reply"
             >
               <svg width="14" height="14" viewBox="0 0 14 14" fill="none">
-                <path d="M2 2L12 12M12 2L2 12" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" />
+                <path
+                  d="M2 2L12 12M12 2L2 12"
+                  stroke="currentColor"
+                  strokeWidth="1.5"
+                  strokeLinecap="round"
+                />
               </svg>
             </button>
             <MentionDropdown suggestions={suggestions} onSelect={handleSelectMention} />
@@ -343,10 +353,11 @@ function ReplySection({
                   onClick={() => toggleLike(reply.commentId)}
                   className="hover:text-white-smoke transition cursor-pointer"
                 >
-                  {reply.isLikedByUser
-                    ? <AiFillHeart size={16} className="text-red-500" />
-                    : <AiOutlineHeart size={16} className="text-white-smoke" />
-                  }
+                  {reply.isLikedByUser ? (
+                    <AiFillHeart size={16} className="text-red-500" />
+                  ) : (
+                    <AiOutlineHeart size={16} className="text-white-smoke" />
+                  )}
                 </button>
                 <span>{reply.numLikes}</span>
               </div>
@@ -355,7 +366,7 @@ function ReplySection({
         </div>
       )}
     </div>
-  )
+  );
 }
 
 export default function CommentList({
@@ -370,23 +381,27 @@ export default function CommentList({
   postReply,
   deleteCommentById,
 }: CommentListProps) {
-  const router = useRouter()
-  const hasMore = comments.length < total
-  const [sortBy, setSortBy] = useState<SortOption>("Newest")
+  const router = useRouter();
+  const hasMore = comments.length < total;
+  const [sortBy, setSortBy] = useState<SortOption>("Newest");
 
   const sortedComments = useMemo(() => {
-    const copy = [...comments]
+    const copy = [...comments];
     switch (sortBy) {
       case "Newest":
-        return copy.sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+        return copy.sort(
+          (a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
+        );
       case "Oldest":
-        return copy.sort((a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime())
+        return copy.sort(
+          (a, b) => new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+        );
       case "Track Time":
-        return copy.sort((a, b) => a.timestamp - b.timestamp)
+        return copy.sort((a, b) => a.timestamp - b.timestamp);
       default:
-        return copy
+        return copy;
     }
-  }, [comments, sortBy])
+  }, [comments, sortBy]);
 
   return (
     <div className="flex flex-col w-full mt-4">
@@ -408,7 +423,9 @@ export default function CommentList({
                   {comment.isOwnComment ? "You" : comment.displayName}
                 </span>
                 <span>at</span>
-                <span className="text-[#888888] font-bold">{formatTimestamp(comment.timestamp)}</span>
+                <span className="text-[#888888] font-bold">
+                  {formatTimestamp(comment.timestamp)}
+                </span>
                 <span className="text-[#888888]">·</span>
                 <span className="text-[#888888]">
                   {formatDistanceToNow(new Date(comment.createdAt), { addSuffix: true })}
@@ -416,7 +433,11 @@ export default function CommentList({
               </div>
 
               <p className="text-white-smoke text-sm">
-                {renderMentionContent(comment.content, router, comment.mentionedUserId ?? undefined)}
+                {renderMentionContent(
+                  comment.content,
+                  router,
+                  comment.mentionedUserId ?? undefined
+                )}
               </p>
 
               <ReplySection
@@ -432,17 +453,17 @@ export default function CommentList({
                 onClick={() => toggleLike(comment.commentId)}
                 className="hover:text-white-smoke transition cursor-pointer"
               >
-                {comment.isLikedByUser
-                  ? <AiFillHeart size={18} className="text-red-500" />
-                  : <AiOutlineHeart size={18} className="text-white-smoke" />
-                }
+                {comment.isLikedByUser ? (
+                  <AiFillHeart size={18} className="text-red-500" />
+                ) : (
+                  <AiOutlineHeart size={18} className="text-white-smoke" />
+                )}
               </button>
               <span>{comment.numLikes}</span>
             </div>
           </div>
         ))}
       </div>
-
     </div>
-  )
+  );
 }

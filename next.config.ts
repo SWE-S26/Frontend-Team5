@@ -1,6 +1,6 @@
 import type { NextConfig } from "next";
 
-const isDev = process.env.NEXT_PUBLIC_ENV === "development"
+const isDev = process.env.NEXT_PUBLIC_ENV === "development";
 
 const nextConfig: NextConfig = {
   reactCompiler: true,
@@ -27,7 +27,7 @@ const nextConfig: NextConfig = {
           source: "/api/:path*",
           destination: `https://beatza.me/api/:path*`,
         },
-      ]
+      ];
     },
   }),
 };

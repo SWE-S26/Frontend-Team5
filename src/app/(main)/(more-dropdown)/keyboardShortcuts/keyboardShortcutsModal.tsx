@@ -15,31 +15,31 @@ const Key = ({ children }: { children: React.ReactNode }) => (
 );
 
 const leftShortcuts = [
-  { keys: ["space"],    label: "Play or pause" },
-  { keys: ["↑", "→"],  label: "Play next track" },
-  { keys: ["↑", "L"],  label: "Repeat playing track" },
-  { keys: ["↑", "←"],  label: "Play previous track" },
-  { keys: ["→"],        label: "Seek forward" },
-  { keys: ["L"],        label: "Like playing track" },
-  { keys: ["R"],        label: "Repost playing track" },
-  { keys: ["S"],        label: "Search" },
+  { keys: ["space"], label: "Play or pause" },
+  { keys: ["↑", "→"], label: "Play next track" },
+  { keys: ["↑", "L"], label: "Repeat playing track" },
+  { keys: ["↑", "←"], label: "Play previous track" },
+  { keys: ["→"], label: "Seek forward" },
+  { keys: ["L"], label: "Like playing track" },
+  { keys: ["R"], label: "Repost playing track" },
+  { keys: ["S"], label: "Search" },
   { keys: ["G then L"], label: "Navigate to Likes" },
   { keys: ["G then C"], label: "Navigate to Library" },
   { keys: ["G then H"], label: "Navigate to History" },
-  { keys: ["↑", "S"],  label: "Shuffle" },
+  { keys: ["↑", "S"], label: "Shuffle" },
 ];
 
 const rightShortcuts = [
-  { keys: ["↑", "↓"],  label: "Decrease volume" },
-  { keys: ["↑", "↑"],  label: "Increase volume" },
-  { keys: ["M"],        label: "Mute volume" },
-  { keys: ["←"],        label: "Seek backward" },
-  { keys: ["0...9"],    label: "Seek to position" },
-  { keys: ["P"],        label: "Navigate to playing track" },
-  { keys: ["H"],        label: "Show keyboard shortcuts" },
+  { keys: ["↑", "↓"], label: "Decrease volume" },
+  { keys: ["↑", "↑"], label: "Increase volume" },
+  { keys: ["M"], label: "Mute volume" },
+  { keys: ["←"], label: "Seek backward" },
+  { keys: ["0...9"], label: "Seek to position" },
+  { keys: ["P"], label: "Navigate to playing track" },
+  { keys: ["H"], label: "Show keyboard shortcuts" },
   { keys: ["G then S"], label: "Navigate to Feed" },
   { keys: ["G then P"], label: "Navigate to Profile" },
-  { keys: ["Q"],        label: "Show Next up" },
+  { keys: ["Q"], label: "Show Next up" },
 ];
 
 export default function KeyboardShortcutsModal({ isOpen, onClose }: KeyboardShortcutsModalProps) {
@@ -93,9 +93,7 @@ export default function KeyboardShortcutsModal({ isOpen, onClose }: KeyboardShor
         }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <h2 className="text-white-smoke text-2xl font-bold mb-8">
-          Keyboard shortcuts
-        </h2>
+        <h2 className="text-white-smoke text-2xl font-bold mb-8">Keyboard shortcuts</h2>
 
         <div className="grid grid-cols-2 gap-x-8 gap-y-3">
           {/* Left column */}

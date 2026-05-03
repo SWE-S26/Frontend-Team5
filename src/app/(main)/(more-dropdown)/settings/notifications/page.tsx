@@ -4,8 +4,8 @@ import { useState, useEffect } from "react";
 import { Select } from "antd";
 import { Check } from "lucide-react";
 import Button from "@/components/ui/Button";
-import InfoPopover from "@/components/settings/InfoPopover"
-import CB from "@/components/settings/CB"
+import InfoPopover from "@/components/settings/InfoPopover";
+import CB from "@/components/settings/CB";
 
 import { useNotificationSettings } from "@/hooks/useSettings";
 import {
@@ -22,26 +22,26 @@ type SectionState = Record<string, { email: boolean; devices: NotifVal }>;
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 const ACTIVITY_ROWS = [
-  { key: "newFollower",  label: "New follower" },
-  { key: "repost",       label: "Repost of your post" },
-  { key: "newPost",      label: "New post by followed user" },
-  { key: "likesPlays",   label: "Likes and plays on your post" },
-  { key: "comment",      label: "Comment on your post" },
-  { key: "recommended",  label: "Recommended Content" },
-  { key: "newMessage",   label: "New message", hasInfo: true, dropdown: true },
+  { key: "newFollower", label: "New follower" },
+  { key: "repost", label: "Repost of your post" },
+  { key: "newPost", label: "New post by followed user" },
+  { key: "likesPlays", label: "Likes and plays on your post" },
+  { key: "comment", label: "Comment on your post" },
+  { key: "recommended", label: "Recommended Content" },
+  { key: "newMessage", label: "New message", hasInfo: true, dropdown: true },
 ];
 
 const BEATZA_ROWS = [
   { key: "featureUpdates", label: "Beatza Feature Updates & Education" },
-  { key: "surveys",        label: "Surveys and feedback" },
-  { key: "promotional",    label: "Promotional & Partnership Content" },
-  { key: "newsletter",     label: "Beatza newsletter" },
+  { key: "surveys", label: "Surveys and feedback" },
+  { key: "promotional", label: "Promotional & Partnership Content" },
+  { key: "newsletter", label: "Beatza newsletter" },
 ];
 
 const DROPDOWN_OPTIONS = [
-  { value: "everyone",  label: "Everyone" },
-  { value: "followed",  label: "Following" },
-  { value: "off",       label: "Off" },
+  { value: "everyone", label: "Everyone" },
+  { value: "followed", label: "Following" },
+  { value: "off", label: "Off" },
 ];
 
 const INFO_TEXT =
@@ -50,30 +50,30 @@ const INFO_TEXT =
 const CELL = "w-[44px] sm:w-[52px]";
 
 const UI_KEY_TO_API_KEY: Record<string, keyof NotificationSettings> = {
-  newFollower:    "newFollower",
-  repost:         "repostOfYourPost",
-  newPost:        "newPostByFollowedUser",
-  likesPlays:     "likesAndPlaysOnYourPost",
-  comment:        "commentOnYourPost",
-  recommended:    "recommendedContent",
-  newMessage:     "newMessage",
+  newFollower: "newFollower",
+  repost: "repostOfYourPost",
+  newPost: "newPostByFollowedUser",
+  likesPlays: "likesAndPlaysOnYourPost",
+  comment: "commentOnYourPost",
+  recommended: "recommendedContent",
+  newMessage: "newMessage",
   featureUpdates: "soundcloudFeatureUpdatesEducation",
-  surveys:        "surveysAndFeedback",
-  promotional:    "promotionalPartnershipContent",
-  newsletter:     "soundcloudNewsletter",
+  surveys: "surveysAndFeedback",
+  promotional: "promotionalPartnershipContent",
+  newsletter: "soundcloudNewsletter",
 };
 
 // ─── Conversion helpers ───────────────────────────────────────────────────────
 
 const channelToState = (val: NotificationChannel) => ({
-  email:   val === "email"   || val === "both",
+  email: val === "email" || val === "both",
   devices: val === "devices" || val === "both",
 });
 
 const stateToChannel = (email: boolean, devices: boolean): NotificationChannel => {
   if (email && devices) return "both";
-  if (email)            return "email";
-  if (devices)          return "devices";
+  if (email) return "email";
+  if (devices) return "devices";
   return "off";
 };
 
@@ -109,15 +109,9 @@ const sectionStateToPatchPayload = (
     })
   );
 
-const headerChecked = (
-  rows: typeof ACTIVITY_ROWS,
-  state: SectionState,
-  col: "email" | "devices"
-) =>
+const headerChecked = (rows: typeof ACTIVITY_ROWS, state: SectionState, col: "email" | "devices") =>
   rows.every((r) =>
-    col === "devices" && r.dropdown
-      ? state[r.key].devices !== "off"
-      : state[r.key][col] === true
+    col === "devices" && r.dropdown ? state[r.key].devices !== "off" : state[r.key][col] === true
   );
 
 // ─── Page ─────────────────────────────────────────────────────────────────────
@@ -126,10 +120,10 @@ export default function Notifications() {
   const { settings, loading, saveStatus, updateSettings } = useNotificationSettings();
 
   const [activities, setActivities] = useState<SectionState | null>(null);
-  const [beatza, setBeatza]         = useState<SectionState | null>(null);
+  const [beatza, setBeatza] = useState<SectionState | null>(null);
 
   const [savedActivities, setSavedActivities] = useState<SectionState | null>(null);
-  const [savedBeatza, setSavedBeatza]         = useState<SectionState | null>(null);
+  const [savedBeatza, setSavedBeatza] = useState<SectionState | null>(null);
 
   useEffect(() => {
     if (!settings) return;
@@ -143,7 +137,7 @@ export default function Notifications() {
 
   const isDirty =
     JSON.stringify(activities) !== JSON.stringify(savedActivities) ||
-    JSON.stringify(beatza)     !== JSON.stringify(savedBeatza);
+    JSON.stringify(beatza) !== JSON.stringify(savedBeatza);
 
   const update = (
     setter: typeof setActivities,
@@ -280,8 +274,8 @@ export default function Notifications() {
 
   return (
     <div className="w-full max-w-2xl px-4 sm:px-0 text-white-smoke space-y-10 mb-10">
-      {renderSection("Activities",          ACTIVITY_ROWS, activities, setActivities)}
-      {renderSection("Updates from Beatza", BEATZA_ROWS,   beatza,     setBeatza)}
+      {renderSection("Activities", ACTIVITY_ROWS, activities, setActivities)}
+      {renderSection("Updates from Beatza", BEATZA_ROWS, beatza, setBeatza)}
 
       <div className="flex items-center justify-end gap-3">
         <span
@@ -303,9 +297,7 @@ export default function Notifications() {
               Changes saved
             </>
           )}
-          {saveStatus === "error" && (
-            <span className="text-red-400">Failed to save</span>
-          )}
+          {saveStatus === "error" && <span className="text-red-400">Failed to save</span>}
         </span>
 
         <Button onClick={handleCancel} className="text-white-smoke">

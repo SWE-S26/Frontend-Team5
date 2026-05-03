@@ -1,19 +1,23 @@
 import api from "@/lib/api";
 
 import {
-  GetPrivacySettingsResponse, UpdatePrivacySettingsRequest, UpdatePrivacySettingsResponse,
-  GetNotificationSettingsResponse, UpdateNotificationSettingsRequest, UpdateNotificationSettingsResponse,
-  GetAccountSettingsResponse, UpdateAccountSettingsRequest, UpdateAccountSettingsResponse,
-  GetContentSettingsResponse, UpdateContentSettingsRequest, UpdateContentSettingsResponse,
+  GetPrivacySettingsResponse,
+  UpdatePrivacySettingsRequest,
+  UpdatePrivacySettingsResponse,
+  GetNotificationSettingsResponse,
+  UpdateNotificationSettingsRequest,
+  UpdateNotificationSettingsResponse,
+  GetAccountSettingsResponse,
+  UpdateAccountSettingsRequest,
+  UpdateAccountSettingsResponse,
+  GetContentSettingsResponse,
+  UpdateContentSettingsRequest,
+  UpdateContentSettingsResponse,
 } from "@/types/settings.types";
-
-
 
 /* --------------- Privacy --------------- */
 export const getPrivacySettings = async (): Promise<GetPrivacySettingsResponse> => {
-  const response = await api.get<GetPrivacySettingsResponse>(
-    "/api/profile/v1/settings/privacy"
-  );
+  const response = await api.get<GetPrivacySettingsResponse>("/api/profile/v1/settings/privacy");
   return response.data;
 };
 
@@ -26,8 +30,6 @@ export const updatePrivacySettings = async (
   );
   return response.data;
 };
-
-
 
 /* --------------- Notifications --------------- */
 export const getNotificationSettings = async (): Promise<GetNotificationSettingsResponse> => {
@@ -47,13 +49,9 @@ export const updateNotificationSettings = async (
   return response.data;
 };
 
-
-
 /* --------------- Account --------------- */
 export const getAccountSettings = async (): Promise<GetAccountSettingsResponse> => {
-  const response = await api.get<GetAccountSettingsResponse>(
-    "/api/profile/v1/settings/account"
-  );
+  const response = await api.get<GetAccountSettingsResponse>("/api/profile/v1/settings/account");
   return response.data;
 };
 
@@ -67,13 +65,9 @@ export const updateAccountSettings = async (
   return response.data;
 };
 
-
-
 /* --------------- Content --------------- */
 export const getContentSettings = async (): Promise<GetContentSettingsResponse> => {
-  const response = await api.get<GetContentSettingsResponse>(
-    "/api/profile/v1/settings/content"
-  );
+  const response = await api.get<GetContentSettingsResponse>("/api/profile/v1/settings/content");
   return response.data;
 };
 

@@ -68,9 +68,7 @@ const ReportReasonPopUp = ({
               </div>
             ) : (
               <>
-                <p className="text-xl text-white-smoke font-bold mb-6">
-                  Report {reasonLabel}
-                </p>
+                <p className="text-xl text-white-smoke font-bold mb-6">Report {reasonLabel}</p>
                 <p className="text-sm text-white-smoke font-bold mb-2">
                   Reporting {username} for {reasonLabel.toLowerCase()}:
                 </p>

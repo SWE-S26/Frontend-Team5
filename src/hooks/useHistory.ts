@@ -13,9 +13,7 @@ import { Track } from "@/types/tracks.types";
 export function useGetTrackHistory() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [tracks, setTracks] = useState<GetTrackHistoryResponse["data"] | null>(
-    null,
-  );
+  const [tracks, setTracks] = useState<GetTrackHistoryResponse["data"] | null>(null);
 
   const getTrackHistory = useCallback(async () => {
     setLoading(true);
@@ -44,9 +42,7 @@ export function useGetTrackHistory() {
 export function useGetPlaylistHistory() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [playlists, setPlaylists] = useState<
-    GetPlaylistHistoryResponse["data"] | null
-  >(null);
+  const [playlists, setPlaylists] = useState<GetPlaylistHistoryResponse["data"] | null>(null);
 
   const getPlaylistHistory = useCallback(async () => {
     setLoading(true);

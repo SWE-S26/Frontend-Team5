@@ -1,8 +1,8 @@
-import Image from "next/image"
+import Image from "next/image";
 
 interface IPhoneMockupProps {
-  className?: string
-  screenImage?: string
+  className?: string;
+  screenImage?: string;
 }
 
 export default function IPhoneMockup({ className = "", screenImage }: IPhoneMockupProps) {
@@ -10,7 +10,6 @@ export default function IPhoneMockup({ className = "", screenImage }: IPhoneMock
     <div className={`relative ${className}`}>
       {/* Outer shell */}
       <div className="relative w-50 h-108.5 rounded-4xl border-[3px] border-[#FF5500] bg-white shadow-md">
-
         {/* Left side buttons */}
         <div className="absolute -left-1.25 top-15 w-1 h-7 rounded-l-sm bg-[#FF5500]" />
         <div className="absolute -left-1.25 top-24.5 w-1 h-7 rounded-l-sm bg-[#FF5500]" />
@@ -35,5 +34,5 @@ export default function IPhoneMockup({ className = "", screenImage }: IPhoneMock
         </div>
       </div>
     </div>
-  )
+  );
 }

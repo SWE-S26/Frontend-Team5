@@ -30,12 +30,12 @@
   --progress-track-color: #4f4f4f;
   --volume1: #1a1a1a;
   --volume-bar: #3a3a3a;
-  --upload-schedular:#3a3a3a;
-  --upload-select:#4a4b4d;
+  --upload-schedular: #3a3a3a;
+  --upload-select: #4a4b4d;
   --waveform-base: #f5f5f5;
   --waveform-left-mask: rgba(88, 88, 88, 0.62);
   --waveform-left-wave: #5d5d5d;
-  --waveform-window-fill: rgba(47, 191, 98, 0.20);
+  --waveform-window-fill: rgba(47, 191, 98, 0.2);
   --waveform-window-fill-zero: rgba(88, 88, 88, 0.32);
   --waveform-playback-mask: rgba(74, 74, 74, 0.62);
 }
@@ -52,7 +52,7 @@
   --volume1: white;
   --volume-bar: #c7c7c7;
   --upload-schedular: #aaaaac;
-  --upload-select:#909398;
+  --upload-select: #909398;
   --waveform-base: #161616;
   --waveform-left-mask: rgba(150, 150, 150, 0.42);
   --waveform-left-wave: #9a9a9a;
@@ -153,22 +153,51 @@ body {
 }
 
 /*  ---------- TabsNavBar Hide Scroll Bar while keeping scroll ability ---------- */
-.tabs-scrollable::-webkit-scrollbar { display: none; }
-.tabs-scrollable { -ms-overflow-style: none; scrollbar-width: none; }
+.tabs-scrollable::-webkit-scrollbar {
+  display: none;
+}
+.tabs-scrollable {
+  -ms-overflow-style: none;
+  scrollbar-width: none;
+}
 
 /*  ---------- Settings (Account Tab - Notification Tab) ---------- */
-.notif-select, .notif-select *, .notif-select .ant-select-selector,
-.notif-select .ant-select-selection-item, .notif-select .ant-select-selection-placeholder,
-.notif-select input { color: var(--fg) !important; }
 .notif-select,
-.notif-select .ant-select-selector { background-color: var(--back) !important; border-color: rgba(245,245,245,0.5) !important; box-shadow: none !important; }
-.notif-select.ant-select-focused .ant-select-selector { border-color: var(--fg) !important; box-shadow: none !important; }
-.notif-select .ant-select-arrow { color: var(--fg) !important; }
-.notif-dropdown-popup { background-color: var(--back) !important; }
-.notif-dropdown-popup .ant-select-item { color: var(--fg) !important; }
-.notif-dropdown-popup .ant-select-item-option-active { background-color: var(--bg) !important; }
-.notif-dropdown-popup .ant-select-item-option-selected { background-color: var(--bg) !important; }
-.notif-dropdown-popup .ant-select-item-option-selected .ant-select-item-option-content { color: var(--fg) !important; }
+.notif-select *,
+.notif-select .ant-select-selector,
+.notif-select .ant-select-selection-item,
+.notif-select .ant-select-selection-placeholder,
+.notif-select input {
+  color: var(--fg) !important;
+}
+.notif-select,
+.notif-select .ant-select-selector {
+  background-color: var(--back) !important;
+  border-color: rgba(245, 245, 245, 0.5) !important;
+  box-shadow: none !important;
+}
+.notif-select.ant-select-focused .ant-select-selector {
+  border-color: var(--fg) !important;
+  box-shadow: none !important;
+}
+.notif-select .ant-select-arrow {
+  color: var(--fg) !important;
+}
+.notif-dropdown-popup {
+  background-color: var(--back) !important;
+}
+.notif-dropdown-popup .ant-select-item {
+  color: var(--fg) !important;
+}
+.notif-dropdown-popup .ant-select-item-option-active {
+  background-color: var(--bg) !important;
+}
+.notif-dropdown-popup .ant-select-item-option-selected {
+  background-color: var(--bg) !important;
+}
+.notif-dropdown-popup .ant-select-item-option-selected .ant-select-item-option-content {
+  color: var(--fg) !important;
+}
 
 .theme-invert {
   filter: invert(1);
@@ -179,8 +208,14 @@ body {
 }
 
 @keyframes slide-in {
-  from { opacity: 0; transform: translateX(20px); }
-  to   { opacity: 1; transform: translateX(0); }
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
 }
 .animate-slide-in {
   animation: slide-in 0.3s ease;

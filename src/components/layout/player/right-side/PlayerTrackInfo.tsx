@@ -4,11 +4,7 @@ type PlayerTrackInfoProps = {
   artist?: string | null;
 };
 
-export default function PlayerTrackInfo({
-  img,
-  title,
-  artist,
-}: PlayerTrackInfoProps) {
+export default function PlayerTrackInfo({ img, title, artist }: PlayerTrackInfoProps) {
   // Don't show anything if track info hasn't loaded yet
   if (!img && !title && !artist) {
     return null;
@@ -16,13 +12,7 @@ export default function PlayerTrackInfo({
 
   return (
     <div className="flex items-center gap-2 overflow-hidden">
-      {img && (
-        <img
-          src={img}
-          alt="cover"
-          className="w-9 h-9 aspect-square object-cover"
-        />
-      )}
+      {img && <img src={img} alt="cover" className="w-9 h-9 aspect-square object-cover" />}
 
       <div className="flex flex-col mr-5 min-w-22.5 max-w-50">
         {title && (

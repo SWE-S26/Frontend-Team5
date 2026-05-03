@@ -1,10 +1,16 @@
-import Link from "next/link"
-import { ChevronRight } from "lucide-react"
+import Link from "next/link";
+import { ChevronRight } from "lucide-react";
 
 const ARTICLES = [
-  { title: "Manage Email & Push Notifications", href: "/need-help/email-notifications/manage-email-and-push-notifications" },
-  { title: "Manage Communications Settings",    href: "/need-help/email-notifications/manage-communications-settings"    },
-]
+  {
+    title: "Manage Email & Push Notifications",
+    href: "/need-help/email-notifications/manage-email-and-push-notifications",
+  },
+  {
+    title: "Manage Communications Settings",
+    href: "/need-help/email-notifications/manage-communications-settings",
+  },
+];
 
 export default function EmailNotificationsPage() {
   return (
@@ -17,7 +23,10 @@ export default function EmailNotificationsPage() {
       <div className="bg-white rounded-2xl shadow-sm overflow-hidden">
         <ul>
           {ARTICLES.map((article, idx) => (
-            <li key={article.href} className={idx < ARTICLES.length - 1 ? "border-b border-gray-100" : ""}>
+            <li
+              key={article.href}
+              className={idx < ARTICLES.length - 1 ? "border-b border-gray-100" : ""}
+            >
               <Link
                 href={article.href}
                 className="flex items-center justify-between px-6 py-4 text-sm text-gray-800 hover:bg-gray-50 hover:text-black transition-colors"
@@ -30,5 +39,5 @@ export default function EmailNotificationsPage() {
         </ul>
       </div>
     </div>
-  )
+  );
 }

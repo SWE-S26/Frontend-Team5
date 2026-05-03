@@ -28,7 +28,7 @@ export function usePlayerPersistence() {
             currentTrackArtist: parsed.currentTrackArtist,
             currentTrackImage: parsed.currentTrackImage,
             currentTrackDuration: parsed.currentTrackDuration,
-          }),
+          })
         );
       }
     } catch (error) {
@@ -52,7 +52,7 @@ export function usePlayerPersistence() {
           currentTrackArtist: playerState.currentTrackArtist,
           currentTrackImage: playerState.currentTrackImage,
           currentTrackDuration: playerState.currentTrackDuration,
-        }),
+        })
       );
     } catch (error) {
       console.error("Failed to save player state:", error);

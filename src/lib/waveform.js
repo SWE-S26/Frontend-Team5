@@ -50,7 +50,7 @@ var SoundCloudWaveform = {
 
     this.settings.onComplete(
       canvas.toDataURL("image/png"),
-      this.settings.context.getImageData(0, 0, canvas.width, canvas.height),
+      this.settings.context.getImageData(0, 0, canvas.width, canvas.height)
     );
 
     this.settings.context.clearRect(0, 0, canvas.width, canvas.height);
@@ -62,35 +62,32 @@ var SoundCloudWaveform = {
 
     var reader = new FileReader();
     reader.onload = function (event) {
-      SoundCloudWaveform._getAudioContext().decodeAudioData(
-        event.target.result,
-        function (buffer) {
-          var channelData = buffer.getChannelData(0);
-          var sectionLen = Math.floor(channelData.length / numSamples);
-          var samples = [];
+      SoundCloudWaveform._getAudioContext().decodeAudioData(event.target.result, function (buffer) {
+        var channelData = buffer.getChannelData(0);
+        var sectionLen = Math.floor(channelData.length / numSamples);
+        var samples = [];
 
-          for (var i = 0; i < numSamples; i++) {
-            var sum = 0;
-            var start = i * sectionLen;
-            for (var j = start; j < start + sectionLen; j++) {
-              sum += channelData[j] * channelData[j];
-            }
-            var rms = Math.sqrt(sum / sectionLen);
-            samples.push(parseFloat((rms * 10000).toFixed(6)));
+        for (var i = 0; i < numSamples; i++) {
+          var sum = 0;
+          var start = i * sectionLen;
+          for (var j = start; j < start + sectionLen; j++) {
+            sum += channelData[j] * channelData[j];
           }
+          var rms = Math.sqrt(sum / sectionLen);
+          samples.push(parseFloat((rms * 10000).toFixed(6)));
+        }
 
-          var blob = new Blob([JSON.stringify(samples, null, 2)], {
-            type: "application/json",
-          });
+        var blob = new Blob([JSON.stringify(samples, null, 2)], {
+          type: "application/json",
+        });
 
-          var url = URL.createObjectURL(blob);
-          var link = document.createElement("a");
-          link.href = url;
-          link.setAttribute("download", filename);
-          link.click();
-          URL.revokeObjectURL(url);
-        },
-      );
+        var url = URL.createObjectURL(blob);
+        var link = document.createElement("a");
+        link.href = url;
+        link.setAttribute("download", filename);
+        link.click();
+        URL.revokeObjectURL(url);
+      });
     };
 
     reader.readAsArrayBuffer(file);
@@ -113,31 +110,21 @@ var SoundCloudWaveform = {
         : this.settings.canvas_height;
 
     this.settings.wave_color =
-      options.wave_color !== undefined
-        ? options.wave_color
-        : this.settings.wave_color;
+      options.wave_color !== undefined ? options.wave_color : this.settings.wave_color;
 
     this.settings.bar_width =
-      options.bar_width !== undefined
-        ? parseInt(options.bar_width)
-        : this.settings.bar_width;
+      options.bar_width !== undefined ? parseInt(options.bar_width) : this.settings.bar_width;
 
     this.settings.bar_gap =
-      options.bar_gap !== undefined
-        ? parseFloat(options.bar_gap)
-        : this.settings.bar_gap;
+      options.bar_gap !== undefined ? parseFloat(options.bar_gap) : this.settings.bar_gap;
 
     this.settings.half = options.half !== undefined ? options.half : undefined;
 
     this.settings.download =
-      options.download !== undefined
-        ? options.download
-        : this.settings.download;
+      options.download !== undefined ? options.download : this.settings.download;
 
     this.settings.onComplete =
-      options.onComplete !== undefined
-        ? options.onComplete
-        : this.settings.onComplete;
+      options.onComplete !== undefined ? options.onComplete : this.settings.onComplete;
   },
 
   extractBuffer: function (buffer) {
@@ -169,16 +156,11 @@ var SoundCloudWaveform = {
         0,
         0,
         this.settings.canvas.width,
-        this.settings.canvas.height,
-      ),
+        this.settings.canvas.height
+      )
     );
 
-    this.settings.context.clearRect(
-      0,
-      0,
-      this.settings.canvas.width,
-      this.settings.canvas.height,
-    );
+    this.settings.context.clearRect(0, 0, this.settings.canvas.width, this.settings.canvas.height);
   },
 
   bufferMeasure: function (position, length, data) {

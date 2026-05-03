@@ -9,15 +9,7 @@ import { useQRLogin } from "@/hooks/useAuth";
 export default function QrLoginPage() {
   const router = useRouter();
 
-  const {
-    generateQR,
-    startPolling,
-    stopPolling,
-    qrCode,
-    status,
-    loading,
-    error,
-  } = useQRLogin();
+  const { generateQR, startPolling, stopPolling, qrCode, status, loading, error } = useQRLogin();
 
   const hasGeneratedQr = useRef(false);
   const isPollingRef = useRef(false);
@@ -69,14 +61,13 @@ export default function QrLoginPage() {
     status === "success"
       ? "Sign-in confirmed. Redirecting..."
       : status === "expired"
-      ? "QR code expired"
-      : "Waiting for scan approval...";
+        ? "QR code expired"
+        : "Waiting for scan approval...";
 
   return (
     <main className="min-h-dvh bg-chinese-black px-4 py-4 sm:px-6 sm:py-6">
       <div className="mx-auto flex h-full w-full max-w-xl items-center">
         <section className="max-h-full w-full overflow-y-auto no-scrollbar rounded-2xl border border-white/10 bg-chinese-black p-5 text-white-smoke shadow-[0_12px_32px_rgba(0,0,0,0.35)] sm:p-6 md:p-7">
-          
           <button
             type="button"
             onClick={() => router.push("/sign-in")}
@@ -103,26 +94,15 @@ export default function QrLoginPage() {
           <div className="mt-6 rounded-xl border border-white/15 bg-black/20 p-4">
             <div className="flex min-h-72 items-center justify-center rounded-lg border border-white/15 p-4">
               {loading ? (
-                <p className="text-sm text-gray-400">
-                  Generating QR code...
-                </p>
-
+                <p className="text-sm text-gray-400">Generating QR code...</p>
               ) : qrCode && isImagePayload ? (
-                <img
-                  src={qrCode}
-                  alt="QR code"
-                  className="h-56 w-56 rounded-md bg-white p-2"
-                />
-
+                <img src={qrCode} alt="QR code" className="h-56 w-56 rounded-md bg-white p-2" />
               ) : qrCode ? (
                 <div className="rounded-md bg-white p-3">
                   <QRCode value={qrCode} size={224} />
                 </div>
-
               ) : (
-                <p className="text-sm text-gray-400">
-                  Failed to load QR code
-                </p>
+                <p className="text-sm text-gray-400">Failed to load QR code</p>
               )}
             </div>
 

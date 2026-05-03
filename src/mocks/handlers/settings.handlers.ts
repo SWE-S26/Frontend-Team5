@@ -1,12 +1,10 @@
 import { http, HttpResponse } from "msw";
-import { 
+import {
   GetPrivacySettingsResponse,
   GetNotificationSettingsResponse,
   GetAccountSettingsResponse,
   GetContentSettingsResponse,
 } from "@/types/settings.types";
-
-
 
 /* --------------- Privacy --------------- */
 let mockPrivacySettings: GetPrivacySettingsResponse = {
@@ -22,13 +20,11 @@ export const privacyHandlers = [
   }),
 
   http.patch("/api/profile/v1/settings/privacy", async ({ request }) => {
-    const body = await request.json() as Partial<GetPrivacySettingsResponse>;
+    const body = (await request.json()) as Partial<GetPrivacySettingsResponse>;
     mockPrivacySettings = { ...mockPrivacySettings, ...body };
     return HttpResponse.json(mockPrivacySettings);
   }),
 ];
-
-
 
 /* --------------- Notifications --------------- */
 let mockNotificationSettings: GetNotificationSettingsResponse = {
@@ -52,13 +48,11 @@ export const notificationHandlers = [
   }),
 
   http.patch("/api/profile/v1/settings/notifications", async ({ request }) => {
-    const body = await request.json() as Partial<GetNotificationSettingsResponse>;
+    const body = (await request.json()) as Partial<GetNotificationSettingsResponse>;
     mockNotificationSettings = { ...mockNotificationSettings, ...body };
     return HttpResponse.json(mockNotificationSettings);
   }),
 ];
-
-
 
 /* --------------- Account --------------- */
 let mockAccountSettings: GetAccountSettingsResponse = {
@@ -73,13 +67,11 @@ export const accountHandlers = [
   }),
 
   http.patch("/api/profile/v1/settings/account", async ({ request }) => {
-    const body = await request.json() as Partial<GetAccountSettingsResponse>;
+    const body = (await request.json()) as Partial<GetAccountSettingsResponse>;
     mockAccountSettings = { ...mockAccountSettings, ...body };
     return HttpResponse.json(mockAccountSettings);
   }),
 ];
-
-
 
 /* --------------- Content --------------- */
 let mockContentSettings: GetContentSettingsResponse = {
@@ -102,7 +94,7 @@ export const contentHandlers = [
   }),
 
   http.patch("/api/profile/v1/settings/content", async ({ request }) => {
-    const body = await request.json() as Partial<GetContentSettingsResponse>;
+    const body = (await request.json()) as Partial<GetContentSettingsResponse>;
     mockContentSettings = { ...mockContentSettings, ...body };
     return HttpResponse.json(mockContentSettings);
   }),

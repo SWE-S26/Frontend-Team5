@@ -1,10 +1,7 @@
 "use client";
 
 import { useEffect, useState, useMemo } from "react";
-
 import { useGetMyPlaylists } from "@/hooks/usePlaylists";
-import { Playlist } from "@/types/playlists.types";
-
 import PlaylistCard from "@/components/ui/PlaylistCard";
 import EmptyCard from "@/components/social-graph/EmptyCard";
 
@@ -34,9 +31,7 @@ function PlaylistsEmptyState({ filtered }: { filtered: boolean }) {
   return (
     <div className="flex justify-center items-center h-64">
       <p className="text-white-smoke font-bold text-2xl">
-        {filtered
-          ? "No playlists match your filter."
-          : "You haven't created any playlists yet."}
+        {filtered ? "No playlists match your filter." : "You haven't created any playlists yet."}
       </p>
     </div>
   );
@@ -78,11 +73,8 @@ export default function Playlists() {
   }, [getMyPlaylists]);
 
   const filteredPlaylists = useMemo(
-    () =>
-      (playlists ?? []).filter((p) =>
-        p.title.toLowerCase().includes(filterText.toLowerCase()),
-      ),
-    [playlists, filterText],
+    () => (playlists ?? []).filter((p) => p.title.toLowerCase().includes(filterText.toLowerCase())),
+    [playlists, filterText]
   );
 
   const gridSlots = useMemo(() => {
@@ -121,9 +113,7 @@ export default function Playlists() {
       {loading && <GridSkeleton />}
 
       {/* ── Empty state ── */}
-      {!loading && filteredPlaylists.length === 0 && (
-        <PlaylistsEmptyState filtered={hasFilter} />
-      )}
+      {!loading && filteredPlaylists.length === 0 && <PlaylistsEmptyState filtered={hasFilter} />}
 
       {/* ── Grid ── */}
       {!loading && filteredPlaylists.length > 0 && (
@@ -142,7 +132,7 @@ export default function Playlists() {
               />
             ) : (
               <EmptyCard key={(slot as { type: "empty"; key: string }).key} />
-            ),
+            )
           )}
         </div>
       )}

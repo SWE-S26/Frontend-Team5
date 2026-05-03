@@ -37,17 +37,13 @@ export default function Feed() {
 
   const [allTracks, setAllTracks] = useState<ApiTrack[]>([]);
   const [allPlaylists, setAllPlaylists] = useState<PlaylistDetail[]>([]);
-  const [playlistCreators, setPlaylistCreators] = useState<
-    Record<string, string>
-  >({});
+  const [playlistCreators, setPlaylistCreators] = useState<Record<string, string>>({});
   const [resolving, setResolving] = useState(true);
   const [hasFetched, setHasFetched] = useState(false);
   const [includeReposts, setIncludeReposts] = useState(true);
 
   const dispatch = useDispatch();
-  const currentTrackId = useSelector(
-    (state: RootState) => state.player.currentTrackId,
-  );
+  const currentTrackId = useSelector((state: RootState) => state.player.currentTrackId);
 
   const sentinelRef = useRef<HTMLDivElement>(null);
   const seenIds = useRef<Set<string>>(new Set());
@@ -65,7 +61,7 @@ export default function Feed() {
       isFetchingRef.current = false;
       setHasFetched(true);
     },
-    [getFeed],
+    [getFeed]
   );
 
   useEffect(() => {
@@ -93,10 +89,7 @@ export default function Feed() {
       .map((item) => item.id);
 
     const freshPlaylistIds = items
-      .filter(
-        (item) =>
-          item.type === "playlist" && !seenPlaylistIds.current.has(item.id),
-      )
+      .filter((item) => item.type === "playlist" && !seenPlaylistIds.current.has(item.id))
       .map((item) => item.id);
 
     if (!freshTrackIds.length && !freshPlaylistIds.length) {
@@ -109,16 +102,10 @@ export default function Feed() {
       try {
         const [trackResults, playlistResults] = await Promise.all([
           freshTrackIds.length
-            ? Promise.allSettled(
-                freshTrackIds.map((id) => tracksService.getTrackById(id)),
-              )
+            ? Promise.allSettled(freshTrackIds.map((id) => tracksService.getTrackById(id)))
             : Promise.resolve([]),
           freshPlaylistIds.length
-            ? Promise.allSettled(
-                freshPlaylistIds.map((id) =>
-                  playlistsService.getPlaylistById(id),
-                ),
-              )
+            ? Promise.allSettled(freshPlaylistIds.map((id) => playlistsService.getPlaylistById(id)))
             : Promise.resolve([]),
         ]);
 
@@ -131,36 +118,27 @@ export default function Feed() {
         });
 
         const resolvedPlaylists: PlaylistDetail[] = [];
-        (playlistResults as PromiseSettledResult<any>[]).forEach(
-          (result, i) => {
-            if (result.status === "fulfilled") {
-              const pl = result.value.data?.data?.playlist;
-              const detail = Array.isArray(pl) ? pl[0] : pl;
-              if (detail) {
-                resolvedPlaylists.push(detail);
-                seenPlaylistIds.current.add(freshPlaylistIds[i]);
-              }
+        (playlistResults as PromiseSettledResult<any>[]).forEach((result, i) => {
+          if (result.status === "fulfilled") {
+            const pl = result.value.data?.data?.playlist;
+            const detail = Array.isArray(pl) ? pl[0] : pl;
+            if (detail) {
+              resolvedPlaylists.push(detail);
+              seenPlaylistIds.current.add(freshPlaylistIds[i]);
             }
-          },
-        );
+          }
+        });
 
         const uniqueArtistIds = Array.from(
-          new Set(
-            resolvedPlaylists
-              .map((playlist) => playlist.artistId)
-              .filter(Boolean),
-          ),
+          new Set(resolvedPlaylists.map((playlist) => playlist.artistId).filter(Boolean))
         );
         const creatorResults = await Promise.allSettled(
           uniqueArtistIds.map(async (artistId) => {
-            const response =
-              await playlistsService.getPublicPlaylistCreator(artistId);
+            const response = await playlistsService.getPublicPlaylistCreator(artistId);
             const artist = response.data.data.artist;
-            const creator = Array.isArray(artist)
-              ? (artist[0] ?? null)
-              : artist;
+            const creator = Array.isArray(artist) ? (artist[0] ?? null) : artist;
             return creator ? ([artistId, creator.displayName] as const) : null;
-          }),
+          })
         );
 
         const nextCreators: Record<string, string> = {};
@@ -170,10 +148,8 @@ export default function Feed() {
           nextCreators[artistId] = displayName;
         });
 
-        if (resolvedTracks.length)
-          setAllTracks((prev) => [...prev, ...resolvedTracks]);
-        if (resolvedPlaylists.length)
-          setAllPlaylists((prev) => [...prev, ...resolvedPlaylists]);
+        if (resolvedTracks.length) setAllTracks((prev) => [...prev, ...resolvedTracks]);
+        if (resolvedPlaylists.length) setAllPlaylists((prev) => [...prev, ...resolvedPlaylists]);
         if (Object.keys(nextCreators).length) {
           setPlaylistCreators((prev) => ({ ...prev, ...nextCreators }));
         }
@@ -213,7 +189,7 @@ export default function Feed() {
           loadNextPage(includeRepostsRef.current);
         }
       },
-      { rootMargin: "200px" },
+      { rootMargin: "200px" }
     );
 
     observer.observe(sentinelRef.current);
@@ -247,7 +223,7 @@ export default function Feed() {
               artist: t.basicInfo.mainArtists[0],
               img: t.image.imgLink,
               duration: t.durationInSeconds,
-            }),
+            })
           );
       }
     }
@@ -274,14 +250,10 @@ export default function Feed() {
       .map((item) => {
         if (item.type === "track") {
           const track = allTracks.find((t) => t.trackId === item.id);
-          return track
-            ? { type: "track" as const, data: track, feedItem: item }
-            : null;
+          return track ? { type: "track" as const, data: track, feedItem: item } : null;
         } else {
           const playlist = allPlaylists.find((p) => p._id === item.id);
-          return playlist
-            ? { type: "playlist" as const, data: playlist, feedItem: item }
-            : null;
+          return playlist ? { type: "playlist" as const, data: playlist, feedItem: item } : null;
         }
       })
       .filter(Boolean) as {
@@ -302,9 +274,7 @@ export default function Feed() {
               Hear the latest posts from the people you're following:
             </h2>
             <div className="flex items-center gap-2">
-              <p className="text-sm font-small text-silver cursor-default">
-                Reposts
-              </p>
+              <p className="text-sm font-small text-silver cursor-default">Reposts</p>
               <ConfigProvider
                 theme={{
                   components: {
@@ -318,10 +288,7 @@ export default function Feed() {
                   },
                 }}
               >
-                <Switch
-                  defaultChecked
-                  onChange={(checked) => setIncludeReposts(checked)}
-                />
+                <Switch defaultChecked onChange={(checked) => setIncludeReposts(checked)} />
               </ConfigProvider>
             </div>
           </div>
@@ -338,11 +305,7 @@ export default function Feed() {
                     "https://xsgames.co/randomusers/avatar.php?g=pixel&f=male"
                   }
                   location="United States"
-                  releaseDate={
-                    item.type === "track"
-                      ? item.data.releaseDate
-                      : item.data.createdAt
-                  }
+                  releaseDate={item.type === "track" ? item.data.releaseDate : item.data.createdAt}
                   isRepost={item.feedItem?.isRepost ?? false}
                 />
 
@@ -368,9 +331,7 @@ export default function Feed() {
                     isLikedByUser={item.data.isLikedByUser}
                     isRepostedByUser={item.data.isRepostedByUser}
                     allTracks={fullQueue}
-                    enableDirectDownload={
-                      item.data.permissions?.enableDirectDownload ?? false
-                    }
+                    enableDirectDownload={item.data.permissions?.enableDirectDownload ?? false}
                     isRepost={item.feedItem?.isRepost ?? false}
                     reposterId={item.feedItem?.actorId}
                     reposterName={item.feedItem?.displayName}
@@ -410,9 +371,7 @@ export default function Feed() {
             <div className="flex justify-center py-8">
               <ConfigProvider theme={{ token: { colorPrimary: "var(--fg)" } }}>
                 <Spin
-                  indicator={
-                    <LoadingOutlined spin style={{ color: "var(--fg)" }} />
-                  }
+                  indicator={<LoadingOutlined spin style={{ color: "var(--fg)" }} />}
                   size="large"
                 />
               </ConfigProvider>
@@ -423,21 +382,15 @@ export default function Feed() {
             <div>
               <p className="text-center font-extrabold text-md py-8 max-w-150 mx-auto">
                 Your feed is currently empty. Go to{" "}
-                <a
-                  href="/search"
-                  className="text-blue-500 hover:text-blue-400 transition"
-                >
+                <a href="/search" className="text-blue-500 hover:text-blue-400 transition">
                   search
                 </a>
                 ,{" "}
-                <a
-                  href="/home"
-                  className="text-blue-500 hover:text-blue-400 transition"
-                >
+                <a href="/home" className="text-blue-500 hover:text-blue-400 transition">
                   home
                 </a>{" "}
-                or use the suggestions below to find creators to follow. Refresh
-                the page to see tracks they are posting.
+                or use the suggestions below to find creators to follow. Refresh the page to see
+                tracks they are posting.
               </p>
               <div className="mx-auto max-w-100">
                 <Suggested DISPLAY_COUNT={10} />
@@ -446,9 +399,7 @@ export default function Feed() {
           )}
 
           {!hasMore && !isLoading && orderedItems.length > 0 && (
-            <p className="text-center text-silver text-sm py-8">
-              You're all caught up
-            </p>
+            <p className="text-center text-silver text-sm py-8">You're all caught up</p>
           )}
         </div>
 

@@ -1,8 +1,6 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
-import { FiDownload } from "react-icons/fi";
-import { IoClose } from "react-icons/io5";
 import { useGetTrackDetailed, useUpdateTrack } from "@/hooks/useTracks";
 import { useAppSelector } from "@/store/hooks";
 import type { UpdateTrackRequest } from "@/types/tracks.types";
@@ -34,12 +32,15 @@ import {
   createZoomCroppedArtworkFile,
 } from "@/components/upload/TrackInfoForm";
 
-import { ArtworkPanel }          from "@/components/upload/TrackInfoForm/ArtworkPanel";
-import { BasicInfoForm }         from "@/components/upload/TrackInfoForm/BasicInfoForm";
+import { ArtworkPanel } from "@/components/upload/TrackInfoForm/ArtworkPanel";
+import { BasicInfoForm } from "@/components/upload/TrackInfoForm/BasicInfoForm";
 import { AdvancedDetailsSection } from "@/components/upload/TrackInfoForm/AdvancedDetailsSection";
-import { PermissionsSection, GEOBLOCKING_REGIONS }    from "@/components/upload/TrackInfoForm/PermissionsSection";
-import { LicensingSection }      from "@/components/upload/TrackInfoForm/LicensingSection";
-import { AudioClipSection }      from "@/components/upload/TrackInfoForm/AudioClipSection";
+import {
+  PermissionsSection,
+  GEOBLOCKING_REGIONS,
+} from "@/components/upload/TrackInfoForm/PermissionsSection";
+import { LicensingSection } from "@/components/upload/TrackInfoForm/LicensingSection";
+import { AudioClipSection } from "@/components/upload/TrackInfoForm/AudioClipSection";
 
 export interface EditTrackPanelProps {
   track: ArtistTrackRow;
@@ -68,33 +69,34 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     setExpandedSections((prev) => ({ ...prev, [section]: !prev[section] }));
 
   // Basic info
-  const [trackTitle, setTrackTitle]     = useState("");
-  const [permalink, setPermalink]       = useState("");
-  const [artistName, setArtistName]     = useState("");
-  const [genre, setGenre]               = useState("");
-  const [tags, setTags]                 = useState("");
-  const [description, setDescription]   = useState("");
+  const [trackTitle, setTrackTitle] = useState("");
+  const [permalink, setPermalink] = useState("");
+  const [artistName, setArtistName] = useState("");
+  const [genre, setGenre] = useState("");
+  const [tags, setTags] = useState("");
+  const [description, setDescription] = useState("");
   const [scheduleRelease, setScheduleRelease] = useState(false);
-  const [isPublic, setIsPublic]         = useState(true);
-  const [visibilityOption, setVisibilityOption] =
-    useState<"public" | "private" | "followerExclusive">("public");
+  const [isPublic, setIsPublic] = useState(true);
+  const [visibilityOption, setVisibilityOption] = useState<
+    "public" | "private" | "followerExclusive"
+  >("public");
 
   // Advanced details
-  const [buyLink, setBuyLink]           = useState("");
-  const [recordLabel, setRecordLabel]   = useState("");
-  const [releaseDate, setReleaseDate]   = useState("");
-  const [publisher, setPublisher]       = useState("");
-  const [isrc, setIsrc]                 = useState("");
+  const [buyLink, setBuyLink] = useState("");
+  const [recordLabel, setRecordLabel] = useState("");
+  const [releaseDate, setReleaseDate] = useState("");
+  const [publisher, setPublisher] = useState("");
+  const [isrc, setIsrc] = useState("");
   const [explicitContent, setExplicitContent] = useState(false);
-  const [pline, setPline]               = useState("");
+  const [pline, setPline] = useState("");
 
   // Permissions
-  const [enableDownloads, setEnableDownloads]     = useState(false);
-  const [offlineListening, setOfflineListening]   = useState(false);
-  const [includeRssFeed, setIncludeRssFeed]       = useState(false);
-  const [displayEmbedCode, setDisplayEmbedCode]   = useState(false);
+  const [enableDownloads, setEnableDownloads] = useState(false);
+  const [offlineListening, setOfflineListening] = useState(false);
+  const [includeRssFeed, setIncludeRssFeed] = useState(false);
+  const [displayEmbedCode, setDisplayEmbedCode] = useState(false);
   const [enableAppPlayback, setEnableAppPlayback] = useState(false);
-  const [allowComments, setAllowComments]         = useState(true);
+  const [allowComments, setAllowComments] = useState(true);
   const [showTrackComments, setShowTrackComments] = useState(true);
   const [showTrackInsights, setShowTrackInsights] = useState(true);
   const [geoblockingOption, setGeoblockingOption] = useState("worldwide");
@@ -103,67 +105,71 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   const [regionSearch, setRegionSearch] = useState("");
 
   // Licensing
-  const [licenseType, setLicenseType] =
-    useState<"all-rights" | "creative-commons">("all-rights");
+  const [licenseType, setLicenseType] = useState<"all-rights" | "creative-commons">("all-rights");
 
   // Artwork
-  const artworkInputRef    = useRef<HTMLInputElement | null>(null);
-  const artworkFrameRef    = useRef<HTMLDivElement | null>(null);
+  const artworkInputRef = useRef<HTMLInputElement | null>(null);
+  const artworkFrameRef = useRef<HTMLDivElement | null>(null);
   const artworkPanStartRef = useRef<{
-    clientX: number; clientY: number; startX: number; startY: number;
+    clientX: number;
+    clientY: number;
+    startX: number;
+    startY: number;
   } | null>(null);
-  const artworkCdnUrlRef   = useRef<string | null>(null);
-  const [artworkUrl, setArtworkUrl]             = useState<string | null>(null);
-  const [artworkFile, setArtworkFile]           = useState<File | null>(null);
-  const [artworkZoom, setArtworkZoom]           = useState(1);
-  const [artworkPosition, setArtworkPosition]   = useState({ x: 0, y: 0 });
-  const [isPanningArtwork, setIsPanningArtwork]       = useState(false);
+  const artworkCdnUrlRef = useRef<string | null>(null);
+  const [artworkUrl, setArtworkUrl] = useState<string | null>(null);
+  const [artworkFile, setArtworkFile] = useState<File | null>(null);
+  const [artworkZoom, setArtworkZoom] = useState(1);
+  const [artworkPosition, setArtworkPosition] = useState({ x: 0, y: 0 });
+  const [isPanningArtwork, setIsPanningArtwork] = useState(false);
   const [isArtworkDragActive, setIsArtworkDragActive] = useState(false);
 
   // Genre / privacy menus
-  const genreMenuRef   = useRef<HTMLDivElement | null>(null);
+  const genreMenuRef = useRef<HTMLDivElement | null>(null);
   const privacyMenuRef = useRef<HTMLDivElement | null>(null);
   const regionMenuRef = useRef<HTMLDivElement | null>(null);
-  const [genreMenuOpen, setGenreMenuOpen]     = useState(false);
-  const [genreSearch, setGenreSearch]         = useState("");
+  const [genreMenuOpen, setGenreMenuOpen] = useState(false);
+  const [genreSearch, setGenreSearch] = useState("");
   const [privacyMenuOpen, setPrivacyMenuOpen] = useState(false);
 
   // Release calendar
   const releaseCalendarRef = useRef<HTMLDivElement | null>(null);
-  const [releaseCalendarOpen, setReleaseCalendarOpen]   = useState(false);
+  const [releaseCalendarOpen, setReleaseCalendarOpen] = useState(false);
   const [releaseCalendarMonth, setReleaseCalendarMonth] = useState(() => new Date());
 
   // Audio clip refs
-  const clipAudioRef             = useRef<HTMLAudioElement | null>(null);
-  const clipTrackRef             = useRef<HTMLDivElement | null>(null);
-  const clipSelectionRef         = useRef<HTMLDivElement | null>(null);
-  const clipLeftShadeRef         = useRef<HTMLDivElement | null>(null);
-  const clipLeftShadeWaveRef     = useRef<HTMLDivElement | null>(null);
-  const clipRightShadeRef        = useRef<HTMLDivElement | null>(null);
-  const clipActivePointerIdRef   = useRef<number | null>(null);
-  const clipDragOffsetRef        = useRef(0);
-  const clipTrackMetricsRef      = useRef<{ left: number; width: number } | null>(null);
+  const clipAudioRef = useRef<HTMLAudioElement | null>(null);
+  const clipTrackRef = useRef<HTMLDivElement | null>(null);
+  const clipSelectionRef = useRef<HTMLDivElement | null>(null);
+  const clipLeftShadeRef = useRef<HTMLDivElement | null>(null);
+  const clipLeftShadeWaveRef = useRef<HTMLDivElement | null>(null);
+  const clipRightShadeRef = useRef<HTMLDivElement | null>(null);
+  const clipActivePointerIdRef = useRef<number | null>(null);
+  const clipDragOffsetRef = useRef(0);
+  const clipTrackMetricsRef = useRef<{ left: number; width: number } | null>(null);
   const clipWasPlayingOnDragStartRef = useRef(false);
-  const clipDragRafRef           = useRef<number | null>(null);
-  const clipPendingRangeRef      = useRef<{ start: number; end: number } | null>(null);
-  const clipVisualRangeRef       = useRef<{ start: number; end: number } | null>(null);
-  const clipSeededFromApiRef      = useRef(false);
+  const clipDragRafRef = useRef<number | null>(null);
+  const clipPendingRangeRef = useRef<{ start: number; end: number } | null>(null);
+  const clipVisualRangeRef = useRef<{ start: number; end: number } | null>(null);
+  const clipSeededFromApiRef = useRef(false);
 
   // Audio clip state
-  const [audioUrl, setAudioUrl]                         = useState<string | null>(null);
+  const [audioUrl, setAudioUrl] = useState<string | null>(null);
   const [audioDurationSeconds, setAudioDurationSeconds] = useState(0);
-  const [audioClipStartInput, setAudioClipStartInput]   = useState("0");
-  const [audioClipEndInput, setAudioClipEndInput]       = useState(String(AUDIO_PREVIEW_SECONDS));
-  const [audioClipStartDraft, setAudioClipStartDraft]   = useState("0:00");
-  const [audioClipEndDraft, setAudioClipEndDraft]       = useState("0:20");
-  const [isClipPlaying, setIsClipPlaying]               = useState(false);
-  const [clipPlaybackSeconds, setClipPlaybackSeconds]   = useState(0);
-  const [isDraggingClip, setIsDraggingClip]             = useState(false);
-  const [clipDragDisplayRange, setClipDragDisplayRange] =
-    useState<{ start: number; end: number } | null>(null);
+  const [audioClipStartInput, setAudioClipStartInput] = useState("0");
+  const [audioClipEndInput, setAudioClipEndInput] = useState(String(AUDIO_PREVIEW_SECONDS));
+  const [audioClipStartDraft, setAudioClipStartDraft] = useState("0:00");
+  const [audioClipEndDraft, setAudioClipEndDraft] = useState("0:20");
+  const [isClipPlaying, setIsClipPlaying] = useState(false);
+  const [clipPlaybackSeconds, setClipPlaybackSeconds] = useState(0);
+  const [isDraggingClip, setIsDraggingClip] = useState(false);
+  const [clipDragDisplayRange, setClipDragDisplayRange] = useState<{
+    start: number;
+    end: number;
+  } | null>(null);
 
   // UI feedback
-  const [submitError, setSubmitError]               = useState<string | null>(null);
+  const [submitError, setSubmitError] = useState<string | null>(null);
   const [showProFeatureModal, setShowProFeatureModal] = useState(false);
 
   // isArtistPro
@@ -187,20 +193,28 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
       .filter(Boolean)
       .pop() ?? "";
 
-  const normalizedGenreSearch    = genreSearch.trim().toLowerCase();
-  const filteredMusicGenres      = MUSIC_GENRES.filter((g) => g.toLowerCase().includes(normalizedGenreSearch));
-  const filteredAudioGenres      = AUDIO_GENRES.filter((g) => g.toLowerCase().includes(normalizedGenreSearch));
+  const normalizedGenreSearch = genreSearch.trim().toLowerCase();
+  const filteredMusicGenres = MUSIC_GENRES.filter((g) =>
+    g.toLowerCase().includes(normalizedGenreSearch)
+  );
+  const filteredAudioGenres = AUDIO_GENRES.filter((g) =>
+    g.toLowerCase().includes(normalizedGenreSearch)
+  );
   const shouldShowAddCustomGenre =
     normalizedGenreSearch.length > 0 &&
     filteredMusicGenres.length === 0 &&
     filteredAudioGenres.length === 0;
 
   const selectedReleaseDate = parseIsoDate(releaseDate);
-  const calendarMonthStart  = new Date(releaseCalendarMonth.getFullYear(), releaseCalendarMonth.getMonth(), 1);
-  const calendarGridStart   = new Date(
+  const calendarMonthStart = new Date(
+    releaseCalendarMonth.getFullYear(),
+    releaseCalendarMonth.getMonth(),
+    1
+  );
+  const calendarGridStart = new Date(
     calendarMonthStart.getFullYear(),
     calendarMonthStart.getMonth(),
-    1 - calendarMonthStart.getDay(),
+    1 - calendarMonthStart.getDay()
   );
   const calendarDays = Array.from({ length: 42 }, (_, i) => {
     const d = new Date(calendarGridStart);
@@ -209,34 +223,45 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   });
 
   // Audio clip geometry
-  const canSetAudioPreview  = audioDurationSeconds > AUDIO_PREVIEW_SECONDS;
-  const timelineMax         = audioDurationSeconds > 0 ? audioDurationSeconds : AUDIO_PREVIEW_SECONDS;
-  const selectionDuration   = canSetAudioPreview
+  const canSetAudioPreview = audioDurationSeconds > AUDIO_PREVIEW_SECONDS;
+  const timelineMax = audioDurationSeconds > 0 ? audioDurationSeconds : AUDIO_PREVIEW_SECONDS;
+  const selectionDuration = canSetAudioPreview
     ? AUDIO_PREVIEW_SECONDS
     : Math.max(1, Math.min(AUDIO_PREVIEW_SECONDS, timelineMax));
-  const rawClipStart        = Number.isFinite(Number(audioClipStartInput))
+  const rawClipStart = Number.isFinite(Number(audioClipStartInput))
     ? Math.max(0, Number(audioClipStartInput))
     : 0;
-  const safeClipStart  = canSetAudioPreview
+  const safeClipStart = canSetAudioPreview
     ? clamp(rawClipStart, 0, Math.max(0, timelineMax - selectionDuration))
     : 0;
-  const safeClipEnd    = canSetAudioPreview ? safeClipStart + selectionDuration : selectionDuration;
-  const clipDuration   = Math.max(1, safeClipEnd - safeClipStart);
-  const clipLeftPercent     = Math.min(100, (safeClipStart / timelineMax) * 100);
-  const clipWidthPercent    = Math.max(5, Math.min(100 - clipLeftPercent, (clipDuration / timelineMax) * 100));
-  const rightShadePercent   = Math.max(0, 100 - (clipLeftPercent + clipWidthPercent));
-  const clipPlaybackOverlayPercent = clamp(
-    ((clipPlaybackSeconds - safeClipStart) / clipDuration) * 100, 0, 100,
+  const safeClipEnd = canSetAudioPreview ? safeClipStart + selectionDuration : selectionDuration;
+  const clipDuration = Math.max(1, safeClipEnd - safeClipStart);
+  const clipLeftPercent = Math.min(100, (safeClipStart / timelineMax) * 100);
+  const clipWidthPercent = Math.max(
+    5,
+    Math.min(100 - clipLeftPercent, (clipDuration / timelineMax) * 100)
   );
-  const liveClipStart           = isDraggingClip ? (clipDragDisplayRange?.start ?? safeClipStart) : safeClipStart;
+  const rightShadePercent = Math.max(0, 100 - (clipLeftPercent + clipWidthPercent));
+  const clipPlaybackOverlayPercent = clamp(
+    ((clipPlaybackSeconds - safeClipStart) / clipDuration) * 100,
+    0,
+    100
+  );
+  const liveClipStart = isDraggingClip
+    ? (clipDragDisplayRange?.start ?? safeClipStart)
+    : safeClipStart;
   const isClipWindowAtZeroStart = liveClipStart < 0.5;
-  const showClipResetButton     = liveClipStart > 0.001;
+  const showClipResetButton = liveClipStart > 0.001;
 
   const waveformDisplaySamples = useMemo(
-    () => Array.from({ length: 220 }, (_, idx) => 48 + Math.sin(idx / 7) * 12 + Math.cos(idx / 15) * 7),
-    [],
+    () =>
+      Array.from({ length: 220 }, (_, idx) => 48 + Math.sin(idx / 7) * 12 + Math.cos(idx / 15) * 7),
+    []
   );
-  const waveformMax = useMemo(() => Math.max(...waveformDisplaySamples, 1), [waveformDisplaySamples]);
+  const waveformMax = useMemo(
+    () => Math.max(...waveformDisplaySamples, 1),
+    [waveformDisplaySamples]
+  );
 
   const baseWaveformBars = useMemo(
     () =>
@@ -246,11 +271,14 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
           <span
             key={`wave-${idx}`}
             className="block flex-1 rounded-[1px]"
-            style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-base)" }}
+            style={{
+              height: `${Math.round(14 + normalized * 72)}px`,
+              backgroundColor: "var(--waveform-base)",
+            }}
           />
         );
       }),
-    [waveformDisplaySamples, waveformMax],
+    [waveformDisplaySamples, waveformMax]
   );
   const leftMaskedWaveformBars = useMemo(
     () =>
@@ -260,16 +288,21 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
           <span
             key={`wave-left-mask-${idx}`}
             className="block flex-1 rounded-[1px]"
-            style={{ height: `${Math.round(14 + normalized * 72)}px`, backgroundColor: "var(--waveform-left-wave)" }}
+            style={{
+              height: `${Math.round(14 + normalized * 72)}px`,
+              backgroundColor: "var(--waveform-left-wave)",
+            }}
           />
         );
       }),
-    [waveformDisplaySamples, waveformMax],
+    [waveformDisplaySamples, waveformMax]
   );
 
   // Fetch track on mount
 
-  useEffect(() => { void getTrackDetailed(track.id); }, [track.id, getTrackDetailed]);
+  useEffect(() => {
+    void getTrackDetailed(track.id);
+  }, [track.id, getTrackDetailed]);
 
   useEffect(() => {
     if (!fullTrack) return;
@@ -306,7 +339,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     // License
     if (fullTrack.license) {
       setLicenseType(
-        fullTrack.license.type === "creativeCommons" ? "creative-commons" : "all-rights",
+        fullTrack.license.type === "creativeCommons" ? "creative-commons" : "all-rights"
       );
     }
 
@@ -342,7 +375,9 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
 
   // Sync effects
 
-  useEffect(() => { setIsPublic(visibilityOption === "public"); }, [visibilityOption]);
+  useEffect(() => {
+    setIsPublic(visibilityOption === "public");
+  }, [visibilityOption]);
 
   useEffect(() => {
     setVisibilityOption((prev) => {
@@ -380,7 +415,10 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
       return;
     }
     const ca = clipAudioRef.current;
-    if (ca) { ca.pause(); ca.currentTime = 0; }
+    if (ca) {
+      ca.pause();
+      ca.currentTime = 0;
+    }
     setClipPlaybackSeconds(0);
     setIsClipPlaying(false);
     if (!clipSeededFromApiRef.current) {
@@ -396,9 +434,9 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
 
     const onPointerMove = (event: PointerEvent) => {
       event.preventDefault();
-      const rangeStart   = xToSeconds(event.clientX) - clipDragOffsetRef.current;
+      const rangeStart = xToSeconds(event.clientX) - clipDragOffsetRef.current;
       const boundedStart = clamp(rangeStart, 0, Math.max(0, timelineMax - clipDuration));
-      const boundedEnd   = boundedStart + clipDuration;
+      const boundedEnd = boundedStart + clipDuration;
       clipPendingRangeRef.current = { start: boundedStart, end: boundedEnd };
       if (clipDragRafRef.current !== null) return;
       clipDragRafRef.current = window.requestAnimationFrame(() => {
@@ -411,8 +449,9 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
           if (
             prev &&
             Math.floor(prev.start) === Math.floor(pending.start) &&
-            Math.floor(prev.end)   === Math.floor(pending.end)
-          ) return prev;
+            Math.floor(prev.end) === Math.floor(pending.end)
+          )
+            return prev;
           return { start: pending.start, end: pending.end };
         });
       });
@@ -428,7 +467,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
           clipSelectionRef.current.releasePointerCapture(clipActivePointerIdRef.current);
       }
       clipActivePointerIdRef.current = null;
-      clipTrackMetricsRef.current    = null;
+      clipTrackMetricsRef.current = null;
       const pending = clipPendingRangeRef.current;
       if (pending) {
         setDraggedClipRange(pending.start, pending.end);
@@ -438,29 +477,29 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
         setAudioClipStartDraft(formatTimeLabel(safeClipStart));
         setAudioClipEndDraft(formatTimeLabel(safeClipEnd));
       }
-      clipPendingRangeRef.current          = null;
-      clipVisualRangeRef.current           = null;
+      clipPendingRangeRef.current = null;
+      clipVisualRangeRef.current = null;
       clipWasPlayingOnDragStartRef.current = false;
       setClipDragDisplayRange(null);
       setIsDraggingClip(false);
     };
 
-    window.addEventListener("pointermove",   onPointerMove);
-    window.addEventListener("pointerup",     onPointerUp);
+    window.addEventListener("pointermove", onPointerMove);
+    window.addEventListener("pointerup", onPointerUp);
     window.addEventListener("pointercancel", onPointerUp);
     return () => {
       if (clipDragRafRef.current !== null) {
         window.cancelAnimationFrame(clipDragRafRef.current);
         clipDragRafRef.current = null;
       }
-      clipActivePointerIdRef.current       = null;
-      clipTrackMetricsRef.current          = null;
-      clipPendingRangeRef.current          = null;
-      clipVisualRangeRef.current           = null;
+      clipActivePointerIdRef.current = null;
+      clipTrackMetricsRef.current = null;
+      clipPendingRangeRef.current = null;
+      clipVisualRangeRef.current = null;
       clipWasPlayingOnDragStartRef.current = false;
       setClipDragDisplayRange(null);
-      window.removeEventListener("pointermove",   onPointerMove);
-      window.removeEventListener("pointerup",     onPointerUp);
+      window.removeEventListener("pointermove", onPointerMove);
+      window.removeEventListener("pointerup", onPointerUp);
       window.removeEventListener("pointercancel", onPointerUp);
     };
   }, [isDraggingClip, timelineMax, clipDuration, canSetAudioPreview, safeClipStart, safeClipEnd]);
@@ -481,11 +520,11 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     syncVisuals();
     const observer = new ResizeObserver(syncVisuals);
     observer.observe(clipTrackRef.current);
-    window.addEventListener("resize",            syncVisuals);
+    window.addEventListener("resize", syncVisuals);
     window.addEventListener("orientationchange", syncVisuals);
     return () => {
       observer.disconnect();
-      window.removeEventListener("resize",            syncVisuals);
+      window.removeEventListener("resize", syncVisuals);
       window.removeEventListener("orientationchange", syncVisuals);
     };
   }, [isDraggingClip, safeClipStart, safeClipEnd, timelineMax]);
@@ -498,7 +537,10 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     artworkCdnUrlRef.current = null;
     setArtworkFile(file);
     const url = URL.createObjectURL(file);
-    setArtworkUrl((prev) => { if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev); return url; });
+    setArtworkUrl((prev) => {
+      if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
+      return url;
+    });
     setArtworkZoom(1);
     setArtworkPosition({ x: 0, y: 0 });
   };
@@ -521,7 +563,10 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   const handleDeleteArtwork = () => {
     artworkCdnUrlRef.current = null;
     setArtworkFile(null);
-    setArtworkUrl((prev) => { if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev); return null; });
+    setArtworkUrl((prev) => {
+      if (prev?.startsWith("blob:")) URL.revokeObjectURL(prev);
+      return null;
+    });
     setArtworkZoom(1);
     setArtworkPosition({ x: 0, y: 0 });
     setIsPanningArtwork(false);
@@ -536,8 +581,10 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     e.preventDefault();
     e.currentTarget.setPointerCapture(e.pointerId);
     artworkPanStartRef.current = {
-      clientX: e.clientX, clientY: e.clientY,
-      startX: artworkPosition.x, startY: artworkPosition.y,
+      clientX: e.clientX,
+      clientY: e.clientY,
+      startX: artworkPosition.x,
+      startY: artworkPosition.y,
     };
     setIsPanningArtwork(true);
   };
@@ -549,7 +596,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     if (!frame) return;
     const dx = e.clientX - artworkPanStartRef.current.clientX;
     const dy = e.clientY - artworkPanStartRef.current.clientY;
-    const overflowX = Math.max(1, frame.clientWidth  * (artworkZoom - 1));
+    const overflowX = Math.max(1, frame.clientWidth * (artworkZoom - 1));
     const overflowY = Math.max(1, frame.clientHeight * (artworkZoom - 1));
     setArtworkPosition({
       x: clampArtworkPos(artworkPanStartRef.current.startX + dx / overflowX),
@@ -559,7 +606,8 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
 
   const handleArtworkPointerUp = (e?: React.PointerEvent<HTMLDivElement>) => {
     if (!isPanningArtwork) return;
-    if (e?.currentTarget.hasPointerCapture(e.pointerId)) e.currentTarget.releasePointerCapture(e.pointerId);
+    if (e?.currentTarget.hasPointerCapture(e.pointerId))
+      e.currentTarget.releasePointerCapture(e.pointerId);
     setIsPanningArtwork(false);
     artworkPanStartRef.current = null;
   };
@@ -598,28 +646,30 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
 
   const updateClipTrackMetrics = () => {
     const rect = clipTrackRef.current?.getBoundingClientRect();
-    if (!rect || rect.width <= 0) { clipTrackMetricsRef.current = null; return null; }
+    if (!rect || rect.width <= 0) {
+      clipTrackMetricsRef.current = null;
+      return null;
+    }
     const metrics = { left: rect.left, width: rect.width };
     clipTrackMetricsRef.current = metrics;
     return metrics;
   };
 
   const applyClipVisualRange = (start: number, end: number) => {
-    const duration     = Math.max(0.001, end - start);
-    const metrics      = clipTrackMetricsRef.current;
-    const leftPercent  = Math.min(100, (start / timelineMax) * 100);
+    const duration = Math.max(0.001, end - start);
+    const metrics = clipTrackMetricsRef.current;
+    const leftPercent = Math.min(100, (start / timelineMax) * 100);
     const widthPercent = Math.max(5, Math.min(100 - leftPercent, (duration / timelineMax) * 100));
 
     if (clipSelectionRef.current) {
       if (metrics && metrics.width > 0) {
-        clipSelectionRef.current.style.left      = "0px";
-        clipSelectionRef.current.style.width     = `${(widthPercent / 100) * metrics.width}px`;
-        clipSelectionRef.current.style.transform =
-          `translate3d(${(leftPercent / 100) * metrics.width}px, 0, 0)`;
+        clipSelectionRef.current.style.left = "0px";
+        clipSelectionRef.current.style.width = `${(widthPercent / 100) * metrics.width}px`;
+        clipSelectionRef.current.style.transform = `translate3d(${(leftPercent / 100) * metrics.width}px, 0, 0)`;
       } else {
         clipSelectionRef.current.style.transform = "translate3d(0px, 0, 0)";
-        clipSelectionRef.current.style.left      = `${leftPercent}%`;
-        clipSelectionRef.current.style.width     = `${widthPercent}%`;
+        clipSelectionRef.current.style.left = `${leftPercent}%`;
+        clipSelectionRef.current.style.width = `${widthPercent}%`;
       }
     }
     if (clipLeftShadeRef.current)
@@ -635,7 +685,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   const setDraggedClipRange = (
     nextStart: number,
     nextEnd: number,
-    opts?: { syncDraft?: boolean },
+    opts?: { syncDraft?: boolean }
   ) => {
     const s = Number(nextStart.toFixed(3));
     const e = Number(nextEnd.toFixed(3));
@@ -652,8 +702,12 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     if (!ca || !audioUrl || !canSetAudioPreview) return;
     ca.currentTime = startSeconds;
     setClipPlaybackSeconds(startSeconds);
-    try { await ca.play(); setIsClipPlaying(true); }
-    catch { setIsClipPlaying(false); }
+    try {
+      await ca.play();
+      setIsClipPlaying(true);
+    } catch {
+      setIsClipPlaying(false);
+    }
   };
 
   const handleClipReset = () => {
@@ -670,21 +724,22 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   const applyTypedClipTime = async (target: "start" | "end") => {
     if (!canSetAudioPreview) return;
     const parsed = parseTimeInputToSeconds(
-      target === "start" ? audioClipStartDraft : audioClipEndDraft,
+      target === "start" ? audioClipStartDraft : audioClipEndDraft
     );
     if (parsed === null) {
       setAudioClipStartDraft(formatTimeLabel(safeClipStart));
       setAudioClipEndDraft(formatTimeLabel(safeClipEnd));
       return;
     }
-    const maxStart  = Math.max(0, timelineMax - AUDIO_PREVIEW_SECONDS);
-    const nextStart = target === "start"
-      ? clamp(parsed, 0, maxStart)
-      : clamp(parsed - AUDIO_PREVIEW_SECONDS, 0, maxStart);
+    const maxStart = Math.max(0, timelineMax - AUDIO_PREVIEW_SECONDS);
+    const nextStart =
+      target === "start"
+        ? clamp(parsed, 0, maxStart)
+        : clamp(parsed - AUDIO_PREVIEW_SECONDS, 0, maxStart);
     const nextEnd = nextStart + AUDIO_PREVIEW_SECONDS;
     if (
       Math.round(nextStart) === Math.round(safeClipStart) &&
-      Math.round(nextEnd)   === Math.round(safeClipEnd)
+      Math.round(nextEnd) === Math.round(safeClipEnd)
     ) {
       setAudioClipStartDraft(formatTimeLabel(safeClipStart));
       setAudioClipEndDraft(formatTimeLabel(safeClipEnd));
@@ -700,7 +755,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     event.preventDefault();
     event.stopPropagation();
     event.currentTarget.setPointerCapture(event.pointerId);
-    clipActivePointerIdRef.current       = event.pointerId;
+    clipActivePointerIdRef.current = event.pointerId;
     clipWasPlayingOnDragStartRef.current = isClipPlaying;
     const rect = clipTrackRef.current?.getBoundingClientRect();
     clipTrackMetricsRef.current =
@@ -721,7 +776,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     }
     const resumeTime = ca.currentTime;
     await playClipFrom(
-      resumeTime > safeClipStart && resumeTime < safeClipEnd ? resumeTime : safeClipStart,
+      resumeTime > safeClipStart && resumeTime < safeClipEnd ? resumeTime : safeClipStart
     );
   };
 
@@ -742,13 +797,16 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     if (!ca || !Number.isFinite(ca.duration) || ca.duration <= 0) return;
     const duration = ca.duration;
     setAudioDurationSeconds(duration);
-    if (duration <= AUDIO_PREVIEW_SECONDS) { setDraggedClipRange(0, duration); return; }
+    if (duration <= AUDIO_PREVIEW_SECONDS) {
+      setDraggedClipRange(0, duration);
+      return;
+    }
     const boundedStart = clamp(safeClipStart, 0, Math.max(0, duration - AUDIO_PREVIEW_SECONDS));
-    const boundedEnd   = boundedStart + AUDIO_PREVIEW_SECONDS;
+    const boundedEnd = boundedStart + AUDIO_PREVIEW_SECONDS;
     if (
       boundedStart !== safeClipStart ||
-      boundedEnd   !== safeClipEnd   ||
-      clipDuration  !== AUDIO_PREVIEW_SECONDS
+      boundedEnd !== safeClipEnd ||
+      clipDuration !== AUDIO_PREVIEW_SECONDS
     ) {
       setDraggedClipRange(boundedStart, boundedEnd);
     }
@@ -762,7 +820,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     }
 
     const continentNames = new Set(
-      GEOBLOCKING_REGIONS.map((group: { continent: string }) => group.continent),
+      GEOBLOCKING_REGIONS.map((group: { continent: string }) => group.continent)
     );
     const regions = geoblockingRegions.filter((value) => continentNames.has(value));
     const countries = geoblockingRegions.filter((value) => !continentNames.has(value));
@@ -780,11 +838,22 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     const mainArtists = toList(artistName);
     const permalinkSlug = normalizePermalinkSlug(toOptionalTrimmed(permalink) ?? slug);
     const permaLinkRegex = /^[a-z0-9_-]+$/;
-    if (!parsedTitle)           { setSubmitError("Track title is required.");         return; }
-    if (mainArtists.length < 1) { setSubmitError("At least one artist is required."); return; }
-    if (!permalinkSlug)         { setSubmitError("Permalink is required.");            return; }
+    if (!parsedTitle) {
+      setSubmitError("Track title is required.");
+      return;
+    }
+    if (mainArtists.length < 1) {
+      setSubmitError("At least one artist is required.");
+      return;
+    }
+    if (!permalinkSlug) {
+      setSubmitError("Permalink is required.");
+      return;
+    }
     if (!permaLinkRegex.test(permalinkSlug)) {
-      setSubmitError("Permalink must contain only lowercase letters, numbers, hyphens (-), or underscores (_).");
+      setSubmitError(
+        "Permalink must contain only lowercase letters, numbers, hyphens (-), or underscores (_)."
+      );
       return;
     }
     setSubmitError(null);
@@ -792,7 +861,11 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
     let zoomCroppedArtwork: File | undefined;
     try {
       if (artworkFile) {
-        zoomCroppedArtwork = await createZoomCroppedArtworkFile(artworkFile, artworkZoom, artworkPosition);
+        zoomCroppedArtwork = await createZoomCroppedArtworkFile(
+          artworkFile,
+          artworkZoom,
+          artworkPosition
+        );
       } else if (
         artworkUrl &&
         artworkCdnUrlRef.current &&
@@ -803,7 +876,11 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
         const ext = artworkCdnUrlRef.current.split("?")[0].split(".").pop() ?? "jpg";
         const mimeType = blob.type.startsWith("image/") ? blob.type : "image/jpeg";
         const cdnFile = new File([blob], `artwork.${ext}`, { type: mimeType });
-        zoomCroppedArtwork = await createZoomCroppedArtworkFile(cdnFile, artworkZoom, artworkPosition);
+        zoomCroppedArtwork = await createZoomCroppedArtworkFile(
+          cdnFile,
+          artworkZoom,
+          artworkPosition
+        );
       }
     } catch {
       setSubmitError("Failed to process artwork.");
@@ -823,7 +900,7 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
         tags: toList(tags).length > 0 ? toList(tags) : undefined,
         description: toOptionalTrimmed(description),
         isPrivate: !isPublic,
-        caption:"",
+        caption: "",
       },
       permissions: {
         enableDirectDownload: isArtistPro ? enableDownloads : false,
@@ -839,15 +916,15 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
         type: licenseType === "creative-commons" ? "creativeCommons" : "allRightsReserved",
       },
       advanced: {
-        buyLink:        toOptionalTrimmed(buyLink),
-        recordLabel:    toOptionalTrimmed(recordLabel),
-        releaseDate:    releaseDate ? new Date(releaseDate).toISOString() : undefined,
-        publisher:      toOptionalTrimmed(publisher),
-        ISRC:           toOptionalTrimmed(isrc),
+        buyLink: toOptionalTrimmed(buyLink),
+        recordLabel: toOptionalTrimmed(recordLabel),
+        releaseDate: releaseDate ? new Date(releaseDate).toISOString() : undefined,
+        publisher: toOptionalTrimmed(publisher),
+        ISRC: toOptionalTrimmed(isrc),
         explicitContent,
-        pLine:          toOptionalTrimmed(pline),
+        pLine: toOptionalTrimmed(pline),
         audioClipStart: canAttachAudioClip ? Number(audioClipStartInput) : undefined,
-        audioClipEnd:   canAttachAudioClip ? Number(audioClipEndInput)   : undefined,
+        audioClipEnd: canAttachAudioClip ? Number(audioClipEndInput) : undefined,
         composer: undefined,
         ISWC: undefined,
         albumTitle: undefined,
@@ -860,12 +937,12 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
       await updateTrack(payload);
       const coverPreview = zoomCroppedArtwork
         ? URL.createObjectURL(zoomCroppedArtwork)
-        : artworkUrl ?? track.cover;
+        : (artworkUrl ?? track.cover);
       onSave?.({
-        title:     parsedTitle,
-        label:     mainArtists.join(", "),
+        title: parsedTitle,
+        label: mainArtists.join(", "),
         isPrivate: !isPublic,
-        cover:     coverPreview,
+        cover: coverPreview,
       });
       onClose();
     } catch (err: any) {
@@ -873,9 +950,11 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
       if (Array.isArray(ve) && ve.length > 0) {
         setSubmitError(
           ve
-            .map((e: { field?: string; message?: string }) =>
-              `${e.field ? `${e.field}: ` : ""}${e.message || "Invalid value"}`)
-            .join(" | "),
+            .map(
+              (e: { field?: string; message?: string }) =>
+                `${e.field ? `${e.field}: ` : ""}${e.message || "Invalid value"}`
+            )
+            .join(" | ")
         );
       } else {
         setSubmitError(err?.response?.data?.message || "Failed to save changes.");
@@ -887,7 +966,9 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
 
   const tabClass = (t: typeof activeTab) =>
     `pb-3 text-[13px] font-semibold border-b-2 transition-colors cursor-pointer whitespace-nowrap ${
-      activeTab === t ? "border-white text-white-smoke" : "border-transparent text-[#666] hover:text-[#aaa]"
+      activeTab === t
+        ? "border-white text-white-smoke"
+        : "border-transparent text-[#666] hover:text-[#aaa]"
     }`;
 
   // Render
@@ -895,11 +976,10 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
   return (
     <>
       {/* Backdrop */}
-          <div className="fixed inset-0 z-1001 bg-chinese-black/40" onClick={onClose} />
+      <div className="fixed inset-0 z-1001 bg-chinese-black/40" onClick={onClose} />
 
-          {/* Drawer */}
-          <div className="fixed right-0 top-0 z-1010 flex h-full w-full max-w-150 flex-col bg-chinese-black shadow-2xl">
-
+      {/* Drawer */}
+      <div className="fixed right-0 top-0 z-1010 flex h-full w-full max-w-150 flex-col bg-chinese-black shadow-2xl">
         {/* Header */}
         <div className="flex items-center justify-between border-b border-[#2a2a2a] px-5 py-3.5">
           <div className="flex items-center gap-3">
@@ -923,10 +1003,18 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
 
         {/* Tabs */}
         <div className="flex gap-6 border-b border-[#2a2a2a] px-6 pt-1">
-          <button type="button" className={tabClass("details")}  onClick={() => setActiveTab("details")}>
+          <button
+            type="button"
+            className={tabClass("details")}
+            onClick={() => setActiveTab("details")}
+          >
             Track details
           </button>
-          <button type="button" className={tabClass("advanced")} onClick={() => setActiveTab("advanced")}>
+          <button
+            type="button"
+            className={tabClass("advanced")}
+            onClick={() => setActiveTab("advanced")}
+          >
             Advanced settings
           </button>
         </div>
@@ -1009,7 +1097,6 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
               {/* Advanced tab */}
               {activeTab === "advanced" && (
                 <div className="border-t border-[#222]">
-
                   <AdvancedDetailsSection
                     expanded={expandedSections.advancedDetails}
                     onToggle={() => toggleSection("advancedDetails")}
@@ -1147,7 +1234,6 @@ export function EditTrackPanel({ track, onClose, onSave }: EditTrackPanelProps) 
           </div>
         </div>
       </div>
-      
 
       {/* Hidden audio element */}
       {audioUrl && (

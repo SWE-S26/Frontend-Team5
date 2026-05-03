@@ -28,8 +28,6 @@ module.exports = {
       },
     ],
   },
-  transformIgnorePatterns: [
-    "/node_modules/(?!(@mswjs/|msw/|until-async/))",
-  ],
+  transformIgnorePatterns: ["/node_modules/(?!(@mswjs/|msw/|until-async/))"],
   setupFiles: ["<rootDir>/jest.msw.setup.js"],
-}
+};
