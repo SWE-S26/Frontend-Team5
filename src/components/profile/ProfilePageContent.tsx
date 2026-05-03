@@ -55,7 +55,6 @@ const profileTabs = [
   { href: "", label: "All",            value: "all"            },
   { href: "", label: "Popular tracks", value: "popular-tracks" },
   { href: "", label: "Tracks",         value: "tracks"         },
-  { href: "", label: "Albums",         value: "albums"         },
   { href: "", label: "Playlists",      value: "playlists"      },
   { href: "", label: "Reposts",        value: "reposts"        },
 ]
@@ -142,7 +141,7 @@ const ProfilePageContent = ({ params }: Props) => {
       void getRepostedTracks(userId)
       void getRepostedPlaylists(userId)
     }
-    if (activeTab === "playlists") {
+    if (activeTab === "all" || activeTab === "playlists") {
       if (isOwn) {
         void getMyPlaylists()
       } else {
@@ -374,7 +373,7 @@ const ProfilePageContent = ({ params }: Props) => {
       isLikedByUser: (playlist as any).isLikedByUser ?? playlist.isLiked ?? false,
       isRepostedByUser: (playlist as any).isRepostedByUser ?? (playlist as any).isReposted ?? false,
       releaseDate: playlist.createdAt,
-      permalink: (playlist as any).basicInfo?.permalink || (playlist as any).permalink,
+      permalink: (playlist as any).permaLink,
       isAvailableForUser: (playlist as any).isAvailableForUser !== false,
     }
   }
@@ -474,7 +473,7 @@ const ProfilePageContent = ({ params }: Props) => {
         const bt = b.releaseDate ? new Date(b.releaseDate).getTime() : 0
         return bt - at
       })
-    }, [postedTrackItems, likedTrackItems, repostedTrackItems, repostedPlaylistItems])
+      }, [postedTrackItems, likedTrackItems, repostedTrackItems, repostedPlaylistItems, userPlaylistItems])
 
   const emptyCollections: any[] = []
   const hasKnownNoTracks = !isLoading && profileTrackCount <= 0
@@ -689,10 +688,6 @@ const ProfilePageContent = ({ params }: Props) => {
                       onEditTrack={(item) => setEditingTrack(buildEditTrackRow(item))}
                       onAddToPlaylist={() => setOpenAddToPlaylist(true)}
                     />
-            )}
-
-            {activeTab === "albums" && (
-              emptyCollections.length === 0 ? <EmptyTab /> : <Albums items={emptyCollections} />
             )}
 
             {activeTab === "playlists" && (

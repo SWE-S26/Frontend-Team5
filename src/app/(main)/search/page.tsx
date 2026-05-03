@@ -103,7 +103,6 @@ const FILTER_TABS = [
   { label: 'Everything', value: 'everything' },
   { label: 'Tracks', value: 'tracks' },
   { label: 'People', value: 'users' },
-  { label: 'Albums', value: 'albums' },
   { label: 'Playlists', value: 'playlists' },
 ]
 
@@ -150,8 +149,8 @@ function ExpandableFilter({
     <div className="mb-1">
       <button
         onClick={() => setOpen((v) => !v)}
-        className={`w-full flex items-center justify-between py-2 px-2.5 rounded-md text-sm transition-colors hover:bg-white/5 ${
-          hasValue ? 'text-white font-medium' : 'text-silver'
+        className={`w-full flex items-center justify-between py-2 px-2.5 rounded-md text-sm transition-colors hover:bg-white-smoke/5 ${
+          hasValue ? 'text-white-smoke font-medium' : 'text-silver'
         }`}
       >
         <span>{selectedOption?.label ?? label}</span>
@@ -170,8 +169,8 @@ function ExpandableFilter({
               onClick={() => { onSelect(opt.value); setOpen(false) }}
               className={`block w-full text-left py-1.5 px-2.5 text-[13px] rounded-md transition-colors ${
                 selected === opt.value
-                  ? 'text-white font-medium bg-white/10'
-                  : 'text-silver hover:text-white-smoke hover:bg-white/5'
+                  ? 'text-white-smoke font-medium bg-white-smoke/10'
+                  : 'text-silver hover:text-white-smoke hover:bg-white-smoke/5'
               }`}
             >
               {opt.label}
@@ -237,8 +236,8 @@ function LocationFilter({
             onClick={() => onSelect(loc)}
             className={`text-left py-1.5 px-2.5 text-[13px] rounded-md transition-colors ${
               selectedLocation === loc
-                ? 'text-white font-medium bg-white/10'
-                : 'text-silver hover:text-white-smoke hover:bg-white/5'
+                ? 'text-white-smoke font-medium bg-white-smoke/10'
+                : 'text-silver hover:text-white-smoke hover:bg-white-smoke/5'
             }`}
           >
             {loc}
@@ -264,7 +263,7 @@ function MobileTabStrip({
           onClick={() => onTabClick(tab.value)}
           className={`shrink-0 px-4 py-2 rounded-full text-[14px] font-medium whitespace-nowrap transition-colors border ${
             type === tab.value
-              ? 'bg-white text-black border-white'
+              ? 'bg-white-smoke text-chinese-black border-white-smoke'
               : 'border-silver/30 text-silver hover:border-white-smoke/50 hover:text-white-smoke'
           }`}
         >
@@ -324,7 +323,7 @@ function MobileFilterDrawer({
         onClick={() => setOpen((v) => !v)}
         className={`flex items-center gap-2 px-3 py-1.5 rounded-full text-[13px] border transition-colors ${
           hasActiveFilters
-            ? 'border-white text-white'
+            ? 'border-white-smoke text-white-smoke'
             : 'border-silver/30 text-silver hover:border-white-smoke/50 hover:text-white-smoke'
         }`}
       >
@@ -333,7 +332,7 @@ function MobileFilterDrawer({
         </svg>
         Filters
         {hasActiveFilters && (
-          <span className="w-1.5 h-1.5 rounded-full bg-white inline-block" />
+          <span className="w-1.5 h-1.5 rounded-full bg-white-smoke inline-block" />
         )}
         <span
           className="text-[9px] text-silver/60 transition-transform duration-150"
@@ -344,7 +343,7 @@ function MobileFilterDrawer({
       </button>
 
       {open && (
-        <div className="mt-3 p-4 rounded-xl border border-white/10 bg-white/5 space-y-4">
+        <div className="mt-3 p-4 rounded-xl border border-white-smoke/10 bg-white-smoke/5 space-y-4">
           {type === 'tracks' && (
             <>
               <div>
@@ -358,7 +357,7 @@ function MobileFilterDrawer({
                       onClick={() => onDateRangeChange(opt.value)}
                       className={`px-3 py-1 rounded-full text-[13px] border transition-colors ${
                         dateRange === opt.value
-                          ? 'bg-white text-black border-white font-medium'
+                          ? 'bg-white-smoke text-chinese-black border-white-smoke font-medium'
                           : 'border-silver/30 text-silver hover:border-white-smoke/50 hover:text-white-smoke'
                       }`}
                     >
@@ -378,7 +377,7 @@ function MobileFilterDrawer({
                       onClick={() => onDurationChange(opt.value)}
                       className={`px-3 py-1 rounded-full text-[13px] border transition-colors ${
                         duration === opt.value
-                          ? 'bg-white text-black border-white font-medium'
+                          ? 'bg-white-smoke text-chinese-black border-white-smoke font-medium'
                           : 'border-silver/30 text-silver hover:border-white-smoke/50 hover:text-white-smoke'
                       }`}
                     >
@@ -398,7 +397,7 @@ function MobileFilterDrawer({
                       onClick={() => onUsageChange(opt.value)}
                       className={`px-3 py-1 rounded-full text-[13px] border transition-colors ${
                         usage === opt.value
-                          ? 'bg-white text-black border-white font-medium'
+                          ? 'bg-white-smoke text-chinese-black border-white-smoke font-medium'
                           : 'border-silver/30 text-silver hover:border-white-smoke/50 hover:text-white-smoke'
                       }`}
                     >
@@ -463,7 +462,7 @@ function SearchSidebar({
   onLocationSelect: (loc: string) => void
 }) {
   return (
-    <div className="hidden md:block w-44 lg:w-52 shrink-0 pr-2 border-r border-white/5">
+    <div className="hidden md:block w-44 lg:w-52 shrink-0 pr-2 border-r border-white-smoke/5">
       <nav className="mb-2">
         <p className="text-[11px] font-medium uppercase tracking-widest text-silver/50 mb-2 px-1">
           Browse
@@ -474,8 +473,8 @@ function SearchSidebar({
             onClick={() => onTabClick(tab.value)}
             className={`flex items-center w-full py-2 px-2.5 mb-0.5 text-[15px] rounded-md font-medium transition-colors ${
               type === tab.value
-                ? 'bg-white/10 text-white'
-                : 'text-silver hover:text-white-smoke hover:bg-white/5'
+                ? 'bg-white-smoke/10 text-white-smoke'
+                : 'text-silver hover:text-white-smoke hover:bg-white-smoke/5'
             }`}
           >
             {tab.label}
@@ -485,7 +484,7 @@ function SearchSidebar({
 
       {type === 'tracks' && (
         <>
-          <div className="h-px bg-white/5 my-3" />
+          <div className="h-px bg-white-smoke/5 my-3" />
           <p className="text-[11px] font-medium uppercase tracking-widest text-silver/50 mb-2 px-1">
             Filter results
           </p>
@@ -515,7 +514,7 @@ function SearchSidebar({
 
       {type === 'users' && availableLocations.length > 0 && (
         <>
-          <div className="h-px bg-white/5 my-3" />
+          <div className="h-px bg-white-smoke/5 my-3" />
           <LocationFilter
             locations={availableLocations}
             selectedLocation={selectedLocation}
@@ -526,7 +525,7 @@ function SearchSidebar({
 
       {(type === 'albums' || type === 'playlists') && availableTags.length > 0 && (
         <>
-          <div className="h-px bg-white/5 my-3" />
+          <div className="h-px bg-white-smoke/5 my-3" />
           <TagFilter tags={availableTags} selectedTag={selectedTag} onSelect={onTagSelect} />
         </>
       )}

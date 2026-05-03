@@ -141,6 +141,9 @@ export default function PlayerNextUp({
   const queue = useAppSelector((state) => state.player.tracks);
   const currentTrackId = useAppSelector((state) => state.player.currentTrackId);
 
+  const instanceIdsRef = useRef<WeakMap<Track, string>>(new WeakMap());
+  const idCounterRef = useRef(0);
+
   // Like — synced with current track
   const { isCurrentTrackLiked: isLiked, currentTrackLikeCount } = useAppSelector(
     (state) => state.player
@@ -324,16 +327,23 @@ export default function PlayerNextUp({
                 onReorder={handleQueueReorder}
                 className="space-y-1"
               >
-                {queue.map((track, index) => (
-                  <QueueItem
-                    key={track.id}
-                    track={track}
-                    index={index}
-                    isCurrent={track.id === currentTrackId}
-                    queue={queue}
-                    onPlay={handlePlayTrack}
-                  />
-                ))}
+                {queue.map((track, index) => {
+                  let uid = instanceIdsRef.current.get(track);
+                  if (!uid) {
+                    uid = `q-${++idCounterRef.current}`;
+                    instanceIdsRef.current.set(track, uid);
+                  }
+                  return (
+                    <QueueItem
+                      key={uid}
+                      track={track}
+                      index={index}
+                      isCurrent={track.id === currentTrackId}
+                      queue={queue}
+                      onPlay={handlePlayTrack}
+                    />
+                  );
+                })}
               </Reorder.Group>
             ) : (
               <div className="py-10 text-center text-sm text-silver">
