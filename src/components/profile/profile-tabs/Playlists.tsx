@@ -24,7 +24,13 @@ export default function Playlists({ items, profileLink }: Props) {
             preloadedTracks={
               (item.playlistTracks ?? []).map((t, i) => ({
                 _id: t._id ?? `${item.id}-${i}`,
-                basicInfo: t.basicInfo ?? { title: t.title ?? "Unknown Title", mainArtists: t.basicInfo?.mainArtists ?? [t.artist ?? "Unknown Artist"], permalink: "" },
+                poster: t.poster,
+                basicInfo: {
+                  ...(t.basicInfo ?? {}),
+                  title: t.basicInfo?.title ?? t.title ?? "Unknown Title",
+                  mainArtists: t.basicInfo?.mainArtists ?? [t.artist ?? "Unknown Artist"],
+                  permalink: t.basicInfo?.permalink ?? t.permalink ?? "",
+                },
                 audio: t.audio ?? { audioLink: "", waveformLink: "" },
                 image: t.image ?? { imgLink: t.img ?? undefined },
                 durationInSeconds: t.durationInSeconds ?? t.duration ?? 0,

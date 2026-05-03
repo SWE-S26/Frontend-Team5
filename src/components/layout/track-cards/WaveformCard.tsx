@@ -85,7 +85,7 @@ type CardProps = {
 
 const FLASH_DURATION = 3000;
 const HOVER_PREVIEW_DELAY = 600;
-const clipBoundsCache = new Map<string, { start: number; end: number }>();
+const clipBoundsCache = new Map<string, { start: number; end: number; duration: number; }>();
 
 export default function WaveformCard({
   img,
@@ -214,6 +214,7 @@ export default function WaveformCard({
   const fetchClipPromiseRef = useRef<Promise<{
     start: number;
     end: number;
+    duration: number;
   } | null> | null>(null);
 
   const profileImgLink = useAppSelector((state) => state.auth.profileImgLink);
@@ -257,6 +258,7 @@ export default function WaveformCard({
   const [fetchedClip, setFetchedClip] = useState<{
     start: number;
     end: number;
+    duration: number;
   } | null>(null);
 
   useEffect(() => {
@@ -291,32 +293,41 @@ export default function WaveformCard({
 
   const { submitComment } = useStatelessComments();
 
-  const parseClipBounds = (startRaw: unknown, endRaw: unknown) => {
+  const parseClipBounds = (
+    startRaw: unknown,
+    endRaw: unknown,
+    durationRaw: unknown,
+  ) => {
     const start = Number(startRaw);
     const end = Number(endRaw);
+    const clipDuration = Number(durationRaw);
     if (!Number.isFinite(start) || !Number.isFinite(end) || end <= start)
       return null;
-    return { start, end };
+    return {
+      start,
+      end,
+      duration: Number.isFinite(clipDuration) ? clipDuration : 0,
+    };
   };
 
-  const isDisabledClip = (startRaw: unknown, endRaw: unknown) => {
-    return Number(startRaw) === 0 && Number(endRaw) === 0;
+  const isDisabledClip = (startRaw: unknown, endRaw: unknown, durationRaw: unknown) => {
+    return Number(startRaw) === 0 && Number(endRaw) === 0 && Number(durationRaw) < 30;
   };
 
   const getClipBounds = (
-    serverClip?: { start: number; end: number } | null,
+    serverClip?: { start: number; end: number; duration: number; } | null,
   ) => {
     if (serverClip) {
-      if (isDisabledClip(serverClip.start, serverClip.end)) return null;
+      if (isDisabledClip(serverClip.start, serverClip.end, serverClip.duration)) return null;
       return serverClip;
     }
-    if (isDisabledClip(audioClipStart, audioClipEnd)) return null;
-    const propClip = parseClipBounds(audioClipStart, audioClipEnd);
+    if (isDisabledClip(audioClipStart, audioClipEnd, duration)) return null;
+    const propClip = parseClipBounds(audioClipStart, audioClipEnd, duration);
     if (propClip) return propClip;
     const start = 0;
     const end = duration ? Math.min(duration, 20) : 20;
     if (end <= start) return null;
-    return { start, end };
+    return { start, end, duration: duration ?? 0 };
   };
 
   const ensureTrackClip = async () => {
@@ -333,14 +344,19 @@ export default function WaveformCard({
       .then((res) => {
         const rawStart = res.data.data.audioClip?.start;
         const rawEnd = res.data.data.audioClip?.end;
-        if (isDisabledClip(rawStart, rawEnd)) {
-          const disabledClip = { start: 0, end: 0 };
+        const rawDuration = res.data.data.durationInSeconds;
+        if (isDisabledClip(rawStart, rawEnd, rawDuration)) {
+          const disabledClip = {
+            start: 0,
+            end: 0,
+            duration: Number(rawDuration) || 0,
+          };
           clipBoundsCache.set(trackId, disabledClip);
           setFetchedClip(disabledClip);
           return disabledClip;
         }
 
-        const clip = parseClipBounds(rawStart, rawEnd);
+        const clip = parseClipBounds(rawStart, rawEnd, rawDuration);
         if (clip) {
           clipBoundsCache.set(trackId, clip);
           setFetchedClip(clip);
